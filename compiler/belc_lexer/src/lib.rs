@@ -15,7 +15,7 @@ pub enum Token {
     Empty,
 
     /// Identifier token containing a variable or function name
-    Ident(String),
+    Ident { value: String },
 
     /// Literals
     Literal { kind: LiteralKind, value: String },
@@ -233,7 +233,9 @@ impl From<&str> for Token {
             "if" => Token::If,
             "else" => Token::Else,
             "return" => Token::Return,
-            _ => Token::Ident(value.to_string()),
+            _ => Token::Ident {
+                value: value.to_string(),
+            },
         }
     }
 }
@@ -249,7 +251,7 @@ impl std::fmt::Display for Token {
             Token::Empty => "<empty>",
             Token::EOF => "EOF",
 
-            Token::Ident(s) => s,
+            Token::Ident { value } => value,
             Token::Literal { value, .. } => value,
 
             Token::Add => "+",

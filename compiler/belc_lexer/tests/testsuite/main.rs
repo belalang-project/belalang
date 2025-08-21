@@ -131,11 +131,11 @@ fn tokens_identifiers() {
     test_tokens(
         "x; x + y",
         vec![
-            Token::Ident("x".into()),
+            Token::Ident { value: "x".into() },
             Token::Semicolon,
-            Token::Ident("x".into()),
+            Token::Ident { value: "x".into() },
             Token::Add,
-            Token::Ident("y".into()),
+            Token::Ident { value: "y".into() },
         ],
     );
 }

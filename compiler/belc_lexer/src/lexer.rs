@@ -479,7 +479,7 @@ mod tests {
         let mut lexer = Lexer::new(&source);
         let result = lexer.read_identifier();
 
-        assert_eq!(result.unwrap(), Token::Ident("Hello".into()));
+        assert_eq!(result.unwrap(), Token::Ident { value: "Hello".into() });
         assert_eq!(lexer.current_row, 1);
         assert_eq!(lexer.current_col, 6);
     }
@@ -490,7 +490,12 @@ mod tests {
         let mut lexer = Lexer::new(&source);
         let result = lexer.read_identifier();
 
-        assert_eq!(result.unwrap(), Token::Ident("こんにちわ".into()));
+        assert_eq!(
+            result.unwrap(),
+            Token::Ident {
+                value: "こんにちわ".into()
+            }
+        );
         assert_eq!(lexer.current_row, 1);
         assert_eq!(lexer.current_col, 6);
     }
@@ -501,7 +506,12 @@ mod tests {
         let mut lexer = Lexer::new(&source);
         let result = lexer.read_identifier();
 
-        assert_eq!(result.unwrap(), Token::Ident("hel_lo_".into()));
+        assert_eq!(
+            result.unwrap(),
+            Token::Ident {
+                value: "hel_lo_".into()
+            }
+        );
         assert_eq!(lexer.current_row, 1);
         assert_eq!(lexer.current_col, 8);
     }

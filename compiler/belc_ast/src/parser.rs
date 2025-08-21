@@ -371,7 +371,7 @@ impl Parser<'_> {
     fn parse_prefix(&mut self) -> Result<Expression, ParserError> {
         match self.curr_token {
             // parse_identifier: parse current token as identifier
-            Token::Ident(ref i) => Ok(Expression::Identifier(Identifier { value: i.into() })),
+            Token::Ident { ref value } => Ok(Expression::Identifier(Identifier { value: value.clone() })),
 
             Token::Literal { ref kind, ref value } => match kind {
                 LiteralKind::Integer => match value.parse::<i64>() {
