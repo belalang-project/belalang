@@ -1,9 +1,9 @@
-use belc_lexer::Token;
+use belc_lexer::TokenKind;
 
 #[derive(thiserror::Error, Debug)]
 pub enum CodegenError {
     #[error("unknown infix operator: {0}")]
-    UnknownInfixOp(Token),
+    UnknownInfixOp(TokenKind),
 
     #[error("duplicate symbol: {0}")]
     DuplicateSymbol(String),
