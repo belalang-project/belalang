@@ -6,6 +6,7 @@ use belc_lexer::Lexer;
 use belvm_bytecode::opcode;
 use belvm_bytecode::{Bytecode, Constant};
 
+#[track_caller]
 fn test_compile(input: &str) -> Result<Bytecode, Box<dyn Error>> {
     let source = input.to_owned();
     let lexer = Lexer::new(&source);
@@ -55,6 +56,7 @@ fn booleans() {
     assert_eq!(code.constants, vec![]);
 }
 
+#[track_caller]
 fn test_compile_infix(op: &str, code: u8, reversed: bool) {
     let input = format!("1 {op} 3;");
     let compiled = test_compile(&input).unwrap();
