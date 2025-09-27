@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::io::{self, Write};
 
-use belc_lexer::{Lexer, Token};
+use belc_lexer::{Lexer, TokenKind};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut input = String::new();
@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         loop {
             match lexer.next_token() {
-                Ok(Token::EOF) => break,
+                Ok(token) if token.kind == TokenKind::EOF => break,
                 Ok(token) => println!("{token:?}"),
                 Err(err) => println!("ERROR: {err}"),
             };

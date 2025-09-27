@@ -3,6 +3,7 @@ use belc_lexer::Lexer;
 use belc_lexer::LiteralKind;
 use belc_lexer::PrefixKind;
 use belc_lexer::Token;
+use belc_lexer::TokenKind;
 
 use super::{Expression, ParserError, Statement};
 use crate::ArrayLiteral;
@@ -43,22 +44,22 @@ pub enum Precedence {
     Index,
 }
 
-impl From<&Token> for Precedence {
-    fn from(value: &Token) -> Self {
+impl From<&TokenKind> for Precedence {
+    fn from(value: &TokenKind) -> Self {
         match value {
-            Token::Assign { .. } => Self::AssignmentOps,
-            Token::Or => Self::LogicalOr,
-            Token::And => Self::LogicalAnd,
-            Token::BitOr => Self::BitOr,
-            Token::BitXor => Self::BitXor,
-            Token::BitAnd => Self::BitAnd,
-            Token::Eq | Token::Ne => Self::Equality,
-            Token::Lt | Token::Le | Token::Gt | Token::Ge => Self::Relational,
-            Token::ShiftLeft | Token::ShiftRight => Self::Shift,
-            Token::Add | Token::Sub => Self::Additive,
-            Token::Div | Token::Mul | Token::Mod => Self::Multiplicative,
-            Token::LeftParen => Self::Call,
-            Token::LeftBracket => Self::Index,
+            TokenKind::Assign { .. } => Self::AssignmentOps,
+            TokenKind::Or => Self::LogicalOr,
+            TokenKind::And => Self::LogicalAnd,
+            TokenKind::BitOr => Self::BitOr,
+            TokenKind::BitXor => Self::BitXor,
+            TokenKind::BitAnd => Self::BitAnd,
+            TokenKind::Eq | TokenKind::Ne => Self::Equality,
+            TokenKind::Lt | TokenKind::Le | TokenKind::Gt | TokenKind::Ge => Self::Relational,
+            TokenKind::ShiftLeft | TokenKind::ShiftRight => Self::Shift,
+            TokenKind::Add | TokenKind::Sub => Self::Additive,
+            TokenKind::Div | TokenKind::Mul | TokenKind::Mod => Self::Multiplicative,
+            TokenKind::LeftParen => Self::Call,
+            TokenKind::LeftBracket => Self::Index,
             _ => Self::Lowest,
         }
     }
@@ -66,18 +67,18 @@ impl From<&Token> for Precedence {
 
 macro_rules! expect_peek {
     ($self:expr, $token:pat) => {
-        if matches!($self.peek_token, $token) {
+        if matches!($self.peek_token.kind, $token) {
             $self.next_token()?;
             true
         } else {
-            return Err(ParserError::UnexpectedToken($self.peek_token.clone()));
+            return Err(ParserError::UnexpectedToken($self.peek_token.kind));
         }
     };
 }
 
 macro_rules! optional_peek {
     ($self:expr, $token:pat) => {
-        if matches!($self.peek_token, $token) {
+        if matches!($self.peek_token.kind, $token) {
             $self.next_token()?;
             true
         } else {
@@ -129,7 +130,7 @@ impl Parser<'_> {
 
         let mut program = Program::default();
 
-        while !matches!(self.curr_token, Token::EOF) {
+        while !matches!(self.curr_token.kind, TokenKind::EOF) {
             program.add_stmt(self.parse_statement()?);
             self.next_token()?;
         }
@@ -138,27 +139,27 @@ impl Parser<'_> {
     }
 
     fn parse_statement(&mut self) -> Result<Statement, ParserError> {
-        match self.curr_token {
+        match self.curr_token.kind {
             // parse_return
-            Token::Return => {
+            TokenKind::Return => {
                 self.next_token()?;
                 let return_value = self.parse_expression(Precedence::Lowest)?;
 
-                self.has_semicolon = expect_peek!(self, Token::Semicolon);
+                self.has_semicolon = expect_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::Return(ReturnStatement { return_value }))
             },
 
             // parse_while
-            Token::While => {
+            TokenKind::While => {
                 self.next_token()?;
                 let condition = self.parse_expression(Precedence::Lowest)?;
 
-                expect_peek!(self, Token::LeftBrace);
+                expect_peek!(self, TokenKind::LeftBrace);
 
                 let block = self.parse_block()?;
 
-                self.has_semicolon = optional_peek!(self, Token::Semicolon);
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::While(WhileStatement {
                     condition: Box::new(condition),
@@ -167,10 +168,10 @@ impl Parser<'_> {
             },
 
             // parse_if: parse if expression as statement
-            Token::If => {
+            TokenKind::If => {
                 let expression = self.parse_if()?;
 
-                self.has_semicolon = optional_peek!(self, Token::Semicolon);
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::Expression(ExpressionStatement { expression }))
             },
@@ -181,9 +182,9 @@ impl Parser<'_> {
                 };
 
                 self.has_semicolon = if self.depth == 0 {
-                    expect_peek!(self, Token::Semicolon)
+                    expect_peek!(self, TokenKind::Semicolon)
                 } else {
-                    optional_peek!(self, Token::Semicolon)
+                    optional_peek!(self, TokenKind::Semicolon)
                 };
 
                 Ok(Statement::Expression(stmt))
@@ -194,7 +195,7 @@ impl Parser<'_> {
     fn parse_expression(&mut self, precedence: Precedence) -> Result<Expression, ParserError> {
         let mut left_expr = self.parse_prefix()?;
 
-        while precedence < Precedence::from(&self.peek_token) {
+        while precedence < Precedence::from(&self.peek_token.kind) {
             match self.parse_infix(&left_expr)? {
                 Some(expr) => left_expr = expr,
                 None => return Ok(left_expr),
@@ -210,7 +211,7 @@ impl Parser<'_> {
         self.next_token()?;
 
         self.depth += 1;
-        while !matches!(self.curr_token, Token::RightBrace | Token::EOF) {
+        while !matches!(self.curr_token.kind, TokenKind::RightBrace | TokenKind::EOF) {
             statements.push(self.parse_statement()?);
             self.next_token()?;
         }
@@ -223,18 +224,18 @@ impl Parser<'_> {
         self.next_token()?;
         let condition = self.parse_expression(Precedence::Lowest)?;
 
-        expect_peek!(self, Token::LeftBrace);
+        expect_peek!(self, TokenKind::LeftBrace);
 
         let consequence = self.parse_block()?;
 
-        let alternative: Option<Box<Expression>> = if matches!(self.peek_token, Token::Else) {
+        let alternative: Option<Box<Expression>> = if matches!(self.peek_token.kind, TokenKind::Else) {
             self.next_token()?;
             self.next_token()?;
 
-            Some(Box::new(match self.curr_token {
-                Token::If => self.parse_if()?,
-                Token::LeftBrace => Expression::Block(self.parse_block()?),
-                _ => return Err(ParserError::UnexpectedToken(self.curr_token.clone())),
+            Some(Box::new(match self.curr_token.kind {
+                TokenKind::If => self.parse_if()?,
+                TokenKind::LeftBrace => Expression::Block(self.parse_block()?),
+                _ => return Err(ParserError::UnexpectedToken(self.curr_token.kind)),
             }))
         } else {
             None
@@ -248,30 +249,30 @@ impl Parser<'_> {
     }
 
     fn parse_infix(&mut self, left: &Expression) -> Result<Option<Expression>, ParserError> {
-        match self.peek_token {
+        match self.peek_token.kind {
             // parse_infix: parse infix expression
-            Token::Add
-            | Token::Sub
-            | Token::Mul
-            | Token::Div
-            | Token::Mod
-            | Token::Eq
-            | Token::Ne
-            | Token::Gt
-            | Token::Ge
-            | Token::Lt
-            | Token::Le
-            | Token::BitAnd
-            | Token::BitOr
-            | Token::BitXor
-            | Token::ShiftLeft
-            | Token::ShiftRight
-            | Token::Or
-            | Token::And => {
+            TokenKind::Add
+            | TokenKind::Sub
+            | TokenKind::Mul
+            | TokenKind::Div
+            | TokenKind::Mod
+            | TokenKind::Eq
+            | TokenKind::Ne
+            | TokenKind::Gt
+            | TokenKind::Ge
+            | TokenKind::Lt
+            | TokenKind::Le
+            | TokenKind::BitAnd
+            | TokenKind::BitOr
+            | TokenKind::BitXor
+            | TokenKind::ShiftLeft
+            | TokenKind::ShiftRight
+            | TokenKind::Or
+            | TokenKind::And => {
                 self.next_token()?;
 
                 let operator = self.curr_token.clone();
-                let precedence = Precedence::from(&self.curr_token);
+                let precedence = Precedence::from(&self.curr_token.kind);
 
                 self.next_token()?;
 
@@ -279,25 +280,25 @@ impl Parser<'_> {
 
                 Ok(Some(Expression::Infix(InfixExpression {
                     left: Box::new(left.clone()),
-                    operator: match operator {
-                        Token::Add => InfixKind::Add,
-                        Token::Sub => InfixKind::Sub,
-                        Token::Mul => InfixKind::Mul,
-                        Token::Div => InfixKind::Div,
-                        Token::Mod => InfixKind::Mod,
-                        Token::Eq => InfixKind::Eq,
-                        Token::Ne => InfixKind::Ne,
-                        Token::Gt => InfixKind::Gt,
-                        Token::Ge => InfixKind::Ge,
-                        Token::Lt => InfixKind::Lt,
-                        Token::Le => InfixKind::Le,
-                        Token::BitAnd => InfixKind::BitAnd,
-                        Token::BitOr => InfixKind::BitOr,
-                        Token::BitXor => InfixKind::BitXor,
-                        Token::ShiftLeft => InfixKind::ShiftLeft,
-                        Token::ShiftRight => InfixKind::ShiftRight,
-                        Token::Or => InfixKind::Or,
-                        Token::And => InfixKind::And,
+                    operator: match operator.kind {
+                        TokenKind::Add => InfixKind::Add,
+                        TokenKind::Sub => InfixKind::Sub,
+                        TokenKind::Mul => InfixKind::Mul,
+                        TokenKind::Div => InfixKind::Div,
+                        TokenKind::Mod => InfixKind::Mod,
+                        TokenKind::Eq => InfixKind::Eq,
+                        TokenKind::Ne => InfixKind::Ne,
+                        TokenKind::Gt => InfixKind::Gt,
+                        TokenKind::Ge => InfixKind::Ge,
+                        TokenKind::Lt => InfixKind::Lt,
+                        TokenKind::Le => InfixKind::Le,
+                        TokenKind::BitAnd => InfixKind::BitAnd,
+                        TokenKind::BitOr => InfixKind::BitOr,
+                        TokenKind::BitXor => InfixKind::BitXor,
+                        TokenKind::ShiftLeft => InfixKind::ShiftLeft,
+                        TokenKind::ShiftRight => InfixKind::ShiftRight,
+                        TokenKind::Or => InfixKind::Or,
+                        TokenKind::And => InfixKind::And,
                         _ => unreachable!(),
                     },
                     right: Box::new(right),
@@ -305,17 +306,17 @@ impl Parser<'_> {
             },
 
             // parse_call: parse call expression
-            Token::LeftParen => {
+            TokenKind::LeftParen => {
                 self.next_token()?;
                 self.next_token()?;
 
                 let mut args = Vec::new();
 
-                if !matches!(self.curr_token, Token::RightParen) {
+                if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     loop {
                         args.push(self.parse_expression(Precedence::Lowest)?);
 
-                        if !matches!(self.peek_token, Token::Comma) {
+                        if !matches!(self.peek_token.kind, TokenKind::Comma) {
                             break;
                         }
 
@@ -323,7 +324,7 @@ impl Parser<'_> {
                         self.next_token()?;
                     }
 
-                    expect_peek!(self, Token::RightParen);
+                    expect_peek!(self, TokenKind::RightParen);
                 }
 
                 Ok(Some(Expression::Call(CallExpression {
@@ -332,13 +333,13 @@ impl Parser<'_> {
                 })))
             },
 
-            Token::LeftBracket => {
+            TokenKind::LeftBracket => {
                 self.next_token()?;
                 self.next_token()?;
 
                 let index = Box::new(self.parse_expression(Precedence::Lowest)?);
 
-                expect_peek!(self, Token::RightBracket);
+                expect_peek!(self, TokenKind::RightBracket);
 
                 Ok(Some(Expression::Index(IndexExpression {
                     left: Box::new(left.clone()),
@@ -346,14 +347,14 @@ impl Parser<'_> {
                 })))
             },
 
-            Token::Assign { ref kind } => {
-                let kind = kind.clone();
+            TokenKind::Assign { ref kind } => {
+                let kind = *kind;
                 if !matches!(left, Expression::Identifier(_)) {
                     return Err(ParserError::InvalidLHS(left.clone()));
                 }
 
                 let name = Identifier {
-                    value: self.curr_token.to_string(),
+                    value: self.curr_token.value.clone(),
                 };
 
                 self.next_token()?;
@@ -369,39 +370,43 @@ impl Parser<'_> {
     }
 
     fn parse_prefix(&mut self) -> Result<Expression, ParserError> {
-        match self.curr_token {
+        match self.curr_token.kind {
             // parse_identifier: parse current token as identifier
-            Token::Ident(ref i) => Ok(Expression::Identifier(Identifier { value: i.into() })),
+            TokenKind::Ident => Ok(Expression::Identifier(Identifier {
+                value: self.curr_token.value.clone(),
+            })),
 
-            Token::Literal { ref kind, ref value } => match kind {
-                LiteralKind::Integer => match value.parse::<i64>() {
+            TokenKind::Literal { ref kind } => match kind {
+                LiteralKind::Integer => match self.curr_token.value.parse::<i64>() {
                     Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
-                    Err(_) => Err(ParserError::ParsingInteger(value.into())),
+                    Err(_) => Err(ParserError::ParsingInteger(self.curr_token.value.clone())),
                 },
-                LiteralKind::Float => match value.parse::<f64>() {
+                LiteralKind::Float => match self.curr_token.value.parse::<f64>() {
                     Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
-                    Err(_) => Err(ParserError::ParsingFloat(value.into())),
+                    Err(_) => Err(ParserError::ParsingFloat(self.curr_token.value.clone())),
                 },
-                LiteralKind::String => Ok(Expression::String(StringLiteral { value: value.into() })),
+                LiteralKind::String => Ok(Expression::String(StringLiteral {
+                    value: self.curr_token.value.clone(),
+                })),
             },
 
             // parse_boolean: parse current token as boolean
-            Token::True | Token::False => Ok(Expression::Boolean(BooleanExpression {
-                value: matches!(self.curr_token, Token::True),
+            TokenKind::True | TokenKind::False => Ok(Expression::Boolean(BooleanExpression {
+                value: matches!(self.curr_token.kind, TokenKind::True),
             })),
 
             // parse_array
-            Token::LeftBracket => Ok(Expression::Array(ArrayLiteral {
+            TokenKind::LeftBracket => Ok(Expression::Array(ArrayLiteral {
                 elements: {
                     self.next_token()?;
 
                     let mut elements = Vec::new();
 
-                    if !matches!(self.curr_token, Token::RightBracket) {
+                    if !matches!(self.curr_token.kind, TokenKind::RightBracket) {
                         loop {
                             elements.push(self.parse_expression(Precedence::Lowest)?);
 
-                            if !matches!(self.peek_token, Token::Comma) {
+                            if !matches!(self.peek_token.kind, TokenKind::Comma) {
                                 break;
                             }
 
@@ -409,7 +414,7 @@ impl Parser<'_> {
                             self.next_token()?;
                         }
 
-                        expect_peek!(self, Token::RightBracket);
+                        expect_peek!(self, TokenKind::RightBracket);
                     }
 
                     elements
@@ -417,7 +422,7 @@ impl Parser<'_> {
             })),
 
             // parse_prefix: parse current expression with prefix
-            Token::Not | Token::Sub => {
+            TokenKind::Not | TokenKind::Sub => {
                 let prev_token = self.curr_token.clone();
 
                 self.next_token()?;
@@ -425,9 +430,9 @@ impl Parser<'_> {
                 let right = self.parse_expression(Precedence::Prefix).unwrap();
 
                 Ok(Expression::Prefix(PrefixExpression {
-                    operator: match prev_token {
-                        Token::Not => PrefixKind::Not,
-                        Token::Sub => PrefixKind::Sub,
+                    operator: match prev_token.kind {
+                        TokenKind::Not => PrefixKind::Not,
+                        TokenKind::Sub => PrefixKind::Sub,
                         _ => unreachable!(),
                     },
                     right: Box::new(right),
@@ -435,57 +440,57 @@ impl Parser<'_> {
             },
 
             // parse_grouped: parse grouped expression
-            Token::LeftParen => {
+            TokenKind::LeftParen => {
                 self.next_token()?;
                 let expr = self.parse_expression(Precedence::Lowest);
 
-                expect_peek!(self, Token::RightParen);
+                expect_peek!(self, TokenKind::RightParen);
 
                 expr
             },
 
             // parse_block
-            Token::LeftBrace => {
+            TokenKind::LeftBrace => {
                 let block = self.parse_block()?;
                 Ok(Expression::Block(block))
             },
 
             // parse_if: parse current if expression
-            Token::If => self.parse_if(),
+            TokenKind::If => self.parse_if(),
 
             // parse_function: parse current expression as function
-            Token::Function => {
+            TokenKind::Function => {
                 let mut params = Vec::new();
 
-                expect_peek!(self, Token::LeftParen);
+                expect_peek!(self, TokenKind::LeftParen);
 
                 self.next_token()?;
 
-                if !matches!(self.curr_token, Token::RightParen) {
+                if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     params.push(Identifier {
-                        value: self.curr_token.to_string(),
+                        value: self.curr_token.value.clone(),
                     });
 
-                    while matches!(self.peek_token, Token::Comma) {
+                    while matches!(self.peek_token.kind, TokenKind::Comma) {
                         self.next_token()?;
                         self.next_token()?;
 
                         params.push(Identifier {
-                            value: self.curr_token.to_string(),
+                            value: self.curr_token.value.clone(),
                         });
                     }
 
-                    expect_peek!(self, Token::RightParen);
+                    expect_peek!(self, TokenKind::RightParen);
                 }
 
-                expect_peek!(self, Token::LeftBrace);
+                expect_peek!(self, TokenKind::LeftBrace);
 
                 let body = self.parse_block()?;
 
                 Ok(Expression::Function(FunctionLiteral { params, body }))
             },
 
-            _ => Err(ParserError::UnknownPrefixOperator(self.curr_token.clone())),
+            _ => Err(ParserError::UnknownPrefixOperator(self.curr_token.kind)),
         }
     }
 }

@@ -1,11 +1,12 @@
-use belc_lexer::{AssignmentKind, Lexer, LiteralKind, Token};
+use belc_lexer::{AssignmentKind, Lexer, LiteralKind, Token, TokenKind};
 
+#[track_caller]
 fn test_tokens(input: &str, expected: Vec<Token>) {
     let source = input.to_owned();
     let mut lexer = Lexer::new(&source);
     let mut result = Vec::new();
     while let Ok(token) = lexer.next_token() {
-        if let Token::EOF = token {
+        if let TokenKind::EOF = token.kind {
             break;
         }
         result.push(token);
@@ -13,69 +14,84 @@ fn test_tokens(input: &str, expected: Vec<Token>) {
     assert_eq!(result, expected);
 }
 
+fn empty_token(kind: TokenKind) -> Token {
+    Token {
+        kind,
+        value: String::new(),
+    }
+}
+
 #[test]
 fn tokens_all() {
     test_tokens(
         "=+(){}[],;!-/*5;5 < 10 > 5;:= >= <= += -= /= %= *= || &&",
         vec![
-            Token::Assign {
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::Assign,
-            },
-            Token::Add,
-            Token::LeftParen,
-            Token::RightParen,
-            Token::LeftBrace,
-            Token::RightBrace,
-            Token::LeftBracket,
-            Token::RightBracket,
-            Token::Comma,
-            Token::Semicolon,
-            Token::Not,
-            Token::Sub,
-            Token::Div,
-            Token::Mul,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            }),
+            empty_token(TokenKind::Add),
+            empty_token(TokenKind::LeftParen),
+            empty_token(TokenKind::RightParen),
+            empty_token(TokenKind::LeftBrace),
+            empty_token(TokenKind::RightBrace),
+            empty_token(TokenKind::LeftBracket),
+            empty_token(TokenKind::RightBracket),
+            empty_token(TokenKind::Comma),
+            empty_token(TokenKind::Semicolon),
+            empty_token(TokenKind::Not),
+            empty_token(TokenKind::Sub),
+            empty_token(TokenKind::Div),
+            empty_token(TokenKind::Mul),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "5".into(),
             },
-            Token::Semicolon,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Semicolon),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "5".into(),
             },
-            Token::Lt,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Lt),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "10".into(),
             },
-            Token::Gt,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Gt),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "5".into(),
             },
-            Token::Semicolon,
-            Token::Assign {
+            empty_token(TokenKind::Semicolon),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::ColonAssign,
-            },
-            Token::Ge,
-            Token::Le,
-            Token::Assign {
+            }),
+            empty_token(TokenKind::Ge),
+            empty_token(TokenKind::Le),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::AddAssign,
-            },
-            Token::Assign {
+            }),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::SubAssign,
-            },
-            Token::Assign {
+            }),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::DivAssign,
-            },
-            Token::Assign {
+            }),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::ModAssign,
-            },
-            Token::Assign {
+            }),
+            empty_token(TokenKind::Assign {
                 kind: AssignmentKind::MulAssign,
-            },
-            Token::Or,
-            Token::And,
+            }),
+            empty_token(TokenKind::Or),
+            empty_token(TokenKind::And),
         ],
     );
 }
@@ -85,13 +101,17 @@ fn tokens_strings() {
     test_tokens(
         r#""Hello, World"; "Test""#,
         vec![
-            Token::Literal {
-                kind: LiteralKind::String,
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::String,
+                },
                 value: "Hello, World".into(),
             },
-            Token::Semicolon,
-            Token::Literal {
-                kind: LiteralKind::String,
+            empty_token(TokenKind::Semicolon),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::String,
+                },
                 value: "Test".into(),
             },
         ],
@@ -103,23 +123,31 @@ fn tokens_integers() {
     test_tokens(
         "123; 456; 789 + 1",
         vec![
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "123".into(),
             },
-            Token::Semicolon,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Semicolon),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "456".into(),
             },
-            Token::Semicolon,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Semicolon),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "789".into(),
             },
-            Token::Add,
-            Token::Literal {
-                kind: LiteralKind::Integer,
+            empty_token(TokenKind::Add),
+            Token {
+                kind: TokenKind::Literal {
+                    kind: LiteralKind::Integer,
+                },
                 value: "1".into(),
             },
         ],
@@ -131,11 +159,20 @@ fn tokens_identifiers() {
     test_tokens(
         "x; x + y",
         vec![
-            Token::Ident("x".into()),
-            Token::Semicolon,
-            Token::Ident("x".into()),
-            Token::Add,
-            Token::Ident("y".into()),
+            Token {
+                kind: TokenKind::Ident,
+                value: "x".into(),
+            },
+            empty_token(TokenKind::Semicolon),
+            Token {
+                kind: TokenKind::Ident,
+                value: "x".into(),
+            },
+            empty_token(TokenKind::Add),
+            Token {
+                kind: TokenKind::Ident,
+                value: "y".into(),
+            },
         ],
     );
 }
@@ -144,8 +181,10 @@ fn tokens_identifiers() {
 fn tokens_escape_strings() {
     test_tokens(
         r#""\n\r\t\"\x41""#,
-        vec![Token::Literal {
-            kind: LiteralKind::String,
+        vec![Token {
+            kind: TokenKind::Literal {
+                kind: LiteralKind::String,
+            },
             value: "\n\r\t\"A".into(),
         }],
     );

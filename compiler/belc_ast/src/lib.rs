@@ -3,7 +3,7 @@ mod parser;
 mod program;
 mod statements;
 
-use belc_lexer::{LexerError, Token};
+use belc_lexer::{LexerError, TokenKind};
 pub use expressions::*;
 pub use parser::Parser;
 pub use program::Program;
@@ -21,7 +21,7 @@ pub enum ParserError {
     LexerError(#[from] LexerError),
 
     #[error("unexpected token: {0}")]
-    UnexpectedToken(Token),
+    UnexpectedToken(TokenKind),
 
     #[error("invalid lhs: {0}")]
     InvalidLHS(Expression),
@@ -33,5 +33,5 @@ pub enum ParserError {
     ParsingFloat(String),
 
     #[error("unknown prefix operator: {0}")]
-    UnknownPrefixOperator(Token),
+    UnknownPrefixOperator(TokenKind),
 }

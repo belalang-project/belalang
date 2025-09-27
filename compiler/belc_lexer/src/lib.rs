@@ -2,11 +2,37 @@ mod lexer;
 
 pub use lexer::*;
 
+#[derive(PartialEq, Eq, Debug, Clone, Default)]
+pub struct Token {
+    pub kind: TokenKind,
+    pub value: String,
+}
+
+impl From<&str> for Token {
+    fn from(value: &str) -> Self {
+        let kind = match value {
+            "fn" => TokenKind::Function,
+            "while" => TokenKind::While,
+            "true" => TokenKind::True,
+            "false" => TokenKind::False,
+            "if" => TokenKind::If,
+            "else" => TokenKind::Else,
+            "return" => TokenKind::Return,
+            _ => TokenKind::Ident,
+        };
+
+        Self {
+            kind,
+            value: value.to_string(),
+        }
+    }
+}
+
 /// Belalang language's tokens
 ///
 /// This is all tokens that exist in the belalang language grammar.
-#[derive(PartialEq, Eq, Debug, Clone, Default)]
-pub enum Token {
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Default)]
+pub enum TokenKind {
     /// End of file marker
     #[default]
     EOF,
@@ -15,10 +41,10 @@ pub enum Token {
     Empty,
 
     /// Identifier token containing a variable or function name
-    Ident(String),
+    Ident,
 
     /// Literals
-    Literal { kind: LiteralKind, value: String },
+    Literal { kind: LiteralKind },
 
     /// Assignments
     Assign { kind: AssignmentKind },
@@ -105,7 +131,7 @@ pub enum Token {
 }
 
 /// Literal types supported by the lexer
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum LiteralKind {
     Integer,
     Float,
@@ -113,7 +139,7 @@ pub enum LiteralKind {
 }
 
 /// Assignment types supported by the lexer
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum AssignmentKind {
     /// Assignment operator `=`
     Assign,
@@ -223,76 +249,61 @@ impl std::fmt::Display for InfixKind {
     }
 }
 
-impl From<&str> for Token {
-    fn from(value: &str) -> Self {
-        match value {
-            "fn" => Token::Function,
-            "while" => Token::While,
-            "true" => Token::True,
-            "false" => Token::False,
-            "if" => Token::If,
-            "else" => Token::Else,
-            "return" => Token::Return,
-            _ => Token::Ident(value.to_string()),
-        }
-    }
-}
-
-impl std::fmt::Display for Token {
+impl std::fmt::Display for TokenKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Token::Assign { kind } = self {
+        if let TokenKind::Assign { kind } = self {
             f.write_str(&kind.to_string())?;
             return Ok(());
         }
 
         f.write_str(match self {
-            Token::Empty => "<empty>",
-            Token::EOF => "EOF",
+            TokenKind::Empty => "<empty>",
+            TokenKind::EOF => "EOF",
 
-            Token::Ident(s) => s,
-            Token::Literal { value, .. } => value,
+            TokenKind::Ident => "<ident>",
+            TokenKind::Literal { .. } => "<literal>",
 
-            Token::Add => "+",
-            Token::Sub => "-",
-            Token::Mul => "*",
-            Token::Div => "/",
-            Token::Mod => "%",
+            TokenKind::Add => "+",
+            TokenKind::Sub => "-",
+            TokenKind::Mul => "*",
+            TokenKind::Div => "/",
+            TokenKind::Mod => "%",
 
-            Token::Not => "!",
-            Token::And => "&&",
-            Token::Or => "||",
+            TokenKind::Not => "!",
+            TokenKind::And => "&&",
+            TokenKind::Or => "||",
 
-            Token::BitAnd => "&",
-            Token::BitOr => "|",
-            Token::BitXor => "^",
-            Token::ShiftLeft => "<<",
-            Token::ShiftRight => ">>",
+            TokenKind::BitAnd => "&",
+            TokenKind::BitOr => "|",
+            TokenKind::BitXor => "^",
+            TokenKind::ShiftLeft => "<<",
+            TokenKind::ShiftRight => ">>",
 
-            Token::Eq => "==",
-            Token::Ne => "!=",
-            Token::Lt => "<",
-            Token::Le => "<=",
-            Token::Gt => ">",
-            Token::Ge => ">=",
+            TokenKind::Eq => "==",
+            TokenKind::Ne => "!=",
+            TokenKind::Lt => "<",
+            TokenKind::Le => "<=",
+            TokenKind::Gt => ">",
+            TokenKind::Ge => ">=",
 
-            Token::LeftParen => "(",
-            Token::RightParen => ")",
-            Token::LeftBrace => "{",
-            Token::RightBrace => "}",
-            Token::LeftBracket => "[",
-            Token::RightBracket => "]",
+            TokenKind::LeftParen => "(",
+            TokenKind::RightParen => ")",
+            TokenKind::LeftBrace => "{",
+            TokenKind::RightBrace => "}",
+            TokenKind::LeftBracket => "[",
+            TokenKind::RightBracket => "]",
 
-            Token::Function => "fn",
-            Token::While => "while",
-            Token::If => "if",
-            Token::Else => "else",
-            Token::Return => "return",
-            Token::True => "true",
-            Token::False => "false",
+            TokenKind::Function => "fn",
+            TokenKind::While => "while",
+            TokenKind::If => "if",
+            TokenKind::Else => "else",
+            TokenKind::Return => "return",
+            TokenKind::True => "true",
+            TokenKind::False => "false",
 
-            Token::Comma => ",",
-            Token::Semicolon => ";",
-            Token::Backslash => r"\",
+            TokenKind::Comma => ",",
+            TokenKind::Semicolon => ";",
+            TokenKind::Backslash => r"\",
 
             _ => unreachable!(),
         })

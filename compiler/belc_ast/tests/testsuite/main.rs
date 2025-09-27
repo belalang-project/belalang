@@ -14,6 +14,7 @@ pub mod common {
         parser.parse_program().expect("parser errors")
     }
 
+    #[track_caller]
     pub fn test_parse_to_string(input: &str, expected: &str) {
         let program = test_parse(input);
         assert_eq!(program.to_string(), expected);
