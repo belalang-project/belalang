@@ -3,6 +3,7 @@ use beltools_tests::instructions;
 use belvm_bytecode::Constant;
 use belvm_bytecode::opcode;
 
+#[track_caller]
 fn test_arithmetic_op(a: i64, b: i64, op: u8, c: i64) {
     let constants = vec![Constant::Integer(a), Constant::Integer(b)];
 
@@ -41,6 +42,7 @@ fn arithmetic_op_modulo() {
     test_arithmetic_op(12, 5, opcode::MOD, 2);
 }
 
+#[track_caller]
 fn test_comparison_op(a: i64, b: i64, op: u8, c: bool) {
     let constants = vec![Constant::Integer(a), Constant::Integer(b)];
 
@@ -74,6 +76,7 @@ fn comparison_op_less_than_equal() {
     test_comparison_op(12, 12, opcode::LESS_THAN_EQUAL, true);
 }
 
+#[track_caller]
 fn test_bitwise_op(a: i64, b: i64, op: u8, c: i64) {
     let constants = vec![Constant::Integer(a), Constant::Integer(b)];
 

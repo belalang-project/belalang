@@ -6,6 +6,7 @@ pub mod common {
     use belc_ast::Parser;
     use belc_lexer::Lexer;
 
+    #[track_caller]
     pub fn test_parse(input: &str) -> ast::Program {
         let source = input.to_owned();
         let lexer = Lexer::new(&source);

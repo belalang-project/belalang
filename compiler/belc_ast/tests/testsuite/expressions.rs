@@ -6,6 +6,7 @@ use belc_lexer::{AssignmentKind, InfixKind, PrefixKind};
 use crate::common::*;
 use crate::*;
 
+#[track_caller]
 fn test_booleans(input: &str, value: bool) {
     let program = test_parse(input);
 
@@ -150,6 +151,7 @@ fn function() {
     );
 }
 
+#[track_caller]
 fn test_function_params(input: &str, output: Vec<&'static str>) {
     let program = test_parse(input);
 
