@@ -359,6 +359,11 @@ impl VM {
                     }
                 },
 
+                opcode::PRINT => {
+                    let value = self.stack.pop()?;
+                    println!("{value}");
+                },
+
                 _ => return Err(RuntimeError::UnknownInstruction(op)),
             };
 
