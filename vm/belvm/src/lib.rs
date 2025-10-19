@@ -1,5 +1,6 @@
 mod core;
 pub mod errors;
+mod io;
 pub mod stack;
 
 pub use core::VM;
