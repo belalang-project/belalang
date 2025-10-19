@@ -13,6 +13,10 @@ belc.workspace = true
 belvm.workspace = true
 clap = { workspace = true, features = ["derive"] }
 
+[dev-dependencies]
+beltools_tests.workspace = true
+belvm_bytecode.workspace = true
+
 # =============================
 # -- workspace configuration --
 # =============================

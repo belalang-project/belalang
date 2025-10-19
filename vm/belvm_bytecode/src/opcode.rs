@@ -115,6 +115,11 @@ pub const MAKE_ARRAY: u8 = 0xC0;
 /// Arrays -- Array indexing (1 byte)
 pub const INDEX: u8 = 0xC1;
 
+/// Print -- Print the TOS value (1 byte)
+///
+/// See <https://github.com/belalang-project/belalang/issues/38>
+pub const PRINT: u8 = 0xD0;
+
 /// Encodes a [`CONSTANT`] instruction with 16-bit index
 ///
 /// # Arguments

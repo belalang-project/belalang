@@ -56,7 +56,9 @@ name = "belalang"
 version = "0.1.0"
 dependencies = [
  "belc",
+ "beltools_tests",
  "belvm",
+ "belvm_bytecode",
  "clap",
 ]
 
