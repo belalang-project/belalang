@@ -2,6 +2,7 @@ use belvm_bytecode::opcode;
 use belvm_bytecode::{Bytecode, Constant};
 
 use crate::errors::RuntimeError;
+use crate::io::VMIO;
 use crate::stack::{Stack, StackValue};
 
 /// The core Virtual Machine structure.
@@ -21,6 +22,9 @@ pub struct VM {
 
     /// The stack memory of the VM.
     stack: Stack,
+
+    /// I/O operation for VM.
+    io: VMIO,
 }
 
 impl VM {
@@ -361,7 +365,8 @@ impl VM {
 
                 opcode::PRINT => {
                     let value = self.stack.pop()?;
-                    println!("{value}");
+                    self.io.print(&value.to_string());
+                    self.io.print("\n");
                 },
 
                 _ => return Err(RuntimeError::UnknownInstruction(op)),
