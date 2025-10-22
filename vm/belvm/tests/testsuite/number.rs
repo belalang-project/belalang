@@ -1,7 +1,11 @@
-use beltools_tests::IntoInstructionBytes;
-use beltools_tests::instructions;
-use belvm_bytecode::Constant;
-use belvm_bytecode::opcode;
+use beltools_tests::{
+    IntoInstructionBytes,
+    instructions,
+};
+use belvm_bytecode::{
+    Constant,
+    opcode,
+};
 
 #[track_caller]
 fn test_arithmetic_op(a: i64, b: i64, op: u8, c: i64) {

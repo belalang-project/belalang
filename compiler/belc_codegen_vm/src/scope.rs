@@ -1,5 +1,7 @@
-use std::collections::HashMap;
-use std::collections::hash_map::Entry;
+use std::collections::{
+    HashMap,
+    hash_map::Entry,
+};
 
 use belvm_bytecode::opcode;
 use belvm_std::BUILTIN_FUNCTIONS;

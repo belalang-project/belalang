@@ -1,5 +1,8 @@
 use belalang::commands;
-use clap::{Parser, Subcommand};
+use clap::{
+    Parser,
+    Subcommand,
+};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]

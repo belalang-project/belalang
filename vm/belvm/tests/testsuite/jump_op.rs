@@ -1,5 +1,7 @@
-use beltools_tests::IntoInstructionBytes;
-use beltools_tests::instructions;
+use beltools_tests::{
+    IntoInstructionBytes,
+    instructions,
+};
 use belvm_bytecode::opcode;
 
 #[test]

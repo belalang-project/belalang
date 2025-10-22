@@ -1,8 +1,10 @@
 use belc_ast as ast;
 use belc_lexer::InfixKind;
 
-use crate::common::*;
-use crate::*;
+use crate::{
+    common::*,
+    *,
+};
 
 #[test]
 fn block() {

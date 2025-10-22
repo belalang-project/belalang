@@ -1,9 +1,17 @@
-use belvm_bytecode::opcode;
-use belvm_bytecode::{Bytecode, Constant};
+use belvm_bytecode::{
+    Bytecode,
+    Constant,
+    opcode,
+};
 
-use crate::errors::RuntimeError;
-use crate::io::VMIO;
-use crate::stack::{Stack, StackValue};
+use crate::{
+    errors::RuntimeError,
+    io::VMIO,
+    stack::{
+        Stack,
+        StackValue,
+    },
+};
 
 /// The core Virtual Machine structure.
 #[derive(Default)]

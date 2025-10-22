@@ -1,10 +1,25 @@
-use std::alloc::{Layout, alloc};
-use std::cell::Cell;
-use std::fmt::Debug;
-use std::hash::{DefaultHasher, Hash, Hasher};
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
-use std::ptr::{NonNull, drop_in_place};
+use std::{
+    alloc::{
+        Layout,
+        alloc,
+    },
+    cell::Cell,
+    fmt::Debug,
+    hash::{
+        DefaultHasher,
+        Hash,
+        Hasher,
+    },
+    marker::PhantomData,
+    ops::{
+        Deref,
+        DerefMut,
+    },
+    ptr::{
+        NonNull,
+        drop_in_place,
+    },
+};
 
 use crate::errors::MemoryError;
 

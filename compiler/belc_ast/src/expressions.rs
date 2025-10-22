@@ -1,4 +1,8 @@
-use belc_lexer::{AssignmentKind, InfixKind, PrefixKind};
+use belc_lexer::{
+    AssignmentKind,
+    InfixKind,
+    PrefixKind,
+};
 
 use super::Statement;
 

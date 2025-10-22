@@ -1,5 +1,11 @@
-use belvm_gc::gc::{GcHeap, GcObject, GcObjectHeader};
-use belvm_gc::with_heap;
+use belvm_gc::{
+    gc::{
+        GcHeap,
+        GcObject,
+        GcObjectHeader,
+    },
+    with_heap,
+};
 
 #[derive(Clone)]
 struct Integer {

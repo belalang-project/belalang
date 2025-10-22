@@ -2,11 +2,26 @@ pub mod disassembler;
 mod error;
 mod scope;
 
-use belc_ast::{BlockExpression, Expression, Program, Statement};
-use belc_lexer::{AssignmentKind, InfixKind, PrefixKind};
-use belvm_bytecode::opcode;
-use belvm_bytecode::{Bytecode, Constant};
-use scope::{ScopeLevel, ScopeManager};
+use belc_ast::{
+    BlockExpression,
+    Expression,
+    Program,
+    Statement,
+};
+use belc_lexer::{
+    AssignmentKind,
+    InfixKind,
+    PrefixKind,
+};
+use belvm_bytecode::{
+    Bytecode,
+    Constant,
+    opcode,
+};
+use scope::{
+    ScopeLevel,
+    ScopeManager,
+};
 
 use crate::error::CodegenError;
 

@@ -1,6 +1,11 @@
-use belvm::VM;
-use belvm::stack::StackValue;
-use belvm_bytecode::{Bytecode, Constant};
+use belvm::{
+    VM,
+    stack::StackValue,
+};
+use belvm_bytecode::{
+    Bytecode,
+    Constant,
+};
 
 #[derive(Default)]
 pub struct VMBuilder {

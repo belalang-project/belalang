@@ -1,7 +1,15 @@
-use std::error::Error;
-use std::io::{self, Write};
+use std::{
+    error::Error,
+    io::{
+        self,
+        Write,
+    },
+};
 
-use belc_lexer::{Lexer, TokenKind};
+use belc_lexer::{
+    Lexer,
+    TokenKind,
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut input = String::new();

@@ -1,8 +1,13 @@
-use beltools_tests::IntoInstructionBytes;
-use beltools_tests::instructions;
+use beltools_tests::{
+    IntoInstructionBytes,
+    instructions,
+};
 use belvm::VM;
-use belvm_bytecode::Bytecode;
-use belvm_bytecode::{Constant, opcode};
+use belvm_bytecode::{
+    Bytecode,
+    Constant,
+    opcode,
+};
 
 fn main() {
     let constants = vec![Constant::Integer(10), Constant::Integer(100)];
