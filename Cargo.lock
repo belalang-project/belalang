@@ -67,7 +67,6 @@ name = "belc"
 version = "0.1.0"
 dependencies = [
  "belc_ast",
- "belc_codegen_vm",
  "belc_lexer",
  "belvm_bytecode",
  "thiserror",
@@ -79,17 +78,6 @@ name = "belc_ast"
 version = "0.1.0"
 dependencies = [
  "belc_lexer",
- "thiserror",
-]
-
-[[package]]
-name = "belc_codegen_vm"
-version = "0.1.0"
-dependencies = [
- "belc_ast",
- "belc_lexer",
- "belvm_bytecode",
- "belvm_std",
  "thiserror",
 ]
 
@@ -107,7 +95,6 @@ version = "0.1.0"
 dependencies = [
  "belc",
  "belc_ast",
- "belc_codegen_vm",
  "belc_lexer",
  "belvm",
  "belvm_bytecode",

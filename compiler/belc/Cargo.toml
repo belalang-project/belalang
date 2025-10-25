@@ -11,7 +11,6 @@ workspace = true
 
 [dependencies]
 belc_ast.workspace = true
-belc_codegen_vm.workspace = true
 belc_lexer.workspace = true
 belvm_bytecode.workspace = true
 thiserror.workspace = true
