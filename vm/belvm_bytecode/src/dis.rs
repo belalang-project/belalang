@@ -1,4 +1,4 @@
-use belvm_bytecode::opcode;
+use crate::opcode;
 
 fn read_u16(bytes: &[u8], i: &mut usize) -> (u16, usize) {
     let hi = bytes[*i + 1];
@@ -6,13 +6,6 @@ fn read_u16(bytes: &[u8], i: &mut usize) -> (u16, usize) {
     *i += 2;
 
     ((hi as u16) << 8 | lo as u16, *i - 2)
-}
-
-fn read_u8(bytes: &[u8], i: &mut usize) -> (u16, usize) {
-    let value = bytes[*i + 1];
-    *i += 1;
-
-    (value as u16, *i - 1)
 }
 
 pub fn disassemble(bytes: Vec<u8>) -> String {
@@ -121,52 +114,6 @@ pub fn disassemble(bytes: Vec<u8>) -> String {
             opcode::JUMP_IF_FALSE => {
                 let (operand, start_i) = read_u16(&bytes, &mut i);
                 result.push_str(&format!("{start_i:#06x}: JUMP_IF_FALSE {operand:#03}\n"));
-            },
-
-            opcode::SET_GLOBAL => {
-                let (operand, start_i) = read_u16(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: SET_GLOBAL {operand:#03}\n"));
-            },
-
-            opcode::GET_GLOBAL => {
-                let (operand, start_i) = read_u16(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: GET_GLOBAL {operand:#03}\n"));
-            },
-
-            opcode::SET_LOCAL => {
-                let (operand, start_i) = read_u8(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: SET_LOCAL {operand:#03}\n"));
-            },
-
-            opcode::GET_LOCAL => {
-                let (operand, start_i) = read_u8(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: GET_LOCAL {operand:#03}\n"));
-            },
-
-            opcode::GET_BUILTIN => {
-                let (operand, start_i) = read_u8(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: GET_BUILTIN {operand:#03}\n"));
-            },
-
-            opcode::CALL => {
-                result.push_str(&format!("{i:#06x}: CALL\n"));
-            },
-
-            opcode::RETURN => {
-                result.push_str(&format!("{i:#06x}: RETURN\n"));
-            },
-
-            opcode::RETURN_VALUE => {
-                result.push_str(&format!("{i:#06x}: RETURN_VALUE\n"));
-            },
-
-            opcode::MAKE_ARRAY => {
-                let (operand, start_i) = read_u16(&bytes, &mut i);
-                result.push_str(&format!("{start_i:#06x}: ARRAY {operand:#03}\n"));
-            },
-
-            opcode::INDEX => {
-                result.push_str(&format!("{i:#06x}: INDEX\n"));
             },
 
             _ => {},
