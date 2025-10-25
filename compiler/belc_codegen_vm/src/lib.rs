@@ -1,4 +1,3 @@
-pub mod disassembler;
 mod error;
 mod scope;
 

@@ -1,4 +1,4 @@
-use belvm_bytecode::opcode;
+use crate::opcode;
 
 fn read_u16(bytes: &[u8], i: &mut usize) -> (u16, usize) {
     let hi = bytes[*i + 1];

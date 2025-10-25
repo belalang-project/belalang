@@ -2,7 +2,6 @@
 
 use belc_ast::Parser;
 use belc_codegen_vm::Compiler;
-pub use belc_codegen_vm::disassembler::disassemble;
 use belc_lexer::Lexer;
 use belvm_bytecode::Bytecode;
 

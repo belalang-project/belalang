@@ -7,11 +7,9 @@ use std::{
 };
 
 use belc_ast::Parser;
-use belc_codegen_vm::{
-    Compiler,
-    disassembler::disassemble,
-};
+use belc_codegen_vm::Compiler;
 use belc_lexer::Lexer;
+use belvm_bytecode::dis::disassemble;
 
 fn compile(line: String) -> Result<(), Box<dyn Error>> {
     let lexer = Lexer::new(&line);

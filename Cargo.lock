@@ -110,6 +110,7 @@ dependencies = [
  "belc_codegen_vm",
  "belc_lexer",
  "belvm",
+ "belvm_bytecode",
  "thiserror",
 ]
 

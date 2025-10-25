@@ -13,7 +13,7 @@ impl Args {
         let source = fs::read_to_string(self.path).unwrap();
         let bytecode = belc::compile(&source);
 
-        let dis = belc::disassemble(bytecode.instructions);
+        let dis = belvm_bytecode::dis::disassemble(bytecode.instructions);
 
         println!("{dis}");
     }
