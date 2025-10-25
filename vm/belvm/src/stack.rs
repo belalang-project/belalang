@@ -12,6 +12,7 @@ const STACK_SIZE: usize = 4096;
 pub enum StackValue {
     Boolean(bool),
     Integer(i64),
+    String(String),
 
     /// Pointer to an address in the bytecode
     AddressPtr(u8),
@@ -31,6 +32,7 @@ impl Display for StackValue {
         match self {
             Self::Boolean(b) => write!(f, "{b}"),
             Self::Integer(i) => write!(f, "{i}"),
+            Self::String(s) => write!(f, "{s}"),
             Self::AddressPtr(addr) => write!(f, "ptr:{addr}"),
             Self::Null => write!(f, "<null>"),
         }
