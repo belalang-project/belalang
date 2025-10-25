@@ -1,7 +1,10 @@
 //! Errors used by The Belalang Virtual Machine.
 
-#[derive(thiserror::Error, Debug, PartialEq)]
+#[derive(thiserror::Error, Debug)]
 pub enum RuntimeError {
+    #[error("{0}")]
+    Io(#[from] std::io::Error),
+
     #[error("stack underflow")]
     StackUnderflow,
 

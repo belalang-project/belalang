@@ -6,6 +6,7 @@ use belvm_bytecode::{
 
 use crate::{
     errors::RuntimeError,
+    fs::VMFS,
     io::VMIO,
     stack::{
         Stack,
@@ -33,6 +34,9 @@ pub struct VM {
 
     /// I/O operation for VM.
     io: VMIO,
+
+    /// Filesystem operation for VM.
+    fs: VMFS,
 }
 
 impl VM {
@@ -375,6 +379,16 @@ impl VM {
                     let value = self.stack.pop()?;
                     self.io.print(&value.to_string());
                     self.io.print("\n");
+                },
+
+                opcode::FS_WRITE => {
+                    let StackValue::String(filename) = self.stack.pop()? else {
+                        return Err(RuntimeError::TypeError);
+                    };
+
+                    let contents = self.stack.pop()?.to_string();
+
+                    self.fs.write_file(filename, contents)?;
                 },
 
                 _ => return Err(RuntimeError::UnknownInstruction(op)),
