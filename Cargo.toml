@@ -34,25 +34,24 @@ authors = ["Vito Secona <secona00@gmail.com>"]
 [workspace.lints.clippy]
 self_named_module_files = "deny"
 
-[workspace.dependencies]
-bincode = "2.0.1"
-clap = "4.5.4"
-crc32fast = "1.5.0"
-proc-macro2 = "1.0"
-serde = "1.0.219"
-syn = "2.0"
-thiserror = "2.0.0"
-unicode-ident = "1.0.18"
-quote = "1.0"
-
-# -- workspace dependencies --
+[workspace.dependencies] # keep-sorted start
 belc = { path = "./compiler/belc" }
 belc_ast = { path = "./compiler/belc_ast" }
 belc_codegen_vm = { path = "./compiler/belc_codegen_vm" }
 belc_lexer = { path = "./compiler/belc_lexer" }
+beltools_tests = { path = "./devtools/beltools_tests" }
 belvm = { path = "./vm/belvm" }
 belvm_bytecode = { path = "./vm/belvm_bytecode" }
 belvm_gc = { path = "./vm/belvm_gc/" }
 belvm_macros = { path = "./vm/belvm_macros" }
 belvm_std = { path = "./vm/belvm_std" }
-beltools_tests = { path = "./devtools/beltools_tests" }
+bincode = "2.0.1"
+clap = "4.5.4"
+crc32fast = "1.5.0"
+proc-macro2 = "1.0"
+quote = "1.0"
+serde = "1.0.219"
+syn = "2.0"
+thiserror = "2.0.0"
+unicode-ident = "1.0.18"
+# keep-sorted end
