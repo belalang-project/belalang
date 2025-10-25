@@ -120,6 +120,9 @@ pub const INDEX: u8 = 0xC1;
 /// See <https://github.com/belalang-project/belalang/issues/38>
 pub const PRINT: u8 = 0xD0;
 
+/// Filesystem write -- writes to the filesystem.
+pub const FS_WRITE: u8 = 0xD1;
+
 /// Encodes a [`CONSTANT`] instruction with 16-bit index
 ///
 /// # Arguments
