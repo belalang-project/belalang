@@ -4,9 +4,7 @@ use crate::errors::RuntimeError;
 
 /// Default stack size of Belalang VM
 ///
-/// This is currently a good enough stack size for Belalang VM. I don't really
-/// know how stack sizes are supposed to be implemented for efficiency. I still
-/// have stuff to read and things to explore.
+/// See <https://github.com/belalang-project/belalang/issues/44>
 const STACK_SIZE: usize = 4096;
 
 /// Values that live on the stack
@@ -23,10 +21,7 @@ pub enum StackValue {
     /// This value is mostly used to indicate uninitialized variables and actual
     /// null values.
     ///
-    /// # Problems
-    /// - I am not sure to go forward with the "null" name or not.
-    /// - I am not sure if uninitialized variables should have this as their
-    ///   value.
+    /// See <https://github.com/belalang-project/belalang/issues/14>
     #[default]
     Null,
 }
