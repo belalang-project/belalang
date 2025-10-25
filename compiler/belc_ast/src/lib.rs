@@ -3,7 +3,10 @@ mod parser;
 mod program;
 mod statements;
 
-use belc_lexer::{LexerError, TokenKind};
+use belc_lexer::{
+    LexerError,
+    TokenKind,
+};
 pub use expressions::*;
 pub use parser::Parser;
 pub use program::Program;

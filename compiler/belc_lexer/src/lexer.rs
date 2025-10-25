@@ -1,10 +1,19 @@
-use std::iter::Peekable;
-use std::str::Chars;
+use std::{
+    iter::Peekable,
+    str::Chars,
+};
 
-use unicode_ident::{is_xid_continue, is_xid_start};
+use unicode_ident::{
+    is_xid_continue,
+    is_xid_start,
+};
 
 use super::Token;
-use crate::{AssignmentKind, LiteralKind, TokenKind};
+use crate::{
+    AssignmentKind,
+    LiteralKind,
+    TokenKind,
+};
 
 #[derive(thiserror::Error, Debug)]
 pub enum LexerError {
@@ -555,10 +564,14 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::Lexer;
-    use super::Token;
-    use crate::LiteralKind;
-    use crate::TokenKind;
+    use super::{
+        Lexer,
+        Token,
+    };
+    use crate::{
+        LiteralKind,
+        TokenKind,
+    };
 
     #[test]
     fn str_ascii() {

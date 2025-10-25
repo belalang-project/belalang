@@ -1,5 +1,7 @@
-use std::fs;
-use std::path::PathBuf;
+use std::{
+    fs,
+    path::PathBuf,
+};
 
 #[derive(clap::Args)]
 pub struct Args {

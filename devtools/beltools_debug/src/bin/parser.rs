@@ -1,5 +1,10 @@
-use std::error::Error;
-use std::io::{self, Write};
+use std::{
+    error::Error,
+    io::{
+        self,
+        Write,
+    },
+};
 
 use belc_ast::Parser;
 use belc_lexer::Lexer;

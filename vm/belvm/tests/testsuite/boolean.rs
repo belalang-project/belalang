@@ -1,7 +1,11 @@
-use beltools_tests::IntoInstructionBytes;
-use beltools_tests::instructions;
-use belvm_bytecode::Constant;
-use belvm_bytecode::opcode;
+use beltools_tests::{
+    IntoInstructionBytes,
+    instructions,
+};
+use belvm_bytecode::{
+    Constant,
+    opcode,
+};
 
 #[track_caller]
 fn test_comparison_op(a: bool, b: bool, op: u8, c: bool) {

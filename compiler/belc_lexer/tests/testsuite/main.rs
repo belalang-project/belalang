@@ -1,4 +1,10 @@
-use belc_lexer::{AssignmentKind, Lexer, LiteralKind, Token, TokenKind};
+use belc_lexer::{
+    AssignmentKind,
+    Lexer,
+    LiteralKind,
+    Token,
+    TokenKind,
+};
 
 #[track_caller]
 fn test_tokens(input: &str, expected: Vec<Token>) {

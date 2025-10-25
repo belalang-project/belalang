@@ -3,9 +3,18 @@
 //! Defines the structure and components used to represent compiled bytecode,
 //! including instructions and constants.
 
-use std::io::{Cursor, Read};
+use std::io::{
+    Cursor,
+    Read,
+};
 
-use bincode::{Decode, Encode, config, decode_from_slice, encode_to_vec};
+use bincode::{
+    Decode,
+    Encode,
+    config,
+    decode_from_slice,
+    encode_to_vec,
+};
 use crc32fast::Hasher;
 
 static BEL_MAGIC: [u8; 4] = [0xBEu8, 0x1Au8, 0x1Au8, 0x9Cu8];

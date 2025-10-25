@@ -3,8 +3,11 @@ use std::error::Error;
 use belc_ast::Parser;
 use belc_codegen_vm::Compiler;
 use belc_lexer::Lexer;
-use belvm_bytecode::opcode;
-use belvm_bytecode::{Bytecode, Constant};
+use belvm_bytecode::{
+    Bytecode,
+    Constant,
+    opcode,
+};
 
 #[track_caller]
 fn test_compile(input: &str) -> Result<Bytecode, Box<dyn Error>> {

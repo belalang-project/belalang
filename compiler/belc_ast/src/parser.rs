@@ -1,29 +1,37 @@
-use belc_lexer::InfixKind;
-use belc_lexer::Lexer;
-use belc_lexer::LiteralKind;
-use belc_lexer::PrefixKind;
-use belc_lexer::Token;
-use belc_lexer::TokenKind;
+use belc_lexer::{
+    InfixKind,
+    Lexer,
+    LiteralKind,
+    PrefixKind,
+    Token,
+    TokenKind,
+};
 
-use super::{Expression, ParserError, Statement};
-use crate::ArrayLiteral;
-use crate::BlockExpression;
-use crate::BooleanExpression;
-use crate::CallExpression;
-use crate::ExpressionStatement;
-use crate::FloatLiteral;
-use crate::FunctionLiteral;
-use crate::Identifier;
-use crate::IfExpression;
-use crate::IndexExpression;
-use crate::InfixExpression;
-use crate::IntegerLiteral;
-use crate::PrefixExpression;
-use crate::Program;
-use crate::ReturnStatement;
-use crate::StringLiteral;
-use crate::VarExpression;
-use crate::WhileStatement;
+use super::{
+    Expression,
+    ParserError,
+    Statement,
+};
+use crate::{
+    ArrayLiteral,
+    BlockExpression,
+    BooleanExpression,
+    CallExpression,
+    ExpressionStatement,
+    FloatLiteral,
+    FunctionLiteral,
+    Identifier,
+    IfExpression,
+    IndexExpression,
+    InfixExpression,
+    IntegerLiteral,
+    PrefixExpression,
+    Program,
+    ReturnStatement,
+    StringLiteral,
+    VarExpression,
+    WhileStatement,
+};
 
 #[derive(Debug, PartialEq, PartialOrd)]
 pub enum Precedence {

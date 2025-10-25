@@ -1,9 +1,16 @@
-use std::error::Error;
-use std::io::{self, Write};
+use std::{
+    error::Error,
+    io::{
+        self,
+        Write,
+    },
+};
 
 use belc_ast::Parser;
-use belc_codegen_vm::Compiler;
-use belc_codegen_vm::disassembler::disassemble;
+use belc_codegen_vm::{
+    Compiler,
+    disassembler::disassemble,
+};
 use belc_lexer::Lexer;
 
 fn compile(line: String) -> Result<(), Box<dyn Error>> {

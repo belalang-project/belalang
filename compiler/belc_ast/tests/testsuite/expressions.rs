@@ -1,10 +1,16 @@
 #![allow(clippy::bool_assert_comparison)]
 
 use belc_ast as ast;
-use belc_lexer::{AssignmentKind, InfixKind, PrefixKind};
+use belc_lexer::{
+    AssignmentKind,
+    InfixKind,
+    PrefixKind,
+};
 
-use crate::common::*;
-use crate::*;
+use crate::{
+    common::*,
+    *,
+};
 
 #[track_caller]
 fn test_booleans(input: &str, value: bool) {

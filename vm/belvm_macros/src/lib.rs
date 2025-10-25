@@ -1,7 +1,15 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::parse::{Parse, ParseStream};
-use syn::{Fields, ItemStruct, Token, parse_macro_input};
+use syn::{
+    Fields,
+    ItemStruct,
+    Token,
+    parse::{
+        Parse,
+        ParseStream,
+    },
+    parse_macro_input,
+};
 
 // TODO: add documentation and clear namings
 

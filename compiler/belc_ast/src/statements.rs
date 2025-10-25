@@ -1,4 +1,7 @@
-use super::{BlockExpression, Expression};
+use super::{
+    BlockExpression,
+    Expression,
+};
 
 #[derive(Debug, Clone)]
 pub struct ExpressionStatement {

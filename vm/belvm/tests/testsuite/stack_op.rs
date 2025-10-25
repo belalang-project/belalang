@@ -1,7 +1,11 @@
-use beltools_tests::IntoInstructionBytes;
-use beltools_tests::instructions;
-use belvm_bytecode::Constant;
-use belvm_bytecode::opcode;
+use beltools_tests::{
+    IntoInstructionBytes,
+    instructions,
+};
+use belvm_bytecode::{
+    Constant,
+    opcode,
+};
 
 #[test]
 fn pop() {
