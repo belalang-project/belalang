@@ -148,7 +148,7 @@ impl VM {
                     let object = match constant {
                         Constant::Integer(int) => StackValue::Integer(int),
                         Constant::Boolean(boolean) => StackValue::Boolean(boolean),
-                        Constant::String(_) => todo!(),
+                        Constant::String(string) => StackValue::String(string),
                         Constant::Null => todo!(),
                     };
 
