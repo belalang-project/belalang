@@ -10,4 +10,5 @@ authors.workspace = true
 workspace = true
 
 [dependencies]
+libc.workspace = true
 thiserror.workspace = true
