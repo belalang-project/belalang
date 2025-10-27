@@ -2,6 +2,7 @@ use std::cell::RefCell;
 
 pub mod errors;
 pub mod gc;
+pub mod immix;
 
 thread_local! {
     static HEAP: RefCell<gc::GcHeap> = RefCell::new(gc::GcHeap::default());
