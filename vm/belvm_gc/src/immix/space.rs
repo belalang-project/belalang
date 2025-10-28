@@ -4,6 +4,8 @@ use std::{
     sync::Mutex,
 };
 
+use super::gc;
+
 pub const LOG_BYTES_IN_LINE: usize = 8;
 pub const LOG_BYTES_IN_BLOCK: usize = 16;
 
@@ -144,7 +146,8 @@ impl IxSpace {
         let res_new_block = self.blocks_usable.lock().unwrap().pop_front();
 
         if res_new_block.is_none() {
-            todo!("trigger gc");
+            gc::trigger_gc();
+            None
         } else {
             res_new_block
         }

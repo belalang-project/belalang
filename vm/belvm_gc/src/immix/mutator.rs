@@ -22,7 +22,7 @@ use crate::immix::space::{
 type Mutator = RwLock<Vec<Option<Arc<IxMutatorGlobal>>>>;
 const MAX_MUTATORS: usize = 1024;
 
-fn mutators() -> &'static Mutator {
+pub(crate) fn mutators() -> &'static Mutator {
     static MUTATORS: OnceLock<Mutator> = OnceLock::new();
     MUTATORS.get_or_init(|| {
         let mut mutators = Vec::with_capacity(MAX_MUTATORS);
