@@ -1,10 +1,13 @@
-use std::sync::{
-    Arc,
-    OnceLock,
-    RwLock,
-    atomic::{
-        AtomicBool,
-        Ordering,
+use std::{
+    ptr,
+    sync::{
+        Arc,
+        OnceLock,
+        RwLock,
+        atomic::{
+            AtomicBool,
+            Ordering,
+        },
     },
 };
 
@@ -31,6 +34,8 @@ fn n_mutators() -> &'static RwLock<usize> {
 
 pub struct IxMutatorLocal {
     id: usize,
+    cursor: ptr::NonNull<libc::c_void>,
+    limit: ptr::NonNull<libc::c_void>,
     global: Arc<IxMutatorGlobal>,
     space: Arc<IxSpace>,
 }
@@ -47,6 +52,8 @@ impl IxMutatorLocal {
 
         let mutator = Self {
             id: *id_lock,
+            cursor: ptr::NonNull::dangling(),
+            limit: ptr::NonNull::dangling(),
             global,
             space,
         };
@@ -54,6 +61,21 @@ impl IxMutatorLocal {
         *id_lock += 1;
 
         mutator
+    }
+
+    pub fn alloc(&mut self, size: usize, align: usize) -> ptr::NonNull<libc::c_void> {
+        let (start, end) = unsafe {
+            let offset = self.cursor.align_offset(align);
+            let start = self.cursor.add(offset);
+            (start, start.add(size))
+        };
+
+        if end > self.limit {
+            todo!()
+        } else {
+            self.cursor = end;
+            start
+        }
     }
 }
 
