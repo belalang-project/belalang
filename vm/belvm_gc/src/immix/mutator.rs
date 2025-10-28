@@ -11,7 +11,13 @@ use std::{
     },
 };
 
-use crate::immix::space::IxSpace;
+use crate::immix::space::{
+    IxBlock,
+    IxSpace,
+    LINES_IN_BLOCK,
+    LOG_BYTES_IN_LINE,
+    LineMark,
+};
 
 type Mutator = RwLock<Vec<Option<Arc<IxMutatorGlobal>>>>;
 const MAX_MUTATORS: usize = 1024;
@@ -36,8 +42,10 @@ pub struct IxMutatorLocal {
     id: usize,
     cursor: ptr::NonNull<libc::c_void>,
     limit: ptr::NonNull<libc::c_void>,
+    line: usize,
     global: Arc<IxMutatorGlobal>,
     space: Arc<IxSpace>,
+    block: Option<Box<IxBlock>>,
 }
 
 impl IxMutatorLocal {
@@ -54,8 +62,10 @@ impl IxMutatorLocal {
             id: *id_lock,
             cursor: ptr::NonNull::dangling(),
             limit: ptr::NonNull::dangling(),
+            line: LINES_IN_BLOCK,
             global,
             space,
+            block: None,
         };
 
         *id_lock += 1;
@@ -71,11 +81,50 @@ impl IxMutatorLocal {
         };
 
         if end > self.limit {
-            todo!()
+            self.try_alloc_from_local(size, align)
         } else {
             self.cursor = end;
             start
         }
+    }
+
+    pub fn try_alloc_from_local(&mut self, size: usize, align: usize) -> ptr::NonNull<libc::c_void> {
+        if self.line < LINES_IN_BLOCK {
+            let opt_next_available_line = {
+                let curr_line = self.line;
+                self.block().get_next_available_line(curr_line)
+            };
+
+            if let Some(next_available_line) = opt_next_available_line {
+                let end_line = self.block().get_next_unavailable_line(next_available_line);
+
+                unsafe {
+                    self.cursor = self.block().start().add(next_available_line << LOG_BYTES_IN_LINE);
+                    self.limit = self.block().start().add(end_line << LOG_BYTES_IN_LINE);
+                    self.line = end_line;
+
+                    let offset = self.limit.offset_from_unsigned(self.cursor);
+                    ptr::write_bytes(self.cursor.as_ptr(), 0, offset);
+                }
+
+                for line in next_available_line..end_line {
+                    self.block().line_mark_table_mut().set(line, LineMark::FreshAlloc);
+                }
+
+                return self.alloc(size, align);
+            }
+        }
+
+        // alloc from global
+        todo!()
+    }
+
+    pub fn alloc_from_global() {
+        todo!()
+    }
+
+    fn block(&mut self) -> &mut IxBlock {
+        self.block.as_mut().unwrap()
     }
 }
 

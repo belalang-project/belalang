@@ -78,6 +78,11 @@ impl LineMarkTableSlice {
     pub fn get(&self, index: usize) -> LineMark {
         unsafe { *self.ptr.add(index) }
     }
+
+    #[inline(always)]
+    pub fn set(&mut self, index: usize, value: LineMark) {
+        unsafe { *self.ptr.add(index) = value };
+    }
 }
 
 pub struct IxSpace {
@@ -152,5 +157,24 @@ impl IxBlock {
             i += 1;
         }
         None
+    }
+
+    pub fn get_next_unavailable_line(&self, curr_line: usize) -> usize {
+        let mut i = curr_line;
+        while i < self.line_mark_table.len {
+            match self.line_mark_table.get(i) {
+                LineMark::Free => i += 1,
+                _ => return i,
+            }
+        }
+        i
+    }
+
+    pub fn line_mark_table_mut(&mut self) -> &mut LineMarkTableSlice {
+        &mut self.line_mark_table
+    }
+
+    pub fn start(&self) -> ptr::NonNull<libc::c_void> {
+        self.start
     }
 }
