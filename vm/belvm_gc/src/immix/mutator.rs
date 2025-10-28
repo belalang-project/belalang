@@ -115,16 +115,49 @@ impl IxMutatorLocal {
             }
         }
 
-        // alloc from global
-        todo!()
+        self.alloc_from_global(size, align)
     }
 
-    pub fn alloc_from_global() {
-        todo!()
+    pub fn alloc_from_global(&mut self, size: usize, align: usize) -> ptr::NonNull<libc::c_void> {
+        self.return_block();
+
+        loop {
+            self.yieldpoint();
+
+            let new_block = self.space.get_next_usable_block();
+
+            match new_block {
+                Some(b) => {
+                    self.block = Some(b);
+                    self.cursor = self.block().start();
+                    self.limit = self.block().start();
+                    self.line = 0;
+
+                    return self.alloc(size, align);
+                },
+                None => continue,
+            }
+        }
     }
 
     fn block(&mut self) -> &mut IxBlock {
         self.block.as_mut().unwrap()
+    }
+
+    fn return_block(&mut self) {
+        if self.block.is_some() {
+            self.space.return_used_block(self.block.take().unwrap());
+        }
+    }
+
+    pub fn yieldpoint(&mut self) {
+        if self.global.take_yield() {
+            self.yieldpoint_slow();
+        }
+    }
+
+    pub fn yieldpoint_slow(&mut self) {
+        todo!("sync_barrier")
     }
 }
 

@@ -139,6 +139,16 @@ impl IxSpace {
     pub fn return_used_block(&self, old: Box<IxBlock>) {
         self.blocks_used.lock().unwrap().push_front(old);
     }
+
+    pub fn get_next_usable_block(&self) -> Option<Box<IxBlock>> {
+        let res_new_block = self.blocks_usable.lock().unwrap().pop_front();
+
+        if res_new_block.is_none() {
+            todo!("trigger gc");
+        } else {
+            res_new_block
+        }
+    }
 }
 
 pub struct IxBlock {
