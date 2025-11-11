@@ -1,4 +1,4 @@
-use beltools_tests::{
+use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
@@ -13,7 +13,7 @@ fn test_comparison_op(a: bool, b: bool, op: u8, c: bool) {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), op,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -37,7 +37,7 @@ fn test_logical_op(a: bool, b: bool, op: u8, c: bool) {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), op,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -61,7 +61,7 @@ fn bang() {
 
     let instructions = instructions![opcode::TRUE, opcode::BANG,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()

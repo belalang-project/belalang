@@ -15,4 +15,4 @@ belvm_macros.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
-beltools_tests.workspace = true
+belalang_dev_tools.workspace = true
