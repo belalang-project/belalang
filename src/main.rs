@@ -1,8 +1,9 @@
-use belalang::commands;
 use clap::{
     Parser,
     Subcommand,
 };
+
+pub mod commands;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
