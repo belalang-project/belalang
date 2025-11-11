@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "belalang"
+name = "belalang_cli"
 version = "0.1.0"
 dependencies = [
  "belalang_dev_tools",
