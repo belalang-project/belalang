@@ -1,0 +1,23 @@
+[package]
+name = "belalang_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "belalang"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+belc.workspace = true
+belvm.workspace = true
+belvm_bytecode.workspace = true
+clap = { workspace = true, features = ["derive"] }
+
+[dev-dependencies]
+belalang_dev_tools.workspace = true
+belvm_bytecode.workspace = true
