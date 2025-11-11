@@ -55,11 +55,19 @@ dependencies = [
 name = "belalang"
 version = "0.1.0"
 dependencies = [
+ "belalang_dev_tools",
  "belc",
- "beltools_tests",
  "belvm",
  "belvm_bytecode",
  "clap",
+]
+
+[[package]]
+name = "belalang_dev_tools"
+version = "0.1.0"
+dependencies = [
+ "belvm",
+ "belvm_bytecode",
 ]
 
 [[package]]
@@ -102,18 +110,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "beltools_tests"
-version = "0.1.0"
-dependencies = [
- "belvm",
- "belvm_bytecode",
-]
-
-[[package]]
 name = "belvm"
 version = "0.1.0"
 dependencies = [
- "beltools_tests",
+ "belalang_dev_tools",
  "belvm_bytecode",
  "belvm_macros",
  "thiserror",

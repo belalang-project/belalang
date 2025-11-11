@@ -1,4 +1,4 @@
-use beltools_tests::{
+use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
@@ -10,7 +10,7 @@ fn jump() {
 
     let instructions = instructions![opcode::jump(1), opcode::TRUE, opcode::FALSE,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -24,7 +24,7 @@ fn jump_if_false_op() {
 
     let instructions = instructions![opcode::TRUE, opcode::jump_if_false(1), opcode::TRUE, opcode::FALSE,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()

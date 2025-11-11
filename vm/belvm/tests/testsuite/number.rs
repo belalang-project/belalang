@@ -1,4 +1,4 @@
-use beltools_tests::{
+use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
@@ -13,7 +13,7 @@ fn test_arithmetic_op(a: i64, b: i64, op: u8, c: i64) {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), op,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -52,7 +52,7 @@ fn test_comparison_op(a: i64, b: i64, op: u8, c: bool) {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), op,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -86,7 +86,7 @@ fn test_bitwise_op(a: i64, b: i64, op: u8, c: i64) {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), op,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
@@ -125,7 +125,7 @@ fn minus() {
 
     let instructions = instructions![opcode::constant(0), opcode::MINUS,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()

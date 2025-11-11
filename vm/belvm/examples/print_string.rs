@@ -1,4 +1,4 @@
-use beltools_tests::{
+use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };

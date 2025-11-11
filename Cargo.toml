@@ -15,7 +15,7 @@ belvm_bytecode.workspace = true
 clap = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
-beltools_tests.workspace = true
+belalang_dev_tools.workspace = true
 belvm_bytecode.workspace = true
 
 # =============================
@@ -36,10 +36,10 @@ authors = ["Vito Secona <secona00@gmail.com>"]
 self_named_module_files = "deny"
 
 [workspace.dependencies] # keep-sorted start
+belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }
 belc = { path = "./compiler/belc" }
 belc_ast = { path = "./compiler/belc_ast" }
 belc_lexer = { path = "./compiler/belc_lexer" }
-beltools_tests = { path = "./devtools/beltools_tests" }
 belvm = { path = "./vm/belvm" }
 belvm_bytecode = { path = "./vm/belvm_bytecode" }
 belvm_gc = { path = "./vm/belvm_gc/" }

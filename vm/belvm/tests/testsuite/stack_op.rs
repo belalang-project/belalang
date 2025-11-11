@@ -1,4 +1,4 @@
-use beltools_tests::{
+use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
@@ -13,7 +13,7 @@ fn pop() {
 
     let instructions = instructions![opcode::constant(0), opcode::constant(1), opcode::POP,];
 
-    beltools_tests::VMBuilder::default()
+    belalang_dev_tools::VMBuilder::default()
         .with_instructions(instructions)
         .with_constants(constants)
         .run_ok()
