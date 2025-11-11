@@ -6,9 +6,25 @@ edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
+[[bin]]
+name = "lexer"
+path = "interactive/lexer.rs"
+required-features = ["interactive"]
+
+[[bin]]
+name = "parser"
+path = "interactive/parser.rs"
+required-features = ["interactive"]
+
+[features]
+interactive = ["dep:belc", "dep:belc_ast", "belc_lexer"]
+
 [lints]
 workspace = true
 
 [dependencies]
+belc = { workspace = true, optional = true }
+belc_ast = { workspace = true, optional = true }
+belc_lexer = { workspace = true, optional = true }
 belvm.workspace = true
 belvm_bytecode.workspace = true
