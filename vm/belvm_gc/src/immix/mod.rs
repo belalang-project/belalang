@@ -16,6 +16,7 @@ use crate::immix::{
 pub mod freelist;
 pub mod gc;
 pub mod mutator;
+pub mod objectmodel;
 pub mod space;
 
 #[cfg(target_arch = "x86_64")]
@@ -50,4 +51,6 @@ pub fn gc_init(ix_size: usize, lo_space: usize, n_gcthreads: usize) {
     drop(gc_writer);
 
     GC_THREADS.store(n_gcthreads, Ordering::SeqCst);
+
+    objectmodel::init();
 }
