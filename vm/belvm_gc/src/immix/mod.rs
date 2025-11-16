@@ -13,6 +13,7 @@ use crate::immix::{
     space::IxSpace,
 };
 
+pub mod freelist;
 pub mod gc;
 pub mod mutator;
 pub mod space;
