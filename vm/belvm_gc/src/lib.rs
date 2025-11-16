@@ -1,3 +1,5 @@
+#![feature(thread_local)]
+
 use std::cell::RefCell;
 
 pub mod errors;

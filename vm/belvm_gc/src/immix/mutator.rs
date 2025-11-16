@@ -140,8 +140,16 @@ impl IxMutatorLocal {
         }
     }
 
+    pub fn id(&self) -> usize {
+        self.id
+    }
+
     fn block(&mut self) -> &mut IxBlock {
         self.block.as_mut().unwrap()
+    }
+
+    pub fn prepare_for_gc(&mut self) {
+        self.return_block();
     }
 
     fn return_block(&mut self) {

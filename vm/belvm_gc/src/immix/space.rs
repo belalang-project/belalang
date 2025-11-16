@@ -95,6 +95,9 @@ pub struct IxSpace {
     line_mark_table: LineMarkTable,
 }
 
+unsafe impl Send for IxSpace {}
+unsafe impl Sync for IxSpace {}
+
 impl IxSpace {
     pub fn new(len: usize) -> Self {
         let addr = ptr::null_mut();
@@ -151,6 +154,14 @@ impl IxSpace {
         } else {
             res_new_block
         }
+    }
+
+    pub fn start(&self) -> ptr::NonNull<libc::c_void> {
+        self.mem_start
+    }
+
+    pub fn end(&self) -> ptr::NonNull<libc::c_void> {
+        self.mem_end
     }
 }
 
