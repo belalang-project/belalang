@@ -42,7 +42,8 @@ pub struct GcContext {
     immix_space: Option<Arc<IxSpace>>,
 }
 
-pub fn init(immix_space: Arc<IxSpace>) {
+pub fn init(n_gcthreads: usize, immix_space: Arc<IxSpace>) {
+    GC_THREADS.store(n_gcthreads, Ordering::SeqCst);
     CONTROLLER.store(NO_CONTROLLER, Ordering::SeqCst);
 
     let mut ctx = gc_context().write().unwrap();

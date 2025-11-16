@@ -8,10 +8,7 @@ use std::sync::{
     },
 };
 
-use crate::immix::{
-    gc::GC_THREADS,
-    space::IxSpace,
-};
+use crate::immix::space::IxSpace;
 
 pub mod freelist;
 pub mod gc;
@@ -44,13 +41,11 @@ pub fn gc_init(ix_size: usize, lo_space: usize, n_gcthreads: usize) {
     LO_SPACE_SIZE.store(lo_space, Ordering::SeqCst);
 
     let ix_space = Arc::new(IxSpace::new(ix_size));
-    gc::init(ix_space.clone());
+    gc::init(n_gcthreads, ix_space.clone());
 
     let mut gc_writer = gc().write().unwrap();
     *gc_writer = Some(Gc { ix_space });
     drop(gc_writer);
-
-    GC_THREADS.store(n_gcthreads, Ordering::SeqCst);
 
     objectmodel::init();
 }
