@@ -6,6 +6,7 @@ use std::{
         RwLock,
         atomic::{
             AtomicIsize,
+            AtomicUsize,
             Ordering,
         },
     },
@@ -28,6 +29,9 @@ pub const LOG_POINTER_SIZE: usize = 3;
 pub const POINTER_SIZE: usize = 1 << LOG_POINTER_SIZE;
 
 static CONTROLLER: AtomicIsize = AtomicIsize::new(0);
+static NO_CONTROLLER: isize = -1;
+
+pub static GC_THREADS: AtomicUsize = AtomicUsize::new(0);
 
 fn gc_context() -> &'static RwLock<GcContext> {
     static GC_CONTEXT: OnceLock<RwLock<GcContext>> = OnceLock::new();
@@ -36,6 +40,14 @@ fn gc_context() -> &'static RwLock<GcContext> {
 
 pub struct GcContext {
     immix_space: Option<Arc<IxSpace>>,
+}
+
+pub fn init(immix_space: Arc<IxSpace>) {
+    CONTROLLER.store(NO_CONTROLLER, Ordering::SeqCst);
+
+    let mut ctx = gc_context().write().unwrap();
+    ctx.immix_space = Some(immix_space);
+    drop(ctx);
 }
 
 pub fn trigger_gc() {
