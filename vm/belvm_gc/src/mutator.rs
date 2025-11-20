@@ -11,7 +11,7 @@ use std::{
     },
 };
 
-use crate::immix::space::{
+use crate::space::{
     IxBlock,
     IxSpace,
     LINES_IN_BLOCK,

@@ -11,7 +11,7 @@ use std::{
     },
 };
 
-use crate::immix::{
+use crate::{
     gc,
     mutator::IxMutatorLocal,
 };
