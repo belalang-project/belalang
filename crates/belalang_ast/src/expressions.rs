@@ -1,4 +1,4 @@
-use belc_lexer::{
+use belalang_lexer::{
     AssignmentKind,
     InfixKind,
     PrefixKind,

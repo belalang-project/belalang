@@ -2,9 +2,9 @@ mod expressions;
 mod statements;
 
 pub mod common {
-    use belc_ast as ast;
-    use belc_ast::Parser;
-    use belc_lexer::Lexer;
+    use belalang_ast as ast;
+    use belalang_ast::Parser;
+    use belalang_lexer::Lexer;
 
     #[track_caller]
     pub fn test_parse(input: &str) -> ast::Program {

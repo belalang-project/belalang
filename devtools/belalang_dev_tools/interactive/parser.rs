@@ -6,8 +6,8 @@ use std::{
     },
 };
 
-use belc_ast::Parser;
-use belc_lexer::Lexer;
+use belalang_ast::Parser;
+use belalang_lexer::Lexer;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut input = String::new();
