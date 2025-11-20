@@ -119,7 +119,24 @@ unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
 
 #[cfg(not(unix))]
 unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
-    ptr::NonNull::dangling()
+    use windows_sys::Win32::System::Memory::{
+        MEM_COMMIT,
+        MEM_RESERVE,
+        PAGE_READWRITE,
+        VirtualAlloc,
+    };
+
+    let addr = ptr::null_mut();
+    let flags = MEM_COMMIT | MEM_RESERVE;
+    let prot = PAGE_READWRITE;
+
+    let raw_ptr = unsafe { VirtualAlloc(addr, len, flags, prot) };
+
+    if raw_ptr.is_null() {
+        panic!("VirtualAlloc failed: {}", std::io::Error::last_os_error());
+    }
+
+    unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
 }
 
 impl IxSpace {
