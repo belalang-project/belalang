@@ -12,9 +12,9 @@ authors = ["Vito Secona <secona00@gmail.com>"]
 self_named_module_files = "deny"
 
 [workspace.dependencies] # keep-sorted start
+belalang_ast = { path = "./compiler/belc_ast" }
 belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }
-belc_ast = { path = "./compiler/belc_ast" }
-belc_lexer = { path = "./compiler/belc_lexer" }
+belalang_lexer = { path = "./compiler/belc_lexer" }
 belvm = { path = "./vm/belvm" }
 belvm_bytecode = { path = "./vm/belvm_bytecode" }
 belvm_gc = { path = "./vm/belvm_gc/" }

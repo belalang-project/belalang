@@ -6,7 +6,7 @@ use std::{
     },
 };
 
-use belc_lexer::{
+use belalang_lexer::{
     Lexer,
     TokenKind,
 };

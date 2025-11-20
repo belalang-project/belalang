@@ -1,5 +1,5 @@
-use belc_ast as ast;
-use belc_lexer::InfixKind;
+use belalang_ast as ast;
+use belalang_lexer::InfixKind;
 
 use crate::{
     common::*,

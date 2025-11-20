@@ -3,7 +3,7 @@ mod parser;
 mod program;
 mod statements;
 
-use belc_lexer::{
+use belalang_lexer::{
     LexerError,
     TokenKind,
 };

@@ -1,5 +1,5 @@
 [package]
-name = "belc_ast"
+name = "belalang_ast"
 publish = false
 version.workspace = true
 edition.workspace = true
@@ -10,5 +10,5 @@ authors.workspace = true
 workspace = true
 
 [dependencies]
-belc_lexer.workspace = true
+belalang_lexer.workspace = true
 thiserror.workspace = true

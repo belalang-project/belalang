@@ -1,7 +1,7 @@
 #![allow(clippy::bool_assert_comparison)]
 
-use belc_ast as ast;
-use belc_lexer::{
+use belalang_ast as ast;
+use belalang_lexer::{
     AssignmentKind,
     InfixKind,
     PrefixKind,
