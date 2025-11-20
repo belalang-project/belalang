@@ -18,11 +18,6 @@ use crate::{
         mutators,
     },
     space::IxSpace,
-    x86_64::{
-        self,
-        get_registers,
-        get_registers_count,
-    },
 };
 
 pub const LOG_POINTER_SIZE: usize = 3;
@@ -59,7 +54,10 @@ pub fn trigger_gc() {
     }
 }
 
+#[cfg(target_arch = "x86_64")]
 pub fn stack_scan() -> Vec<ptr::NonNull<libc::c_void>> {
+    use crate::x86_64;
+
     let stack_ptr = unsafe {
         let sp_usize = x86_64::get_stack_ptr();
         let sp_ptr = sp_usize as *mut libc::c_void;
@@ -87,8 +85,8 @@ pub fn stack_scan() -> Vec<ptr::NonNull<libc::c_void>> {
         cursor = unsafe { cursor.add(POINTER_SIZE) };
     }
 
-    let reg_count = get_registers_count();
-    let regs = unsafe { get_registers() };
+    let reg_count = x86_64::get_registers_count();
+    let regs = unsafe { x86_64::get_registers() };
 
     for i in 0..reg_count {
         let value = unsafe { regs.offset(i as isize) };
@@ -121,6 +119,9 @@ pub fn sync_barrier(mutator: &mut IxMutatorLocal) {
 
     mutator.prepare_for_gc();
 
-    let thread_roots = stack_scan();
-    todo!("Append thread_roots to roots");
+    #[cfg(target_arch = "x86_64")]
+    {
+        let thread_roots = stack_scan();
+        todo!("Append thread_roots to roots");
+    }
 }
