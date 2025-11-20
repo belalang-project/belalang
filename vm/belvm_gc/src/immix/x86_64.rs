@@ -57,13 +57,6 @@ pub unsafe fn get_registers() -> ptr::NonNull<libc::c_void> {
     unsafe { ptr::NonNull::new_unchecked(ptr) }
 }
 
-pub unsafe fn set_low_water_mark() {
-    unsafe {
-        let rsp = get_stack_ptr();
-        LOW_WATER_MARK = rsp;
-    }
-}
-
 pub unsafe fn get_low_water_mark() -> usize {
     unsafe { LOW_WATER_MARK }
 }

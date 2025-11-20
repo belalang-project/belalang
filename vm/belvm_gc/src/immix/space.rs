@@ -30,8 +30,10 @@ pub enum BlockMark {
 
 #[derive(Clone)]
 pub struct LineMarkTable {
+    #[allow(dead_code)]
     space_start: ptr::NonNull<libc::c_void>,
     ptr: *mut LineMark,
+    #[allow(dead_code)]
     len: usize,
 }
 
@@ -102,12 +104,17 @@ impl IxSpace {
     pub fn new(len: usize) -> Self {
         let addr = ptr::null_mut();
         let prot = libc::PROT_READ | libc::PROT_WRITE;
-        let flags = libc::MAP_ANONYMOUS;
+        let flags = libc::MAP_ANONYMOUS | libc::MAP_PRIVATE;
         let fd = -1;
         let offset = 0;
 
         let (mem_start, mem_end) = unsafe {
             let raw_ptr = libc::mmap(addr, len, prot, flags, fd, offset);
+
+            if raw_ptr == libc::MAP_FAILED {
+                panic!("mmap failed: {}", std::io::Error::last_os_error());
+            }
+
             let start = ptr::NonNull::new_unchecked(raw_ptr);
             let end = start.add(len);
             (start, end)
@@ -126,7 +133,7 @@ impl IxSpace {
         let mut blocks_usable = space.blocks_usable.lock().unwrap();
         let mut block_start = mem_start.clone();
         let mut line = 0;
-        while unsafe { block_start.add(BYTES_IN_BLOCK) } <= mem_end {
+        while unsafe { mem_end.offset_from(block_start) } >= BYTES_IN_BLOCK as isize {
             let block = IxBlock {
                 state: BlockMark::Usable,
                 start: block_start,
@@ -166,6 +173,7 @@ impl IxSpace {
 }
 
 pub struct IxBlock {
+    #[allow(dead_code)]
     state: BlockMark,
     start: ptr::NonNull<libc::c_void>,
     line_mark_table: LineMarkTableSlice,

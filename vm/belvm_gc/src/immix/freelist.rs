@@ -96,6 +96,7 @@ impl FreeListSpace {
 }
 
 pub struct FreeListNode {
+    #[allow(dead_code)]
     id: usize,
     start: ptr::NonNull<libc::c_void>,
     layout: Layout,

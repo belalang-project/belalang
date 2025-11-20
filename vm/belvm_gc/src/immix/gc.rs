@@ -113,6 +113,7 @@ pub fn stack_scan() -> Vec<ptr::NonNull<libc::c_void>> {
     }
 }
 
+#[allow(unused_variables)]
 pub fn sync_barrier(mutator: &mut IxMutatorLocal) {
     let controller_id = CONTROLLER
         .compare_exchange(-1, mutator.id() as isize, Ordering::SeqCst, Ordering::SeqCst)
@@ -120,6 +121,6 @@ pub fn sync_barrier(mutator: &mut IxMutatorLocal) {
 
     mutator.prepare_for_gc();
 
-    let mut thread_roots = stack_scan();
+    let thread_roots = stack_scan();
     todo!("Append thread_roots to roots");
 }

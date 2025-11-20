@@ -8,7 +8,10 @@ use std::sync::{
     },
 };
 
-use crate::immix::space::IxSpace;
+use crate::immix::{
+    mutator::IxMutatorLocal,
+    space::IxSpace,
+};
 
 pub mod freelist;
 pub mod gc;
@@ -48,4 +51,10 @@ pub fn gc_init(ix_size: usize, lo_space: usize, n_gcthreads: usize) {
     drop(gc_writer);
 
     objectmodel::init();
+}
+
+pub fn new_mutator() -> Box<IxMutatorLocal> {
+    Box::new(IxMutatorLocal::new(
+        gc().read().unwrap().as_ref().unwrap().ix_space.clone(),
+    ))
 }

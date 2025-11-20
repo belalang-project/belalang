@@ -7,6 +7,8 @@ use belvm_gc::{
     with_heap,
 };
 
+mod immix;
+
 #[derive(Clone)]
 struct Integer {
     header: GcObjectHeader,
