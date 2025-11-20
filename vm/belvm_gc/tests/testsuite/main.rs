@@ -6,7 +6,7 @@ use belvm_gc::{
 };
 
 #[test]
-#[cfg(all(target_arch = "x86_64", unix))]
+#[cfg(target_arch = "x86_64")]
 fn simple() {
     #[repr(C)]
     struct Test(i32, i32);

@@ -12,3 +12,7 @@ workspace = true
 [dependencies]
 libc.workspace = true
 thiserror.workspace = true
+
+[dependencies.windows-sys]
+workspace = true
+features = ["Win32_System_Memory"]
