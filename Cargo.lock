@@ -56,7 +56,6 @@ name = "belalang_cli"
 version = "0.1.0"
 dependencies = [
  "belalang_dev_tools",
- "belc",
  "belvm",
  "belvm_bytecode",
  "clap",
@@ -66,22 +65,10 @@ dependencies = [
 name = "belalang_dev_tools"
 version = "0.1.0"
 dependencies = [
- "belc",
  "belc_ast",
  "belc_lexer",
  "belvm",
  "belvm_bytecode",
-]
-
-[[package]]
-name = "belc"
-version = "0.1.0"
-dependencies = [
- "belc_ast",
- "belc_lexer",
- "belvm_bytecode",
- "thiserror",
- "unicode-ident",
 ]
 
 [[package]]

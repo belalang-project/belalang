@@ -17,13 +17,12 @@ path = "interactive/parser.rs"
 required-features = ["interactive"]
 
 [features]
-interactive = ["dep:belc", "dep:belc_ast", "belc_lexer"]
+interactive = ["dep:belc_ast", "belc_lexer"]
 
 [lints]
 workspace = true
 
 [dependencies]
-belc = { workspace = true, optional = true }
 belc_ast = { workspace = true, optional = true }
 belc_lexer = { workspace = true, optional = true }
 belvm.workspace = true

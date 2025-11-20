@@ -13,7 +13,6 @@ self_named_module_files = "deny"
 
 [workspace.dependencies] # keep-sorted start
 belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }
-belc = { path = "./compiler/belc" }
 belc_ast = { path = "./compiler/belc_ast" }
 belc_lexer = { path = "./compiler/belc_lexer" }
 belvm = { path = "./vm/belvm" }
