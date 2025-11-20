@@ -102,13 +102,14 @@ unsafe impl Sync for IxSpace {}
 
 impl IxSpace {
     pub fn new(len: usize) -> Self {
-        let addr = ptr::null_mut();
-        let prot = libc::PROT_READ | libc::PROT_WRITE;
-        let flags = libc::MAP_ANONYMOUS | libc::MAP_PRIVATE;
-        let fd = -1;
-        let offset = 0;
-
+        #[cfg(unix)]
         let (mem_start, mem_end) = unsafe {
+            let addr = ptr::null_mut();
+            let prot = libc::PROT_READ | libc::PROT_WRITE;
+            let flags = libc::MAP_ANONYMOUS | libc::MAP_PRIVATE;
+            let fd = -1;
+            let offset = 0;
+
             let raw_ptr = libc::mmap(addr, len, prot, flags, fd, offset);
 
             if raw_ptr == libc::MAP_FAILED {
@@ -119,6 +120,9 @@ impl IxSpace {
             let end = start.add(len);
             (start, end)
         };
+
+        #[cfg(not(unix))]
+        let (mem_start, mem_end) = (ptr::NonNull::dangling(), ptr::NonNull::dangling());
 
         let line_mark_table = LineMarkTable::new(mem_start, mem_end);
 
