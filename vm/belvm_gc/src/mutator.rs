@@ -174,6 +174,12 @@ pub struct IxMutatorGlobal {
     still_blocked: AtomicBool,
 }
 
+impl Default for IxMutatorGlobal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl IxMutatorGlobal {
     pub fn new() -> Self {
         Self {

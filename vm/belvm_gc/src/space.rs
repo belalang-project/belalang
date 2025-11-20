@@ -61,7 +61,7 @@ impl LineMarkTable {
     }
 
     pub fn take_slice(&mut self, start: usize, len: usize) -> LineMarkTableSlice {
-        let ptr = unsafe { self.ptr.offset(start as isize) };
+        let ptr = unsafe { self.ptr.add(start) };
         LineMarkTableSlice { ptr, len }
     }
 
@@ -135,7 +135,7 @@ impl IxSpace {
         };
 
         let mut blocks_usable = space.blocks_usable.lock().unwrap();
-        let mut block_start = mem_start.clone();
+        let mut block_start = mem_start;
         let mut line = 0;
         while unsafe { mem_end.offset_from(block_start) } >= BYTES_IN_BLOCK as isize {
             let block = IxBlock {

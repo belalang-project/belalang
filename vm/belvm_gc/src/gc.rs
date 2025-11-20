@@ -47,10 +47,8 @@ pub fn init(n_gcthreads: usize, immix_space: Arc<IxSpace>) {
 }
 
 pub fn trigger_gc() {
-    for m in mutators().write().unwrap().iter_mut() {
-        if let Some(m) = m {
-            m.set_take_yield(true);
-        }
+    for m in mutators().write().unwrap().iter_mut().flatten() {
+        m.set_take_yield(true);
     }
 }
 
