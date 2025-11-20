@@ -117,7 +117,7 @@ unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
     unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
 }
 
-#[cfg(not(unix))]
+#[cfg(windows)]
 unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
     use windows_sys::Win32::System::Memory::{
         MEM_COMMIT,
@@ -138,6 +138,9 @@ unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
 
     unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
 }
+
+#[cfg(not(any(unix, windows)))]
+compile_error!("Unsupported platform. Only Unix-like systems and Windows are currently supported.");
 
 impl IxSpace {
     pub fn new(len: usize) -> Self {
