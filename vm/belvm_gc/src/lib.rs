@@ -23,9 +23,6 @@ pub mod mutator;
 pub mod objectmodel;
 pub mod space;
 
-#[cfg(target_arch = "x86_64")]
-mod x86_64;
-
 pub fn gc() -> &'static RwLock<Option<Gc>> {
     static GC: OnceLock<RwLock<Option<Gc>>> = OnceLock::new();
     GC.get_or_init(|| RwLock::new(None))
