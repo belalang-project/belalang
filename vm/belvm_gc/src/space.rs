@@ -1,5 +1,10 @@
 use std::{
+    alloc::{
+        Layout,
+        alloc,
+    },
     collections::LinkedList,
+    mem,
     ptr,
     sync::Mutex,
 };
@@ -42,10 +47,10 @@ impl LineMarkTable {
         let offset = unsafe { space_end.offset_from(space_start) };
         let len = offset.unsigned_abs() / BYTES_IN_LINE;
 
-        let line_mark_table = unsafe {
-            let size: libc::size_t = std::mem::size_of::<LineMark>() * len;
-            libc::malloc(size) as *mut LineMark
-        };
+        let line_mark_table_layout =
+            unsafe { Layout::from_size_align_unchecked(mem::size_of::<LineMark>() * len, mem::align_of::<LineMark>()) };
+
+        let line_mark_table = unsafe { alloc(line_mark_table_layout) } as *mut LineMark;
 
         let mut cursor = line_mark_table;
         for _ in 0..len {
