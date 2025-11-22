@@ -37,10 +37,9 @@ jobs:
         run: rustup update nightly && rustup default nightly
       - name: Build workspace for release
         run: cargo build --release --workspace
-  flake-check:
+  flake-static-check:
     strategy:
       matrix:
-        # omit `workspace-test` and `workspace-build` as that is already covered
         checks: [treefmt, workspace-clippy]
         target: [x86_64-linux]
     name: Check Nix Flake
@@ -52,10 +51,24 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v19
       - name: Check Nix flake
         run: nix build .#checks.${{ matrix.target }}.${{ matrix.checks }} -L
+  flake-test:
+    strategy:
+      matrix:
+        checks: [workspace-test]
+        target: [x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin]
+    name: Test using Nix Flake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v19
+      - name: Check Nix flake
+        run: nix build .#checks.${{ matrix.target }}.${{ matrix.checks }} -L
   flake-build:
     strategy:
       matrix:
-        target: [x86_64-linux]
+        target: [x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin]
     name: Build Nix Package
     runs-on: ubuntu-latest
     steps:
