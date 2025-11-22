@@ -1,4 +1,5 @@
 #![feature(thread_local)]
+#![feature(cfg_select)]
 
 use std::sync::{
     Arc,
@@ -17,6 +18,7 @@ use crate::{
 
 pub mod freelist;
 pub mod gc;
+mod mem;
 pub mod mutator;
 pub mod objectmodel;
 pub mod space;

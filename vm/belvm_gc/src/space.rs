@@ -9,7 +9,10 @@ use std::{
     sync::Mutex,
 };
 
-use super::gc;
+use super::{
+    gc,
+    mem as gc_mem,
+};
 
 pub const LOG_BYTES_IN_LINE: usize = 8;
 pub const LOG_BYTES_IN_BLOCK: usize = 16;
@@ -105,52 +108,10 @@ pub struct IxSpace {
 unsafe impl Send for IxSpace {}
 unsafe impl Sync for IxSpace {}
 
-#[cfg(unix)]
-unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
-    let addr = ptr::null_mut();
-    let prot = libc::PROT_READ | libc::PROT_WRITE;
-    let flags = libc::MAP_ANONYMOUS | libc::MAP_PRIVATE;
-    let fd = -1;
-    let offset = 0;
-
-    let raw_ptr = unsafe { libc::mmap(addr, len, prot, flags, fd, offset) };
-
-    if raw_ptr == libc::MAP_FAILED {
-        panic!("mmap failed: {}", std::io::Error::last_os_error());
-    }
-
-    unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
-}
-
-#[cfg(windows)]
-unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
-    use windows_sys::Win32::System::Memory::{
-        MEM_COMMIT,
-        MEM_RESERVE,
-        PAGE_READWRITE,
-        VirtualAlloc,
-    };
-
-    let addr = ptr::null_mut();
-    let flags = MEM_COMMIT | MEM_RESERVE;
-    let prot = PAGE_READWRITE;
-
-    let raw_ptr = unsafe { VirtualAlloc(addr, len, flags, prot) };
-
-    if raw_ptr.is_null() {
-        panic!("VirtualAlloc failed: {}", std::io::Error::last_os_error());
-    }
-
-    unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
-}
-
-#[cfg(not(any(unix, windows)))]
-compile_error!("Unsupported platform. Only Unix-like systems and Windows are currently supported.");
-
 impl IxSpace {
     pub fn new(len: usize) -> Self {
         let (mem_start, mem_end) = unsafe {
-            let start = alloc_space(len);
+            let start = gc_mem::alloc_space(len);
             let end = start.add(len);
             (start, end)
         };
