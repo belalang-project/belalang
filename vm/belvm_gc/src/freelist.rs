@@ -40,7 +40,7 @@ impl FreeListSpace {
             let layout = Layout::from_size_align(size, align).ok()?;
 
             let ptr = unsafe {
-                let ptr = alloc::alloc(layout) as *mut libc::c_void;
+                let ptr = alloc::alloc(layout).cast::<libc::c_void>();
                 ptr::NonNull::new_unchecked(ptr)
             };
 
@@ -74,7 +74,7 @@ impl FreeListSpace {
                         ret.push_back(node);
                     },
                     NodeMark::PrevLive | NodeMark::FreshAlloc => {
-                        unsafe { alloc::dealloc(node.start.as_ptr() as *mut u8, node.layout) };
+                        unsafe { alloc::dealloc(node.start.as_ptr().cast::<u8>(), node.layout) };
                     },
                 }
             }
