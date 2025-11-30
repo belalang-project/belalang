@@ -9,9 +9,11 @@ pub unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
 
     let raw_ptr = unsafe { libc::mmap(addr, len, prot, flags, fd, offset) };
 
-    if raw_ptr == libc::MAP_FAILED {
-        panic!("mmap failed: {}", std::io::Error::last_os_error());
-    }
+    assert!(
+        (raw_ptr != libc::MAP_FAILED),
+        "mmap failed: {}",
+        std::io::Error::last_os_error()
+    );
 
     unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
 }
