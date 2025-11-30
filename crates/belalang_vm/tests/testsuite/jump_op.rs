@@ -1,8 +1,8 @@
+use belalang_bytecode::opcode;
 use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
-use belalang_bytecode::opcode;
 
 #[test]
 fn jump() {

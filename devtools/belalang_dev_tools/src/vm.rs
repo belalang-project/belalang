@@ -1,10 +1,10 @@
-use belalang_vm::{
-    VM,
-    stack::StackValue,
-};
 use belalang_bytecode::{
     Bytecode,
     Constant,
+};
+use belalang_vm::{
+    VM,
+    stack::StackValue,
 };
 
 #[derive(Default)]
