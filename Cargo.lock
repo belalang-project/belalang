@@ -60,12 +60,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "belalang_bytecode"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "crc32fast",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "belalang_cli"
 version = "0.1.0"
 dependencies = [
+ "belalang_bytecode",
  "belalang_dev_tools",
- "belvm",
- "belvm_bytecode",
+ "belalang_vm",
  "clap",
 ]
 
@@ -74,9 +84,18 @@ name = "belalang_dev_tools"
 version = "0.1.0"
 dependencies = [
  "belalang_ast",
+ "belalang_bytecode",
  "belalang_lexer",
- "belvm",
- "belvm_bytecode",
+ "belalang_vm",
+]
+
+[[package]]
+name = "belalang_gc"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "thiserror",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -88,36 +107,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "belvm"
-version = "0.1.0"
-dependencies = [
- "belalang_dev_tools",
- "belvm_bytecode",
- "belvm_macros",
- "thiserror",
-]
-
-[[package]]
-name = "belvm_bytecode"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "crc32fast",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "belvm_gc"
-version = "0.1.0"
-dependencies = [
- "libc",
- "thiserror",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "belvm_macros"
+name = "belalang_macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
@@ -126,8 +116,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "belvm_std"
+name = "belalang_std"
 version = "0.1.0"
+
+[[package]]
+name = "belalang_vm"
+version = "0.1.0"
+dependencies = [
+ "belalang_bytecode",
+ "belalang_dev_tools",
+ "belalang_macros",
+ "thiserror",
+]
 
 [[package]]
 name = "bincode"

@@ -1,18 +1,18 @@
 [package]
-name = "belvm_macros"
+name = "belalang_gc"
 publish = false
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
-[lib]
-proc-macro = true
-
 [lints]
 workspace = true
 
 [dependencies]
-proc-macro2.workspace = true
-quote.workspace = true
-syn = { workspace = true, features = ["full"] }
+libc.workspace = true
+thiserror.workspace = true
+
+[dependencies.windows-sys]
+workspace = true
+features = ["Win32_System_Memory"]

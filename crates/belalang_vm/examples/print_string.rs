@@ -1,13 +1,13 @@
-use belalang_dev_tools::{
-    IntoInstructionBytes,
-    instructions,
-};
-use belvm::VM;
-use belvm_bytecode::{
+use belalang_bytecode::{
     Bytecode,
     Constant,
     opcode,
 };
+use belalang_dev_tools::{
+    IntoInstructionBytes,
+    instructions,
+};
+use belalang_vm::VM;
 
 fn main() {
     let s = String::from("Hello, World!");

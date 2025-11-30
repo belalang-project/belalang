@@ -1,5 +1,5 @@
 [package]
-name = "belvm_bytecode"
+name = "belalang_bytecode"
 publish = false
 version.workspace = true
 edition.workspace = true

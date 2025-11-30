@@ -1,10 +1,10 @@
+use belalang_bytecode::{
+    Constant,
+    opcode,
+};
 use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
-};
-use belvm_bytecode::{
-    Constant,
-    opcode,
 };
 
 #[track_caller]

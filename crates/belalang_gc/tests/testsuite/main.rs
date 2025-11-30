@@ -1,6 +1,6 @@
 use std::mem;
 
-use belvm_gc::{
+use belalang_gc::{
     gc_init,
     new_mutator,
 };

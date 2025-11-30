@@ -25,5 +25,5 @@ workspace = true
 [dependencies]
 belalang_ast = { workspace = true, optional = true }
 belalang_lexer = { workspace = true, optional = true }
-belvm.workspace = true
-belvm_bytecode.workspace = true
+belalang_vm.workspace = true
+belalang_bytecode.workspace = true
