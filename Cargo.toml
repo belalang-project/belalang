@@ -10,6 +10,8 @@ authors = ["Vito Secona <secona00@gmail.com>"]
 
 [workspace.lints.clippy]
 self_named_module_files = "deny"
+ptr_as_ptr = "deny"
+manual_assert = "deny"
 
 [workspace.dependencies] # keep-sorted start
 belalang_ast = { path = "./crates/belalang_ast" }

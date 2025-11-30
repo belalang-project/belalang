@@ -14,9 +14,11 @@ pub unsafe fn alloc_space(len: usize) -> ptr::NonNull<libc::c_void> {
 
     let raw_ptr = unsafe { VirtualAlloc(addr, len, flags, prot) };
 
-    if raw_ptr.is_null() {
-        panic!("VirtualAlloc failed: {}", std::io::Error::last_os_error());
-    }
+    assert!(
+        !raw_ptr.is_null(),
+        "VirtualAlloc failed: {}",
+        std::io::Error::last_os_error()
+    );
 
     unsafe { ptr::NonNull::new_unchecked(raw_ptr) }
 }

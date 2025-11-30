@@ -53,7 +53,7 @@ impl LineMarkTable {
         let line_mark_table_layout =
             unsafe { Layout::from_size_align_unchecked(mem::size_of::<LineMark>() * len, mem::align_of::<LineMark>()) };
 
-        let line_mark_table = unsafe { alloc(line_mark_table_layout) } as *mut LineMark;
+        let line_mark_table = unsafe { alloc(line_mark_table_layout) }.cast::<LineMark>();
 
         let mut cursor = line_mark_table;
         for _ in 0..len {
