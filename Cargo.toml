@@ -15,13 +15,13 @@ manual_assert = "deny"
 
 [workspace.dependencies] # keep-sorted start
 belalang_ast = { path = "./crates/belalang_ast" }
+belalang_bytecode = { path = "./vm/belvm_bytecode" }
 belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }
+belalang_gc = { path = "./vm/belvm_gc/" }
 belalang_lexer = { path = "./crates/belalang_lexer" }
-belvm = { path = "./vm/belvm" }
-belvm_bytecode = { path = "./vm/belvm_bytecode" }
-belvm_gc = { path = "./vm/belvm_gc/" }
-belvm_macros = { path = "./vm/belvm_macros" }
-belvm_std = { path = "./vm/belvm_std" }
+belalang_macros = { path = "./vm/belvm_macros" }
+belalang_std = { path = "./vm/belvm_std" }
+belalang_vm = { path = "./vm/belvm" }
 bincode = "2.0.1"
 clap = "4.5.4"
 crc32fast = "1.5.0"

@@ -1,4 +1,4 @@
-use belvm_bytecode::{
+use belalang_bytecode::{
     Bytecode,
     Constant,
     opcode,

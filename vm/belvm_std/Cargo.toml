@@ -1,5 +1,5 @@
 [package]
-name = "belvm_std"
+name = "belalang_std"
 publish = false
 version.workspace = true
 edition.workspace = true

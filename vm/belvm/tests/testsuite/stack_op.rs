@@ -2,7 +2,7 @@ use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
-use belvm_bytecode::{
+use belalang_bytecode::{
     Constant,
     opcode,
 };

@@ -2,8 +2,8 @@ use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
-use belvm::VM;
-use belvm_bytecode::{
+use belalang_vm::VM;
+use belalang_bytecode::{
     Bytecode,
     Constant,
     opcode,

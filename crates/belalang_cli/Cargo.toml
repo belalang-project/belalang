@@ -13,10 +13,9 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
-belvm.workspace = true
-belvm_bytecode.workspace = true
+belalang_vm.workspace = true
+belalang_bytecode.workspace = true
 clap = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 belalang_dev_tools.workspace = true
-belvm_bytecode.workspace = true

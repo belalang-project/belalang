@@ -1,5 +1,5 @@
 [package]
-name = "belvm"
+name = "belalang_vm"
 publish = false
 version.workspace = true
 edition.workspace = true
@@ -10,8 +10,8 @@ authors.workspace = true
 workspace = true
 
 [dependencies]
-belvm_bytecode.workspace = true
-belvm_macros.workspace = true
+belalang_bytecode.workspace = true
+belalang_macros.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]

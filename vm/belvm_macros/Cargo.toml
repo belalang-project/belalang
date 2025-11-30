@@ -1,5 +1,5 @@
 [package]
-name = "belvm_macros"
+name = "belalang_macros"
 publish = false
 version.workspace = true
 edition.workspace = true
