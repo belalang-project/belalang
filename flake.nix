@@ -44,9 +44,10 @@
           # Build cargo deps of the entire workspace.
           cargoArtifacts = craneLib.buildDepsOnly { inherit src; };
 
+          pname = "belalang";
+
           belalang = craneLib.buildPackage {
-            pname = "belalang";
-            inherit src cargoArtifacts;
+            inherit pname src cargoArtifacts;
           };
         in
         {
@@ -61,17 +62,17 @@
 
           checks = {
             workspace-test = craneLib.cargoNextest {
-              inherit src cargoArtifacts;
+              inherit pname src cargoArtifacts;
               cargoNextestExtraArgs = "--workspace --all-features";
             };
 
             workspace-clippy = craneLib.cargoClippy {
-              inherit src cargoArtifacts;
+              inherit pname src cargoArtifacts;
               cargoClippyExtraArgs = "--workspace --all-targets --all-features --keep-going -- -D warnings";
             };
 
             workspace-build = craneLib.cargoBuild {
-              inherit src cargoArtifacts;
+              inherit pname src cargoArtifacts;
               cargoExtraArgs = "--workspace";
             };
           };
