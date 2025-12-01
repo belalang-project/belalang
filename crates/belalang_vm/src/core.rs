@@ -9,7 +9,7 @@ use crate::{
     fs::VMFS,
     io::VMIO,
     stack::{
-        Stack,
+        StackMemory,
         StackValue,
     },
 };
@@ -30,7 +30,7 @@ pub struct VM {
     constants: Vec<Constant>,
 
     /// The stack memory of the VM.
-    stack: Stack,
+    stack: StackMemory,
 
     /// I/O operation for VM.
     io: VMIO,
@@ -425,7 +425,7 @@ impl VM {
     }
 
     pub fn stack_pop(&mut self) -> Result<StackValue, RuntimeError> {
-        self.stack.pop()
+        self.stack.pop().map_err(RuntimeError::StackMemory)
     }
 }
 
