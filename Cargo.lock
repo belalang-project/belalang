@@ -126,7 +126,9 @@ dependencies = [
  "belalang_bytecode",
  "belalang_dev_tools",
  "belalang_macros",
+ "libc",
  "thiserror",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

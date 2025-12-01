@@ -12,7 +12,16 @@ workspace = true
 [dependencies]
 belalang_bytecode.workspace = true
 belalang_macros.workspace = true
+libc.workspace = true
 thiserror.workspace = true
+
+[dependencies.windows-sys]
+workspace = true
+features = [
+  "Win32_System_SystemInformation",
+  "Win32_System_Memory",
+  "Win32_Foundation",
+]
 
 [dev-dependencies]
 belalang_dev_tools.workspace = true

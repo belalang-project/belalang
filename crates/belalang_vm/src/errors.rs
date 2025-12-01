@@ -1,15 +1,14 @@
 //! Errors used by The Belalang Virtual Machine.
 
+use crate::stack::StackError;
+
 #[derive(thiserror::Error, Debug)]
 pub enum RuntimeError {
     #[error("{0}")]
     Io(#[from] std::io::Error),
 
-    #[error("stack underflow")]
-    StackUnderflow,
-
-    #[error("stack overflow")]
-    StackOverflow,
+    #[error("{0}")]
+    StackMemory(#[from] StackError),
 
     #[error("unknown instruction: {0}")]
     UnknownInstruction(u8),
