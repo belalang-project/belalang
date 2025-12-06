@@ -8,3 +8,5 @@ mod io;
 pub mod stack;
 
 pub use core::VM;
+
+pub use io::VMIO;

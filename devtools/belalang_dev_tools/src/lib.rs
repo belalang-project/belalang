@@ -1,3 +1,4 @@
+mod buf;
 mod vm;
 
 pub use vm::*;
