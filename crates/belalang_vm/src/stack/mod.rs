@@ -4,6 +4,11 @@ use std::{
     ptr,
 };
 
+use crate::heap::{
+    HeapObject,
+    HeapValue,
+};
+
 cfg_select! {
     target_family = "unix" => {
         mod unix;
@@ -25,10 +30,12 @@ const STACK_SIZE: usize = 4096;
 pub enum StackValue {
     Boolean(bool),
     Integer(i64),
-    String(String),
 
     /// Pointer to an address in the bytecode
     AddressPtr(u8),
+
+    /// Pointer to object in the heap memory
+    ObjectPtr(*mut HeapObject),
 
     /// Null value in the stack
     ///
@@ -45,8 +52,18 @@ impl Display for StackValue {
         match self {
             Self::Boolean(b) => write!(f, "{b}"),
             Self::Integer(i) => write!(f, "{i}"),
-            Self::String(s) => write!(f, "{s}"),
             Self::AddressPtr(addr) => write!(f, "ptr:{addr}"),
+            Self::ObjectPtr(ptr) => {
+                if ptr.is_null() {
+                    return write!(f, "<null-obj-ptr>");
+                }
+
+                let obj = unsafe { &*(*ptr) };
+
+                match &obj.value {
+                    HeapValue::String(s) => write!(f, "{s}"),
+                }
+            },
             Self::Null => write!(f, "<null>"),
         }
     }
@@ -118,11 +135,41 @@ impl StackMemory {
     pub fn size(&self) -> usize {
         unsafe { self.stack_top.offset_from_unsigned(self.sp) }
     }
+
+    pub fn iter<'a>(&'a self) -> StackMemoryIter<'a> {
+        StackMemoryIter {
+            stack: self,
+            curr: self.sp,
+        }
+    }
 }
 
 impl Drop for StackMemory {
     fn drop(&mut self) {
         sys::drop_stack_memory(self);
+    }
+}
+
+pub struct StackMemoryIter<'a> {
+    stack: &'a StackMemory,
+    curr: *mut StackValue,
+}
+
+impl<'a> Iterator for StackMemoryIter<'a> {
+    type Item = StackValue;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if unsafe { self.curr.offset_from(self.stack.stack_top) } == 0 {
+            return None;
+        }
+
+        if !self.curr.is_null() {
+            let item = unsafe { self.curr.read() };
+            self.curr = unsafe { self.curr.add(1) };
+            Some(item)
+        } else {
+            None
+        }
     }
 }
 
@@ -160,5 +207,18 @@ mod tests {
 
         let err = stack.push(StackValue::Integer(3)).unwrap_err();
         assert_matches!(err, StackError::StackOverflow);
+    }
+
+    #[test]
+    fn iterator() {
+        let mut stack = StackMemory::new(mem::size_of::<StackValue>() * 2).unwrap();
+
+        stack.push(StackValue::Integer(1)).unwrap();
+        stack.push(StackValue::Integer(2)).unwrap();
+
+        let mut iter = stack.iter();
+        assert_matches!(iter.next(), Some(StackValue::Integer(2)));
+        assert_matches!(iter.next(), Some(StackValue::Integer(1)));
+        assert_matches!(iter.next(), None);
     }
 }

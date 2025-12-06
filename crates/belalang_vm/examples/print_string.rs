@@ -20,4 +20,6 @@ fn main() {
         constants,
     })
     .unwrap();
+
+    vm.collect_garbage();
 }

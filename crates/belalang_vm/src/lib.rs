@@ -3,6 +3,7 @@
 mod core;
 pub mod errors;
 mod fs;
+mod heap;
 mod io;
 pub mod stack;
 
