@@ -27,15 +27,6 @@ pub enum LexerError {
     UnclosedString,
 }
 
-pub fn char_to_u8(c: char) -> Option<u8> {
-    match c {
-        '0'..='9' => Some(c as u8 - b'0'),
-        'a'..='f' => Some(c as u8 - b'a' + 10),
-        'A'..='F' => Some(c as u8 - b'A' + 10),
-        _ => None,
-    }
-}
-
 pub struct Lexer<'a> {
     current: Option<char>,
     chars: Peekable<Chars<'a>>,
@@ -486,7 +477,10 @@ impl<'a> Lexer<'a> {
                     Some('x') => {
                         self.advance(); // consume the 'x'
 
-                        match (self.advance().and_then(char_to_u8), self.advance().and_then(char_to_u8)) {
+                        let hi = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
+                        let lo = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
+
+                        match (hi, lo) {
                             (Some(hi), Some(lo)) => result.push(((hi << 4) | lo) as char),
                             (_, _) => return Err(LexerError::UnknownEscapeString),
                         }
