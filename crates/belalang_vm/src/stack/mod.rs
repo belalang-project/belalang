@@ -210,6 +210,13 @@ mod tests {
     }
 
     #[test]
+    fn underflow() {
+        let mut stack = StackMemory::new(mem::size_of::<StackValue>() * 2).unwrap();
+        let err = stack.pop().unwrap_err();
+        assert_matches!(err, StackError::StackUnderflow);
+    }
+
+    #[test]
     fn iterator() {
         let mut stack = StackMemory::new(mem::size_of::<StackValue>() * 2).unwrap();
 
