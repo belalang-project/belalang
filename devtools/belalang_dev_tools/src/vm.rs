@@ -4,8 +4,11 @@ use belalang_bytecode::{
 };
 use belalang_vm::{
     VM,
+    VMIO,
     stack::StackValue,
 };
+
+use crate::buf::SharedBuffer;
 
 #[derive(Default)]
 pub struct VMBuilder {
@@ -25,18 +28,22 @@ impl VMBuilder {
     }
 
     pub fn run_ok(self) -> VMRunner {
-        let mut vm = VM::default();
+        let out_stream = SharedBuffer::default();
+        let io = VMIO::new(Box::new(out_stream.clone()));
+        let mut vm = VM::with_io(io);
+
         let result = vm.run(Bytecode {
             instructions: self.instructions,
             constants: self.constants,
         });
 
         result.expect("VM failed to run");
-        VMRunner { vm }
+        VMRunner { out_stream, vm }
     }
 }
 
 pub struct VMRunner {
+    out_stream: SharedBuffer,
     vm: VM,
 }
 
@@ -64,6 +71,12 @@ impl VMRunner {
             panic!("TOS is not a Boolean!");
         };
         assert_eq!(value, expected, "Boolean value mismatch on stack top!");
+        self
+    }
+
+    #[track_caller]
+    pub fn expect_stdout(self, expected: String) -> Self {
+        assert_eq!(expected, self.out_stream.get_string());
         self
     }
 

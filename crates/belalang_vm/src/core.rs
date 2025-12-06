@@ -47,6 +47,12 @@ pub struct VM {
 }
 
 impl VM {
+    pub fn with_io(io: VMIO) -> VM {
+        let mut vm = VM::default();
+        vm.io = io;
+        vm
+    }
+
     /// Executes the provided [`Bytecode`] program.
     ///
     /// # Arguments
