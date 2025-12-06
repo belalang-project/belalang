@@ -7,6 +7,10 @@ use belalang_bytecode::{
 use crate::{
     errors::RuntimeError,
     fs::VMFS,
+    heap::{
+        HeapMemory,
+        HeapValue,
+    },
     io::VMIO,
     stack::{
         StackMemory,
@@ -31,6 +35,9 @@ pub struct VM {
 
     /// The stack memory of the VM.
     stack: StackMemory,
+
+    /// The heap memory of the VM.
+    heap: HeapMemory,
 
     /// I/O operation for VM.
     io: VMIO,
@@ -152,7 +159,11 @@ impl VM {
                     let object = match constant {
                         Constant::Integer(int) => StackValue::Integer(int),
                         Constant::Boolean(boolean) => StackValue::Boolean(boolean),
-                        Constant::String(string) => StackValue::String(string),
+                        Constant::String(string) => {
+                            let heap_value = HeapValue::String(string);
+                            let ptr = self.heap.new_object(heap_value);
+                            StackValue::ObjectPtr(ptr)
+                        },
                         Constant::Null => todo!(),
                     };
 
@@ -382,13 +393,14 @@ impl VM {
                 },
 
                 opcode::FS_WRITE => {
-                    let StackValue::String(filename) = self.stack.pop()? else {
+                    let StackValue::ObjectPtr(obj) = self.stack.pop()? else {
                         return Err(RuntimeError::TypeError);
                     };
+                    let HeapValue::String(filename) = &unsafe { &*obj }.value;
 
                     let contents = self.stack.pop()?.to_string();
 
-                    self.fs.write_file(filename, contents)?;
+                    self.fs.write_file(filename.clone(), contents)?;
                 },
 
                 _ => return Err(RuntimeError::UnknownInstruction(op)),
@@ -426,6 +438,16 @@ impl VM {
 
     pub fn stack_pop(&mut self) -> Result<StackValue, RuntimeError> {
         self.stack.pop().map_err(RuntimeError::StackMemory)
+    }
+
+    pub fn collect_garbage(&mut self) {
+        for stack_value in self.stack.iter() {
+            if let StackValue::ObjectPtr(ptr) = stack_value {
+                self.heap.mark(ptr);
+            }
+        }
+
+        self.heap.sweep();
     }
 }
 
