@@ -440,7 +440,10 @@ impl VM {
         self.stack.pop().map_err(RuntimeError::StackMemory)
     }
 
+    #[tracing::instrument(skip(self), name = "garbage_collection")]
     pub fn collect_garbage(&mut self) {
+        let start_objects = self.heap.n_objects;
+
         for stack_value in self.stack.iter() {
             if let StackValue::ObjectPtr(ptr) = stack_value {
                 self.heap.mark(ptr);
@@ -448,6 +451,12 @@ impl VM {
         }
 
         self.heap.sweep();
+
+        tracing::info!(
+            collected = start_objects - self.heap.n_objects,
+            remaining = self.heap.n_objects,
+            "GC Complete"
+        )
     }
 }
 

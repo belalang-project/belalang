@@ -10,6 +10,8 @@ use belalang_dev_tools::{
 use belalang_vm::VM;
 
 fn main() {
+    tracing_subscriber::fmt().init();
+
     let s = String::from("Hello, World!");
     let f = String::from("test.txt");
     let constants = vec![Constant::String(s), Constant::String(f)];
