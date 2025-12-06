@@ -12,6 +12,7 @@ pub struct HeapObject {
 
 pub struct HeapMemory {
     head: *mut HeapObject,
+    pub n_objects: i32,
 }
 
 impl Default for HeapMemory {
@@ -22,7 +23,10 @@ impl Default for HeapMemory {
 
 impl HeapMemory {
     pub fn new() -> Self {
-        Self { head: ptr::null_mut() }
+        Self {
+            head: ptr::null_mut(),
+            n_objects: 0,
+        }
     }
 
     pub fn new_object(&mut self, value: HeapValue) -> *mut HeapObject {
@@ -33,6 +37,7 @@ impl HeapMemory {
         }));
 
         self.head = ptr;
+        self.n_objects += 1;
 
         ptr
     }
@@ -60,6 +65,7 @@ impl HeapMemory {
             } else {
                 *ptr_to_curr = obj.next;
                 let _dropped = unsafe { Box::from_raw(curr) };
+                self.n_objects -= 1;
             }
         }
     }
