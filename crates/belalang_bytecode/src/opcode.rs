@@ -4,94 +4,118 @@
 //! Belalang VM. Each opcode represents an operation that the VM can execute,
 //! encoded as single-byte values followed by optional operands.
 
-/// No operation -- Does nothing (1 byte)
-pub const NOOP: u8 = 0x00;
+macro_rules! define_opcodes {
+    (
+        $(#[doc = $doc:expr])*
+        $name:ident = $val:expr;
+        $($rest:tt)*
+    ) => {
+        $(#[doc = $doc])*
+        pub const $name: u8 = $val;
+        define_opcodes!(@step $name; $($rest)*);
+    };
 
-/// Stack operation -- Pop from stack (1 byte)
-pub const POP: u8 = 0x01;
+    (
+        @step $prev:ident;
+        $(#[doc = $doc:expr])*
+        $name:ident;
+        $($rest:tt)*
+    ) => {
+        $(#[doc = $doc])*
+        pub const $name: u8 = $prev + 1;
+        define_opcodes!(@step $name; $($rest)*);
+    };
 
-/// Arithmetic operation -- Add top two stack values (1 byte)
-pub const ADD: u8 = 0x10;
+    (@step $prev:ident;) => {};
+}
 
-/// Arithmetic operation -- Subtract top two stack values (1 byte)
-pub const SUB: u8 = 0x11;
+define_opcodes! {
+    /// No operation -- Does nothing (1 byte)
+    NOOP = 0x00;
 
-/// Arithmetic operation -- Multiply top two stack values (1 byte)
-pub const MUL: u8 = 0x12;
+    /// Stack operation -- Pop from stack (1 byte)
+    POP;
 
-/// Arithmetic operation -- Divide top two stack values (1 byte)
-pub const DIV: u8 = 0x13;
+    /// Arithmetic operation -- Add top two stack values (1 byte)
+    ADD;
 
-/// Arithmetic operation -- Modulo of top two stack values (1 byte)
-pub const MOD: u8 = 0x14;
+    /// Arithmetic operation -- Subtract top two stack values (1 byte)
+    SUB;
 
-/// Constants -- Load constant from constant pool (3 bytes: opcode + 16-bit
-/// index)
-pub const CONSTANT: u8 = 0x20;
+    /// Arithmetic operation -- Multiply top two stack values (1 byte)
+    MUL;
 
-/// Constants -- Push boolean value `true` (1 byte)
-pub const TRUE: u8 = 0x21;
+    /// Arithmetic operation -- Divide top two stack values (1 byte)
+    DIV;
 
-/// Constants -- Push boolean value `false` (1 byte)
-pub const FALSE: u8 = 0x22;
+    /// Arithmetic operation -- Modulo of top two stack values (1 byte)
+    MOD;
 
-/// Constants -- Push null value (1 byte)
-pub const NULL: u8 = 0x23;
+    /// Constants -- Load constant from constant pool (3 bytes: opcode + 16-bit index)
+    CONSTANT;
 
-/// Comparison operation -- Compares top two stack values for equality (1 byte)
-pub const EQUAL: u8 = 0x30;
+    /// Constants -- Push boolean value `true` (1 byte)
+    TRUE;
 
-/// Comparison operation -- Compares top two stack values for inequality (1
-/// byte)
-pub const NOT_EQUAL: u8 = 0x31;
+    /// Constants -- Push boolean value `false` (1 byte)
+    FALSE;
 
-/// Comparison operation -- TOS-1 < TOS (1 byte)
-pub const LESS_THAN: u8 = 0x32;
+    /// Constants -- Push null value (1 byte)
+    NULL;
 
-/// Comparison operation -- TOS-1 <= TOS (1 byte)
-pub const LESS_THAN_EQUAL: u8 = 0x33;
+    /// Comparison operation -- Compares top two stack values for equality (1 byte)
+    EQUAL;
 
-/// Logical operation -- TOS-1 && TOS (1 byte)
-pub const AND: u8 = 0x40;
+    /// Comparison operation -- Compares top two stack values for inequality (1 byte)
+    NOT_EQUAL;
 
-/// Logical operation -- TOS-1 || TOS (1 byte)
-pub const OR: u8 = 0x41;
+    /// Comparison operation -- TOS-1 < TOS (1 byte)
+    LESS_THAN;
 
-/// Logical operation -- TOS-1 bit and TOS (1 byte)
-pub const BIT_AND: u8 = 0x50;
+    /// Comparison operation -- TOS-1 <= TOS (1 byte)
+    LESS_THAN_EQUAL;
 
-/// Logical operation -- TOS-1 bit or TOS (1 byte)
-pub const BIT_OR: u8 = 0x51;
+    /// Logical operation -- TOS-1 && TOS (1 byte)
+    AND;
 
-/// Logical operation -- TOS-1 bit xor TOS (1 byte)
-pub const BIT_XOR: u8 = 0x52;
+    /// Logical operation -- TOS-1 || TOS (1 byte)
+    OR;
 
-/// Logical operation -- TOS-1 << TOS (1 byte)
-pub const BIT_SL: u8 = 0x53;
+    /// Logical operation -- TOS-1 bit and TOS (1 byte)
+    BIT_AND;
 
-/// Logical operation -- TOS-1 >> TOS (1 byte)
-pub const BIT_SR: u8 = 0x54;
+    /// Logical operation -- TOS-1 bit or TOS (1 byte)
+    BIT_OR;
 
-/// Unary operation -- !TOS (1 byte)
-pub const BANG: u8 = 0x60;
+    /// Logical operation -- TOS-1 bit xor TOS (1 byte)
+    BIT_XOR;
 
-/// Unary operation -- -TOS (1 byte)
-pub const MINUS: u8 = 0x61;
+    /// Logical operation -- TOS-1 << TOS (1 byte)
+    BIT_SL;
 
-/// Jump operation -- Unconditional jump (3 bytes: opcode + 16-bit offset)
-pub const JUMP: u8 = 0x70;
+    /// Logical operation -- TOS-1 >> TOS (1 byte)
+    BIT_SR;
 
-/// Jump operation -- Conditional jump if popped TOS is false (3 bytes: opcode +
-/// 16-bit offset)
-pub const JUMP_IF_FALSE: u8 = 0x71;
+    /// Unary operation -- !TOS (1 byte)
+    BANG;
 
-/// Print -- Print the TOS value (1 byte)
-///
-/// See <https://github.com/belalang-project/belalang/issues/38>
-pub const PRINT: u8 = 0xD0;
+    /// Unary operation -- -TOS (1 byte)
+    MINUS;
 
-/// Filesystem write -- writes to the filesystem.
-pub const FS_WRITE: u8 = 0xD1;
+    /// Jump operation -- Unconditional jump (3 bytes: opcode + 16-bit offset)
+    JUMP;
+
+    /// Jump operation -- Conditional jump if popped TOS is false (3 bytes: opcode + 16-bit offset)
+    JUMP_IF_FALSE;
+
+    /// Print -- Print the TOS value (1 byte)
+    ///
+    /// See <https://github.com/belalang-project/belalang/issues/38>
+    PRINT;
+
+    /// Filesystem write -- writes to the filesystem.
+    FS_WRITE;
+}
 
 /// Encodes a [`CONSTANT`] instruction with 16-bit index
 ///
@@ -135,7 +159,7 @@ mod tests {
         let bytes = opcode::constant(65534);
 
         assert_eq!(bytes.len(), 3);
-        assert_eq!(bytes[0], 32);
+        assert_eq!(bytes[0], opcode::CONSTANT);
         assert_eq!(bytes[1], 255);
         assert_eq!(bytes[2], 254);
     }
