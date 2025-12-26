@@ -4,10 +4,7 @@ use std::{
     ptr,
 };
 
-use crate::heap::{
-    HeapObject,
-    HeapValue,
-};
+use crate::heap::HeapObject;
 
 cfg_select! {
     target_family = "unix" => {
@@ -60,9 +57,7 @@ impl Display for StackValue {
 
                 let obj = unsafe { &*(*ptr) };
 
-                match &obj.value {
-                    HeapValue::String(s) => write!(f, "{s}"),
-                }
+                obj.value.fmt(f)
             },
             Self::Null => write!(f, "<null>"),
         }

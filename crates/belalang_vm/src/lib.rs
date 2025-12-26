@@ -5,6 +5,7 @@ pub mod errors;
 mod fs;
 mod heap;
 mod io;
+mod objectmodel;
 pub mod stack;
 
 pub use core::VM;

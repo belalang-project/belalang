@@ -7,11 +7,9 @@ use belalang_bytecode::{
 use crate::{
     errors::RuntimeError,
     fs::VMFS,
-    heap::{
-        HeapMemory,
-        HeapValue,
-    },
+    heap::HeapMemory,
     io::VMIO,
+    objectmodel::BelalangString,
     stack::{
         StackMemory,
         StackValue,
@@ -166,8 +164,8 @@ impl VM {
                         Constant::Integer(int) => StackValue::Integer(int),
                         Constant::Boolean(boolean) => StackValue::Boolean(boolean),
                         Constant::String(string) => {
-                            let heap_value = HeapValue::String(string);
-                            let ptr = self.heap.new_object(heap_value);
+                            let heap_value = BelalangString::new(string);
+                            let ptr = self.heap.new_object(Box::new(heap_value));
                             StackValue::ObjectPtr(ptr)
                         },
                         Constant::Null => todo!(),
@@ -402,7 +400,7 @@ impl VM {
                     let StackValue::ObjectPtr(obj) = self.stack.pop()? else {
                         return Err(RuntimeError::TypeError);
                     };
-                    let HeapValue::String(filename) = &unsafe { &*obj }.value;
+                    let filename = unsafe { &*obj }.value.to_string();
 
                     let contents = self.stack.pop()?.to_string();
 

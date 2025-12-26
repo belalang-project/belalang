@@ -1,13 +1,11 @@
 use std::ptr;
 
-pub enum HeapValue {
-    String(String),
-}
+use crate::objectmodel::ObjectModel;
 
 pub struct HeapObject {
     marked: bool,
     next: *mut HeapObject,
-    pub value: HeapValue,
+    pub value: Box<dyn ObjectModel>,
 }
 
 pub struct HeapMemory {
@@ -29,7 +27,7 @@ impl HeapMemory {
         }
     }
 
-    pub fn new_object(&mut self, value: HeapValue) -> *mut HeapObject {
+    pub fn new_object(&mut self, value: Box<dyn ObjectModel>) -> *mut HeapObject {
         let ptr = Box::into_raw(Box::new(HeapObject {
             marked: false,
             next: self.head,
