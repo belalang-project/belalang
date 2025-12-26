@@ -4,7 +4,6 @@ profile = "minimal"
 components = [
   "rustfmt",
   "rustc",
-  "rustc-codegen-cranelift-preview",
   "rust-analyzer",
   "rust-src",
   "cargo",
