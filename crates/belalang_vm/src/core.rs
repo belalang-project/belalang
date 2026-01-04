@@ -9,7 +9,10 @@ use crate::{
     fs::VMFS,
     heap::HeapMemory,
     io::VMIO,
-    objectmodel::BelalangString,
+    objectmodel::{
+        BelalangString,
+        STRING_METHODS,
+    },
     stack::{
         StackMemory,
         StackValue,
@@ -165,7 +168,7 @@ impl VM {
                         Constant::Boolean(boolean) => StackValue::Boolean(boolean),
                         Constant::String(string) => {
                             let heap_value = BelalangString::new(string);
-                            let ptr = self.heap.new_object(Box::new(heap_value));
+                            let ptr = self.heap.new_object(Box::new(heap_value), STRING_METHODS.to_vec());
                             StackValue::ObjectPtr(ptr)
                         },
                         Constant::Null => todo!(),

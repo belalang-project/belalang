@@ -1,11 +1,15 @@
 use std::ptr;
 
-use crate::objectmodel::ObjectModel;
+use crate::objectmodel::{
+    ObjectMethod,
+    ObjectModel,
+};
 
 pub struct HeapObject {
     marked: bool,
     next: *mut HeapObject,
     pub value: Box<dyn ObjectModel>,
+    pub methods: Vec<ObjectMethod>,
 }
 
 pub struct HeapMemory {
@@ -27,11 +31,12 @@ impl HeapMemory {
         }
     }
 
-    pub fn new_object(&mut self, value: Box<dyn ObjectModel>) -> *mut HeapObject {
+    pub fn new_object(&mut self, value: Box<dyn ObjectModel>, methods: Vec<ObjectMethod>) -> *mut HeapObject {
         let ptr = Box::into_raw(Box::new(HeapObject {
             marked: false,
             next: self.head,
             value,
+            methods,
         }));
 
         self.head = ptr;

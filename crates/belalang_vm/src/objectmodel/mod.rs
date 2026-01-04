@@ -1,7 +1,14 @@
 mod string;
 
-use std::fmt::Display;
+use std::{
+    any::Any,
+    fmt::Display,
+};
 
-pub use string::BelalangString;
+pub use string::*;
 
-pub trait ObjectModel: Display {}
+pub trait ObjectModel: Display + Any {
+    fn as_any(&self) -> &dyn Any;
+}
+
+pub type ObjectMethod = fn(instance: &mut Box<dyn ObjectModel>) -> usize;
