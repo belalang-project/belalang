@@ -19,8 +19,6 @@ belalang_bytecode = { path = "./crates/belalang_bytecode" }
 belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }
 belalang_gc = { path = "./crates/belalang_gc/" }
 belalang_lexer = { path = "./crates/belalang_lexer" }
-belalang_macros = { path = "./crates/belalang_macros" }
-belalang_std = { path = "./crates/belalang_std" }
 belalang_vm = { path = "./crates/belalang_vm" }
 bincode = "2.0.1"
 clap = "4.5.4"

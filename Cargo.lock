@@ -107,25 +107,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "belalang_macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "belalang_std"
-version = "0.1.0"
-
-[[package]]
 name = "belalang_vm"
 version = "0.1.0"
 dependencies = [
  "belalang_bytecode",
  "belalang_dev_tools",
- "belalang_macros",
  "libc",
  "thiserror",
  "tracing",
