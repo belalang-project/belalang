@@ -13,8 +13,9 @@ impl From<&str> for Token {
         let kind = match value {
             "fn" => TokenKind::Function,
             "while" => TokenKind::While,
-            "true" => TokenKind::True,
-            "false" => TokenKind::False,
+            "true" | "false" => TokenKind::Literal {
+                kind: LiteralKind::Boolean,
+            },
             "if" => TokenKind::If,
             "else" => TokenKind::Else,
             "return" => TokenKind::Return,
@@ -117,10 +118,6 @@ pub enum TokenKind {
     Else,
     /// Return keyword `return`
     Return,
-    /// Boolean true literal `true`
-    True,
-    /// Boolean false literal `false`
-    False,
 
     /// Comma separator `,`
     Comma,
@@ -136,6 +133,7 @@ pub enum LiteralKind {
     Integer,
     Float,
     String,
+    Boolean,
 }
 
 /// Assignment types supported by the lexer
@@ -298,8 +296,6 @@ impl std::fmt::Display for TokenKind {
             TokenKind::If => "if",
             TokenKind::Else => "else",
             TokenKind::Return => "return",
-            TokenKind::True => "true",
-            TokenKind::False => "false",
 
             TokenKind::Comma => ",",
             TokenKind::Semicolon => ";",
