@@ -396,12 +396,10 @@ impl Parser<'_> {
                 LiteralKind::String => Ok(Expression::String(StringLiteral {
                     value: self.curr_token.value.clone(),
                 })),
+                LiteralKind::Boolean => Ok(Expression::Boolean(BooleanExpression {
+                    value: self.curr_token.value == "true",
+                })),
             },
-
-            // parse_boolean: parse current token as boolean
-            TokenKind::True | TokenKind::False => Ok(Expression::Boolean(BooleanExpression {
-                value: matches!(self.curr_token.kind, TokenKind::True),
-            })),
 
             // parse_array
             TokenKind::LeftBracket => Ok(Expression::Array(ArrayLiteral {
