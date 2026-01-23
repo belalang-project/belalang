@@ -1,0 +1,110 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Function(
+                FunctionLiteral {
+                    params: [
+                        Identifier {
+                            value: "x",
+                        },
+                        Identifier {
+                            value: "y",
+                        },
+                    ],
+                    body: BlockExpression {
+                        statements: [
+                            Expression(
+                                ExpressionStatement {
+                                    expression: Infix(
+                                        InfixExpression {
+                                            left: Identifier(
+                                                Identifier {
+                                                    value: "x",
+                                                },
+                                            ),
+                                            operator: Add,
+                                            right: Identifier(
+                                                Identifier {
+                                                    value: "y",
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Function(
+                FunctionLiteral {
+                    params: [],
+                    body: BlockExpression {
+                        statements: [],
+                    },
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Function(
+                FunctionLiteral {
+                    params: [
+                        Identifier {
+                            value: "x",
+                        },
+                    ],
+                    body: BlockExpression {
+                        statements: [],
+                    },
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Function(
+                FunctionLiteral {
+                    params: [
+                        Identifier {
+                            value: "x",
+                        },
+                        Identifier {
+                            value: "y",
+                        },
+                    ],
+                    body: BlockExpression {
+                        statements: [],
+                    },
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Function(
+                FunctionLiteral {
+                    params: [
+                        Identifier {
+                            value: "x",
+                        },
+                        Identifier {
+                            value: "y",
+                        },
+                        Identifier {
+                            value: "z",
+                        },
+                    ],
+                    body: BlockExpression {
+                        statements: [],
+                    },
+                },
+            ),
+        },
+    ),
+]

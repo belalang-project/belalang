@@ -1,0 +1,96 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "add",
+                    },
+                    value: Function(
+                        FunctionLiteral {
+                            params: [
+                                Identifier {
+                                    value: "x",
+                                },
+                                Identifier {
+                                    value: "y",
+                                },
+                            ],
+                            body: BlockExpression {
+                                statements: [
+                                    Return(
+                                        ReturnStatement {
+                                            return_value: Infix(
+                                                InfixExpression {
+                                                    left: Identifier(
+                                                        Identifier {
+                                                            value: "x",
+                                                        },
+                                                    ),
+                                                    operator: Add,
+                                                    right: Identifier(
+                                                        Identifier {
+                                                            value: "y",
+                                                        },
+                                                    ),
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "mul",
+                    },
+                    value: Function(
+                        FunctionLiteral {
+                            params: [
+                                Identifier {
+                                    value: "x",
+                                },
+                                Identifier {
+                                    value: "y",
+                                },
+                            ],
+                            body: BlockExpression {
+                                statements: [
+                                    Expression(
+                                        ExpressionStatement {
+                                            expression: Infix(
+                                                InfixExpression {
+                                                    left: Identifier(
+                                                        Identifier {
+                                                            value: "x",
+                                                        },
+                                                    ),
+                                                    operator: Mul,
+                                                    right: Identifier(
+                                                        Identifier {
+                                                            value: "y",
+                                                        },
+                                                    ),
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+]

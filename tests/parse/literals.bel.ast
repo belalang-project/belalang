@@ -1,0 +1,76 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Integer(
+                IntegerLiteral {
+                    value: 12,
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Sub,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 12,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Not,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 12,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Sub,
+                    right: Boolean(
+                        BooleanExpression {
+                            value: true,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Not,
+                    right: Boolean(
+                        BooleanExpression {
+                            value: true,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: String(
+                StringLiteral {
+                    value: "Hello, World!",
+                },
+            ),
+        },
+    ),
+]

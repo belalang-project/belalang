@@ -1,0 +1,24 @@
+price := 50;
+
+status := if price < 30 {
+    "very cheap"
+} else if price < 40 {
+    "not so cheap"
+} else {
+    "very not cheap"
+};
+
+if x < y {
+	x
+}
+
+if x < y {
+	x
+} else {
+	y
+}
+
+if x < y {
+	a := 10;
+	x
+}

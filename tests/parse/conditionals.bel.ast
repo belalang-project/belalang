@@ -1,0 +1,258 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "price",
+                    },
+                    value: Integer(
+                        IntegerLiteral {
+                            value: 50,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "status",
+                    },
+                    value: If(
+                        IfExpression {
+                            condition: Infix(
+                                InfixExpression {
+                                    left: Identifier(
+                                        Identifier {
+                                            value: "price",
+                                        },
+                                    ),
+                                    operator: Lt,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 30,
+                                        },
+                                    ),
+                                },
+                            ),
+                            consequence: BlockExpression {
+                                statements: [
+                                    Expression(
+                                        ExpressionStatement {
+                                            expression: String(
+                                                StringLiteral {
+                                                    value: "very cheap",
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                            alternative: Some(
+                                If(
+                                    IfExpression {
+                                        condition: Infix(
+                                            InfixExpression {
+                                                left: Identifier(
+                                                    Identifier {
+                                                        value: "price",
+                                                    },
+                                                ),
+                                                operator: Lt,
+                                                right: Integer(
+                                                    IntegerLiteral {
+                                                        value: 40,
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                        consequence: BlockExpression {
+                                            statements: [
+                                                Expression(
+                                                    ExpressionStatement {
+                                                        expression: String(
+                                                            StringLiteral {
+                                                                value: "not so cheap",
+                                                            },
+                                                        ),
+                                                    },
+                                                ),
+                                            ],
+                                        },
+                                        alternative: Some(
+                                            Block(
+                                                BlockExpression {
+                                                    statements: [
+                                                        Expression(
+                                                            ExpressionStatement {
+                                                                expression: String(
+                                                                    StringLiteral {
+                                                                        value: "very not cheap",
+                                                                    },
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ],
+                                                },
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: If(
+                IfExpression {
+                    condition: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "x",
+                                },
+                            ),
+                            operator: Lt,
+                            right: Identifier(
+                                Identifier {
+                                    value: "y",
+                                },
+                            ),
+                        },
+                    ),
+                    consequence: BlockExpression {
+                        statements: [
+                            Expression(
+                                ExpressionStatement {
+                                    expression: Identifier(
+                                        Identifier {
+                                            value: "x",
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                    alternative: None,
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: If(
+                IfExpression {
+                    condition: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "x",
+                                },
+                            ),
+                            operator: Lt,
+                            right: Identifier(
+                                Identifier {
+                                    value: "y",
+                                },
+                            ),
+                        },
+                    ),
+                    consequence: BlockExpression {
+                        statements: [
+                            Expression(
+                                ExpressionStatement {
+                                    expression: Identifier(
+                                        Identifier {
+                                            value: "x",
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                    alternative: Some(
+                        Block(
+                            BlockExpression {
+                                statements: [
+                                    Expression(
+                                        ExpressionStatement {
+                                            expression: Identifier(
+                                                Identifier {
+                                                    value: "y",
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        ),
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: If(
+                IfExpression {
+                    condition: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "x",
+                                },
+                            ),
+                            operator: Lt,
+                            right: Identifier(
+                                Identifier {
+                                    value: "y",
+                                },
+                            ),
+                        },
+                    ),
+                    consequence: BlockExpression {
+                        statements: [
+                            Expression(
+                                ExpressionStatement {
+                                    expression: Var(
+                                        VarExpression {
+                                            kind: ColonAssign,
+                                            name: Identifier {
+                                                value: "a",
+                                            },
+                                            value: Integer(
+                                                IntegerLiteral {
+                                                    value: 10,
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ),
+                            Expression(
+                                ExpressionStatement {
+                                    expression: Identifier(
+                                        Identifier {
+                                            value: "x",
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                    alternative: None,
+                },
+            ),
+        },
+    ),
+]

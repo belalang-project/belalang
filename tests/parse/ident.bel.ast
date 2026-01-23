@@ -1,0 +1,11 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Identifier(
+                Identifier {
+                    value: "name",
+                },
+            ),
+        },
+    ),
+]

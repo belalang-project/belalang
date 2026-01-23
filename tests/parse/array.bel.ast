@@ -1,0 +1,45 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Array(
+                ArrayLiteral {
+                    elements: [
+                        Integer(
+                            IntegerLiteral {
+                                value: 1,
+                            },
+                        ),
+                        Integer(
+                            IntegerLiteral {
+                                value: 2,
+                            },
+                        ),
+                        Integer(
+                            IntegerLiteral {
+                                value: 3,
+                            },
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Index(
+                IndexExpression {
+                    left: Identifier(
+                        Identifier {
+                            value: "arr",
+                        },
+                    ),
+                    index: Integer(
+                        IntegerLiteral {
+                            value: 1,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+]

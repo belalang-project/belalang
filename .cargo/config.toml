@@ -1,0 +1,2 @@
+[alias]
+"btest" = "run -q -p btest"

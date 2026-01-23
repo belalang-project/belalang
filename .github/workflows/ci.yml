@@ -24,6 +24,8 @@ jobs:
           tool: nextest
       - name: Run tests with nextest
         run: cargo nextest run --workspace --all-features
+      - name: Run btest
+        run: cargo btest tests
   build:
     strategy:
       matrix:
