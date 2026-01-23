@@ -1,0 +1,104 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "int_var",
+                    },
+                    value: Integer(
+                        IntegerLiteral {
+                            value: 123,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "flo_var",
+                    },
+                    value: Float(
+                        FloatLiteral {
+                            value: 44.2,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "str_var",
+                    },
+                    value: String(
+                        StringLiteral {
+                            value: "Hello, World!",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: Assign,
+                    name: Identifier {
+                        value: "int_var",
+                    },
+                    value: Integer(
+                        IntegerLiteral {
+                            value: 1,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: Assign,
+                    name: Identifier {
+                        value: "flo_var",
+                    },
+                    value: Float(
+                        FloatLiteral {
+                            value: 1.4,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: Assign,
+                    name: Identifier {
+                        value: "str_var",
+                    },
+                    value: String(
+                        StringLiteral {
+                            value: "Hello, Mom!",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+]

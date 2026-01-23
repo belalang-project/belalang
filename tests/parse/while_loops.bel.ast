@@ -1,0 +1,69 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "i",
+                    },
+                    value: Integer(
+                        IntegerLiteral {
+                            value: 0,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    While(
+        WhileStatement {
+            condition: Infix(
+                InfixExpression {
+                    left: Identifier(
+                        Identifier {
+                            value: "i",
+                        },
+                    ),
+                    operator: Lt,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 10,
+                        },
+                    ),
+                },
+            ),
+            block: BlockExpression {
+                statements: [
+                    Expression(
+                        ExpressionStatement {
+                            expression: Var(
+                                VarExpression {
+                                    kind: Assign,
+                                    name: Identifier {
+                                        value: "i",
+                                    },
+                                    value: Infix(
+                                        InfixExpression {
+                                            left: Identifier(
+                                                Identifier {
+                                                    value: "i",
+                                                },
+                                            ),
+                                            operator: Add,
+                                            right: Integer(
+                                                IntegerLiteral {
+                                                    value: 1,
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                ],
+            },
+        },
+    ),
+]

@@ -1,0 +1,104 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Var(
+                VarExpression {
+                    kind: ColonAssign,
+                    name: Identifier {
+                        value: "fact",
+                    },
+                    value: Function(
+                        FunctionLiteral {
+                            params: [
+                                Identifier {
+                                    value: "n",
+                                },
+                            ],
+                            body: BlockExpression {
+                                statements: [
+                                    Expression(
+                                        ExpressionStatement {
+                                            expression: If(
+                                                IfExpression {
+                                                    condition: Infix(
+                                                        InfixExpression {
+                                                            left: Identifier(
+                                                                Identifier {
+                                                                    value: "n",
+                                                                },
+                                                            ),
+                                                            operator: Lt,
+                                                            right: Integer(
+                                                                IntegerLiteral {
+                                                                    value: 2,
+                                                                },
+                                                            ),
+                                                        },
+                                                    ),
+                                                    consequence: BlockExpression {
+                                                        statements: [
+                                                            Return(
+                                                                ReturnStatement {
+                                                                    return_value: Integer(
+                                                                        IntegerLiteral {
+                                                                            value: 1,
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ],
+                                                    },
+                                                    alternative: None,
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                    Return(
+                                        ReturnStatement {
+                                            return_value: Infix(
+                                                InfixExpression {
+                                                    left: Identifier(
+                                                        Identifier {
+                                                            value: "n",
+                                                        },
+                                                    ),
+                                                    operator: Mul,
+                                                    right: Call(
+                                                        CallExpression {
+                                                            function: Identifier(
+                                                                Identifier {
+                                                                    value: "fact",
+                                                                },
+                                                            ),
+                                                            args: [
+                                                                Infix(
+                                                                    InfixExpression {
+                                                                        left: Identifier(
+                                                                            Identifier {
+                                                                                value: "n",
+                                                                            },
+                                                                        ),
+                                                                        operator: Sub,
+                                                                        right: Integer(
+                                                                            IntegerLiteral {
+                                                                                value: 1,
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                            ],
+                                                        },
+                                                    ),
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+]

@@ -1,0 +1,107 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Call(
+                CallExpression {
+                    function: Identifier(
+                        Identifier {
+                            value: "add",
+                        },
+                    ),
+                    args: [
+                        Integer(
+                            IntegerLiteral {
+                                value: 1,
+                            },
+                        ),
+                        Infix(
+                            InfixExpression {
+                                left: Integer(
+                                    IntegerLiteral {
+                                        value: 2,
+                                    },
+                                ),
+                                operator: Mul,
+                                right: Integer(
+                                    IntegerLiteral {
+                                        value: 3,
+                                    },
+                                ),
+                            },
+                        ),
+                        Infix(
+                            InfixExpression {
+                                left: Integer(
+                                    IntegerLiteral {
+                                        value: 4,
+                                    },
+                                ),
+                                operator: Add,
+                                right: Integer(
+                                    IntegerLiteral {
+                                        value: 5,
+                                    },
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Call(
+                CallExpression {
+                    function: Function(
+                        FunctionLiteral {
+                            params: [
+                                Identifier {
+                                    value: "x",
+                                },
+                                Identifier {
+                                    value: "y",
+                                },
+                            ],
+                            body: BlockExpression {
+                                statements: [
+                                    Expression(
+                                        ExpressionStatement {
+                                            expression: Infix(
+                                                InfixExpression {
+                                                    left: Identifier(
+                                                        Identifier {
+                                                            value: "x",
+                                                        },
+                                                    ),
+                                                    operator: Add,
+                                                    right: Identifier(
+                                                        Identifier {
+                                                            value: "y",
+                                                        },
+                                                    ),
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        },
+                    ),
+                    args: [
+                        Integer(
+                            IntegerLiteral {
+                                value: 2,
+                            },
+                        ),
+                        Integer(
+                            IntegerLiteral {
+                                value: 3,
+                            },
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+]

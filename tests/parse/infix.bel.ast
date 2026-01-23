@@ -1,0 +1,21 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Integer(
+                        IntegerLiteral {
+                            value: 1,
+                        },
+                    ),
+                    operator: Add,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 2,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+]

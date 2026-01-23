@@ -1,0 +1,927 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Mul,
+                            right: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Add,
+                    right: Identifier(
+                        Identifier {
+                            value: "c",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Not,
+                    right: Prefix(
+                        PrefixExpression {
+                            operator: Sub,
+                            right: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Add,
+                            right: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Add,
+                    right: Identifier(
+                        Identifier {
+                            value: "c",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Add,
+                            right: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Sub,
+                    right: Identifier(
+                        Identifier {
+                            value: "c",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Mul,
+                            right: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Mul,
+                    right: Identifier(
+                        Identifier {
+                            value: "c",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Mul,
+                            right: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Div,
+                    right: Identifier(
+                        Identifier {
+                            value: "c",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Identifier(
+                        Identifier {
+                            value: "a",
+                        },
+                    ),
+                    operator: Add,
+                    right: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "b",
+                                },
+                            ),
+                            operator: Div,
+                            right: Identifier(
+                                Identifier {
+                                    value: "c",
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Infix(
+                                InfixExpression {
+                                    left: Identifier(
+                                        Identifier {
+                                            value: "a",
+                                        },
+                                    ),
+                                    operator: Add,
+                                    right: Infix(
+                                        InfixExpression {
+                                            left: Identifier(
+                                                Identifier {
+                                                    value: "b",
+                                                },
+                                            ),
+                                            operator: Mul,
+                                            right: Identifier(
+                                                Identifier {
+                                                    value: "c",
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Identifier(
+                                        Identifier {
+                                            value: "d",
+                                        },
+                                    ),
+                                    operator: Div,
+                                    right: Identifier(
+                                        Identifier {
+                                            value: "e",
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Sub,
+                    right: Identifier(
+                        Identifier {
+                            value: "f",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Integer(
+                        IntegerLiteral {
+                            value: 3,
+                        },
+                    ),
+                    operator: Add,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 4,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Prefix(
+                        PrefixExpression {
+                            operator: Sub,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Mul,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 5,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                            operator: Gt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 4,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Eq,
+                    right: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Lt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 4,
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                            operator: Lt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 4,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Ne,
+                    right: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Gt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 4,
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 4,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 5,
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Eq,
+                    right: Infix(
+                        InfixExpression {
+                            left: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 3,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 1,
+                                        },
+                                    ),
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 4,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 5,
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 4,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 5,
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Eq,
+                    right: Infix(
+                        InfixExpression {
+                            left: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 3,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 1,
+                                        },
+                                    ),
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 4,
+                                        },
+                                    ),
+                                    operator: Mul,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 5,
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Gt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Eq,
+                    right: Boolean(
+                        BooleanExpression {
+                            value: false,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 3,
+                                },
+                            ),
+                            operator: Lt,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Eq,
+                    right: Boolean(
+                        BooleanExpression {
+                            value: true,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 1,
+                                },
+                            ),
+                            operator: Add,
+                            right: Infix(
+                                InfixExpression {
+                                    left: Integer(
+                                        IntegerLiteral {
+                                            value: 2,
+                                        },
+                                    ),
+                                    operator: Add,
+                                    right: Integer(
+                                        IntegerLiteral {
+                                            value: 3,
+                                        },
+                                    ),
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Add,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 4,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                            operator: Add,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Mul,
+                    right: Integer(
+                        IntegerLiteral {
+                            value: 2,
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Integer(
+                        IntegerLiteral {
+                            value: 2,
+                        },
+                    ),
+                    operator: Div,
+                    right: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                            operator: Add,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Sub,
+                    right: Infix(
+                        InfixExpression {
+                            left: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                            operator: Add,
+                            right: Integer(
+                                IntegerLiteral {
+                                    value: 5,
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Prefix(
+                PrefixExpression {
+                    operator: Not,
+                    right: Infix(
+                        InfixExpression {
+                            left: Boolean(
+                                BooleanExpression {
+                                    value: true,
+                                },
+                            ),
+                            operator: Eq,
+                            right: Boolean(
+                                BooleanExpression {
+                                    value: true,
+                                },
+                            ),
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Infix(
+                InfixExpression {
+                    left: Infix(
+                        InfixExpression {
+                            left: Identifier(
+                                Identifier {
+                                    value: "a",
+                                },
+                            ),
+                            operator: Add,
+                            right: Call(
+                                CallExpression {
+                                    function: Identifier(
+                                        Identifier {
+                                            value: "add",
+                                        },
+                                    ),
+                                    args: [
+                                        Infix(
+                                            InfixExpression {
+                                                left: Identifier(
+                                                    Identifier {
+                                                        value: "b",
+                                                    },
+                                                ),
+                                                operator: Mul,
+                                                right: Identifier(
+                                                    Identifier {
+                                                        value: "c",
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                    operator: Add,
+                    right: Identifier(
+                        Identifier {
+                            value: "d",
+                        },
+                    ),
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Call(
+                CallExpression {
+                    function: Identifier(
+                        Identifier {
+                            value: "add",
+                        },
+                    ),
+                    args: [
+                        Identifier(
+                            Identifier {
+                                value: "a",
+                            },
+                        ),
+                        Identifier(
+                            Identifier {
+                                value: "b",
+                            },
+                        ),
+                        Integer(
+                            IntegerLiteral {
+                                value: 1,
+                            },
+                        ),
+                        Infix(
+                            InfixExpression {
+                                left: Integer(
+                                    IntegerLiteral {
+                                        value: 2,
+                                    },
+                                ),
+                                operator: Mul,
+                                right: Integer(
+                                    IntegerLiteral {
+                                        value: 3,
+                                    },
+                                ),
+                            },
+                        ),
+                        Infix(
+                            InfixExpression {
+                                left: Integer(
+                                    IntegerLiteral {
+                                        value: 4,
+                                    },
+                                ),
+                                operator: Add,
+                                right: Integer(
+                                    IntegerLiteral {
+                                        value: 5,
+                                    },
+                                ),
+                            },
+                        ),
+                        Call(
+                            CallExpression {
+                                function: Identifier(
+                                    Identifier {
+                                        value: "add",
+                                    },
+                                ),
+                                args: [
+                                    Integer(
+                                        IntegerLiteral {
+                                            value: 6,
+                                        },
+                                    ),
+                                    Infix(
+                                        InfixExpression {
+                                            left: Integer(
+                                                IntegerLiteral {
+                                                    value: 7,
+                                                },
+                                            ),
+                                            operator: Mul,
+                                            right: Integer(
+                                                IntegerLiteral {
+                                                    value: 8,
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                            },
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Call(
+                CallExpression {
+                    function: Identifier(
+                        Identifier {
+                            value: "add",
+                        },
+                    ),
+                    args: [
+                        Infix(
+                            InfixExpression {
+                                left: Infix(
+                                    InfixExpression {
+                                        left: Infix(
+                                            InfixExpression {
+                                                left: Identifier(
+                                                    Identifier {
+                                                        value: "a",
+                                                    },
+                                                ),
+                                                operator: Add,
+                                                right: Identifier(
+                                                    Identifier {
+                                                        value: "b",
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                        operator: Add,
+                                        right: Infix(
+                                            InfixExpression {
+                                                left: Infix(
+                                                    InfixExpression {
+                                                        left: Identifier(
+                                                            Identifier {
+                                                                value: "c",
+                                                            },
+                                                        ),
+                                                        operator: Mul,
+                                                        right: Identifier(
+                                                            Identifier {
+                                                                value: "d",
+                                                            },
+                                                        ),
+                                                    },
+                                                ),
+                                                operator: Div,
+                                                right: Identifier(
+                                                    Identifier {
+                                                        value: "f",
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    },
+                                ),
+                                operator: Add,
+                                right: Identifier(
+                                    Identifier {
+                                        value: "g",
+                                    },
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ),
+        },
+    ),
+]

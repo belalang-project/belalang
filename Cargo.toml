@@ -14,6 +14,7 @@ ptr_as_ptr = "deny"
 manual_assert = "deny"
 
 [workspace.dependencies] # keep-sorted start
+anyhow = "1.0.100"
 belalang_ast = { path = "./crates/belalang_ast" }
 belalang_bytecode = { path = "./crates/belalang_bytecode" }
 belalang_dev_tools = { path = "./devtools/belalang_dev_tools" }

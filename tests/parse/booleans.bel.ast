@@ -1,0 +1,20 @@
+[
+    Expression(
+        ExpressionStatement {
+            expression: Boolean(
+                BooleanExpression {
+                    value: true,
+                },
+            ),
+        },
+    ),
+    Expression(
+        ExpressionStatement {
+            expression: Boolean(
+                BooleanExpression {
+                    value: false,
+                },
+            ),
+        },
+    ),
+]
