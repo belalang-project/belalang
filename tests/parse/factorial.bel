@@ -1,12 +1,7 @@
-# Recursions!
 fact := fn(n) {
-  # The base case
   if (n < 2) {
     return 1;
   }
   
-  # The recursive case
   return n * fact(n - 1);
 };
-
-print(fact(5));
