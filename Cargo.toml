@@ -6,7 +6,6 @@ members = ["crates/*", "devtools/*"]
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-authors = ["Vito Secona <secona00@gmail.com>"]
 
 [workspace.lints.clippy]
 self_named_module_files = "deny"
