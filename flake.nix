@@ -49,6 +49,8 @@
           belalang = craneLib.buildPackage {
             inherit pname src cargoArtifacts;
           };
+
+          llvm = pkgs.llvmPackages_latest;
         in
         {
           _module.args = {
@@ -88,6 +90,27 @@
             '';
           };
 
+          devShells.cpp = pkgs.mkShell.override { stdenv = llvm.libcxxStdenv; } {
+            buildInputs = [
+              pkgs.cmake
+              pkgs.ninja
+              pkgs.pkg-config
+            ];
+
+            shellHook = ''
+              ${config.pre-commit.installationScript}
+
+              INCLUDES=$(echo | clang++ -v -x c++ - 2>&1 | grep "^ /" | sed 's/^ /    - "-I/' | sed 's/$/"/')
+
+              cat > .clangd << EOF
+              CompileFlags:
+                Add:
+              $INCLUDES
+                CompilationDatabase: build/
+              EOF
+            '';
+          };
+
           pre-commit = {
             check.enable = true;
             settings.hooks = {
@@ -102,6 +125,9 @@
             taplo.enable = true;
             yamlfmt.enable = true;
             keep-sorted.enable = true;
+
+            cmake-format.enable = true;
+            clang-format.enable = true;
           };
         };
     };
