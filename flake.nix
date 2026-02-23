@@ -92,6 +92,10 @@
 
           devShells.cpp = pkgs.mkShell.override { stdenv = llvm.libcxxStdenv; } {
             buildInputs = [
+              pkgs.cli11
+            ];
+
+            nativeBuildInputs = [
               pkgs.cmake
               pkgs.ninja
               pkgs.pkg-config

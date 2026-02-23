@@ -76,16 +76,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "belalang_cli"
-version = "0.1.0"
-dependencies = [
- "belalang_bytecode",
- "belalang_dev_tools",
- "belalang_vm",
- "clap",
-]
-
-[[package]]
 name = "belalang_dev_tools"
 version = "0.1.0"
 dependencies = [
