@@ -51,6 +51,25 @@
           };
 
           llvm = pkgs.llvmPackages_latest;
+          stdenv = llvm.libcxxStdenv;
+
+          belalang-cpp = stdenv.mkDerivation {
+            name = "belalang";
+
+            src = ./.;
+
+            buildInputs = [
+              pkgs.cli11
+            ];
+
+            nativeBuildInputs = [
+              pkgs.cmake
+              pkgs.ninja
+              pkgs.pkg-config
+            ];
+
+            cmakeFlags = [ "-GNinja" ];
+          };
         in
         {
           _module.args = {
@@ -61,6 +80,7 @@
           };
 
           packages.default = belalang;
+          packages.belalang-cpp = belalang-cpp;
 
           checks = {
             workspace-test = craneLib.cargoNextest {
