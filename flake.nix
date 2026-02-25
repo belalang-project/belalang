@@ -99,28 +99,13 @@
             };
           };
 
-          devShells.default = pkgs.mkShell {
+          devShells.default = pkgs.mkShell.override { inherit stdenv; } {
             name = "belalang";
             buildInputs = [
               rust-toolchain
               pkgs.cargo-nextest
             ];
-            shellHook = ''
-              ${config.pre-commit.installationScript}
-            '';
-          };
-
-          devShells.cpp = pkgs.mkShell.override { stdenv = llvm.libcxxStdenv; } {
-            buildInputs = [
-              pkgs.cli11
-            ];
-
-            nativeBuildInputs = [
-              pkgs.cmake
-              pkgs.ninja
-              pkgs.pkg-config
-            ];
-
+            inputsFrom = [ belalang-cpp ];
             shellHook = ''
               ${config.pre-commit.installationScript}
 
