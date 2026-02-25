@@ -67,3 +67,5 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v19
       - name: Build Nix package
         run: nix build .#packages.${{ matrix.target }}.default -L
+      - name: Build Nix package
+        run: nix build .#packages.${{ matrix.target }}.belalang-cpp -L
