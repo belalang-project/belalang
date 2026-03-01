@@ -60,6 +60,7 @@
 
             buildInputs = [
               pkgs.cli11
+              pkgs.gtest
             ];
 
             nativeBuildInputs = [
@@ -69,6 +70,15 @@
             ];
 
             cmakeFlags = [ "-GNinja" ];
+
+            buildPhase = ''
+              cmake --build . --target belalang
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp bin/belalang $out/bin/
+            '';
           };
         in
         {
