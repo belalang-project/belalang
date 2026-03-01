@@ -60,6 +60,7 @@
 
             buildInputs = [
               pkgs.cli11
+              pkgs.gtest
             ];
 
             nativeBuildInputs = [
