@@ -51,25 +51,6 @@
           };
 
           llvm = pkgs.llvmPackages_latest;
-          stdenv = llvm.libcxxStdenv;
-
-          belalang-cpp = stdenv.mkDerivation {
-            name = "belalang";
-
-            src = ./.;
-
-            buildInputs = [
-              pkgs.cli11
-            ];
-
-            nativeBuildInputs = [
-              pkgs.cmake
-              pkgs.ninja
-              pkgs.pkg-config
-            ];
-
-            cmakeFlags = [ "-GNinja" ];
-          };
         in
         {
           _module.args = {
@@ -80,7 +61,6 @@
           };
 
           packages.default = belalang;
-          packages.belalang-cpp = belalang-cpp;
 
           checks = {
             workspace-test = craneLib.cargoNextest {
@@ -99,13 +79,28 @@
             };
           };
 
-          devShells.default = pkgs.mkShell.override { inherit stdenv; } {
+          devShells.default = pkgs.mkShell {
             name = "belalang";
             buildInputs = [
               rust-toolchain
               pkgs.cargo-nextest
             ];
-            inputsFrom = [ belalang-cpp ];
+            shellHook = ''
+              ${config.pre-commit.installationScript}
+            '';
+          };
+
+          devShells.cpp = pkgs.mkShell.override { stdenv = llvm.libcxxStdenv; } {
+            buildInputs = [
+              pkgs.cli11
+            ];
+
+            nativeBuildInputs = [
+              pkgs.cmake
+              pkgs.ninja
+              pkgs.pkg-config
+            ];
+
             shellHook = ''
               ${config.pre-commit.installationScript}
 
