@@ -49,37 +49,6 @@
           belalang = craneLib.buildPackage {
             inherit pname src cargoArtifacts;
           };
-
-          llvm = pkgs.llvmPackages_latest;
-          stdenv = llvm.libcxxStdenv;
-
-          belalang-cpp = stdenv.mkDerivation {
-            name = "belalang";
-
-            src = ./.;
-
-            buildInputs = [
-              pkgs.cli11
-              pkgs.gtest
-            ];
-
-            nativeBuildInputs = [
-              pkgs.cmake
-              pkgs.ninja
-              pkgs.pkg-config
-            ];
-
-            cmakeFlags = [ "-GNinja" ];
-
-            buildPhase = ''
-              cmake --build . --target belalang
-            '';
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp bin/belalang $out/bin/
-            '';
-          };
         in
         {
           _module.args = {
@@ -90,7 +59,6 @@
           };
 
           packages.default = belalang;
-          packages.belalang-cpp = belalang-cpp;
 
           checks = {
             workspace-test = craneLib.cargoNextest {
@@ -109,24 +77,14 @@
             };
           };
 
-          devShells.default = pkgs.mkShell.override { inherit stdenv; } {
+          devShells.default = pkgs.mkShell {
             name = "belalang";
             buildInputs = [
               rust-toolchain
               pkgs.cargo-nextest
             ];
-            inputsFrom = [ belalang-cpp ];
             shellHook = ''
               ${config.pre-commit.installationScript}
-
-              INCLUDES=$(echo | clang++ -v -x c++ - 2>&1 | grep "^ /" | sed 's/^ /    - "-I/' | sed 's/$/"/')
-
-              cat > .clangd << EOF
-              CompileFlags:
-                Add:
-              $INCLUDES
-                CompilationDatabase: build/
-              EOF
             '';
           };
 
@@ -144,9 +102,6 @@
             taplo.enable = true;
             yamlfmt.enable = true;
             keep-sorted.enable = true;
-
-            cmake-format.enable = true;
-            clang-format.enable = true;
           };
         };
     };

@@ -1,6 +1,6 @@
 # Belalang 🦗
 
-A simple interpreted language.
+A simple interpreted language written in Rust.
 
 ## License
 
