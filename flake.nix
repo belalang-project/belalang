@@ -40,16 +40,50 @@
           craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rust-toolchain;
 
           # Source of the entire workspace
-          src = craneLib.cleanCargoSource ./.;
-
-          # Build cargo deps of the entire workspace.
-          cargoArtifacts = craneLib.buildDepsOnly { inherit src; };
+          src = pkgs.lib.cleanSourceWith {
+            src = ./.;
+            filter =
+              path: type:
+              let
+                baseName = baseNameOf path;
+              in
+              (craneLib.filterCargoSources path type)
+              || (pkgs.lib.hasSuffix ".h" baseName)
+              || (pkgs.lib.hasSuffix ".hpp" baseName)
+              || (pkgs.lib.hasSuffix ".c" baseName)
+              || (pkgs.lib.hasSuffix ".cpp" baseName)
+              || (baseName == "CMakeLists.txt")
+              || (pkgs.lib.hasSuffix ".td" baseName)
+              || (pkgs.lib.hasSuffix ".mlir" baseName)
+              || (baseName == "lit.cfg.py");
+          };
 
           pname = "belalang";
 
-          belalang = craneLib.buildPackage {
-            inherit pname src cargoArtifacts;
+          nativeBuildInputs = [
+            pkgs.cmake
+            pkgs.ninja
+          ];
+
+          buildInputs = [
+            llvm.tblgen
+            llvm.mlir
+            llvm.llvm
+          ];
+
+          commonArgs = {
+            inherit src nativeBuildInputs buildInputs;
           };
+
+          # Build cargo deps of the entire workspace.
+          cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+
+          belalang = craneLib.buildPackage (
+            commonArgs
+            // {
+              inherit pname cargoArtifacts;
+            }
+          );
         in
         {
           _module.args = {
@@ -62,20 +96,29 @@
           packages.default = belalang;
 
           checks = {
-            workspace-test = craneLib.cargoNextest {
-              inherit pname src cargoArtifacts;
-              cargoNextestExtraArgs = "--workspace --all-features";
-            };
+            workspace-test = craneLib.cargoNextest (
+              commonArgs
+              // {
+                inherit pname cargoArtifacts;
+                cargoNextestExtraArgs = "--workspace --all-features";
+              }
+            );
 
-            workspace-clippy = craneLib.cargoClippy {
-              inherit pname src cargoArtifacts;
-              cargoClippyExtraArgs = "--workspace --all-targets --all-features --keep-going -- -D warnings";
-            };
+            workspace-clippy = craneLib.cargoClippy (
+              commonArgs
+              // {
+                inherit pname cargoArtifacts;
+                cargoClippyExtraArgs = "--workspace --all-targets --all-features --keep-going -- -D warnings";
+              }
+            );
 
-            workspace-build = craneLib.cargoBuild {
-              inherit pname src cargoArtifacts;
-              cargoExtraArgs = "--workspace";
-            };
+            workspace-build = craneLib.cargoBuild (
+              commonArgs
+              // {
+                inherit pname cargoArtifacts;
+                cargoExtraArgs = "--workspace";
+              }
+            );
           };
 
           devShells.default = pkgs.mkShell.override { stdenv = llvm.stdenv; } {
