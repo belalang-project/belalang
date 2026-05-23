@@ -1,0 +1,17 @@
+[package]
+name = "belalang_ir"
+publish = false
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+cxx = "1.0.194"
+
+[build-dependencies]
+build-rs = "0.3"
+cmake = "0.1"
+cxx-build = "1.0.194"

@@ -35,6 +35,7 @@
           ...
         }:
         let
+          llvm = pkgs.llvmPackages;
           rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
           craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rust-toolchain;
 
@@ -77,14 +78,21 @@
             };
           };
 
-          devShells.default = pkgs.mkShell {
+          devShells.default = pkgs.mkShell.override { stdenv = llvm.stdenv; } {
             name = "belalang";
+            nativeBuildInputs = [
+              pkgs.cmake
+              pkgs.ninja
+            ];
             buildInputs = [
               rust-toolchain
               pkgs.cargo-nextest
             ];
             shellHook = ''
               ${config.pre-commit.installationScript}
+
+              export MLIR_DIR="${llvm.mlir.dev}/lib/cmake/mlir"
+              export LLVM_DIR="${llvm.llvm.dev}/lib/cmake/llvm"
             '';
           };
 
@@ -102,6 +110,8 @@
             taplo.enable = true;
             yamlfmt.enable = true;
             keep-sorted.enable = true;
+            clang-format.enable = true;
+            clang-format.package = llvm.clang-tools;
           };
         };
     };
