@@ -85,6 +85,7 @@
               pkgs.ninja
             ];
             buildInputs = [
+              llvm.tblgen
               rust-toolchain
               pkgs.cargo-nextest
             ];
@@ -93,6 +94,9 @@
 
               export MLIR_DIR="${llvm.mlir.dev}/lib/cmake/mlir"
               export LLVM_DIR="${llvm.llvm.dev}/lib/cmake/llvm"
+
+              export CC="${llvm.clang}/bin/clang"
+              export CXX="${llvm.clang}/bin/clang++"
             '';
           };
 

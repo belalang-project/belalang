@@ -1,5 +1,9 @@
 use std::fs;
-use build_rs::{input, output};
+
+use build_rs::{
+    input,
+    output,
+};
 
 fn main() {
     let manifest_dir = input::cargo_manifest_dir();
@@ -14,8 +18,8 @@ fn main() {
         .include(manifest_dir.join("include"))
         .compile("belalang-ir-bridge");
 
-    output::rustc_link_search_kind("native", cmake_build_dir.join("build"));
-    output::rustc_link_lib_kind("static", "test");
+    output::rustc_link_search_kind("native", cmake_build_dir.join("build").join("lib"));
+    output::rustc_link_lib_kind("static", "BelalangIR");
 
     output::rerun_if_changed(manifest_dir.join("CMakeLists.txt"));
     output::rerun_if_changed(manifest_dir.join("lib"));
