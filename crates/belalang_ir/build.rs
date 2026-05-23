@@ -1,11 +1,17 @@
-use std::fs;
-
-use build_rs::{
-    input,
-    output,
-};
-
 fn main() {
+    #[cfg(feature = "mlir")]
+    mlir_build();
+}
+
+#[cfg(feature = "mlir")]
+fn mlir_build() {
+    use std::fs;
+
+    use build_rs::{
+        input,
+        output,
+    };
+
     let manifest_dir = input::cargo_manifest_dir();
 
     let cmake_build_dir = cmake::Config::new(".")
