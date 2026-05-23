@@ -86,6 +86,9 @@
             ];
             buildInputs = [
               llvm.tblgen
+              llvm.mlir
+              llvm.llvm
+              pkgs.lit
               rust-toolchain
               pkgs.cargo-nextest
             ];
