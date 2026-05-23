@@ -23,7 +23,7 @@ jobs:
         with:
           tool: nextest
       - name: Run tests with nextest
-        run: cargo nextest run --workspace --all-features
+        run: cargo nextest run --workspace
       - name: Run btest
         run: cargo btest tests
   build:

@@ -2,3 +2,7 @@
 .pre-commit-config.yaml
 
 /target
+
+# clangd stuff
+.cache
+compile_commands.json
