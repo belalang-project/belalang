@@ -27,6 +27,18 @@ fn mlir_build() {
     output::rustc_link_search_kind("native", cmake_build_dir.join("build").join("lib"));
     output::rustc_link_lib_kind("static", "BelalangIR");
 
+    // HACK: copy bir-opt to a stable location: target/bir-opt
+    let built_bir_opt = cmake_build_dir
+        .join("build")
+        .join("tools")
+        .join("bir-opt")
+        .join("bir-opt");
+    let target_bir_opt = manifest_dir.join("..").join("..").join("target").join("bir-opt");
+    if built_bir_opt.exists() {
+        let _ = fs::create_dir_all(target_bir_opt.parent().unwrap());
+        let _ = fs::copy(&built_bir_opt, &target_bir_opt);
+    }
+
     output::rerun_if_changed(manifest_dir.join("CMakeLists.txt"));
     output::rerun_if_changed(manifest_dir.join("lib"));
     output::rerun_if_changed(manifest_dir.join("include"));
