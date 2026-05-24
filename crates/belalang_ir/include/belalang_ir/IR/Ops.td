@@ -1,6 +1,6 @@
-#ifndef BELALANG_IR_OPS
-#define BELALANG_IR_OPS
+#ifndef BELALANG_IR_OPS_TD_
+#define BELALANG_IR_OPS_TD_
 
 include "belalang_ir/IR/Dialect.td"
 
-#endif // BELALANG_IR_OPS
+#endif // BELALANG_IR_OPS_TD_
