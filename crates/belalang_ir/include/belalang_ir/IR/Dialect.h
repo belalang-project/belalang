@@ -3,9 +3,9 @@
 
 #include "mlir/IR/Dialect.h"
 
-#include "belalang_ir/Dialect.h.inc"
+#include "belalang_ir/IR/Dialect.h.inc"
 
 #define GET_OP_CLASSES
-#include "belalang_ir/Ops.h.inc"
+#include "belalang_ir/IR/Ops.h.inc"
 
 #endif // BELALANG_IR_DIALECT_H_
