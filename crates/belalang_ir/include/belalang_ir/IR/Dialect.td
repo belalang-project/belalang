@@ -3,9 +3,9 @@
 
 include "mlir/IR/OpBase.td"
 
-def BelalangDialect : Dialect {
-  let name = "belalang";
-  let cppNamespace = "::mlir::belalang";
+def BIR_Dialect : Dialect {
+  let name = "bir";
+  let cppNamespace = "::bir";
 }
 
 #endif // BELALANG_IR_DIALECT
