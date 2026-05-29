@@ -1,4 +1,8 @@
 build --@rules_rust//rust/toolchain/channel=nightly
 
+build --@rules_rust//rust/settings:rustfmt.toml=//:.rustfmt.toml
+build --aspects=@rules_rust//rust:defs.bzl%rustfmt_aspect
+build --output_groups=+rustfmt_checks
+
 build --action_env=PATH
 build --host_action_env=PATH
