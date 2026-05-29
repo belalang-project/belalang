@@ -8,5 +8,6 @@
    pkgs.gcc
    pkgs.zlib
    pkgs.python313
+   pkgs.clang-tools
  ];
 }).env

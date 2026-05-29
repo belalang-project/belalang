@@ -8,6 +8,15 @@ bazel_dep(name = "rules_shell", version = "0.8.0")
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "llvm", version = "0.8.3")
 
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "2.0.1", dev_dependency = True)
+
+git_override(
+    module_name = "hedron_compile_commands",
+    commit = "26a1ba52bd76aa3d95fa7278a9696d51f7946612",
+    remote = "https://github.com/helly25/bazel-compile-commands-extractor.git",
+)
+
 llvm_source = use_extension("@llvm//extensions:llvm_source.bzl", "llvm_source")
 llvm_source.version(llvm_version = "22.1.4")
 use_repo(llvm_source, "llvm-raw", "llvm_config", "llvm_zlib", "llvm_zstd")
