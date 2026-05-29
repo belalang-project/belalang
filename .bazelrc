@@ -1,0 +1,4 @@
+build --@rules_rust//rust/toolchain/channel=nightly
+
+build --action_env=PATH
+build --host_action_env=PATH

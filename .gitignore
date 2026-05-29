@@ -6,3 +6,6 @@
 # clangd stuff
 .cache
 compile_commands.json
+
+# bazel symlinks
+/bazel-*

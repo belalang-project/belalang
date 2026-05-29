@@ -1,0 +1,6 @@
+load("//devtools/btest:defs.bzl", "btest_test")
+
+btest_test(
+	name = "parse",
+	test_dir = "parse",
+)

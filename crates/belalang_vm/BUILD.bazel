@@ -1,0 +1,34 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+	name = "belalang_vm",
+	srcs = glob(["src/**/*.rs"]),
+	deps = [
+		"//crates/belalang_bytecode:belalang_bytecode",
+		"@crates//:libc",
+		"@crates//:thiserror",
+		"@crates//:tracing",
+		"@crates//:windows-sys",
+	],
+	visibility = ["//visibility:public"],
+)
+
+rust_test(
+	name = "belalang_vm_test",
+	crate = ":belalang_vm",
+	deps = [
+		"//devtools/belalang_dev_tools:belalang_dev_tools",
+		"@crates//:tracing-subscriber",
+	]
+)
+
+rust_test(
+	name = "belalang_vm_itest",
+	crate_root = "tests/testsuite/main.rs",
+	srcs = glob(["tests/**/*.rs"]),
+	deps = [
+		":belalang_vm",
+		"//devtools/belalang_dev_tools:belalang_dev_tools",
+		"//crates/belalang_bytecode:belalang_bytecode",
+	],
+)

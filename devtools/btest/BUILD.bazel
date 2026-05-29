@@ -1,0 +1,19 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+exports_files(["run_test.sh"])
+
+rust_binary(
+	name = "btest",
+	srcs = ["src/main.rs"],
+	visibility = ["//visibility:public"],
+	deps = [
+		"@crates//:walkdir",
+		"@crates//:glob",
+		"@crates//:similar",
+		"@crates//:console",
+		"@crates//:anyhow",
+		"//crates/belalang_ast:belalang_ast",
+		"//crates/belalang_lexer:belalang_lexer",
+		"@crates//:clap",
+	],
+)

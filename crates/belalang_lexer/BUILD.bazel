@@ -1,0 +1,22 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+	name = "belalang_lexer",
+	srcs = glob(["src/*.rs"]),
+	deps = [
+		"@crates//:thiserror",
+		"@crates//:unicode-ident",
+	],
+	visibility = ["//visibility:public"],
+)
+
+rust_test(
+	name = "belalang_lexer_test",
+	crate = ":belalang_lexer",
+)
+
+rust_test(
+	name = "belalang_lexer_itest",
+	srcs = glob(["tests/**/*.rs"]),
+	deps = [":belalang_lexer"],
+)
