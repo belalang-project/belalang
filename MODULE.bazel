@@ -5,7 +5,16 @@ module(
 
 bazel_dep(name = "rules_rust", version = "0.70.0")
 bazel_dep(name = "rules_shell", version = "0.8.0")
-bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "rules_cc", version = "0.2.18")
+bazel_dep(name = "llvm", version = "0.8.3")
+
+llvm_source = use_extension("@llvm//extensions:llvm_source.bzl", "llvm_source")
+llvm_source.version(llvm_version = "22.1.4")
+use_repo(llvm_source, "llvm-raw", "llvm_config", "llvm_zlib", "llvm_zstd")
+
+llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
+llvm.configure(targets = ["X86"])
+use_repo(llvm, "llvm-project")
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(

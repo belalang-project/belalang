@@ -1,0 +1,73 @@
+load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+package(default_visibility = ["//visibility:public"])
+
+td_library(
+    name = "BelalangIRTdFiles",
+    srcs = [
+        "include/belalang_ir/IR/Dialect.td",
+        "include/belalang_ir/IR/Ops.td",
+    ],
+    includes = ["include"],
+    deps = [
+        "@llvm-project//mlir:OpBaseTdFiles",
+    ],
+)
+
+gentbl_cc_library(
+    name = "BelalangIRDialectIncGen",
+    tbl_outs = {
+        "include/belalang_ir/IR/Dialect.h.inc": ["-gen-dialect-decls"],
+        "include/belalang_ir/IR/Dialect.cpp.inc": ["-gen-dialect-defs"],
+    },
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang_ir/IR/Dialect.td",
+    deps = [":BelalangIRTdFiles"],
+)
+
+gentbl_cc_library(
+    name = "BelalangIROpsIncGen",
+    tbl_outs = {
+        "include/belalang_ir/IR/Ops.h.inc": ["-gen-op-decls"],
+        "include/belalang_ir/IR/Ops.cpp.inc": ["-gen-op-defs"],
+    },
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang_ir/IR/Ops.td",
+    deps = [":BelalangIRTdFiles"],
+)
+
+cc_library(
+    name = "belalang_ir",
+    srcs = ["lib/Dialect.cpp"],
+    hdrs = ["include/belalang_ir/IR/Dialect.h"],
+    includes = ["include"],
+    deps = [
+        ":BelalangIRDialectIncGen",
+        ":BelalangIROpsIncGen",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:Support",
+    ],
+)
+
+cc_binary(
+    name = "bir-opt",
+    srcs = ["tools/bir-opt/bir-opt.cpp"],
+    deps = [
+        ":belalang_ir",
+        "@llvm-project//mlir:ArithDialect",
+        "@llvm-project//mlir:FuncDialect",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:MlirOptLib",
+    ],
+)
+
+rust_library(
+    name = "belalang_ir_rs",
+    srcs = ["src/lib.rs"],
+    deps = [
+        ":belalang_ir",
+        "@crates//:cxx",
+    ],
+)
