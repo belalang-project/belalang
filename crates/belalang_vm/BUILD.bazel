@@ -17,7 +17,6 @@ rust_test(
 	name = "belalang_vm_test",
 	crate = ":belalang_vm",
 	deps = [
-		"//devtools/belalang_dev_tools:belalang_dev_tools",
 		"@crates//:tracing-subscriber",
 	]
 )
