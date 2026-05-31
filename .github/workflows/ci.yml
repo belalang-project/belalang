@@ -4,66 +4,36 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-env:
-  CARGO_TERM_COLOR: always
+
 jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
     name: Test
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-      - name: Use nightly toolchain
-        run: rustup update nightly && rustup default nightly
-      - name: Install nextest
-        uses: taiki-e/install-action@v2
+      - uses: actions/checkout@v5
+      - uses: bazel-contrib/setup-bazel@0.19.0
         with:
-          tool: nextest
-      - name: Run tests with nextest
-        run: cargo nextest run --workspace
-      - name: Run btest
-        run: cargo btest tests
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          cache-save: ${{ github.event_name != 'pull_request' }}
+      - run: bazel test //...
+
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    name: Build Workspace
+        os: [ubuntu-latest, macos-latest]
+    name: Build
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-      - name: Use nightly toolchain
-        run: rustup update nightly && rustup default nightly
-      - name: Build workspace for release
-        run: cargo build --release --workspace
-  flake-check:
-    strategy:
-      matrix:
-        # omit `workspace-test` and `workspace-build` as that is already covered
-        checks: [treefmt, workspace-clippy]
-        target: [x86_64-linux]
-    name: Check Nix Flake
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v19
-      - name: Check Nix flake
-        run: nix build .#checks.${{ matrix.target }}.${{ matrix.checks }} -L
-  flake-build:
-    strategy:
-      matrix:
-        target: [x86_64-linux]
-    name: Build Nix Package
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v19
-      - name: Build Nix package
-        run: nix build .#packages.${{ matrix.target }}.default -L
+      - uses: actions/checkout@v5
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          cache-save: ${{ github.event_name != 'pull_request' }}
+      - run: bazel build //...
