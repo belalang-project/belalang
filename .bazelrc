@@ -10,5 +10,4 @@ build --@rules_rust//rust/settings:clippy_flag="-Dclippy::manual_assert"
 build --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
 build --output_groups=+clippy_checks
 
-build --action_env=PATH
-build --host_action_env=PATH
+build --incompatible_strict_action_env
