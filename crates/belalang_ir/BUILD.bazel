@@ -13,6 +13,7 @@ td_library(
     includes = ["include"],
     deps = [
         "@llvm-project//mlir:OpBaseTdFiles",
+        "@llvm-project//mlir:BuiltinDialectTdFiles",
     ],
 )
 
@@ -48,6 +49,7 @@ cc_library(
         ":BelalangIROpsIncGen",
         "@llvm-project//mlir:IR",
         "@llvm-project//mlir:Support",
+        "@llvm-project//mlir:BytecodeOpInterface",
     ],
 )
 
