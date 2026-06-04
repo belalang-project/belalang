@@ -37,7 +37,7 @@ llvm_source.version(llvm_version = "22.1.4")
 use_repo(llvm_source, "llvm-raw", "llvm_config", "llvm_zlib", "llvm_zstd")
 
 llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
-llvm.configure(targets = ["X86"])
+llvm.configure(targets = ["X86", "AArch64"])
 use_repo(llvm, "llvm-project")
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
