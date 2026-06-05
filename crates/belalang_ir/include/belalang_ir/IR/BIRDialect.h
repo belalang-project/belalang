@@ -11,4 +11,7 @@
 #define GET_OP_CLASSES
 #include "belalang_ir/IR/BIROps.h.inc"
 
+#define GET_TYPEDEF_CLASSES
+#include "belalang_ir/IR/BIRTypes.h.inc"
+
 #endif // BELALANG_IR_DIALECT_H_

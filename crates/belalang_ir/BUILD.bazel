@@ -9,6 +9,7 @@ td_library(
     srcs = [
         "include/belalang_ir/IR/BIRDialect.td",
         "include/belalang_ir/IR/BIROps.td",
+        "include/belalang_ir/IR/BIRTypes.td",
     ],
     includes = ["include"],
     deps = [
@@ -44,6 +45,8 @@ gentbl_cc_library(
     tbl_outs = [
         (["-gen-op-decls"], "include/belalang_ir/IR/BIROps.h.inc"),
         (["-gen-op-defs"], "include/belalang_ir/IR/BIROps.cpp.inc"),
+        (["-gen-typedef-decls"], "include/belalang_ir/IR/BIRTypes.h.inc"),
+        (["-gen-typedef-defs"], "include/belalang_ir/IR/BIRTypes.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
     td_file = "include/belalang_ir/IR/BIROps.td",
@@ -64,6 +67,7 @@ cc_library(
     name = "belalang_ir",
     srcs = [
         "lib/IR/BIRDialect.cpp",
+        "lib/IR/BIROps.cpp",
         "lib/Passes.cpp",
     ],
     hdrs = [

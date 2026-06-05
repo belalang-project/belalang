@@ -10,8 +10,8 @@ func.func @basic(%lhs: i32, %rhs: i32) -> i32 {
 // -----
 
 // CHECK-LABEL: func.func @basic
-func.func @basic() -> i32 {
-    // CHECK: bir.constant 42 : i32
-    %0 = bir.constant 42 : i32
-    return %0 : i32
+func.func @basic() -> !bir.int {
+    // CHECK: bir.constant 42 : !bir.int
+    %0 = bir.constant 42 : !bir.int
+    return %0 : !bir.int
 }
