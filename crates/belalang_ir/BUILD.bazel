@@ -17,6 +17,17 @@ td_library(
     ],
 )
 
+td_library(
+    name = "BelalangPassesTdFiles",
+    srcs = [
+        "include/belalang_ir/Passes.td",
+    ],
+    includes = ["include"],
+    deps = [
+        "@llvm-project//mlir:PassBaseTdFiles",
+    ],
+)
+
 gentbl_cc_library(
     name = "BelalangIRDialectIncGen",
     tbl_outs = [
@@ -39,17 +50,37 @@ gentbl_cc_library(
     deps = [":BelalangIRTdFiles"],
 )
 
+gentbl_cc_library(
+    name = "BelalangPassIncGen",
+    tbl_outs = [
+        (["-gen-pass-decls"], "include/belalang_ir/Passes.h.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang_ir/Passes.td",
+    deps = [":BelalangPassesTdFiles"],
+)
+
 cc_library(
     name = "belalang_ir",
-    srcs = ["lib/Dialect.cpp"],
-    hdrs = ["include/belalang_ir/IR/Dialect.h"],
+    srcs = [
+        "lib/Dialect.cpp",
+        "lib/Passes.cpp",
+    ],
+    hdrs = [
+        "include/belalang_ir/IR/Dialect.h",
+        "include/belalang_ir/Passes.h",
+    ],
     includes = ["include"],
     deps = [
         ":BelalangIRDialectIncGen",
         ":BelalangIROpsIncGen",
+        ":BelalangPassIncGen",
+        "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:IR",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:BytecodeOpInterface",
+        "@llvm-project//mlir:ArithDialect",
+        "@llvm-project//mlir:TransformUtils",
     ],
 )
 
