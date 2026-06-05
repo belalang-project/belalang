@@ -3,10 +3,10 @@
 
 // CHECK-LABEL: func.func @lower_constant
 // ROUNDTRIP-LABEL: func.func @lower_constant
-func.func @lower_constant() -> i32 {
+func.func @lower_constant() -> !bir.int {
     // CHECK-NOT: bir.constant
     // CHECK: arith.constant 42 : i32
-    // ROUNDTRIP: bir.constant 42 : i32
-    %0 = bir.constant 42 : i32
-    return %0 : i32
+    // ROUNDTRIP: bir.constant 42 : !bir.int
+    %0 = bir.constant 42 : !bir.int
+    return %0 : !bir.int
 }
