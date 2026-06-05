@@ -7,8 +7,8 @@ package(default_visibility = ["//visibility:public"])
 td_library(
     name = "BelalangIRTdFiles",
     srcs = [
-        "include/belalang_ir/IR/Dialect.td",
-        "include/belalang_ir/IR/Ops.td",
+        "include/belalang_ir/IR/BIRDialect.td",
+        "include/belalang_ir/IR/BIROps.td",
     ],
     includes = ["include"],
     deps = [
@@ -31,22 +31,22 @@ td_library(
 gentbl_cc_library(
     name = "BelalangIRDialectIncGen",
     tbl_outs = [
-        (["-gen-dialect-decls"], "include/belalang_ir/IR/Dialect.h.inc"),
-        (["-gen-dialect-defs"], "include/belalang_ir/IR/Dialect.cpp.inc"),
+        (["-gen-dialect-decls"], "include/belalang_ir/IR/BIRDialect.h.inc"),
+        (["-gen-dialect-defs"], "include/belalang_ir/IR/BIRDialect.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang_ir/IR/Dialect.td",
+    td_file = "include/belalang_ir/IR/BIRDialect.td",
     deps = [":BelalangIRTdFiles"],
 )
 
 gentbl_cc_library(
     name = "BelalangIROpsIncGen",
     tbl_outs = [
-        (["-gen-op-decls"], "include/belalang_ir/IR/Ops.h.inc"),
-        (["-gen-op-defs"], "include/belalang_ir/IR/Ops.cpp.inc"),
+        (["-gen-op-decls"], "include/belalang_ir/IR/BIROps.h.inc"),
+        (["-gen-op-defs"], "include/belalang_ir/IR/BIROps.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang_ir/IR/Ops.td",
+    td_file = "include/belalang_ir/IR/BIROps.td",
     deps = [":BelalangIRTdFiles"],
 )
 
@@ -63,11 +63,11 @@ gentbl_cc_library(
 cc_library(
     name = "belalang_ir",
     srcs = [
-        "lib/Dialect.cpp",
+        "lib/IR/BIRDialect.cpp",
         "lib/Passes.cpp",
     ],
     hdrs = [
-        "include/belalang_ir/IR/Dialect.h",
+        "include/belalang_ir/IR/BIRDialect.h",
         "include/belalang_ir/Passes.h",
     ],
     includes = ["include"],

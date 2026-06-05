@@ -6,9 +6,9 @@
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpImplementation.h"
 
-#include "belalang_ir/IR/Dialect.h.inc"
+#include "belalang_ir/IR/BIRDialect.h.inc"
 
 #define GET_OP_CLASSES
-#include "belalang_ir/IR/Ops.h.inc"
+#include "belalang_ir/IR/BIROps.h.inc"
 
 #endif // BELALANG_IR_DIALECT_H_

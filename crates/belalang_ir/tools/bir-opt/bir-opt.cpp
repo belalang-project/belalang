@@ -1,4 +1,4 @@
-#include "belalang_ir/IR/Dialect.h"
+#include "belalang_ir/IR/BIRDialect.h"
 #include "belalang_ir/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"

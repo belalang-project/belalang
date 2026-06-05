@@ -1,5 +1,5 @@
 #include "belalang_ir/Passes.h"
-#include "belalang_ir/IR/Dialect.h"
+#include "belalang_ir/IR/BIRDialect.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
