@@ -2,6 +2,7 @@
 #define BELALANG_IR_OPS_TD_
 
 include "belalang_ir/IR/BIRDialect.td"
+include "belalang_ir/IR/BIRTypes.td"
 
 include "mlir/IR/BuiltinAttributeInterfaces.td"
 
