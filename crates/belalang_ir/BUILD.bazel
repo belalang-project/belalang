@@ -5,7 +5,7 @@ load("@rules_rust//rust:defs.bzl", "rust_library")
 package(default_visibility = ["//visibility:public"])
 
 td_library(
-    name = "BelalangIRTdFiles",
+    name = "BelalangBIRTdFiles",
     srcs = [
         "include/belalang_ir/IR/BIRDialect.td",
         "include/belalang_ir/IR/BIROps.td",
@@ -29,25 +29,25 @@ td_library(
 )
 
 gentbl_cc_library(
-    name = "BelalangIRDialectIncGen",
+    name = "BelalangBIRDialectIncGen",
     tbl_outs = [
         (["-gen-dialect-decls"], "include/belalang_ir/IR/BIRDialect.h.inc"),
         (["-gen-dialect-defs"], "include/belalang_ir/IR/BIRDialect.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
     td_file = "include/belalang_ir/IR/BIRDialect.td",
-    deps = [":BelalangIRTdFiles"],
+    deps = [":BelalangBIRTdFiles"],
 )
 
 gentbl_cc_library(
-    name = "BelalangIROpsIncGen",
+    name = "BelalangBIROpsIncGen",
     tbl_outs = [
         (["-gen-op-decls"], "include/belalang_ir/IR/BIROps.h.inc"),
         (["-gen-op-defs"], "include/belalang_ir/IR/BIROps.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
     td_file = "include/belalang_ir/IR/BIROps.td",
-    deps = [":BelalangIRTdFiles"],
+    deps = [":BelalangBIRTdFiles"],
 )
 
 gentbl_cc_library(
@@ -72,8 +72,8 @@ cc_library(
     ],
     includes = ["include"],
     deps = [
-        ":BelalangIRDialectIncGen",
-        ":BelalangIROpsIncGen",
+        ":BelalangBIRDialectIncGen",
+        ":BelalangBIROpsIncGen",
         ":BelalangPassIncGen",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:IR",
