@@ -1,10 +1,10 @@
 #ifndef BELALANG_IR_DIALECT_H_
 #define BELALANG_IR_DIALECT_H_
 
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpImplementation.h"
-#include "mlir/Bytecode/BytecodeOpInterface.h"
 
 #include "belalang_ir/IR/Dialect.h.inc"
 
