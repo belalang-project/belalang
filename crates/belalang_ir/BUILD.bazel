@@ -67,6 +67,7 @@ cc_library(
     name = "belalang_ir",
     srcs = [
         "lib/IR/BIRDialect.cpp",
+        "lib/IR/BIROps.cpp",
         "lib/Passes.cpp",
     ],
     hdrs = [
