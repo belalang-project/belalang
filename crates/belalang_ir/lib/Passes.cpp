@@ -1,5 +1,5 @@
 #include "belalang_ir/Passes.h"
-#include "belalang_ir/IR/Dialect.h"
+#include "belalang_ir/IR/BIRDialect.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
@@ -29,8 +29,8 @@ struct BelalangConstantsPass
     mlir::RewritePatternSet patterns(&getContext());
     patterns.add<ConstantOpLowering>(&getContext());
 
-    if (mlir::failed(mlir::applyPatternsAndFoldGreedily(getOperation(),
-                                                        std::move(patterns)))) {
+    if (mlir::failed(
+            mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
       signalPassFailure();
     }
   }

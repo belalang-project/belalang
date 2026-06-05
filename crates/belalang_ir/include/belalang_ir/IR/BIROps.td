@@ -1,7 +1,7 @@
 #ifndef BELALANG_IR_OPS_TD_
 #define BELALANG_IR_OPS_TD_
 
-include "belalang_ir/IR/Dialect.td"
+include "belalang_ir/IR/BIRDialect.td"
 
 include "mlir/IR/BuiltinAttributeInterfaces.td"
 
