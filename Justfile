@@ -9,7 +9,7 @@ fmt:
 	bazelisk run @rules_rust//:rustfmt
 
 test-ir:
-	bazelisk test //crates/belalang_ir/test:all --test_output=all
+	bazelisk test //belalang_ir/test:all --test_output=all
 
 opt:
-	bazelisk build //crates/belalang_ir:bir-opt
+	bazelisk build //belalang_ir:bir-opt
