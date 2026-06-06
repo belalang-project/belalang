@@ -9,11 +9,11 @@ py_test(
     args = ["$(execpath %s)" % f for f in MLIR_TESTS],
     data = MLIR_TESTS + [
         "lit.cfg.py",
-        "//belalang_ir:bir-opt",
+        "//bir:bir-opt",
         "@llvm-project//llvm:FileCheck",
     ],
     env = {
-        "BIR_OPT": "$(rlocationpath //belalang_ir:bir-opt)",
+        "BIR_OPT": "$(rlocationpath //bir:bir-opt)",
         "FILECHECK": "$(rlocationpath @llvm-project//llvm:FileCheck)",
     },
     main = "run_lit.py",
