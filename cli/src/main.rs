@@ -1,0 +1,50 @@
+use std::{
+    fs,
+    path::PathBuf,
+};
+
+use belalang_ast::Parser;
+use belalang_lexer::Lexer;
+use birgen::BIRGen;
+use clap::{
+    Parser as ClapParser,
+    ValueEnum,
+};
+
+#[derive(ValueEnum, Clone, Debug, Default)]
+enum EmitTarget {
+    #[default]
+    Bir,
+}
+
+#[derive(ClapParser)]
+#[command(version, about, long_about = None)]
+struct Belalang {
+    /// Path to the .bel file to compile
+    path: PathBuf,
+
+    /// What to emit
+    #[arg(long, value_enum, default_value_t = EmitTarget::Bir)]
+    emit: EmitTarget,
+}
+
+fn main() -> anyhow::Result<()> {
+    let belalang = Belalang::parse();
+
+    let source = fs::read_to_string(&belalang.path)?;
+
+    let lexer = Lexer::new(&source);
+    let mut parser = Parser::new(lexer);
+    let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+
+    let mut generator = BIRGen::new();
+    generator.generate_program(&program);
+
+    match belalang.emit {
+        EmitTarget::Bir => {
+            println!("{}", generator.dump_to_string());
+        },
+    }
+
+    Ok(())
+}
