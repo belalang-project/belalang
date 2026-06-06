@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --lower-print %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --runtimize %s | %FileCheck %s
 
 // CHECK: func.func private @belalang_print_int(!bir.int)
 

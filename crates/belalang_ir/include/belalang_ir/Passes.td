@@ -8,8 +8,8 @@ def BelalangConstantsPass : Pass<"constantize"> {
   let dependentDialects = ["::bir::BIRDialect", "::mlir::arith::ArithDialect"];
 }
 
-def BelalangLowerPrintPass : Pass<"lower-print"> {
-  let summary = "lower belalang.print to runtime calls";
+def BelalangRuntimizePass : Pass<"runtimize"> {
+  let summary = "lower belalang ops to calls to runtime functions";
   let dependentDialects = ["::bir::BIRDialect"];
 }
 
