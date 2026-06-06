@@ -4,6 +4,10 @@
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Pass/Pass.h"
 
+namespace mlir {
+class RewritePatternSet;
+} // namespace mlir
+
 namespace bir {
 
 #define GEN_PASS_DECL
@@ -11,6 +15,9 @@ namespace bir {
 
 #define GEN_PASS_REGISTRATION
 #include "belalang_ir/Passes.h.inc"
+
+void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangLowerPrintPatterns(mlir::RewritePatternSet &patterns);
 
 } // namespace bir
 

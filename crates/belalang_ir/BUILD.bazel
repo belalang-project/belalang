@@ -69,6 +69,8 @@ cc_library(
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
         "lib/Passes.cpp",
+        "lib/Transforms/Constantize.cpp",
+        "lib/Transforms/LowerPrint.cpp",
     ],
     hdrs = [
         "include/belalang_ir/IR/BIRDialect.h",
