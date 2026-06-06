@@ -10,7 +10,7 @@ def main():
 
     # Resolve tool paths using TEST_SRCDIR.
     # $(rlocationpath ...) already includes the workspace/repo prefix
-    # (e.g. "_main/crates/belalang_ir/bir-opt" or
+    # (e.g. "_main/bir/bir-opt" or
     # "llvm++llvm+llvm-project/llvm/FileCheck"), so just join with TEST_SRCDIR.
     # We need the absolute path, so join with cwd (the execroot).
     test_srcdir = os.environ.get("TEST_SRCDIR", "")
