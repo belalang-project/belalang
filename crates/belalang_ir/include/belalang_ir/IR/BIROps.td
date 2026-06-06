@@ -6,8 +6,8 @@ include "belalang_ir/IR/BIRTypes.td"
 
 include "mlir/IR/BuiltinAttributeInterfaces.td"
 
-class BIR_Op<string mnemonic, list<Trait> traits = []> :
-    Op<BIR_Dialect, mnemonic, traits>;
+class BIR_Op<string mnemonic, list<Trait> traits = []>
+    : Op<BIR_Dialect, mnemonic, traits>;
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
@@ -27,6 +27,56 @@ def ConstantOp : BIR_Op<"constant"> {
   let results = (outs BIR_AnyType:$result);
 
   let hasCustomAssemblyFormat = 1;
+}
+
+def AddOp : BIR_Op<"add"> {
+  let summary = "add";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+}
+
+def SubOp : BIR_Op<"sub"> {
+  let summary = "sub";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+}
+
+def MulOp : BIR_Op<"mul"> {
+  let summary = "mul";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+}
+
+def DivOp : BIR_Op<"div"> {
+  let summary = "div";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+}
+
+def ModOp : BIR_Op<"mod"> {
+  let summary = "mod";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
 def PrintOp : BIR_Op<"print"> {
