@@ -1,0 +1,22 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_library(
+    name = "birgen",
+    srcs = glob(["src/**/*.rs"]),
+    deps = [
+        "//bir",
+        "//crates/belalang_ast",
+        "//crates/belalang_lexer",
+        "@crates//:cxx",
+    ],
+)
+
+rust_test(
+    name = "birgen_test",
+    crate = ":birgen",
+    deps = [
+        "//bir:bir-sys",
+    ],
+)

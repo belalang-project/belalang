@@ -1,5 +1,5 @@
 #[cxx::bridge(namespace = "bir")]
-mod ffi {
+pub mod ffi {
     unsafe extern "C++" {
         include!("belalang/IR/Builder.h");
 
