@@ -5,16 +5,15 @@ use belalang_ast::{
     Statement,
 };
 use belalang_lexer::InfixKind;
-use bir::ffi;
 
 pub struct BIRGen {
-    builder: cxx::UniquePtr<ffi::BIRBuilder>,
+    builder: cxx::UniquePtr<bir::BIRBuilder>,
 }
 
 impl BIRGen {
     pub fn new() -> Self {
         Self {
-            builder: ffi::create_builder(),
+            builder: bir::create_builder(),
         }
     }
 
@@ -38,7 +37,7 @@ impl BIRGen {
         }
     }
 
-    pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<ffi::BIRValue> {
+    pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<bir::BIRValue> {
         match expr {
             Expression::Integer(lit) => self.builder.pin_mut().build_constant_int(lit.value),
             Expression::Float(lit) => self.builder.pin_mut().build_constant_float(lit.value),
@@ -47,7 +46,7 @@ impl BIRGen {
         }
     }
 
-    fn generate_infix(&mut self, infix: &InfixExpression) -> cxx::UniquePtr<ffi::BIRValue> {
+    fn generate_infix(&mut self, infix: &InfixExpression) -> cxx::UniquePtr<bir::BIRValue> {
         let lhs = self.generate_expression(&infix.left);
         let rhs = self.generate_expression(&infix.right);
 

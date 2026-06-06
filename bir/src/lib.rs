@@ -1,5 +1,7 @@
+pub use ffi::*;
+
 #[cxx::bridge(namespace = "bir")]
-pub mod ffi {
+mod ffi {
     unsafe extern "C++" {
         include!("belalang/IR/Builder.h");
 
@@ -28,7 +30,7 @@ mod tests {
 
     #[test]
     fn test_builder() {
-        let mut builder = ffi::create_builder();
+        let mut builder = create_builder();
         let lhs = builder.pin_mut().build_constant_int(42);
         let rhs = builder.pin_mut().build_constant_int(1);
         let sum = builder.pin_mut().build_add(&lhs, &rhs);
