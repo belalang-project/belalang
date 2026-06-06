@@ -17,7 +17,7 @@ namespace bir {
 #include "belalang_ir/Passes.h.inc"
 
 void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
-void populateBelalangLowerPrintPatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
 
 } // namespace bir
 

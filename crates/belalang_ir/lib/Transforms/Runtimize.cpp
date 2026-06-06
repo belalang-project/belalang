@@ -60,7 +60,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 };
 } // namespace
 
-void populateBelalangLowerPrintPatterns(mlir::RewritePatternSet &patterns) {
+void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns) {
   patterns.add<PrintOpLowering>(patterns.getContext());
 }
 

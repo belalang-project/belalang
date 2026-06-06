@@ -10,7 +10,7 @@ namespace bir {
 #define GEN_PASS_DEF_BELALANGCONSTANTSPASS
 #include "belalang_ir/Passes.h.inc"
 
-#define GEN_PASS_DEF_BELALANGLOWERPRINTPASS
+#define GEN_PASS_DEF_BELALANGRUNTIMIZEPASS
 #include "belalang_ir/Passes.h.inc"
 
 namespace {
@@ -31,14 +31,14 @@ struct BelalangConstantsPass
   }
 };
 
-struct BelalangLowerPrintPass
-    : public impl::BelalangLowerPrintPassBase<BelalangLowerPrintPass> {
-  using impl::BelalangLowerPrintPassBase<
-      BelalangLowerPrintPass>::BelalangLowerPrintPassBase;
+struct BelalangRuntimizePass
+    : public impl::BelalangRuntimizePassBase<BelalangRuntimizePass> {
+  using impl::BelalangRuntimizePassBase<
+      BelalangRuntimizePass>::BelalangRuntimizePassBase;
 
   void runOnOperation() override {
     mlir::RewritePatternSet patterns(&getContext());
-    populateBelalangLowerPrintPatterns(patterns);
+    populateBelalangRuntimizePatterns(patterns);
 
     if (mlir::failed(
             mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
