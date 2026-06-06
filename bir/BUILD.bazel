@@ -1,6 +1,7 @@
 load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -68,16 +69,14 @@ cc_library(
     srcs = [
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
+        "lib/IR/Builder.cpp",
         "lib/Passes.cpp",
         "lib/Transforms/Constantize.cpp",
         "lib/Transforms/Runtimize.cpp",
     ],
-    hdrs = [
-        "include/belalang/IR/BIRDialect.h",
-        "include/belalang/Passes.h",
-    ],
-    includes = ["include"],
     deps = [
+        ":bir-include",
+        ":bridge/include",
         ":BelalangBIRDialectIncGen",
         ":BelalangBIROpsIncGen",
         ":BelalangPassIncGen",
@@ -88,6 +87,23 @@ cc_library(
         "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:TransformUtils",
+    ],
+)
+
+cc_library(
+    name = "bir-include",
+    hdrs = [
+        "include/belalang/IR/BIRDialect.h",
+        "include/belalang/IR/Builder.h",
+        "include/belalang/Passes.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":BelalangBIRDialectIncGen",
+        ":BelalangBIROpsIncGen",
+        ":BelalangPassIncGen",
+        "@llvm-project//mlir:IR",
+        "@cxx.rs//:core",
     ],
 )
 
@@ -105,9 +121,16 @@ cc_binary(
 
 rust_library(
     name = "bir",
-    srcs = ["src/lib.rs"],
+    srcs = glob(["src/**/*.rs"]),
     deps = [
         ":bir-sys",
+        ":bridge",
         "@crates//:cxx",
     ],
+)
+
+rust_cxx_bridge(
+    name = "bridge",
+    src = "src/lib.rs",
+    deps = [":bir-include"],
 )
