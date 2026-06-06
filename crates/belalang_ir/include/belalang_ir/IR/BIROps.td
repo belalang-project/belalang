@@ -29,4 +29,12 @@ def ConstantOp : BIR_Op<"constant"> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def PrintOp : BIR_Op<"print"> {
+  let summary = "print";
+
+  let arguments = (ins BIR_AnyType:$value);
+
+  let assemblyFormat = "attr-dict $value `:` type($value)";
+}
+
 #endif // BELALANG_IR_OPS_TD_
