@@ -1,5 +1,5 @@
-#include "belalang_ir/IR/BIRDialect.h"
-#include "belalang_ir/Passes.h"
+#include "belalang/IR/BIRDialect.h"
+#include "belalang/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"

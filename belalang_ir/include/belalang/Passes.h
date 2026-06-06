@@ -11,10 +11,10 @@ class RewritePatternSet;
 namespace bir {
 
 #define GEN_PASS_DECL
-#include "belalang_ir/Passes.h.inc"
+#include "belalang/Passes.h.inc"
 
 #define GEN_PASS_REGISTRATION
-#include "belalang_ir/Passes.h.inc"
+#include "belalang/Passes.h.inc"
 
 void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
