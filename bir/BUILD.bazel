@@ -64,7 +64,7 @@ gentbl_cc_library(
 )
 
 cc_library(
-    name = "belalang_ir",
+    name = "bir-sys",
     srcs = [
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
@@ -95,7 +95,7 @@ cc_binary(
     name = "bir-opt",
     srcs = ["tools/bir-opt/bir-opt.cpp"],
     deps = [
-        ":belalang_ir",
+        ":bir-sys",
         "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:IR",
@@ -104,10 +104,10 @@ cc_binary(
 )
 
 rust_library(
-    name = "belalang_rs",
+    name = "bir",
     srcs = ["src/lib.rs"],
     deps = [
-        ":belalang_ir",
+        ":bir-sys",
         "@crates//:cxx",
     ],
 )
