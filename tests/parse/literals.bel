@@ -1,3 +1,4 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
 12;
 -12;
 !12;
@@ -6,3 +7,80 @@
 !true;
 
 "Hello, World!";
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Integer(
+# CHECK-NEXT:                 IntegerLiteral {
+# CHECK-NEXT:                     value: 12,
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Prefix(
+# CHECK-NEXT:                 PrefixExpression {
+# CHECK-NEXT:                     operator: Sub,
+# CHECK-NEXT:                     right: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 12,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Prefix(
+# CHECK-NEXT:                 PrefixExpression {
+# CHECK-NEXT:                     operator: Not,
+# CHECK-NEXT:                     right: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 12,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Prefix(
+# CHECK-NEXT:                 PrefixExpression {
+# CHECK-NEXT:                     operator: Sub,
+# CHECK-NEXT:                     right: Boolean(
+# CHECK-NEXT:                         BooleanExpression {
+# CHECK-NEXT:                             value: true,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Prefix(
+# CHECK-NEXT:                 PrefixExpression {
+# CHECK-NEXT:                     operator: Not,
+# CHECK-NEXT:                     right: Boolean(
+# CHECK-NEXT:                         BooleanExpression {
+# CHECK-NEXT:                             value: true,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: String(
+# CHECK-NEXT:                 StringLiteral {
+# CHECK-NEXT:                     value: "Hello, World!",
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

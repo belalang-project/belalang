@@ -1,4 +1,75 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
 i := 0;
 while i < 10 {
   i = i + 1;
 }
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "i",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 0,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     While(
+# CHECK-NEXT:         WhileStatement {
+# CHECK-NEXT:             condition: Infix(
+# CHECK-NEXT:                 InfixExpression {
+# CHECK-NEXT:                     left: Identifier(
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "i",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     operator: Lt,
+# CHECK-NEXT:                     right: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 10,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:             block: BlockExpression {
+# CHECK-NEXT:                 statements: [
+# CHECK-NEXT:                     Expression(
+# CHECK-NEXT:                         ExpressionStatement {
+# CHECK-NEXT:                             expression: Var(
+# CHECK-NEXT:                                 VarExpression {
+# CHECK-NEXT:                                     kind: Assign,
+# CHECK-NEXT:                                     name: Identifier {
+# CHECK-NEXT:                                         value: "i",
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                     value: Infix(
+# CHECK-NEXT:                                         InfixExpression {
+# CHECK-NEXT:                                             left: Identifier(
+# CHECK-NEXT:                                                 Identifier {
+# CHECK-NEXT:                                                     value: "i",
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                             operator: Add,
+# CHECK-NEXT:                                             right: Integer(
+# CHECK-NEXT:                                                 IntegerLiteral {
+# CHECK-NEXT:                                                     value: 1,
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 ],
+# CHECK-NEXT:             },
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

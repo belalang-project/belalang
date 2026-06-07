@@ -1,3 +1,4 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
 int_var := 123;
 flo_var := 44.2;
 str_var := "Hello, World!";
@@ -5,3 +6,108 @@ str_var := "Hello, World!";
 int_var = 1;
 flo_var = 1.4;
 str_var = "Hello, Mom!";
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "int_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 123,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "flo_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Float(
+# CHECK-NEXT:                         FloatLiteral {
+# CHECK-NEXT:                             value: 44.2,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "str_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: String(
+# CHECK-NEXT:                         StringLiteral {
+# CHECK-NEXT:                             value: "Hello, World!",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: Assign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "int_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 1,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: Assign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "flo_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Float(
+# CHECK-NEXT:                         FloatLiteral {
+# CHECK-NEXT:                             value: 1.4,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: Assign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "str_var",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: String(
+# CHECK-NEXT:                         StringLiteral {
+# CHECK-NEXT:                             value: "Hello, Mom!",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]
