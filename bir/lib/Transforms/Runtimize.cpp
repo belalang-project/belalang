@@ -1,3 +1,4 @@
+#include "belalang/BRT/BRT.h"
 #include "belalang/IR/BIRDialect.h"
 #include "belalang/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -17,7 +18,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 
     if (auto v = mlir::dyn_cast<IntType>(value.getType())) {
       mlir::func::FuncOp f =
-          mod.lookupSymbol<mlir::func::FuncOp>("belalang_print_int");
+          mod.lookupSymbol<mlir::func::FuncOp>(BRT_PRINT_INT);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<IntType>();
@@ -26,8 +27,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = mlir::func::FuncOp::create(rewriter, op.getLoc(),
-                                       "belalang_print_int", funcType);
+        f = mlir::func::FuncOp::create(rewriter, op.getLoc(), BRT_PRINT_INT, funcType);
         f.setPrivate();
       }
 
@@ -37,7 +37,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 
     if (auto v = mlir::dyn_cast<FloatType>(value.getType())) {
       mlir::func::FuncOp f =
-          mod.lookupSymbol<mlir::func::FuncOp>("belalang_print_float");
+          mod.lookupSymbol<mlir::func::FuncOp>(BRT_PRINT_FLOAT);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<FloatType>();
@@ -46,8 +46,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = mlir::func::FuncOp::create(rewriter, op.getLoc(),
-                                       "belalang_print_float", funcType);
+        f = mlir::func::FuncOp::create(rewriter, op.getLoc(), BRT_PRINT_FLOAT, funcType);
         f.setPrivate();
       }
 
