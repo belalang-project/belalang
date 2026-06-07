@@ -70,13 +70,11 @@ impl<'a> Lexer<'a> {
             match self.current {
                 // skips all lines that start with `#`
                 Some('#') => {
-                    while let Some(c) = self.advance() {
+                    while let Some(c) = self.current {
                         if c == '\n' {
-                            self.advance();
-                            self.current_row += 1;
-                            self.current_col = 1;
                             break;
                         }
+                        self.advance();
                     }
                 },
                 // skips all empty whitespaces
