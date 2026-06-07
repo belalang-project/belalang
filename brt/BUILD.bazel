@@ -1,0 +1,81 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test", "rust_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_library(
+    name = "brt",
+    srcs = glob(["src/**/*.rs"]),
+    deps = [
+        "@crates//:bincode",
+        "@crates//:crc32fast",
+        "@crates//:thiserror",
+        "@crates//:serde",
+        "@crates//:libc",
+        "@crates//:tracing",
+        "@crates//:windows-sys",
+    ],
+)
+
+rust_library(
+    name = "belalang_dev_tools",
+    srcs = glob(["dev_tools/*.rs"]),
+    deps = [
+        ":brt",
+        "//crates/belalang_ast:belalang_ast",
+        "//crates/belalang_lexer:belalang_lexer",
+    ],
+)
+
+rust_test(
+    name = "brt_test",
+    crate = ":brt",
+    deps = [
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_test(
+    name = "brt_itest",
+    crate_root = "tests/testsuite/main.rs",
+    srcs = glob(["tests/testsuite/*.rs"]),
+    deps = [
+        ":brt",
+        ":belalang_dev_tools",
+    ],
+)
+
+rust_test(
+    name = "gc_itest",
+    crate_root = "tests/gc_tests/main.rs",
+    srcs = glob(["tests/gc_tests/**/*.rs"]),
+    deps = [":brt"],
+)
+
+rust_binary(
+    name = "addition_example",
+    srcs = ["examples/addition.rs"],
+    deps = [
+        ":brt",
+        ":belalang_dev_tools",
+    ],
+)
+
+rust_binary(
+    name = "print_string_example",
+    srcs = ["examples/print_string.rs"],
+    deps = [
+        ":brt",
+        ":belalang_dev_tools",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_binary(
+    name = "write_file_example",
+    srcs = ["examples/write_file.rs"],
+    deps = [
+        ":brt",
+        ":belalang_dev_tools",
+        "@crates//:tracing-subscriber",
+    ],
+)
