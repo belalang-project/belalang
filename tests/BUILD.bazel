@@ -1,6 +1,4 @@
-load("//devtools/btest:defs.bzl", "btest_test")
-
-btest_test(
-	name = "parse",
-	test_dir = "parse",
-)
+exports_files([
+    "run_lit.py",
+    "lit.cfg.py",
+])

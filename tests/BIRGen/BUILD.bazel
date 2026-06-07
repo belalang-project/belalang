@@ -1,0 +1,14 @@
+load("//tests:lit.bzl", "lit_test")
+
+BELALANG_TESTS = glob(["*.bel"])
+
+lit_test(
+    name = "lit_test",
+    tests = BELALANG_TESTS,
+    data = [
+        "//cli:belalang",
+    ],
+    env = {
+        "BELALANG": "$(rlocationpath //cli:belalang)",
+    },
+)

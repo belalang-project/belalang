@@ -1,0 +1,118 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+fn(x, y) { x + y; };
+
+fn() {};
+fn(x) {};
+fn(x, y) {};
+fn(x, y, z) {};
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Function(
+# CHECK-NEXT:                 FunctionLiteral {
+# CHECK-NEXT:                     params: [
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "x",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "y",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                     body: BlockExpression {
+# CHECK-NEXT:                         statements: [
+# CHECK-NEXT:                             Expression(
+# CHECK-NEXT:                                 ExpressionStatement {
+# CHECK-NEXT:                                     expression: Infix(
+# CHECK-NEXT:                                         InfixExpression {
+# CHECK-NEXT:                                             left: Identifier(
+# CHECK-NEXT:                                                 Identifier {
+# CHECK-NEXT:                                                     value: "x",
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                             operator: Add,
+# CHECK-NEXT:                                             right: Identifier(
+# CHECK-NEXT:                                                 Identifier {
+# CHECK-NEXT:                                                     value: "y",
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         ],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Function(
+# CHECK-NEXT:                 FunctionLiteral {
+# CHECK-NEXT:                     params: [],
+# CHECK-NEXT:                     body: BlockExpression {
+# CHECK-NEXT:                         statements: [],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Function(
+# CHECK-NEXT:                 FunctionLiteral {
+# CHECK-NEXT:                     params: [
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "x",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                     body: BlockExpression {
+# CHECK-NEXT:                         statements: [],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Function(
+# CHECK-NEXT:                 FunctionLiteral {
+# CHECK-NEXT:                     params: [
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "x",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "y",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                     body: BlockExpression {
+# CHECK-NEXT:                         statements: [],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Function(
+# CHECK-NEXT:                 FunctionLiteral {
+# CHECK-NEXT:                     params: [
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "x",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "y",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "z",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                     body: BlockExpression {
+# CHECK-NEXT:                         statements: [],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

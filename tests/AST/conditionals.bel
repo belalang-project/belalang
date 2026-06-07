@@ -1,0 +1,284 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+price := 50;
+
+status := if price < 30 {
+    "very cheap"
+} else if price < 40 {
+    "not so cheap"
+} else {
+    "very not cheap"
+};
+
+if x < y {
+	x
+}
+
+if x < y {
+	x
+} else {
+	y
+}
+
+if x < y {
+	a := 10;
+	x
+}
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "price",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Integer(
+# CHECK-NEXT:                         IntegerLiteral {
+# CHECK-NEXT:                             value: 50,
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "status",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: If(
+# CHECK-NEXT:                         IfExpression {
+# CHECK-NEXT:                             condition: Infix(
+# CHECK-NEXT:                                 InfixExpression {
+# CHECK-NEXT:                                     left: Identifier(
+# CHECK-NEXT:                                         Identifier {
+# CHECK-NEXT:                                             value: "price",
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                     operator: Lt,
+# CHECK-NEXT:                                     right: Integer(
+# CHECK-NEXT:                                         IntegerLiteral {
+# CHECK-NEXT:                                             value: 30,
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                             consequence: BlockExpression {
+# CHECK-NEXT:                                 statements: [
+# CHECK-NEXT:                                     Expression(
+# CHECK-NEXT:                                         ExpressionStatement {
+# CHECK-NEXT:                                             expression: String(
+# CHECK-NEXT:                                                 StringLiteral {
+# CHECK-NEXT:                                                     value: "very cheap",
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 ],
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                             alternative: Some(
+# CHECK-NEXT:                                 If(
+# CHECK-NEXT:                                     IfExpression {
+# CHECK-NEXT:                                         condition: Infix(
+# CHECK-NEXT:                                             InfixExpression {
+# CHECK-NEXT:                                                 left: Identifier(
+# CHECK-NEXT:                                                     Identifier {
+# CHECK-NEXT:                                                         value: "price",
+# CHECK-NEXT:                                                     },
+# CHECK-NEXT:                                                 ),
+# CHECK-NEXT:                                                 operator: Lt,
+# CHECK-NEXT:                                                 right: Integer(
+# CHECK-NEXT:                                                     IntegerLiteral {
+# CHECK-NEXT:                                                         value: 40,
+# CHECK-NEXT:                                                     },
+# CHECK-NEXT:                                                 ),
+# CHECK-NEXT:                                             },
+# CHECK-NEXT:                                         ),
+# CHECK-NEXT:                                         consequence: BlockExpression {
+# CHECK-NEXT:                                             statements: [
+# CHECK-NEXT:                                                 Expression(
+# CHECK-NEXT:                                                     ExpressionStatement {
+# CHECK-NEXT:                                                         expression: String(
+# CHECK-NEXT:                                                             StringLiteral {
+# CHECK-NEXT:                                                                 value: "not so cheap",
+# CHECK-NEXT:                                                             },
+# CHECK-NEXT:                                                         ),
+# CHECK-NEXT:                                                     },
+# CHECK-NEXT:                                                 ),
+# CHECK-NEXT:                                             ],
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                         alternative: Some(
+# CHECK-NEXT:                                             Block(
+# CHECK-NEXT:                                                 BlockExpression {
+# CHECK-NEXT:                                                     statements: [
+# CHECK-NEXT:                                                         Expression(
+# CHECK-NEXT:                                                             ExpressionStatement {
+# CHECK-NEXT:                                                                 expression: String(
+# CHECK-NEXT:                                                                     StringLiteral {
+# CHECK-NEXT:                                                                         value: "very not cheap",
+# CHECK-NEXT:                                                                     },
+# CHECK-NEXT:                                                                 ),
+# CHECK-NEXT:                                                             },
+# CHECK-NEXT:                                                         ),
+# CHECK-NEXT:                                                     ],
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         ),
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                 ),
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: If(
+# CHECK-NEXT:                 IfExpression {
+# CHECK-NEXT:                     condition: Infix(
+# CHECK-NEXT:                         InfixExpression {
+# CHECK-NEXT:                             left: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "x",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                             operator: Lt,
+# CHECK-NEXT:                             right: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "y",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     consequence: BlockExpression {
+# CHECK-NEXT:                         statements: [
+# CHECK-NEXT:                             Expression(
+# CHECK-NEXT:                                 ExpressionStatement {
+# CHECK-NEXT:                                     expression: Identifier(
+# CHECK-NEXT:                                         Identifier {
+# CHECK-NEXT:                                             value: "x",
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         ],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     alternative: None,
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: If(
+# CHECK-NEXT:                 IfExpression {
+# CHECK-NEXT:                     condition: Infix(
+# CHECK-NEXT:                         InfixExpression {
+# CHECK-NEXT:                             left: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "x",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                             operator: Lt,
+# CHECK-NEXT:                             right: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "y",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     consequence: BlockExpression {
+# CHECK-NEXT:                         statements: [
+# CHECK-NEXT:                             Expression(
+# CHECK-NEXT:                                 ExpressionStatement {
+# CHECK-NEXT:                                     expression: Identifier(
+# CHECK-NEXT:                                         Identifier {
+# CHECK-NEXT:                                             value: "x",
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         ],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     alternative: Some(
+# CHECK-NEXT:                         Block(
+# CHECK-NEXT:                             BlockExpression {
+# CHECK-NEXT:                                 statements: [
+# CHECK-NEXT:                                     Expression(
+# CHECK-NEXT:                                         ExpressionStatement {
+# CHECK-NEXT:                                             expression: Identifier(
+# CHECK-NEXT:                                                 Identifier {
+# CHECK-NEXT:                                                     value: "y",
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 ],
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: If(
+# CHECK-NEXT:                 IfExpression {
+# CHECK-NEXT:                     condition: Infix(
+# CHECK-NEXT:                         InfixExpression {
+# CHECK-NEXT:                             left: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "x",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                             operator: Lt,
+# CHECK-NEXT:                             right: Identifier(
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "y",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     consequence: BlockExpression {
+# CHECK-NEXT:                         statements: [
+# CHECK-NEXT:                             Expression(
+# CHECK-NEXT:                                 ExpressionStatement {
+# CHECK-NEXT:                                     expression: Var(
+# CHECK-NEXT:                                         VarExpression {
+# CHECK-NEXT:                                             kind: ColonAssign,
+# CHECK-NEXT:                                             name: Identifier {
+# CHECK-NEXT:                                                 value: "a",
+# CHECK-NEXT:                                             },
+# CHECK-NEXT:                                             value: Integer(
+# CHECK-NEXT:                                                 IntegerLiteral {
+# CHECK-NEXT:                                                     value: 10,
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                             Expression(
+# CHECK-NEXT:                                 ExpressionStatement {
+# CHECK-NEXT:                                     expression: Identifier(
+# CHECK-NEXT:                                         Identifier {
+# CHECK-NEXT:                                             value: "x",
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ),
+# CHECK-NEXT:                         ],
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     alternative: None,
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

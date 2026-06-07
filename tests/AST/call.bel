@@ -1,0 +1,111 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+add(1, 2 * 3, 4 + 5);
+fn(x, y) { x + y }(2, 3);
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Call(
+# CHECK-NEXT:                 CallExpression {
+# CHECK-NEXT:                     function: Identifier(
+# CHECK-NEXT:                         Identifier {
+# CHECK-NEXT:                             value: "add",
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     args: [
+# CHECK-NEXT:                         Integer(
+# CHECK-NEXT:                             IntegerLiteral {
+# CHECK-NEXT:                                 value: 1,
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                         Infix(
+# CHECK-NEXT:                             InfixExpression {
+# CHECK-NEXT:                                 left: Integer(
+# CHECK-NEXT:                                     IntegerLiteral {
+# CHECK-NEXT:                                         value: 2,
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                 ),
+# CHECK-NEXT:                                 operator: Mul,
+# CHECK-NEXT:                                 right: Integer(
+# CHECK-NEXT:                                     IntegerLiteral {
+# CHECK-NEXT:                                         value: 3,
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                 ),
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                         Infix(
+# CHECK-NEXT:                             InfixExpression {
+# CHECK-NEXT:                                 left: Integer(
+# CHECK-NEXT:                                     IntegerLiteral {
+# CHECK-NEXT:                                         value: 4,
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                 ),
+# CHECK-NEXT:                                 operator: Add,
+# CHECK-NEXT:                                 right: Integer(
+# CHECK-NEXT:                                     IntegerLiteral {
+# CHECK-NEXT:                                         value: 5,
+# CHECK-NEXT:                                     },
+# CHECK-NEXT:                                 ),
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Call(
+# CHECK-NEXT:                 CallExpression {
+# CHECK-NEXT:                     function: Function(
+# CHECK-NEXT:                         FunctionLiteral {
+# CHECK-NEXT:                             params: [
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "x",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "y",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ],
+# CHECK-NEXT:                             body: BlockExpression {
+# CHECK-NEXT:                                 statements: [
+# CHECK-NEXT:                                     Expression(
+# CHECK-NEXT:                                         ExpressionStatement {
+# CHECK-NEXT:                                             expression: Infix(
+# CHECK-NEXT:                                                 InfixExpression {
+# CHECK-NEXT:                                                     left: Identifier(
+# CHECK-NEXT:                                                         Identifier {
+# CHECK-NEXT:                                                             value: "x",
+# CHECK-NEXT:                                                         },
+# CHECK-NEXT:                                                     ),
+# CHECK-NEXT:                                                     operator: Add,
+# CHECK-NEXT:                                                     right: Identifier(
+# CHECK-NEXT:                                                         Identifier {
+# CHECK-NEXT:                                                             value: "y",
+# CHECK-NEXT:                                                         },
+# CHECK-NEXT:                                                     ),
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 ],
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                     args: [
+# CHECK-NEXT:                         Integer(
+# CHECK-NEXT:                             IntegerLiteral {
+# CHECK-NEXT:                                 value: 2,
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                         Integer(
+# CHECK-NEXT:                             IntegerLiteral {
+# CHECK-NEXT:                                 value: 3,
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         ),
+# CHECK-NEXT:                     ],
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

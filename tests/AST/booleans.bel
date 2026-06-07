@@ -1,0 +1,24 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+true;
+false;
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Boolean(
+# CHECK-NEXT:                 BooleanExpression {
+# CHECK-NEXT:                     value: true,
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Boolean(
+# CHECK-NEXT:                 BooleanExpression {
+# CHECK-NEXT:                     value: false,
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

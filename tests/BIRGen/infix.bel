@@ -1,0 +1,17 @@
+# RUN: %belalang --emit=bir %s | %FileCheck %s
+
+# CHECK: module {
+
+# CHECK-NEXT: %[[C0:.*]] = bir.constant 1 : !bir.int
+# CHECK-NEXT: %[[C1:.*]] = bir.constant 2 : !bir.int
+# CHECK-NEXT: %[[C2:.*]] = bir.add %[[C0]], %[[C1]] : (!bir.int, !bir.int) -> !bir.int
+1 + 2;
+
+# CHECK-NEXT: %[[C3:.*]] = bir.constant 10 : !bir.int
+# CHECK-NEXT: %[[C4:.*]] = bir.constant 2 : !bir.int
+# CHECK-NEXT: %[[C5:.*]] = bir.div %[[C3]], %[[C4]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C6:.*]] = bir.constant 2 : !bir.int
+# CHECK-NEXT: %[[C7:.*]] = bir.mul %[[C5]], %[[C6]] : (!bir.int, !bir.int) -> !bir.int
+10 / 2 * 2;
+
+# CHECK-NEXT: }

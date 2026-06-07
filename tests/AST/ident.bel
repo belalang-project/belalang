@@ -1,0 +1,14 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+name;
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Identifier(
+# CHECK-NEXT:                 Identifier {
+# CHECK-NEXT:                     value: "name",
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]

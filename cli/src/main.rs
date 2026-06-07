@@ -15,6 +15,7 @@ use clap::{
 enum EmitTarget {
     #[default]
     Bir,
+    Ast,
 }
 
 #[derive(ClapParser)]
@@ -37,12 +38,14 @@ fn main() -> anyhow::Result<()> {
     let mut parser = Parser::new(lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
 
-    let mut generator = BIRGen::new();
-    generator.generate_program(&program);
-
     match belalang.emit {
         EmitTarget::Bir => {
+            let mut generator = BIRGen::new();
+            generator.generate_program(&program);
             println!("{}", generator.dump_to_string());
+        },
+        EmitTarget::Ast => {
+            println!("{:#?}", program.statements);
         },
     }
 

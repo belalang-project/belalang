@@ -1,0 +1,113 @@
+# RUN: %belalang --emit ast %s | %FileCheck %s
+fact := fn(n) {
+  if (n < 2) {
+    return 1;
+  }
+  
+  return n * fact(n - 1);
+};
+
+# CHECK:      [
+# CHECK-NEXT:     Expression(
+# CHECK-NEXT:         ExpressionStatement {
+# CHECK-NEXT:             expression: Var(
+# CHECK-NEXT:                 VarExpression {
+# CHECK-NEXT:                     kind: ColonAssign,
+# CHECK-NEXT:                     name: Identifier {
+# CHECK-NEXT:                         value: "fact",
+# CHECK-NEXT:                     },
+# CHECK-NEXT:                     value: Function(
+# CHECK-NEXT:                         FunctionLiteral {
+# CHECK-NEXT:                             params: [
+# CHECK-NEXT:                                 Identifier {
+# CHECK-NEXT:                                     value: "n",
+# CHECK-NEXT:                                 },
+# CHECK-NEXT:                             ],
+# CHECK-NEXT:                             body: BlockExpression {
+# CHECK-NEXT:                                 statements: [
+# CHECK-NEXT:                                     Expression(
+# CHECK-NEXT:                                         ExpressionStatement {
+# CHECK-NEXT:                                             expression: If(
+# CHECK-NEXT:                                                 IfExpression {
+# CHECK-NEXT:                                                     condition: Infix(
+# CHECK-NEXT:                                                         InfixExpression {
+# CHECK-NEXT:                                                             left: Identifier(
+# CHECK-NEXT:                                                                 Identifier {
+# CHECK-NEXT:                                                                     value: "n",
+# CHECK-NEXT:                                                                 },
+# CHECK-NEXT:                                                             ),
+# CHECK-NEXT:                                                             operator: Lt,
+# CHECK-NEXT:                                                             right: Integer(
+# CHECK-NEXT:                                                                 IntegerLiteral {
+# CHECK-NEXT:                                                                     value: 2,
+# CHECK-NEXT:                                                                 },
+# CHECK-NEXT:                                                             ),
+# CHECK-NEXT:                                                         },
+# CHECK-NEXT:                                                     ),
+# CHECK-NEXT:                                                     consequence: BlockExpression {
+# CHECK-NEXT:                                                         statements: [
+# CHECK-NEXT:                                                             Return(
+# CHECK-NEXT:                                                                 ReturnStatement {
+# CHECK-NEXT:                                                                     return_value: Integer(
+# CHECK-NEXT:                                                                         IntegerLiteral {
+# CHECK-NEXT:                                                                             value: 1,
+# CHECK-NEXT:                                                                         },
+# CHECK-NEXT:                                                                     ),
+# CHECK-NEXT:                                                                 },
+# CHECK-NEXT:                                                             ),
+# CHECK-NEXT:                                                         ],
+# CHECK-NEXT:                                                     },
+# CHECK-NEXT:                                                     alternative: None,
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                     Return(
+# CHECK-NEXT:                                         ReturnStatement {
+# CHECK-NEXT:                                             return_value: Infix(
+# CHECK-NEXT:                                                 InfixExpression {
+# CHECK-NEXT:                                                     left: Identifier(
+# CHECK-NEXT:                                                         Identifier {
+# CHECK-NEXT:                                                             value: "n",
+# CHECK-NEXT:                                                         },
+# CHECK-NEXT:                                                     ),
+# CHECK-NEXT:                                                     operator: Mul,
+# CHECK-NEXT:                                                     right: Call(
+# CHECK-NEXT:                                                         CallExpression {
+# CHECK-NEXT:                                                             function: Identifier(
+# CHECK-NEXT:                                                                 Identifier {
+# CHECK-NEXT:                                                                     value: "fact",
+# CHECK-NEXT:                                                                 },
+# CHECK-NEXT:                                                             ),
+# CHECK-NEXT:                                                             args: [
+# CHECK-NEXT:                                                                 Infix(
+# CHECK-NEXT:                                                                     InfixExpression {
+# CHECK-NEXT:                                                                         left: Identifier(
+# CHECK-NEXT:                                                                             Identifier {
+# CHECK-NEXT:                                                                                 value: "n",
+# CHECK-NEXT:                                                                             },
+# CHECK-NEXT:                                                                         ),
+# CHECK-NEXT:                                                                         operator: Sub,
+# CHECK-NEXT:                                                                         right: Integer(
+# CHECK-NEXT:                                                                             IntegerLiteral {
+# CHECK-NEXT:                                                                                 value: 1,
+# CHECK-NEXT:                                                                             },
+# CHECK-NEXT:                                                                         ),
+# CHECK-NEXT:                                                                     },
+# CHECK-NEXT:                                                                 ),
+# CHECK-NEXT:                                                             ],
+# CHECK-NEXT:                                                         },
+# CHECK-NEXT:                                                     ),
+# CHECK-NEXT:                                                 },
+# CHECK-NEXT:                                             ),
+# CHECK-NEXT:                                         },
+# CHECK-NEXT:                                     ),
+# CHECK-NEXT:                                 ],
+# CHECK-NEXT:                             },
+# CHECK-NEXT:                         },
+# CHECK-NEXT:                     ),
+# CHECK-NEXT:                 },
+# CHECK-NEXT:             ),
+# CHECK-NEXT:         },
+# CHECK-NEXT:     ),
+# CHECK-NEXT: ]
