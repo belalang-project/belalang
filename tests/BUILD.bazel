@@ -1,5 +1,10 @@
 load("//devtools/btest:defs.bzl", "btest_test")
 
+exports_files([
+    "run_lit.py",
+    "lit.cfg.py",
+])
+
 btest_test(
 	name = "parse",
 	test_dir = "parse",

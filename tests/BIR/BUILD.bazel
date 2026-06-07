@@ -1,21 +1,14 @@
-load("@pypi//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_test")
+load("//tests:lit.bzl", "lit_test")
 
 MLIR_TESTS = glob(["*.mlir"])
 
-py_test(
+lit_test(
     name = "lit_test",
-    srcs = ["run_lit.py"],
-    args = ["$(execpath %s)" % f for f in MLIR_TESTS],
-    data = MLIR_TESTS + [
-        "lit.cfg.py",
+    tests = MLIR_TESTS,
+    data = [
         "//bir:bir-opt",
-        "@llvm-project//llvm:FileCheck",
     ],
     env = {
         "BIR_OPT": "$(rlocationpath //bir:bir-opt)",
-        "FILECHECK": "$(rlocationpath @llvm-project//llvm:FileCheck)",
     },
-    main = "run_lit.py",
-    deps = [requirement("lit")],
 )
