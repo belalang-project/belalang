@@ -8,8 +8,8 @@ rust_binary(
     deps = [
         "//bir:bir",
         "//birgen:birgen",
-        "//crates/belalang_ast:ast",
-        "//crates/belalang_lexer:lexer",
+        "//crates/ast",
+        "//crates/lexer",
         "@crates//:clap",
         "@crates//:anyhow",
     ],

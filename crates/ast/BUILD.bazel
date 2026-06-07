@@ -4,7 +4,7 @@ rust_library(
 	name = "ast",
 	srcs = glob(["src/*.rs"]),
 	deps = [
-		"//crates/belalang_lexer:lexer",
+		"//crates/lexer",
 		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],

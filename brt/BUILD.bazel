@@ -21,8 +21,8 @@ rust_library(
     srcs = glob(["dev_tools/*.rs"]),
     deps = [
         ":brt",
-        "//crates/belalang_ast:ast",
-        "//crates/belalang_lexer:lexer",
+        "//crates/ast",
+        "//crates/lexer",
     ],
 )
 
