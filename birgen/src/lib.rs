@@ -1,10 +1,10 @@
-use belalang_ast::{
+use ast::{
     Expression,
     InfixExpression,
     Program,
     Statement,
 };
-use belalang_lexer::InfixKind;
+use lexer::InfixKind;
 
 pub struct BIRGen {
     builder: cxx::UniquePtr<bir::BIRBuilder>,
@@ -78,13 +78,13 @@ impl Default for BIRGen {
 #[cfg(test)]
 #[allow(clippy::approx_constant)]
 mod tests {
-    use belalang_ast::{
+    use ast::{
         Expression,
         FloatLiteral,
         InfixExpression,
         IntegerLiteral,
     };
-    use belalang_lexer::InfixKind;
+    use lexer::InfixKind;
 
     use super::*;
 

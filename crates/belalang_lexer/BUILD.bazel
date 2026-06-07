@@ -1,7 +1,7 @@
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 rust_library(
-	name = "belalang_lexer",
+	name = "lexer",
 	srcs = glob(["src/*.rs"]),
 	deps = [
 		"@crates//:thiserror",
@@ -12,11 +12,11 @@ rust_library(
 
 rust_test(
 	name = "belalang_lexer_test",
-	crate = ":belalang_lexer",
+	crate = ":lexer",
 )
 
 rust_test(
 	name = "belalang_lexer_itest",
 	srcs = glob(["tests/**/*.rs"]),
-	deps = [":belalang_lexer"],
+	deps = [":lexer"],
 )

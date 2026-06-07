@@ -3,11 +3,11 @@ mod parser;
 mod program;
 mod statements;
 
-use belalang_lexer::{
+pub use expressions::*;
+use lexer::{
     LexerError,
     TokenKind,
 };
-pub use expressions::*;
 pub use parser::Parser;
 pub use program::Program;
 pub use statements::*;
