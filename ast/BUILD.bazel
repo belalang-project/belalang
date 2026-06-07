@@ -1,10 +1,10 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
-	name = "belalang_ast",
+	name = "ast",
 	srcs = glob(["src/*.rs"]),
 	deps = [
-		"//crates/belalang_lexer:belalang_lexer",
+		"//lexer",
 		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],

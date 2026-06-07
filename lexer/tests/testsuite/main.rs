@@ -1,4 +1,4 @@
-use belalang_lexer::{
+use lexer::{
     AssignmentKind,
     Lexer,
     LiteralKind,

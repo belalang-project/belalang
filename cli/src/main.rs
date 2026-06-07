@@ -3,13 +3,13 @@ use std::{
     path::PathBuf,
 };
 
-use belalang_ast::Parser;
-use belalang_lexer::Lexer;
+use ast::Parser;
 use birgen::BIRGen;
 use clap::{
     Parser as ClapParser,
     ValueEnum,
 };
+use lexer::Lexer;
 
 #[derive(ValueEnum, Clone, Debug, Default)]
 enum EmitTarget {
