@@ -1,0 +1,21 @@
+load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_test")
+
+BELALANG_TESTS = glob(["*.bel"])
+
+py_test(
+    name = "lit_test",
+    srcs = ["run_lit.py"],
+    args = ["$(execpath %s)" % f for f in BELALANG_TESTS],
+    data = BELALANG_TESTS + [
+        "lit.cfg.py",
+        "//cli:belalang",
+        "@llvm-project//llvm:FileCheck",
+    ],
+    env = {
+        "BELALANG": "$(rlocationpath //cli:belalang)",
+        "FILECHECK": "$(rlocationpath @llvm-project//llvm:FileCheck)",
+    },
+    main = "run_lit.py",
+    deps = [requirement("lit")],
+)
