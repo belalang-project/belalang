@@ -36,6 +36,8 @@ public:
   void dump() const;
   rust::String dump_to_string() const;
 
+  bool optimize();
+
 private:
   mlir::MLIRContext context;
   mlir::ModuleOp module;

@@ -67,6 +67,10 @@ impl BIRGen {
     pub fn dump_to_string(&self) -> String {
         self.builder.dump_to_string()
     }
+
+    pub fn optimize(&mut self) -> bool {
+        self.builder.pin_mut().optimize()
+    }
 }
 
 impl Default for BIRGen {
