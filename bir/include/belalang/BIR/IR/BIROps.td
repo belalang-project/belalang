@@ -5,6 +5,7 @@ include "belalang/BIR/IR/BIRDialect.td"
 include "belalang/BIR/IR/BIRTypes.td"
 
 include "mlir/IR/BuiltinAttributeInterfaces.td"
+include "mlir/Interfaces/CallInterfaces.td"
 
 class BIR_Op<string mnemonic, list<Trait> traits = []>
     : Op<BIR_Dialect, mnemonic, traits>;
@@ -129,6 +130,20 @@ def BIR_PrintOp : BIR_Op<"print"> {
   let arguments = (ins BIR_AnyType:$value);
 
   let assemblyFormat = "attr-dict $value `:` type($value)";
+}
+
+def FuncOp : BIR_Op<"func"> {
+  let summary = "func";
+
+  let regions = (region AnyRegion:$body);
+
+  let assemblyFormat = "attr-dict-with-keyword $body";
+}
+
+def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
+  let summary = "return";
+
+  let assemblyFormat = "attr-dict";
 }
 
 #endif // BELALANG_IR_OPS_TD_
