@@ -12,10 +12,10 @@ namespace belalang {
 namespace bir {
 
 #define GEN_PASS_DECL
-#include "belalang/Passes.h.inc"
+#include "belalang/BIR/Passes.h.inc"
 
 #define GEN_PASS_REGISTRATION
-#include "belalang/Passes.h.inc"
+#include "belalang/BIR/Passes.h.inc"
 
 void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);

@@ -1,4 +1,4 @@
-#include "belalang/IR/BIRDialect.h"
+#include "belalang/BIR/IR/BIRDialect.h"
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
@@ -7,10 +7,10 @@
 #include "llvm/ADT/TypeSwitch.h"
 
 #define GET_OP_CLASSES
-#include "belalang/IR/BIROps.cpp.inc"
+#include "belalang/BIR/IR/BIROps.cpp.inc"
 
 #define GET_TYPEDEF_CLASSES
-#include "belalang/IR/BIRTypes.cpp.inc"
+#include "belalang/BIR/IR/BIRTypes.cpp.inc"
 
 namespace belalang {
 namespace bir {

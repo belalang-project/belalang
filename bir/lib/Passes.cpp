@@ -1,5 +1,5 @@
-#include "belalang/Passes.h"
-#include "belalang/IR/BIRDialect.h"
+#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/IR/BIRDialect.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -9,10 +9,10 @@ namespace belalang {
 namespace bir {
 
 #define GEN_PASS_DEF_BELALANGCONSTANTSPASS
-#include "belalang/Passes.h.inc"
+#include "belalang/BIR/Passes.h.inc"
 
 #define GEN_PASS_DEF_BELALANGRUNTIMIZEPASS
-#include "belalang/Passes.h.inc"
+#include "belalang/BIR/Passes.h.inc"
 
 namespace {
 

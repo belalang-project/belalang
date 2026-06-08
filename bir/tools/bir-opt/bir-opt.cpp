@@ -1,5 +1,5 @@
-#include "belalang/IR/BIRDialect.h"
-#include "belalang/Passes.h"
+#include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/DialectRegistry.h"

@@ -1,6 +1,6 @@
 #include "belalang/BRT/BRT.h"
-#include "belalang/IR/BIRDialect.h"
-#include "belalang/Passes.h"
+#include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"

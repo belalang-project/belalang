@@ -5,8 +5,7 @@ include "mlir/Pass/PassBase.td"
 
 def BelalangConstantsPass : Pass<"constantize"> {
   let summary = "lower belalang.constant to arith.constant";
-  let dependentDialects = ["::belalang::bir::BIRDialect",
-                           "::mlir::arith::ArithDialect"];
+  let dependentDialects = ["::belalang::bir::BIRDialect", "::mlir::arith::ArithDialect"];
 }
 
 def BelalangRuntimizePass : Pass<"runtimize"> {

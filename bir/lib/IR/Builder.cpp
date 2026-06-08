@@ -1,5 +1,5 @@
-#include "belalang/IR/Builder.h"
-#include "belalang/IR/BIRDialect.h"
+#include "belalang/BIR/IR/Builder.h"
+#include "belalang/BIR/IR/BIRDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
