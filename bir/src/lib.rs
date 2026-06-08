@@ -18,6 +18,7 @@ mod ffi {
         fn build_div(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mod(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRBuilder>, val: &BIRValue);
+        fn optimize(self: Pin<&mut BIRBuilder>) -> bool;
 
         fn dump(self: &BIRBuilder);
         fn dump_to_string(self: &BIRBuilder) -> String;

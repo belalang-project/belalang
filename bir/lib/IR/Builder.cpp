@@ -1,9 +1,11 @@
 #include "belalang/BIR/IR/Builder.h"
 #include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/Passes.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/IR/Verifier.h"
+#include "mlir/Pass/PassManager.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace belalang {
@@ -80,6 +82,13 @@ rust::String BIRBuilder::dump_to_string() const {
   llvm::raw_string_ostream os(s);
   const_cast<mlir::ModuleOp &>(module).print(os);
   return rust::String(os.str());
+}
+
+bool BIRBuilder::optimize() {
+  mlir::PassManager pm(&context);
+  // TODO: change this with actual optimizers.
+  pm.addPass(createBelalangConstantsPass());
+  return mlir::succeeded(pm.run(module));
 }
 
 std::unique_ptr<BIRBuilder> create_builder() {
