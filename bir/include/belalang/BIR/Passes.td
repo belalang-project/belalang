@@ -10,7 +10,7 @@ def BelalangConstantsPass : Pass<"constantize"> {
 
 def BelalangRuntimizePass : Pass<"runtimize"> {
   let summary = "lower belalang ops to calls to runtime functions";
-  let dependentDialects = ["::belalang::bir::BIRDialect"];
+  let dependentDialects = ["::belalang::bir::BIRDialect", "::mlir::func::FuncDialect"];
 }
 
 #endif // BELALANG_PASSES_TD_
