@@ -1,11 +1,12 @@
-#include "belalang/IR/Builder.h"
-#include "belalang/IR/BIRDialect.h"
+#include "belalang/BIR/IR/Builder.h"
+#include "belalang/BIR/IR/BIRDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/IR/Verifier.h"
 #include "llvm/Support/raw_ostream.h"
 
+namespace belalang {
 namespace bir {
 
 BIRBuilder::BIRBuilder() : builder(&context), loc(builder.getUnknownLoc()) {
@@ -86,3 +87,4 @@ std::unique_ptr<BIRBuilder> create_builder() {
 }
 
 } // namespace bir
+} // namespace belalang

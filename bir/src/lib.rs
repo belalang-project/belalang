@@ -1,9 +1,9 @@
 pub use ffi::*;
 
-#[cxx::bridge(namespace = "bir")]
+#[cxx::bridge(namespace = "belalang::bir")]
 mod ffi {
     unsafe extern "C++" {
-        include!("belalang/IR/Builder.h");
+        include!("belalang/BIR/IR/Builder.h");
 
         type BIRValue;
         type BIRBuilder;

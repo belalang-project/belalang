@@ -1,9 +1,10 @@
-#include "belalang/IR/BIRDialect.h"
-#include "belalang/Passes.h"
+#include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"
 
+namespace belalang {
 namespace bir {
 
 namespace {
@@ -39,3 +40,4 @@ void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns) {
 }
 
 } // namespace bir
+} // namespace belalang

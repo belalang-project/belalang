@@ -5,7 +5,7 @@ include "mlir/IR/OpBase.td"
 
 def BIR_Dialect : Dialect {
   let name = "bir";
-  let cppNamespace = "::bir";
+  let cppNamespace = "::belalang::bir";
 
   let useDefaultTypePrinterParser = 1;
 }

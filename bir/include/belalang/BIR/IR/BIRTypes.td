@@ -1,7 +1,7 @@
 #ifndef BELALANG_IR_TYPES_TD_
 #define BELALANG_IR_TYPES_TD_
 
-include "belalang/IR/BIRDialect.td"
+include "belalang/BIR/IR/BIRDialect.td"
 
 class BIR_Type<string name, string typeMnemonic, list<Trait> traits = [],
                string baseCppClass = "::mlir::Type">

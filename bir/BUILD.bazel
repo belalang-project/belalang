@@ -8,9 +8,9 @@ package(default_visibility = ["//visibility:public"])
 td_library(
     name = "BelalangBIRTdFiles",
     srcs = [
-        "include/belalang/IR/BIRDialect.td",
-        "include/belalang/IR/BIROps.td",
-        "include/belalang/IR/BIRTypes.td",
+        "include/belalang/BIR/IR/BIRDialect.td",
+        "include/belalang/BIR/IR/BIROps.td",
+        "include/belalang/BIR/IR/BIRTypes.td",
     ],
     includes = ["include"],
     deps = [
@@ -22,7 +22,7 @@ td_library(
 td_library(
     name = "BelalangPassesTdFiles",
     srcs = [
-        "include/belalang/Passes.td",
+        "include/belalang/BIR/Passes.td",
     ],
     includes = ["include"],
     deps = [
@@ -33,34 +33,34 @@ td_library(
 gentbl_cc_library(
     name = "BelalangBIRDialectIncGen",
     tbl_outs = [
-        (["-gen-dialect-decls"], "include/belalang/IR/BIRDialect.h.inc"),
-        (["-gen-dialect-defs"], "include/belalang/IR/BIRDialect.cpp.inc"),
+        (["-gen-dialect-decls"], "include/belalang/BIR/IR/BIRDialect.h.inc"),
+        (["-gen-dialect-defs"], "include/belalang/BIR/IR/BIRDialect.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/IR/BIRDialect.td",
+    td_file = "include/belalang/BIR/IR/BIRDialect.td",
     deps = [":BelalangBIRTdFiles"],
 )
 
 gentbl_cc_library(
     name = "BelalangBIROpsIncGen",
     tbl_outs = [
-        (["-gen-op-decls"], "include/belalang/IR/BIROps.h.inc"),
-        (["-gen-op-defs"], "include/belalang/IR/BIROps.cpp.inc"),
-        (["-gen-typedef-decls"], "include/belalang/IR/BIRTypes.h.inc"),
-        (["-gen-typedef-defs"], "include/belalang/IR/BIRTypes.cpp.inc"),
+        (["-gen-op-decls"], "include/belalang/BIR/IR/BIROps.h.inc"),
+        (["-gen-op-defs"], "include/belalang/BIR/IR/BIROps.cpp.inc"),
+        (["-gen-typedef-decls"], "include/belalang/BIR/IR/BIRTypes.h.inc"),
+        (["-gen-typedef-defs"], "include/belalang/BIR/IR/BIRTypes.cpp.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/IR/BIROps.td",
+    td_file = "include/belalang/BIR/IR/BIROps.td",
     deps = [":BelalangBIRTdFiles"],
 )
 
 gentbl_cc_library(
     name = "BelalangPassIncGen",
     tbl_outs = [
-        (["-gen-pass-decls"], "include/belalang/Passes.h.inc"),
+        (["-gen-pass-decls"], "include/belalang/BIR/Passes.h.inc"),
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/Passes.td",
+    td_file = "include/belalang/BIR/Passes.td",
     deps = [":BelalangPassesTdFiles"],
 )
 
@@ -92,7 +92,7 @@ cc_library(
 cc_library(
     name = "bir-ffi",
     srcs = ["lib/IR/Builder.cpp"],
-    hdrs = ["include/belalang/IR/Builder.h"],
+    hdrs = ["include/belalang/BIR/IR/Builder.h"],
     includes = ["include"],
     alwayslink = True,
     deps = [
@@ -105,8 +105,8 @@ cc_library(
 cc_library(
     name = "bir-include",
     hdrs = [
-        "include/belalang/IR/BIRDialect.h",
-        "include/belalang/Passes.h",
+        "include/belalang/BIR/IR/BIRDialect.h",
+        "include/belalang/BIR/Passes.h",
     ],
     includes = ["include"],
     deps = [
