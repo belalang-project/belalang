@@ -87,7 +87,7 @@ rust::String BIRBuilder::dump_to_string() const {
 bool BIRBuilder::optimize() {
   mlir::PassManager pm(&context);
   // TODO: change this with actual optimizers.
-  pm.addPass(createBelalangConstantsPass());
+  pm.addPass(createBelalangRuntimizePass());
   return mlir::succeeded(pm.run(module));
 }
 

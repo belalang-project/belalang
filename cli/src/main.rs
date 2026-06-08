@@ -42,6 +42,7 @@ fn main() -> anyhow::Result<()> {
         EmitTarget::Bir => {
             let mut generator = BIRGen::new();
             generator.generate_program(&program);
+            generator.optimize();
             println!("{}", generator.dump_to_string());
         },
         EmitTarget::Ast => {

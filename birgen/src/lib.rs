@@ -42,6 +42,21 @@ impl BIRGen {
             Expression::Integer(lit) => self.builder.pin_mut().build_constant_int(lit.value),
             Expression::Float(lit) => self.builder.pin_mut().build_constant_float(lit.value),
             Expression::Infix(infix) => self.generate_infix(infix),
+            Expression::Call(call) => {
+                // HACK: this checks for the print function hardcoded-ly
+                if let Expression::Identifier(ref ident) = *call.function
+                    && ident.value == "print"
+                {
+                    // TODO: handle more than one arguments
+                    let arg = self.generate_expression(&call.args[0]);
+                    self.builder.pin_mut().build_print(&arg);
+
+                    // TODO: maybe not return nullptr here
+                    return cxx::UniquePtr::null();
+                }
+
+                todo!("Generation for call expression not implemented");
+            },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
     }
