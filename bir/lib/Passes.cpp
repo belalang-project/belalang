@@ -5,6 +5,7 @@
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
+namespace belalang {
 namespace bir {
 
 #define GEN_PASS_DEF_BELALANGCONSTANTSPASS
@@ -50,3 +51,4 @@ struct BelalangRuntimizePass
 } // namespace
 
 } // namespace bir
+} // namespace belalang

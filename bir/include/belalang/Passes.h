@@ -8,6 +8,7 @@ namespace mlir {
 class RewritePatternSet;
 } // namespace mlir
 
+namespace belalang {
 namespace bir {
 
 #define GEN_PASS_DECL
@@ -20,5 +21,6 @@ void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
 
 } // namespace bir
+} // namespace belalang
 
 #endif // BELALANG_PASSES_H_

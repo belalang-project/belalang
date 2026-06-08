@@ -5,6 +5,7 @@
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"
 
+namespace belalang {
 namespace bir {
 
 namespace {
@@ -64,3 +65,4 @@ void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns) {
 }
 
 } // namespace bir
+} // namespace belalang

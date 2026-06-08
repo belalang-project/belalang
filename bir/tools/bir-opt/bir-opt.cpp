@@ -9,9 +9,9 @@ int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
 
   registry.insert<mlir::arith::ArithDialect, mlir::func::FuncDialect,
-                  bir::BIRDialect>();
+                  belalang::bir::BIRDialect>();
 
-  bir::registerPasses();
+  belalang::bir::registerPasses();
 
   return mlir::asMainReturnCode(mlir::MlirOptMain(
       argc, argv, "Belalang IR analysis and optimization tool\n", registry));

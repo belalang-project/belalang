@@ -12,6 +12,7 @@
 #define GET_TYPEDEF_CLASSES
 #include "belalang/IR/BIRTypes.cpp.inc"
 
+namespace belalang {
 namespace bir {
 
 mlir::ParseResult ConstantOp::parse(mlir::OpAsmParser &parser,
@@ -54,3 +55,4 @@ void ConstantOp::print(mlir::OpAsmPrinter &p) {
 }
 
 } // namespace bir
+} // namespace belalang

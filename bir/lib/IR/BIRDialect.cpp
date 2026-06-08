@@ -2,6 +2,7 @@
 
 #include "belalang/IR/BIRDialect.cpp.inc"
 
+namespace belalang {
 namespace bir {
 
 void BIRDialect::initialize() {
@@ -17,3 +18,4 @@ void BIRDialect::initialize() {
 }
 
 } // namespace bir
+} // namespace belalang

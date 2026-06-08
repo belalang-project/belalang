@@ -7,6 +7,7 @@
 #include "rust/cxx.h"
 #include <memory>
 
+namespace belalang {
 namespace bir {
 
 class BIRValue {
@@ -45,5 +46,6 @@ private:
 std::unique_ptr<BIRBuilder> create_builder();
 
 } // namespace bir
+} // namespace belalang
 
 #endif // BELALANG_BIR_BUILDER_H_
