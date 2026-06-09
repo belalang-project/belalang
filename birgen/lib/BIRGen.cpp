@@ -1,4 +1,4 @@
-#include "belalang/BIR/IR/Builder.h"
+#include "belalang/BIRGen/BIRGen.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/IR/Builders.h"
@@ -9,29 +9,29 @@
 #include "llvm/Support/raw_ostream.h"
 
 namespace belalang {
-namespace bir {
+namespace birgen {
 
-BIRBuilder::BIRBuilder() : builder(&context), loc(builder.getUnknownLoc()) {
+BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   context.getOrLoadDialect<bir::BIRDialect>();
   module = mlir::ModuleOp::create(loc);
   builder.setInsertionPointToStart(module.getBody());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_constant_int(int64_t val) {
+std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
   auto type = builder.getType<bir::IntType>();
   auto op = bir::ConstantOp::create(builder, loc, type,
                                     builder.getI32IntegerAttr(val));
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_constant_float(double val) {
+std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
   auto type = builder.getType<bir::FloatType>();
   auto op =
       bir::ConstantOp::create(builder, loc, type, builder.getF64FloatAttr(val));
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_add(const BIRValue &lhs,
+std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
                                                 const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
@@ -39,7 +39,7 @@ std::unique_ptr<BIRValue> BIRBuilder::build_add(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_sub(const BIRValue &lhs,
+std::unique_ptr<BIRValue> BIRGen::build_sub(const BIRValue &lhs,
                                                 const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
@@ -47,7 +47,7 @@ std::unique_ptr<BIRValue> BIRBuilder::build_sub(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_mul(const BIRValue &lhs,
+std::unique_ptr<BIRValue> BIRGen::build_mul(const BIRValue &lhs,
                                                 const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
@@ -55,7 +55,7 @@ std::unique_ptr<BIRValue> BIRBuilder::build_mul(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_div(const BIRValue &lhs,
+std::unique_ptr<BIRValue> BIRGen::build_div(const BIRValue &lhs,
                                                 const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
@@ -63,7 +63,7 @@ std::unique_ptr<BIRValue> BIRBuilder::build_div(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRBuilder::build_mod(const BIRValue &lhs,
+std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
                                                 const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
@@ -71,29 +71,29 @@ std::unique_ptr<BIRValue> BIRBuilder::build_mod(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-void BIRBuilder::build_print(const BIRValue &val) {
+void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
 }
 
-void BIRBuilder::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }
+void BIRGen::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }
 
-rust::String BIRBuilder::dump_to_string() const {
+rust::String BIRGen::dump_to_string() const {
   std::string s;
   llvm::raw_string_ostream os(s);
   const_cast<mlir::ModuleOp &>(module).print(os);
   return rust::String(os.str());
 }
 
-bool BIRBuilder::optimize() {
+bool BIRGen::optimize() {
   mlir::PassManager pm(&context);
   // TODO: change this with actual optimizers.
-  pm.addPass(createBelalangRuntimizePass());
+  pm.addPass(bir::createBelalangRuntimizePass());
   return mlir::succeeded(pm.run(module));
 }
 
-std::unique_ptr<BIRBuilder> create_builder() {
-  return std::make_unique<BIRBuilder>();
+std::unique_ptr<BIRGen> create_birgen() {
+  return std::make_unique<BIRGen>();
 }
 
-} // namespace bir
+} // namespace birgen
 } // namespace belalang
