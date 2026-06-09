@@ -5,6 +5,12 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpImplementation.h"
+#include "mlir/IR/SymbolTable.h"
+#include "mlir/Interfaces/FunctionInterfaces.h"
+#include "mlir/Support/LLVM.h"
+
+using namespace mlir;
+using namespace llvm;
 
 #include "belalang/BIR/IR/BIRDialect.h.inc"
 

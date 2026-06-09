@@ -3,6 +3,7 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/OpImplementation.h"
+#include "mlir/Interfaces/FunctionImplementation.h"
 #include "mlir/Support/LLVM.h"
 #include "llvm/ADT/TypeSwitch.h"
 
@@ -56,6 +57,37 @@ void ConstantOp::print(mlir::OpAsmPrinter &p) {
   }
   p << " : " << getType();
   p.printOptionalAttrDict((*this)->getAttrs(), {"value"});
+}
+
+void FuncOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                   llvm::StringRef name, mlir::FunctionType type,
+                   llvm::ArrayRef<mlir::NamedAttribute> attrs) {
+  state.addRegion();
+  state.addAttribute(mlir::SymbolTable::getSymbolAttrName(),
+                     builder.getStringAttr(name));
+  state.addAttribute(getFunctionTypeAttrName(state.name),
+                     mlir::TypeAttr::get(type));
+  state.attributes.append(attrs.begin(), attrs.end());
+}
+
+mlir::ParseResult FuncOp::parse(mlir::OpAsmParser &parser,
+                                mlir::OperationState &result) {
+  auto buildFuncType =
+      [](mlir::Builder &builder, llvm::ArrayRef<mlir::Type> argTypes,
+         llvm::ArrayRef<mlir::Type> results,
+         mlir::function_interface_impl::VariadicFlag,
+         std::string &) { return builder.getFunctionType(argTypes, results); };
+
+  return mlir::function_interface_impl::parseFunctionOp(
+      parser, result, false, getFunctionTypeAttrName(result.name),
+      buildFuncType, getArgAttrsAttrName(result.name),
+      getResAttrsAttrName(result.name));
+}
+
+void FuncOp::print(mlir::OpAsmPrinter &p) {
+  mlir::function_interface_impl::printFunctionOp(
+      p, *this, false, getFunctionTypeAttrName(), getArgAttrsAttrName(),
+      getResAttrsAttrName());
 }
 
 } // namespace bir

@@ -16,6 +16,7 @@ td_library(
     deps = [
         "@llvm-project//mlir:OpBaseTdFiles",
         "@llvm-project//mlir:BuiltinDialectTdFiles",
+        "@llvm-project//mlir:FunctionInterfacesTdFiles",
     ],
 )
 
@@ -83,6 +84,7 @@ cc_library(
         "@llvm-project//mlir:IR",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:BytecodeOpInterface",
+        "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:TransformUtils",
