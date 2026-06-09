@@ -1,5 +1,5 @@
-#ifndef BELALANG_BIR_BUILDER_H_
-#define BELALANG_BIR_BUILDER_H_
+#ifndef BELALANG_BIRGEN_BIRGEN_H_
+#define BELALANG_BIRGEN_BIRGEN_H_
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -50,4 +50,4 @@ std::unique_ptr<BIRBuilder> create_builder();
 } // namespace bir
 } // namespace belalang
 
-#endif // BELALANG_BIR_BUILDER_H_
+#endif // BELALANG_BIRGEN_BIRGEN_H_

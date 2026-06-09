@@ -1,7 +1,5 @@
 load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_rust//rust:defs.bzl", "rust_library")
-load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -66,7 +64,7 @@ gentbl_cc_library(
 )
 
 cc_library(
-    name = "bir-sys",
+    name = "bir",
     srcs = [
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
@@ -81,26 +79,12 @@ cc_library(
         ":BelalangPassIncGen",
         "//brt:brt-include",
         "@llvm-project//mlir:Pass",
-        "@llvm-project//mlir:IR",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:BytecodeOpInterface",
         "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:TransformUtils",
-    ],
-)
-
-cc_library(
-    name = "bir-ffi",
-    srcs = ["lib/IR/Builder.cpp"],
-    hdrs = ["include/belalang/BIR/IR/Builder.h"],
-    includes = ["include"],
-    alwayslink = True,
-    deps = [
-        ":bir-sys",
-        ":bridge/include",
-        "@cxx.rs//:core",
     ],
 )
 
@@ -123,27 +107,7 @@ cc_binary(
     name = "bir-opt",
     srcs = ["tools/bir-opt/bir-opt.cpp"],
     deps = [
-        ":bir-sys",
-        "@llvm-project//mlir:ArithDialect",
-        "@llvm-project//mlir:FuncDialect",
-        "@llvm-project//mlir:IR",
+        ":bir",
         "@llvm-project//mlir:MlirOptLib",
     ],
-)
-
-rust_library(
-    name = "bir",
-    srcs = glob(["src/**/*.rs"]),
-    deps = [
-        ":bir-sys",
-        ":bir-ffi",
-        ":bridge",
-        "@crates//:cxx",
-    ],
-)
-
-rust_cxx_bridge(
-    name = "bridge",
-    src = "src/lib.rs",
-    deps = [":bir-ffi"],
 )

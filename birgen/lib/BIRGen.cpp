@@ -1,4 +1,4 @@
-#include "belalang/BIR/IR/Builder.h"
+#include "belalang/BIRGen/BIRGen.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/IR/Builders.h"

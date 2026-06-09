@@ -6,14 +6,39 @@ use ast::{
 };
 use lexer::InfixKind;
 
+#[cxx::bridge(namespace = "belalang::bir")]
+mod ffi {
+    unsafe extern "C++" {
+        include!("belalang/BIRGen/BIRGen.h");
+
+        type BIRValue;
+        type BIRBuilder;
+
+        fn create_builder() -> UniquePtr<BIRBuilder>;
+
+        fn build_constant_int(self: Pin<&mut BIRBuilder>, val: i64) -> UniquePtr<BIRValue>;
+        fn build_constant_float(self: Pin<&mut BIRBuilder>, val: f64) -> UniquePtr<BIRValue>;
+        fn build_add(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_sub(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_mul(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_div(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_mod(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_print(self: Pin<&mut BIRBuilder>, val: &BIRValue);
+        fn optimize(self: Pin<&mut BIRBuilder>) -> bool;
+
+        fn dump(self: &BIRBuilder);
+        fn dump_to_string(self: &BIRBuilder) -> String;
+    }
+}
+
 pub struct BIRGen {
-    builder: cxx::UniquePtr<bir::BIRBuilder>,
+    builder: cxx::UniquePtr<ffi::BIRBuilder>,
 }
 
 impl BIRGen {
     pub fn new() -> Self {
         Self {
-            builder: bir::create_builder(),
+            builder: ffi::create_builder(),
         }
     }
 
@@ -37,7 +62,7 @@ impl BIRGen {
         }
     }
 
-    pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<bir::BIRValue> {
+    pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<ffi::BIRValue> {
         match expr {
             Expression::Integer(lit) => self.builder.pin_mut().build_constant_int(lit.value),
             Expression::Float(lit) => self.builder.pin_mut().build_constant_float(lit.value),
@@ -61,7 +86,7 @@ impl BIRGen {
         }
     }
 
-    fn generate_infix(&mut self, infix: &InfixExpression) -> cxx::UniquePtr<bir::BIRValue> {
+    fn generate_infix(&mut self, infix: &InfixExpression) -> cxx::UniquePtr<ffi::BIRValue> {
         let lhs = self.generate_expression(&infix.left);
         let rhs = self.generate_expression(&infix.right);
 

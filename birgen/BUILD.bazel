@@ -1,11 +1,34 @@
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "birgen-cc",
+    srcs = ["lib/BIRGen.cpp"],
+    hdrs = ["include/belalang/BIRGen/BIRGen.h"],
+    includes = ["include"],
+    alwayslink = True,
+    deps = [
+        ":birgen-bridge/include",
+        "//bir",
+        "@cxx.rs//:core",
+    ],
+)
+
+rust_cxx_bridge(
+    name = "birgen-bridge",
+    src = "src/lib.rs",
+    deps = [":birgen-cc"],
+)
 
 rust_library(
     name = "birgen",
     srcs = glob(["src/**/*.rs"]),
     deps = [
+        ":birgen-bridge",
+        ":birgen-cc",
         "//bir",
         "//ast",
         "//lexer",
@@ -16,7 +39,4 @@ rust_library(
 rust_test(
     name = "birgen_test",
     crate = ":birgen",
-    deps = [
-        "//bir:bir-sys",
-    ],
 )
