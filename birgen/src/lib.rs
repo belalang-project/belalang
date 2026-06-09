@@ -6,39 +6,39 @@ use ast::{
 };
 use lexer::InfixKind;
 
-#[cxx::bridge(namespace = "belalang::bir")]
+#[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
         type BIRValue;
-        type BIRBuilder;
+        type BIRGen;
 
-        fn create_builder() -> UniquePtr<BIRBuilder>;
+        fn create_birgen() -> UniquePtr<BIRGen>;
 
-        fn build_constant_int(self: Pin<&mut BIRBuilder>, val: i64) -> UniquePtr<BIRValue>;
-        fn build_constant_float(self: Pin<&mut BIRBuilder>, val: f64) -> UniquePtr<BIRValue>;
-        fn build_add(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_sub(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_mul(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_div(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_mod(self: Pin<&mut BIRBuilder>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_print(self: Pin<&mut BIRBuilder>, val: &BIRValue);
-        fn optimize(self: Pin<&mut BIRBuilder>) -> bool;
+        fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
+        fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
+        fn build_add(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_sub(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_mul(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_div(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn optimize(self: Pin<&mut BIRGen>) -> bool;
 
-        fn dump(self: &BIRBuilder);
-        fn dump_to_string(self: &BIRBuilder) -> String;
+        fn dump(self: &BIRGen);
+        fn dump_to_string(self: &BIRGen) -> String;
     }
 }
 
 pub struct BIRGen {
-    builder: cxx::UniquePtr<ffi::BIRBuilder>,
+    inner: cxx::UniquePtr<ffi::BIRGen>,
 }
 
 impl BIRGen {
     pub fn new() -> Self {
         Self {
-            builder: ffi::create_builder(),
+            inner: ffi::create_birgen(),
         }
     }
 
@@ -64,8 +64,8 @@ impl BIRGen {
 
     pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<ffi::BIRValue> {
         match expr {
-            Expression::Integer(lit) => self.builder.pin_mut().build_constant_int(lit.value),
-            Expression::Float(lit) => self.builder.pin_mut().build_constant_float(lit.value),
+            Expression::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
+            Expression::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
             Expression::Infix(infix) => self.generate_infix(infix),
             Expression::Call(call) => {
                 // HACK: this checks for the print function hardcoded-ly
@@ -74,7 +74,7 @@ impl BIRGen {
                 {
                     // TODO: handle more than one arguments
                     let arg = self.generate_expression(&call.args[0]);
-                    self.builder.pin_mut().build_print(&arg);
+                    self.inner.pin_mut().build_print(&arg);
 
                     // TODO: maybe not return nullptr here
                     return cxx::UniquePtr::null();
@@ -91,25 +91,25 @@ impl BIRGen {
         let rhs = self.generate_expression(&infix.right);
 
         match infix.operator {
-            InfixKind::Add => self.builder.pin_mut().build_add(&lhs, &rhs),
-            InfixKind::Sub => self.builder.pin_mut().build_sub(&lhs, &rhs),
-            InfixKind::Mul => self.builder.pin_mut().build_mul(&lhs, &rhs),
-            InfixKind::Div => self.builder.pin_mut().build_div(&lhs, &rhs),
-            InfixKind::Mod => self.builder.pin_mut().build_mod(&lhs, &rhs),
+            InfixKind::Add => self.inner.pin_mut().build_add(&lhs, &rhs),
+            InfixKind::Sub => self.inner.pin_mut().build_sub(&lhs, &rhs),
+            InfixKind::Mul => self.inner.pin_mut().build_mul(&lhs, &rhs),
+            InfixKind::Div => self.inner.pin_mut().build_div(&lhs, &rhs),
+            InfixKind::Mod => self.inner.pin_mut().build_mod(&lhs, &rhs),
             _ => todo!("Infix operator {:?} not implemented", infix.operator),
         }
     }
 
     pub fn dump(&self) {
-        self.builder.dump();
+        self.inner.dump();
     }
 
     pub fn dump_to_string(&self) -> String {
-        self.builder.dump_to_string()
+        self.inner.dump_to_string()
     }
 
     pub fn optimize(&mut self) -> bool {
-        self.builder.pin_mut().optimize()
+        self.inner.pin_mut().optimize()
     }
 }
 

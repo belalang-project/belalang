@@ -8,7 +8,7 @@
 #include <memory>
 
 namespace belalang {
-namespace bir {
+namespace birgen {
 
 class BIRValue {
 public:
@@ -19,10 +19,10 @@ private:
   mlir::Value value;
 };
 
-class BIRBuilder {
+class BIRGen {
 public:
-  BIRBuilder();
-  ~BIRBuilder() = default;
+  BIRGen();
+  ~BIRGen() = default;
 
   std::unique_ptr<BIRValue> build_constant_int(int64_t val);
   std::unique_ptr<BIRValue> build_constant_float(double val);
@@ -45,9 +45,9 @@ private:
   mlir::Location loc;
 };
 
-std::unique_ptr<BIRBuilder> create_builder();
+std::unique_ptr<BIRGen> create_birgen();
 
-} // namespace bir
+} // namespace birgen
 } // namespace belalang
 
 #endif // BELALANG_BIRGEN_BIRGEN_H_
