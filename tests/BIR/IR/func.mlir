@@ -23,3 +23,27 @@ bir.func @main() {
 bir.func @f(%arg0 : !bir.int) {
   bir.return
 }
+
+// -----
+
+// CHECK:      module {
+// CHECK-NEXT:   bir.func @f(%arg0: !bir.int) -> !bir.int {
+// CHECK-NEXT:     bir.return %arg0 : !bir.int
+// CHECK-NEXT:   }
+// CHECK-NEXT: }
+
+bir.func @f(%arg0 : !bir.int) -> !bir.int {
+  bir.return %arg0 : !bir.int
+}
+
+// -----
+
+// CHECK:      module {
+// CHECK-NEXT:   bir.func @f(%arg0: !bir.int) -> (!bir.int, !bir.int) {
+// CHECK-NEXT:     bir.return %arg0, %arg0 : !bir.int, !bir.int
+// CHECK-NEXT:   }
+// CHECK-NEXT: }
+
+bir.func @f(%arg0 : !bir.int) -> (!bir.int, !bir.int) {
+  bir.return %arg0, %arg0 : !bir.int, !bir.int
+}

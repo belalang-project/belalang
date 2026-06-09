@@ -166,7 +166,9 @@ def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
 def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
   let summary = "return";
 
-  let assemblyFormat = "attr-dict";
+  let arguments = (ins Variadic<BIR_AnyType>:$input);
+
+  let assemblyFormat = "($input^ `:` type($input))? attr-dict";
 }
 
 #endif // BELALANG_IR_OPS_TD_
