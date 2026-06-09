@@ -4,7 +4,9 @@
 include "belalang/BIR/IR/BIRDialect.td"
 include "belalang/BIR/IR/BIRTypes.td"
 
+include "mlir/IR/SymbolInterfaces.td"
 include "mlir/IR/BuiltinAttributeInterfaces.td"
+include "mlir/Interfaces/FunctionInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 
 class BIR_Op<string mnemonic, list<Trait> traits = []>
@@ -132,10 +134,31 @@ def BIR_PrintOp : BIR_Op<"print"> {
   let assemblyFormat = "attr-dict $value `:` type($value)";
 }
 
-def FuncOp : BIR_Op<"func"> {
+def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
+                             IsolatedFromAbove]> {
   let summary = "func";
 
+  let arguments = (ins SymbolNameAttr:$sym_name,
+      TypeAttrOf<FunctionType>:$function_type,
+      OptionalAttr<DictArrayAttr>:$arg_attrs,
+      OptionalAttr<DictArrayAttr>:$res_attrs);
   let regions = (region AnyRegion:$body);
+
+  let builders = [OpBuilder<(ins "::llvm::StringRef":$name,
+      "::mlir::FunctionType":$type,
+      CArg<"::llvm::ArrayRef<::mlir::NamedAttribute>", "{}">:$attrs)>];
+
+  let extraClassDeclaration = [{
+    // -------------------------------------------------------------------------
+    // FunctionOpInterface
+    // -------------------------------------------------------------------------
+
+    Region *getCallableRegion() { return &getBody(); }
+
+    ArrayRef<Type> getArgumentTypes() { return getFunctionType().getInputs(); }
+
+    ArrayRef<Type> getResultTypes() { return getFunctionType().getResults(); }
+  }];
 
   let hasCustomAssemblyFormat = 1;
 }
