@@ -11,15 +11,6 @@ class BIR_Op<string mnemonic, list<Trait> traits = []>
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
-def MinimalOp : BIR_Op<"minimal"> {
-  let summary = "minimal";
-
-  let arguments = (ins);
-  let results = (outs);
-
-  let assemblyFormat = "attr-dict";
-}
-
 def ConstantOp : BIR_Op<"constant"> {
   let summary = "constant";
 
