@@ -11,7 +11,7 @@ class BIR_Op<string mnemonic, list<Trait> traits = []>
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
-def ConstantOp : BIR_Op<"constant"> {
+def BIR_ConstantOp : BIR_Op<"constant"> {
   let summary = "constant";
 
   let arguments = (ins TypedAttrInterface:$value);
@@ -20,7 +20,7 @@ def ConstantOp : BIR_Op<"constant"> {
   let hasCustomAssemblyFormat = 1;
 }
 
-def AddOp : BIR_Op<"add"> {
+def BIR_AddOp : BIR_Op<"add"> {
   let summary = "add";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -30,7 +30,7 @@ def AddOp : BIR_Op<"add"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def SubOp : BIR_Op<"sub"> {
+def BIR_SubOp : BIR_Op<"sub"> {
   let summary = "sub";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -40,7 +40,7 @@ def SubOp : BIR_Op<"sub"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def MulOp : BIR_Op<"mul"> {
+def BIR_MulOp : BIR_Op<"mul"> {
   let summary = "mul";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -50,7 +50,7 @@ def MulOp : BIR_Op<"mul"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def DivOp : BIR_Op<"div"> {
+def BIR_DivOp : BIR_Op<"div"> {
   let summary = "div";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -60,7 +60,7 @@ def DivOp : BIR_Op<"div"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def ModOp : BIR_Op<"mod"> {
+def BIR_ModOp : BIR_Op<"mod"> {
   let summary = "mod";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -70,7 +70,7 @@ def ModOp : BIR_Op<"mod"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def PrintOp : BIR_Op<"print"> {
+def BIR_PrintOp : BIR_Op<"print"> {
   let summary = "print";
 
   let arguments = (ins BIR_AnyType:$value);
