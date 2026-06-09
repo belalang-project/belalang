@@ -4,10 +4,6 @@
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Pass/Pass.h"
 
-namespace mlir {
-class RewritePatternSet;
-} // namespace mlir
-
 namespace belalang {
 namespace bir {
 
