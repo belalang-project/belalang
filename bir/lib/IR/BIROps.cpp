@@ -58,5 +58,20 @@ void ConstantOp::print(mlir::OpAsmPrinter &p) {
   p.printOptionalAttrDict((*this)->getAttrs(), {"value"});
 }
 
+mlir::ParseResult FuncOp::parse(mlir::OpAsmParser &parser, mlir::OperationState &result) {
+  mlir::Region *region = result.addRegion();
+
+  if (!mlir::succeeded(parser.parseRegion(*region))) {
+    return mlir::failure();
+  }
+
+  return mlir::success();
+}
+
+void FuncOp::print(mlir::OpAsmPrinter &p) {
+  p << " ";
+  p.printRegion(getRegion());
+}
+
 } // namespace bir
 } // namespace belalang

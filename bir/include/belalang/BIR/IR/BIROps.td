@@ -137,7 +137,7 @@ def FuncOp : BIR_Op<"func"> {
 
   let regions = (region AnyRegion:$body);
 
-  let assemblyFormat = "attr-dict-with-keyword $body";
+  let hasCustomAssemblyFormat = 1;
 }
 
 def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
