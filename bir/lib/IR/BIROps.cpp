@@ -15,6 +15,10 @@
 namespace belalang {
 namespace bir {
 
+// -----------------------------------------------------------------------------
+// ConstantOp
+// -----------------------------------------------------------------------------
+
 mlir::ParseResult ConstantOp::parse(mlir::OpAsmParser &parser,
                                     mlir::OperationState &result) {
   int64_t iVal;

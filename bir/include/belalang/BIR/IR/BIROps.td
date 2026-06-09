@@ -14,6 +14,12 @@ def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 def BIR_ConstantOp : BIR_Op<"constant"> {
   let summary = "constant";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 1 : !bir.int
+    ```
+  }];
+
   let arguments = (ins TypedAttrInterface:$value);
   let results = (outs BIR_AnyType:$result);
 
@@ -22,6 +28,14 @@ def BIR_ConstantOp : BIR_Op<"constant"> {
 
 def BIR_AddOp : BIR_Op<"add"> {
   let summary = "add";
+
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
@@ -33,6 +47,14 @@ def BIR_AddOp : BIR_Op<"add"> {
 def BIR_SubOp : BIR_Op<"sub"> {
   let summary = "sub";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.sub %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -42,6 +64,14 @@ def BIR_SubOp : BIR_Op<"sub"> {
 
 def BIR_MulOp : BIR_Op<"mul"> {
   let summary = "mul";
+
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.mul %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
@@ -53,6 +83,14 @@ def BIR_MulOp : BIR_Op<"mul"> {
 def BIR_DivOp : BIR_Op<"div"> {
   let summary = "div";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.div %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -63,6 +101,14 @@ def BIR_DivOp : BIR_Op<"div"> {
 def BIR_ModOp : BIR_Op<"mod"> {
   let summary = "mod";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.mod %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -72,6 +118,13 @@ def BIR_ModOp : BIR_Op<"mod"> {
 
 def BIR_PrintOp : BIR_Op<"print"> {
   let summary = "print";
+
+  let description = [{
+    ```mlir
+    %0 = bir.constant 0 : !bir.int
+    bir.print %0 : !bir.int
+    ```
+  }];
 
   let arguments = (ins BIR_AnyType:$value);
 
