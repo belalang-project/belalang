@@ -1,4 +1,4 @@
-#include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/IR/BIR.h"
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
@@ -14,6 +14,10 @@
 
 namespace belalang {
 namespace bir {
+
+// -----------------------------------------------------------------------------
+// ConstantOp
+// -----------------------------------------------------------------------------
 
 mlir::ParseResult ConstantOp::parse(mlir::OpAsmParser &parser,
                                     mlir::OperationState &result) {

@@ -11,17 +11,14 @@ class BIR_Op<string mnemonic, list<Trait> traits = []>
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
-def MinimalOp : BIR_Op<"minimal"> {
-  let summary = "minimal";
-
-  let arguments = (ins);
-  let results = (outs);
-
-  let assemblyFormat = "attr-dict";
-}
-
-def ConstantOp : BIR_Op<"constant"> {
+def BIR_ConstantOp : BIR_Op<"constant"> {
   let summary = "constant";
+
+  let description = [{
+    ```mlir
+    %0 = bir.constant 1 : !bir.int
+    ```
+  }];
 
   let arguments = (ins TypedAttrInterface:$value);
   let results = (outs BIR_AnyType:$result);
@@ -29,9 +26,17 @@ def ConstantOp : BIR_Op<"constant"> {
   let hasCustomAssemblyFormat = 1;
 }
 
-def AddOp : BIR_Op<"add"> {
+def BIR_AddOp : BIR_Op<"add"> {
   let summary = "add";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -39,9 +44,17 @@ def AddOp : BIR_Op<"add"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def SubOp : BIR_Op<"sub"> {
+def BIR_SubOp : BIR_Op<"sub"> {
   let summary = "sub";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.sub %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -49,9 +62,17 @@ def SubOp : BIR_Op<"sub"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def MulOp : BIR_Op<"mul"> {
+def BIR_MulOp : BIR_Op<"mul"> {
   let summary = "mul";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.mul %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -59,9 +80,17 @@ def MulOp : BIR_Op<"mul"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def DivOp : BIR_Op<"div"> {
+def BIR_DivOp : BIR_Op<"div"> {
   let summary = "div";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.div %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -69,9 +98,17 @@ def DivOp : BIR_Op<"div"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def ModOp : BIR_Op<"mod"> {
+def BIR_ModOp : BIR_Op<"mod"> {
   let summary = "mod";
 
+  let description = [{
+    ```mlir
+    %0 = bir.constant 4 : !bir.int
+    %1 = bir.constant 2 : !bir.int
+    %2 = bir.mod %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    ```
+  }];
+
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
@@ -79,8 +116,15 @@ def ModOp : BIR_Op<"mod"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def PrintOp : BIR_Op<"print"> {
+def BIR_PrintOp : BIR_Op<"print"> {
   let summary = "print";
+
+  let description = [{
+    ```mlir
+    %0 = bir.constant 0 : !bir.int
+    bir.print %0 : !bir.int
+    ```
+  }];
 
   let arguments = (ins BIR_AnyType:$value);
 

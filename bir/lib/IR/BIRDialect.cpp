@@ -1,4 +1,4 @@
-#include "belalang/BIR/IR/BIRDialect.h"
+#include "belalang/BIR/IR/BIR.h"
 
 #include "belalang/BIR/IR/BIRDialect.cpp.inc"
 
