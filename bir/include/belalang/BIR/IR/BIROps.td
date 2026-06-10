@@ -153,11 +153,11 @@ def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
     // FunctionOpInterface
     // -------------------------------------------------------------------------
 
-    Region *getCallableRegion() { return &getBody(); }
+    ::mlir::Region *getCallableRegion() { return &getBody(); }
 
-    ArrayRef<Type> getArgumentTypes() { return getFunctionType().getInputs(); }
+    ArrayRef<::mlir::Type> getArgumentTypes() { return getFunctionType().getInputs(); }
 
-    ArrayRef<Type> getResultTypes() { return getFunctionType().getResults(); }
+    ArrayRef<::mlir::Type> getResultTypes() { return getFunctionType().getResults(); }
   }];
 
   let hasCustomAssemblyFormat = 1;

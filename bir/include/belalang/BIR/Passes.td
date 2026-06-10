@@ -15,4 +15,10 @@ def BelalangRuntimizePass : Pass<"runtimize"> {
                            "::mlir::func::FuncDialect"];
 }
 
+def BelalangBIRToLLVMPass : Pass<"bir-to-llvm"> {
+  let summary = "lower bir instructions to LLVM";
+  let dependentDialects = ["::belalang::bir::BIRDialect",
+                           "::mlir::LLVM::LLVMDialect"];
+}
+
 #endif // BELALANG_PASSES_TD_
