@@ -16,6 +16,7 @@ namespace bir {
 
 void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns);
 
 } // namespace bir
 } // namespace belalang
