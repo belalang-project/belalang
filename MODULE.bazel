@@ -42,6 +42,8 @@ llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
 llvm.configure(targets = ["X86", "AArch64"])
 use_repo(llvm, "llvm-project")
 
+register_toolchains("@llvm//toolchain:all")
+
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2024",

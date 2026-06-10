@@ -11,3 +11,7 @@ build --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
 build --output_groups=+clippy_checks
 
 build --incompatible_strict_action_env
+
+build --extra_toolchains=@llvm//toolchain:all
+build --@llvm//config:empty_sysroot=True
+build --@llvm//config:experimental_stub_libgcc_s=True
