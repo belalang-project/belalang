@@ -13,8 +13,10 @@ using namespace mlir;
 using namespace belalang;
 
 struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
+  using OpConversionPattern<bir::ConstantOp>::OpConversionPattern;
+
   LogicalResult
-  matchAndRewrite(bir::ConstantOp *op, ArrayRef<Value> operands,
+  matchAndRewrite(bir::ConstantOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     return failure();
   }
@@ -23,8 +25,8 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
-    mlir::RewritePatternSet &patterns) {
-  patterns.add<ConstantOpLowering>();
+    mlir::RewritePatternSet &patterns, mlir::TypeConverter typeConverter) {
+  patterns.add<ConstantOpLowering>(typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
@@ -37,12 +39,18 @@ struct BelalangBIRToLLVMPass
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {
+    mlir::TypeConverter typeConverter;
+
+    typeConverter.addConversion([](bir::IntType ty) {
+      return mlir::IntegerType::get(ty.getContext(), 32);
+    });
+
     mlir::ConversionTarget target(getContext());
     target.addLegalDialect<mlir::LLVM::LLVMDialect>();
     target.addIllegalDialect<bir::BIRDialect>();
 
     mlir::RewritePatternSet patterns(&getContext());
-    belalang::bir::populateBelalangBIRToLLVMPatterns(patterns);
+    belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
 
     if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                   std::move(patterns)))) {
@@ -50,3 +58,7 @@ struct BelalangBIRToLLVMPass
     }
   }
 };
+
+std::unique_ptr<mlir::Pass> belalang::bir::createBelalangBIRToLLVMPass() {
+  return std::make_unique<BelalangBIRToLLVMPass>();
+}
