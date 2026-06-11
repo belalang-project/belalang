@@ -24,8 +24,10 @@ rust_library(
         "@crates//:serde",
         "@crates//:libc",
         "@crates//:tracing",
-        "@crates//:windows-sys",
-    ],
+    ] + select({
+        "@platforms//os:windows": ["@crates//:windows-sys"],
+        "//conditions:default": [],
+    }),
 )
 
 rust_library(
