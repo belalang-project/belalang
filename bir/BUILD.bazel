@@ -68,7 +68,6 @@ cc_library(
     srcs = [
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
-        "lib/Passes.cpp",
         "lib/Transforms/Constantize.cpp",
         "lib/Transforms/Runtimize.cpp",
     ],

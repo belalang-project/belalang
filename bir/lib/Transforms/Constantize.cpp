@@ -3,11 +3,16 @@
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"
+#include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
-namespace belalang {
-namespace bir {
+namespace mlir {
+#define GEN_PASS_DEF_BELALANGCONSTANTSPASS
+#include "belalang/BIR/Passes.h.inc"
+} // namespace mlir
 
 namespace {
+using namespace belalang::bir;
+
 struct ConstantOpLowering : public mlir::OpRewritePattern<ConstantOp> {
   using OpRewritePattern<ConstantOp>::OpRewritePattern;
 
@@ -35,9 +40,31 @@ struct ConstantOpLowering : public mlir::OpRewritePattern<ConstantOp> {
 };
 } // namespace
 
-void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns) {
+void belalang::bir::populateBelalangConstantsPatterns(
+    mlir::RewritePatternSet &patterns) {
   patterns.add<ConstantOpLowering>(patterns.getContext());
 }
 
-} // namespace bir
-} // namespace belalang
+// -----------------------------------------------------------------------------
+// The Pass
+// -----------------------------------------------------------------------------
+
+struct BelalangConstantsPass
+    : public impl::BelalangConstantsPassBase<BelalangConstantsPass> {
+  using impl::BelalangConstantsPassBase<
+      BelalangConstantsPass>::BelalangConstantsPassBase;
+
+  void runOnOperation() override {
+    mlir::RewritePatternSet patterns(&getContext());
+    populateBelalangConstantsPatterns(patterns);
+
+    if (mlir::failed(
+            mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
+      signalPassFailure();
+    }
+  }
+};
+
+std::unique_ptr<mlir::Pass> belalang::bir::createBelalangConstantsPass() {
+  return std::make_unique<BelalangConstantsPass>();
+}
