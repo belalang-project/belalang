@@ -4,12 +4,17 @@
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"
+#include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
-namespace belalang {
-
-namespace bir {
+namespace mlir {
+#define GEN_PASS_DEF_BELALANGRUNTIMIZEPASS
+#include "belalang/BIR/Passes.h.inc"
+} // namespace mlir
 
 namespace {
+using namespace belalang;
+using namespace belalang::bir;
+
 struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
   using OpRewritePattern<PrintOp>::OpRewritePattern;
 
@@ -23,7 +28,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
           mod.lookupSymbol<mlir::func::FuncOp>(brt::BRT_PRINT_INT);
 
       if (!f) {
-        mlir::Type ty = rewriter.getType<IntType>();
+        mlir::Type ty = rewriter.getType<bir::IntType>();
         mlir::FunctionType funcType = rewriter.getFunctionType({ty}, {});
 
         mlir::OpBuilder::InsertionGuard guard(rewriter);
@@ -38,12 +43,12 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
       return mlir::success();
     }
 
-    if (auto v = mlir::dyn_cast<FloatType>(value.getType())) {
+    if (auto v = mlir::dyn_cast<bir::FloatType>(value.getType())) {
       mlir::func::FuncOp f =
           mod.lookupSymbol<mlir::func::FuncOp>(brt::BRT_PRINT_FLOAT);
 
       if (!f) {
-        mlir::Type ty = rewriter.getType<FloatType>();
+        mlir::Type ty = rewriter.getType<bir::FloatType>();
         mlir::FunctionType funcType = rewriter.getFunctionType({ty}, {});
 
         mlir::OpBuilder::InsertionGuard guard(rewriter);
@@ -63,9 +68,31 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 };
 } // namespace
 
-void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns) {
+void belalang::bir::populateBelalangRuntimizePatterns(
+    mlir::RewritePatternSet &patterns) {
   patterns.add<PrintOpLowering>(patterns.getContext());
 }
 
-} // namespace bir
-} // namespace belalang
+// -----------------------------------------------------------------------------
+// The Pass
+// -----------------------------------------------------------------------------
+
+struct BelalangRuntimizePass
+    : public impl::BelalangRuntimizePassBase<BelalangRuntimizePass> {
+  using impl::BelalangRuntimizePassBase<
+      BelalangRuntimizePass>::BelalangRuntimizePassBase;
+
+  void runOnOperation() override {
+    mlir::RewritePatternSet patterns(&getContext());
+    populateBelalangRuntimizePatterns(patterns);
+
+    if (mlir::failed(
+            mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
+      signalPassFailure();
+    }
+  }
+};
+
+std::unique_ptr<mlir::Pass> belalang::bir::createBelalangRuntimizePass() {
+  return std::make_unique<BelalangRuntimizePass>();
+}
