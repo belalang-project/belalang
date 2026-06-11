@@ -15,6 +15,10 @@ cc_library(
         "//bir",
         "@cxx.rs//:core",
     ],
+    linkopts = select({
+        "@platforms//os:macos": ["-lc++"],
+        "//conditions:default": [],
+    }),
 )
 
 rust_cxx_bridge(
