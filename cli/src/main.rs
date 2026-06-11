@@ -16,6 +16,7 @@ enum EmitTarget {
     #[default]
     Bir,
     Ast,
+    Tokens,
 }
 
 #[derive(ClapParser)]
@@ -34,6 +35,18 @@ fn main() -> anyhow::Result<()> {
 
     let source = fs::read_to_string(&belalang.path)?;
 
+    if let EmitTarget::Tokens = belalang.emit {
+        let mut lexer = Lexer::new(&source);
+        loop {
+            let token = lexer.next_token().map_err(|e| anyhow::anyhow!("{}", e))?;
+            if token.kind == lexer::TokenKind::EOF {
+                break;
+            }
+            println!("{:?}", token);
+        }
+        return Ok(());
+    }
+
     let lexer = Lexer::new(&source);
     let mut parser = Parser::new(lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
@@ -48,6 +61,7 @@ fn main() -> anyhow::Result<()> {
         EmitTarget::Ast => {
             println!("{:#?}", program.statements);
         },
+        EmitTarget::Tokens => unreachable!(),
     }
 
     Ok(())

@@ -1,0 +1,10 @@
+# RUN: %belalang --emit=tokens %s | %FileCheck %s
+
+# CHECK: Token { kind: Ident, value: "print" }
+# CHECK: Token { kind: LeftParen, value: "" }
+# CHECK: Token { kind: Literal { kind: Integer }, value: "1" }
+# CHECK: Token { kind: Add, value: "" }
+# CHECK: Token { kind: Literal { kind: Integer }, value: "2" }
+# CHECK: Token { kind: RightParen, value: "" }
+# CHECK: Token { kind: Semicolon, value: "" }
+print(1 + 2);
