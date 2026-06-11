@@ -2,9 +2,9 @@
 
 // -----
 
-// CHECK-LABEL: func.func @basic
-func.func @basic() -> !bir.int {
+// CHECK-LABEL: bir.func @basic
+bir.func @basic() -> !bir.int {
     // CHECK: bir.constant 42 : !bir.int
     %0 = bir.constant 42 : !bir.int
-    return %0 : !bir.int
+    bir.return %0 : !bir.int
 }

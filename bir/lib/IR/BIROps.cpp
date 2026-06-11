@@ -93,6 +93,10 @@ void FuncOp::print(mlir::OpAsmPrinter &p) {
       getResAttrsAttrName());
 }
 
+mlir::Type FuncOp::getResType() {
+  return getNumResults() > 0 ? getResultTypes()[0] : mlir::Type();
+}
+
 // -----------------------------------------------------------------------------
 // CallOp
 // -----------------------------------------------------------------------------
@@ -105,6 +109,13 @@ void CallOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
     state.addAttribute("callee", callee);
   if (resType)
     state.addTypes(resType);
+}
+
+void CallOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                   bir::FuncOp f, mlir::ValueRange operands) {
+  auto callee = mlir::SymbolRefAttr::get(builder.getContext(), f.getName());
+  auto resType = f.getResType();
+  build(builder, state, callee, resType, operands);
 }
 
 mlir::ParseResult CallOp::parse(mlir::OpAsmParser &parser,
