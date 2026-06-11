@@ -70,6 +70,7 @@ cc_library(
         "lib/IR/BIROps.cpp",
         "lib/Transforms/Constantize.cpp",
         "lib/Transforms/Runtimize.cpp",
+        "lib/Transforms/BIRToLLVM.cpp",
     ],
     deps = [
         ":bir-include",
@@ -83,6 +84,7 @@ cc_library(
         "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:FuncDialect",
+        "@llvm-project//mlir:LLVMDialect",
         "@llvm-project//mlir:TransformUtils",
     ],
     linkopts = select({

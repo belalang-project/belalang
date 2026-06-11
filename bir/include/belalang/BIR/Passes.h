@@ -2,7 +2,9 @@
 #define BELALANG_PASSES_H_
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Pass/Pass.h"
+#include "mlir/Transforms/DialectConversion.h"
 
 namespace belalang {
 namespace bir {
@@ -15,6 +17,8 @@ namespace bir {
 
 void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
+                                       mlir::TypeConverter &typeConverter);
 
 } // namespace bir
 } // namespace belalang
