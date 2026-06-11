@@ -1,6 +1,6 @@
 // RUN: %bir-opt --split-input-file --runtimize %s | %FileCheck %s
 
-// CHECK: func.func private @brt_print_int(!bir.int)
+// CHECK: bir.func private @brt_print_int(!bir.int)
 
 // CHECK-LABEL: bir.func @print_belalang
 bir.func @print_belalang() {
@@ -13,7 +13,7 @@ bir.func @print_belalang() {
 
 // -----
 
-// CHECK: func.func private @brt_print_float(!bir.float)
+// CHECK: bir.func private @brt_print_float(!bir.float)
 
 // CHECK-LABEL: bir.func @print_belalang
 bir.func @print_belalang() {

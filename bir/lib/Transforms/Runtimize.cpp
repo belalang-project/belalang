@@ -24,8 +24,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     mlir::ModuleOp mod = op->getParentOfType<mlir::ModuleOp>();
 
     if (auto v = mlir::dyn_cast<IntType>(value.getType())) {
-      mlir::func::FuncOp f =
-          mod.lookupSymbol<mlir::func::FuncOp>(brt::BRT_PRINT_INT);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_INT);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::IntType>();
@@ -34,18 +33,17 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = mlir::func::FuncOp::create(rewriter, op.getLoc(),
-                                       brt::BRT_PRINT_INT, funcType);
+        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_INT,
+                                funcType);
         f.setPrivate();
       }
 
-      rewriter.replaceOpWithNewOp<mlir::func::CallOp>(op, f, op->getOperands());
+      rewriter.replaceOpWithNewOp<bir::CallOp>(op, f, op->getOperands());
       return mlir::success();
     }
 
     if (auto v = mlir::dyn_cast<bir::FloatType>(value.getType())) {
-      mlir::func::FuncOp f =
-          mod.lookupSymbol<mlir::func::FuncOp>(brt::BRT_PRINT_FLOAT);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_FLOAT);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::FloatType>();
@@ -54,12 +52,12 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = mlir::func::FuncOp::create(rewriter, op.getLoc(),
-                                       brt::BRT_PRINT_FLOAT, funcType);
+        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_FLOAT,
+                                funcType);
         f.setPrivate();
       }
 
-      rewriter.replaceOpWithNewOp<mlir::func::CallOp>(op, f, op->getOperands());
+      rewriter.replaceOpWithNewOp<bir::CallOp>(op, f, op->getOperands());
       return mlir::success();
     }
 
