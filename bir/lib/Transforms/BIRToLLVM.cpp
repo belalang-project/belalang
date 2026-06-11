@@ -18,7 +18,21 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
   LogicalResult
   matchAndRewrite(bir::ConstantOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
-    return failure();
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    Attribute value = op.getValue();
+    if (auto intAttr = llvm::dyn_cast<IntegerAttr>(value)) {
+      value = rewriter.getIntegerAttr(type, intAttr.getValue());
+    } else if (auto floatAttr = llvm::dyn_cast<FloatAttr>(value)) {
+      value = rewriter.getFloatAttr(type, floatAttr.getValue());
+    } else {
+      return failure();
+    }
+
+    rewriter.replaceOpWithNewOp<LLVM::ConstantOp>(op, type, value);
+    return success();
   }
 };
 
@@ -27,13 +41,16 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     addConversion([](bir::IntType ty) {
       return mlir::IntegerType::get(ty.getContext(), 32);
     });
+    addConversion([](bir::FloatType ty) {
+      return mlir::Float32Type::get(ty.getContext());
+    });
   }
 };
 
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
-    mlir::RewritePatternSet &patterns, mlir::TypeConverter typeConverter) {
+    mlir::RewritePatternSet &patterns, mlir::TypeConverter &typeConverter) {
   patterns.add<ConstantOpLowering>(typeConverter, patterns.getContext());
 }
 
@@ -52,6 +69,9 @@ struct BelalangBIRToLLVMPass
     mlir::ConversionTarget target(getContext());
     target.addLegalDialect<mlir::LLVM::LLVMDialect>();
     target.addIllegalDialect<bir::BIRDialect>();
+
+    // TODO: make this full by making all bir ops illegal
+    target.addLegalOp<bir::FuncOp, bir::ReturnOp>();
 
     mlir::RewritePatternSet patterns(&getContext());
     belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
