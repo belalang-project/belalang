@@ -22,6 +22,14 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
   }
 };
 
+struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
+  BIRToLLVMTypeConverter() {
+    addConversion([](bir::IntType ty) {
+      return mlir::IntegerType::get(ty.getContext(), 32);
+    });
+  }
+};
+
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
@@ -39,11 +47,7 @@ struct BelalangBIRToLLVMPass
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {
-    mlir::TypeConverter typeConverter;
-
-    typeConverter.addConversion([](bir::IntType ty) {
-      return mlir::IntegerType::get(ty.getContext(), 32);
-    });
+    BIRToLLVMTypeConverter typeConverter;
 
     mlir::ConversionTarget target(getContext());
     target.addLegalDialect<mlir::LLVM::LLVMDialect>();
