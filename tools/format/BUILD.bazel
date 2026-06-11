@@ -1,0 +1,7 @@
+# TODO: add more formatting rules here.
+# ideally, we should use something like aspect_rules_lint or something similar
+
+alias(
+    name = "rustfmt",
+    actual = "@rules_rust//:rustfmt",
+)
