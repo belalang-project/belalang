@@ -9,6 +9,8 @@
 #include "mlir/Interfaces/FunctionInterfaces.h"
 #include "mlir/Support/LLVM.h"
 
+#include "llvm/ADT/TypeSwitch.h"
+
 using namespace mlir;
 using namespace llvm;
 

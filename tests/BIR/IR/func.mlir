@@ -47,3 +47,13 @@ bir.func @f(%arg0 : !bir.int) -> !bir.int {
 bir.func @f(%arg0 : !bir.int) -> (!bir.int, !bir.int) {
   bir.return %arg0, %arg0 : !bir.int, !bir.int
 }
+
+// -----
+
+bir.func @f(%arg0 : !bir.int) -> !bir.int
+
+bir.func @main() -> !bir.int {
+  %0 = bir.constant 1 : !bir.int
+  %1 = bir.call @f(%0) : (!bir.int) -> !bir.int
+  bir.return %1 : !bir.int
+}

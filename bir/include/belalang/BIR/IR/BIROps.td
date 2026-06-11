@@ -163,6 +163,24 @@ def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
   let hasCustomAssemblyFormat = 1;
 }
 
+def CallOp
+    : BIR_Op<"call", [DeclareOpInterfaceMethods<CallOpInterface>,
+                      DeclareOpInterfaceMethods<SymbolUserOpInterface>]> {
+  let summary = "call";
+
+  let arguments = (ins FlatSymbolRefAttr:$callee, Variadic<BIR_AnyType>:$args,
+      OptionalAttr<DictArrayAttr>:$arg_attrs,
+      OptionalAttr<DictArrayAttr>:$res_attrs);
+
+  let results = (outs Optional<BIR_AnyType>:$result);
+
+  let builders = [OpBuilder<(ins "mlir::SymbolRefAttr":$callee,
+      "mlir::Type":$resType, "mlir::ValueRange":$operands)>];
+
+  let skipDefaultBuilders = 1;
+  let hasCustomAssemblyFormat = 1;
+}
+
 def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
   let summary = "return";
 
