@@ -158,6 +158,8 @@ def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
     ArrayRef<::mlir::Type> getArgumentTypes() { return getFunctionType().getInputs(); }
 
     ArrayRef<::mlir::Type> getResultTypes() { return getFunctionType().getResults(); }
+
+    mlir::Type getResType();
   }];
 
   let hasCustomAssemblyFormat = 1;
@@ -175,7 +177,10 @@ def CallOp
   let results = (outs Optional<BIR_AnyType>:$result);
 
   let builders = [OpBuilder<(ins "mlir::SymbolRefAttr":$callee,
-      "mlir::Type":$resType, "mlir::ValueRange":$operands)>];
+                      "mlir::Type":$resType, "mlir::ValueRange":$operands)>,
+                  OpBuilder<(ins "bir::FuncOp":$funcOp,
+                      "mlir::ValueRange":$operands)>,
+  ];
 
   let skipDefaultBuilders = 1;
   let hasCustomAssemblyFormat = 1;
