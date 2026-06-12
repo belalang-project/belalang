@@ -68,7 +68,6 @@ cc_library(
     srcs = [
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
-        "lib/Transforms/Constantize.cpp",
         "lib/Transforms/Runtimize.cpp",
         "lib/Transforms/BIRToLLVM.cpp",
     ],
@@ -82,7 +81,6 @@ cc_library(
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:BytecodeOpInterface",
         "@llvm-project//mlir:FunctionInterfaces",
-        "@llvm-project//mlir:ArithDialect",
         "@llvm-project//mlir:LLVMDialect",
         "@llvm-project//mlir:TransformUtils",
     ],
