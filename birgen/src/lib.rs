@@ -26,6 +26,8 @@ mod ffi {
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
+        fn lower_to_llvm_dialect(self: Pin<&mut BIRGen>) -> bool;
+        fn translateToLLVMIR(self: Pin<&mut BIRGen>) -> String;
 
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
@@ -112,6 +114,14 @@ impl BIRGen {
 
     pub fn optimize(&mut self) -> bool {
         self.inner.pin_mut().optimize()
+    }
+
+    pub fn lower_to_llvm_dialect(&mut self) -> bool {
+        self.inner.pin_mut().lower_to_llvm_dialect()
+    }
+
+    pub fn translate_to_llvm_ir(&mut self) -> String {
+        self.inner.pin_mut().translateToLLVMIR()
     }
 }
 

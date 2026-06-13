@@ -17,6 +17,7 @@ enum EmitTarget {
     Bir,
     Ast,
     Tokens,
+    Llvm,
 }
 
 #[derive(ClapParser)]
@@ -60,6 +61,13 @@ fn main() -> anyhow::Result<()> {
         },
         EmitTarget::Ast => {
             println!("{:#?}", program.statements);
+        },
+        EmitTarget::Llvm => {
+            let mut generator = BIRGen::new();
+            generator.generate_program(&program);
+            generator.optimize();
+            generator.lower_to_llvm_dialect();
+            println!("{}", generator.translate_to_llvm_ir());
         },
         EmitTarget::Tokens => unreachable!(),
     }

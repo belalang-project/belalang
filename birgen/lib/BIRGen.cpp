@@ -1,17 +1,28 @@
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
+#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/DialectRegistry.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/IR/Verifier.h"
 #include "mlir/Pass/PassManager.h"
+#include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
+#include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
+#include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace belalang {
 namespace birgen {
 
 BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
+  mlir::DialectRegistry registry;
+  registry.insert<bir::BIRDialect, mlir::LLVM::LLVMDialect>();
+  mlir::registerLLVMDialectTranslation(registry);
+  mlir::registerBuiltinDialectTranslation(registry);
+  context.appendDialectRegistry(registry);
+
   context.getOrLoadDialect<bir::BIRDialect>();
   module = mlir::ModuleOp::create(loc);
   builder.setInsertionPointToStart(module.getBody());
@@ -104,7 +115,25 @@ bool BIRGen::optimize() {
   return mlir::succeeded(pm.run(module));
 }
 
+bool BIRGen::lower_to_llvm_dialect() {
+  mlir::PassManager pm(&context);
+  pm.addPass(bir::createBelalangBIRToLLVMPass());
+  return mlir::succeeded(pm.run(module));
+}
+
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
+
+rust::String BIRGen::translateToLLVMIR() {
+  llvm::LLVMContext llvmContext;
+  auto llvmModule = mlir::translateModuleToLLVMIR(module, llvmContext);
+  if (!llvmModule)
+    return rust::String();
+
+  std::string s;
+  llvm::raw_string_ostream os(s);
+  llvmModule->print(os, nullptr);
+  return rust::String(os.str());
+}
 
 } // namespace birgen
 } // namespace belalang
