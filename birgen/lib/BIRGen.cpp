@@ -15,6 +15,11 @@ BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   context.getOrLoadDialect<bir::BIRDialect>();
   module = mlir::ModuleOp::create(loc);
   builder.setInsertionPointToStart(module.getBody());
+
+  auto main = bir::FuncOp::create(builder, loc, "main",
+                                  mlir::FunctionType::get(&context, {}, {}));
+  mlir::Block *entry = main.addEntryBlock();
+  builder.setInsertionPointToStart(entry);
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
@@ -32,7 +37,7 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
-                                                const BIRValue &rhs) {
+                                            const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
       bir::AddOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
@@ -40,7 +45,7 @@ std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_sub(const BIRValue &lhs,
-                                                const BIRValue &rhs) {
+                                            const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
       bir::SubOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
@@ -48,7 +53,7 @@ std::unique_ptr<BIRValue> BIRGen::build_sub(const BIRValue &lhs,
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_mul(const BIRValue &lhs,
-                                                const BIRValue &rhs) {
+                                            const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
       bir::MulOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
@@ -56,7 +61,7 @@ std::unique_ptr<BIRValue> BIRGen::build_mul(const BIRValue &lhs,
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_div(const BIRValue &lhs,
-                                                const BIRValue &rhs) {
+                                            const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
       bir::DivOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
@@ -64,7 +69,7 @@ std::unique_ptr<BIRValue> BIRGen::build_div(const BIRValue &lhs,
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
-                                                const BIRValue &rhs) {
+                                            const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
   auto op =
       bir::ModOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
@@ -73,6 +78,14 @@ std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
 
 void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
+}
+
+void BIRGen::build_return(const BIRValue &val) {
+  bir::ReturnOp::create(builder, loc, val.getValue());
+}
+
+void BIRGen::build_empty_return() {
+  bir::ReturnOp::create(builder, loc, {});
 }
 
 void BIRGen::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }
@@ -91,9 +104,7 @@ bool BIRGen::optimize() {
   return mlir::succeeded(pm.run(module));
 }
 
-std::unique_ptr<BIRGen> create_birgen() {
-  return std::make_unique<BIRGen>();
-}
+std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
 
 } // namespace birgen
 } // namespace belalang

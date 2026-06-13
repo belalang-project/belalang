@@ -32,6 +32,8 @@ public:
   std::unique_ptr<BIRValue> build_div(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_mod(const BIRValue &lhs, const BIRValue &rhs);
   void build_print(const BIRValue &val);
+  void build_return(const BIRValue &val);
+  void build_empty_return();
 
   void dump() const;
   rust::String dump_to_string() const;

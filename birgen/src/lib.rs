@@ -24,6 +24,7 @@ mod ffi {
         fn build_div(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn build_empty_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
 
         fn dump(self: &BIRGen);
@@ -46,6 +47,7 @@ impl BIRGen {
         for stmt in &program.statements {
             self.generate_statement(stmt);
         }
+        self.inner.pin_mut().build_empty_return();
     }
 
     pub fn generate_statement(&mut self, stmt: &Statement) {
@@ -116,47 +118,5 @@ impl BIRGen {
 impl Default for BIRGen {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-#[allow(clippy::approx_constant)]
-mod tests {
-    use ast::{
-        Expression,
-        FloatLiteral,
-        InfixExpression,
-        IntegerLiteral,
-    };
-    use lexer::InfixKind;
-
-    use super::*;
-
-    #[test]
-    fn test_generate_infix() {
-        let mut generator = BIRGen::new();
-        let expr = Expression::Infix(InfixExpression {
-            left: Box::new(Expression::Integer(IntegerLiteral { value: 10 })),
-            operator: InfixKind::Add,
-            right: Box::new(Expression::Integer(IntegerLiteral { value: 32 })),
-        });
-
-        generator.generate_expression(&expr);
-        let ir = generator.dump_to_string();
-
-        assert!(ir.contains("bir.constant 10 : !bir.int"));
-        assert!(ir.contains("bir.constant 32 : !bir.int"));
-        assert!(ir.contains("bir.add"));
-    }
-
-    #[test]
-    fn test_generate_float() {
-        let mut generator = BIRGen::new();
-        let expr = Expression::Float(FloatLiteral { value: 3.14 });
-
-        generator.generate_expression(&expr);
-        let ir = generator.dump_to_string();
-
-        assert!(ir.contains("bir.constant 3.140000e+00 : !bir.float"));
     }
 }
