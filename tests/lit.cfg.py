@@ -16,5 +16,6 @@ def add_sub(name, env_var):
         config.substitutions.append((name, val))
 
 add_sub("%bir-opt", "BIR_OPT")
+add_sub("%bir-translate", "BIR_TRANSLATE")
 add_sub("%belalang", "BELALANG")
 add_sub("%FileCheck", "FILECHECK")

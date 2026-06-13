@@ -113,3 +113,13 @@ cc_binary(
         "@llvm-project//mlir:MlirOptLib",
     ],
 )
+
+cc_binary(
+    name = "bir-translate",
+    srcs = ["tools/bir-translate/bir-translate.cpp"],
+    deps = [
+        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
+        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
+        "@llvm-project//mlir:TranslateLib",
+    ],
+)
