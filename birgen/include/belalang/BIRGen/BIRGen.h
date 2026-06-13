@@ -1,9 +1,13 @@
 #ifndef BELALANG_BIRGEN_BIRGEN_H_
 #define BELALANG_BIRGEN_BIRGEN_H_
 
+#include "llvm/IR/Module.h"
+
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
+#include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
+#include "mlir/Target/LLVMIR/Export.h"
 #include "rust/cxx.h"
 #include <memory>
 
@@ -39,12 +43,16 @@ public:
   rust::String dump_to_string() const;
 
   bool optimize();
+  bool lower_to_llvm_dialect();
+  rust::String translateToLLVMIR();
 
 private:
   mlir::MLIRContext context;
   mlir::ModuleOp module;
   mlir::OpBuilder builder;
   mlir::Location loc;
+
+  std::unique_ptr<llvm::Module> llvmModule;
 };
 
 std::unique_ptr<BIRGen> create_birgen();
