@@ -20,10 +20,6 @@ cc_library(
         "@llvm-project//mlir:LLVMToLLVMIRTranslation",
         "@llvm-project//llvm:AllTargetsAsmParsers",
     ],
-    linkopts = select({
-        "@platforms//os:macos": ["-lc++"],
-        "//conditions:default": [],
-    }),
 )
 
 rust_cxx_bridge(

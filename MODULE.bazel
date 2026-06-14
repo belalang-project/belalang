@@ -42,7 +42,6 @@ use_repo(llvm_source, "llvm-raw", "llvm_config", "llvm_zlib", "llvm_zstd")
 llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
 llvm.configure(targets = [
     "X86",
-    "AArch64",
 ])
 use_repo(llvm, "llvm-project")
 
@@ -78,26 +77,6 @@ crate.spec(
     version = "0.2.177",
 )
 crate.spec(
-    package = "proc-macro2",
-    version = "1.0",
-)
-crate.spec(
-    package = "quote",
-    version = "1.0",
-)
-crate.spec(
-    package = "serde",
-    version = "1.0.219",
-)
-crate.spec(
-    package = "syn",
-    version = "2.0",
-)
-crate.spec(
-    package = "thiserror",
-    version = "2.0.0",
-)
-crate.spec(
     package = "tracing",
     version = "0.1.43",
 )
@@ -106,37 +85,16 @@ crate.spec(
     version = "0.3.22",
 )
 crate.spec(
+    package = "thiserror",
+    version = "2.0.0",
+)
+crate.spec(
     package = "unicode-ident",
     version = "1.0.18",
 )
 crate.spec(
-    features = [
-        "Win32_System_SystemInformation",
-        "Win32_System_Memory",
-        "Win32_Foundation",
-    ],
-    package = "windows-sys",
-    version = "0.61.2",
-)
-crate.spec(
-    package = "walkdir",
-    version = "2.5.0",
-)
-crate.spec(
     package = "cxx",
     version = "1.0.194",
-)
-crate.spec(
-    package = "glob",
-    version = "0.3.3",
-)
-crate.spec(
-    package = "similar",
-    version = "2.7.0",
-)
-crate.spec(
-    package = "console",
-    version = "0.16.2",
 )
 crate.from_specs()
 use_repo(crate, "crates")
