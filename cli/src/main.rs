@@ -63,11 +63,12 @@ fn main() -> anyhow::Result<()> {
             println!("{:#?}", program.statements);
         },
         EmitTarget::Llvm => {
-            let mut generator = BIRGen::new();
-            generator.generate_program(&program);
-            generator.optimize();
-            generator.lower_to_llvm_dialect();
-            println!("{}", generator.translate_to_llvm_ir());
+            let mut birgen = BIRGen::new();
+            birgen.generate_program(&program);
+            birgen.optimize();
+
+            let llvmgen = birgen.llvmgen();
+            println!("{}", llvmgen.dump_to_string());
         },
         EmitTarget::Tokens => unreachable!(),
     }

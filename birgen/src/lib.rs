@@ -13,6 +13,7 @@ mod ffi {
 
         type BIRValue;
         type BIRGen;
+        type LLVMGen;
 
         fn create_birgen() -> UniquePtr<BIRGen>;
 
@@ -27,10 +28,11 @@ mod ffi {
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn lower_to_llvm_dialect(self: Pin<&mut BIRGen>) -> bool;
-        fn translateToLLVMIR(self: Pin<&mut BIRGen>) -> String;
-
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
+        fn llvmgen(self: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
+
+        fn dump_to_string(self: &LLVMGen) -> String;
     }
 }
 
@@ -120,8 +122,20 @@ impl BIRGen {
         self.inner.pin_mut().lower_to_llvm_dialect()
     }
 
-    pub fn translate_to_llvm_ir(&mut self) -> String {
-        self.inner.pin_mut().translateToLLVMIR()
+    pub fn llvmgen(&mut self) -> LLVMGen {
+        LLVMGen {
+            inner: self.inner.pin_mut().llvmgen(),
+        }
+    }
+}
+
+pub struct LLVMGen {
+    inner: cxx::UniquePtr<ffi::LLVMGen>,
+}
+
+impl LLVMGen {
+    pub fn dump_to_string(&self) -> String {
+        self.inner.dump_to_string()
     }
 }
 
