@@ -20,6 +20,7 @@ public:
   ~LLVMGen() = default;
 
   rust::String dump_to_string() const;
+  rust::String compile_object_file() const;
 
 private:
   llvm::LLVMContext context;

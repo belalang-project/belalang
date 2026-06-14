@@ -18,6 +18,7 @@ enum EmitTarget {
     Ast,
     Tokens,
     Llvm,
+    Obj,
 }
 
 #[derive(ClapParser)]
@@ -69,6 +70,14 @@ fn main() -> anyhow::Result<()> {
 
             let llvmgen = birgen.llvmgen();
             println!("{}", llvmgen.dump_to_string());
+        },
+        EmitTarget::Obj => {
+            let mut birgen = BIRGen::new();
+            birgen.generate_program(&program);
+            birgen.optimize();
+
+            let llvmgen = birgen.llvmgen();
+            println!("{}", llvmgen.compile_object_file());
         },
         EmitTarget::Tokens => unreachable!(),
     }

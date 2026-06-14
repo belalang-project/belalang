@@ -11,7 +11,13 @@
 #include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/TargetParser/Host.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/Target/TargetMachine.h"
 
 namespace belalang {
 namespace birgen {
@@ -139,7 +145,48 @@ LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   auto llvmModule = mlir::translateModuleToLLVMIR(*op, context);
   assert(llvmModule);
 
+  auto triple = Triple(sys::getDefaultTargetTriple());
+  llvmModule->setTargetTriple(triple);
+
   this->module = std::move(llvmModule);
+}
+
+rust::String LLVMGen::compile_object_file() const {
+  InitializeAllTargetInfos();
+  InitializeAllTargets();
+  InitializeAllTargetMCs();
+  InitializeAllAsmParsers();
+  InitializeAllAsmPrinters();
+
+  auto triple = Triple(sys::getDefaultTargetTriple());
+  module->setTargetTriple(triple);
+
+  std::string error;
+  auto target = TargetRegistry::lookupTarget(triple, error);
+  if (!target)
+    return rust::String("failed to lookup target");
+
+  auto cpu = "generic";
+  auto features = "";
+  TargetOptions opt;
+  auto rm = std::optional<Reloc::Model>();
+
+  auto tm = target->createTargetMachine(triple, cpu, features, opt, rm);
+  module->setDataLayout(tm->createDataLayout());
+
+  std::error_code ec;
+  raw_fd_ostream dest("test.o", ec);
+  if (ec)
+    return rust::String("failed to create destination");
+
+  legacy::PassManager pm;
+  if (tm->addPassesToEmitFile(pm, dest, nullptr, CodeGenFileType::ObjectFile))
+    return rust::String("failed to add passes");
+
+  pm.run(*module);
+
+  dest.flush();
+  return rust::String();
 }
 
 rust::String LLVMGen::dump_to_string() const {
