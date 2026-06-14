@@ -97,6 +97,127 @@ struct ReturnOpLowering final : public OpConversionPattern<bir::ReturnOp> {
   }
 };
 
+struct AddOpLowering final : public OpConversionPattern<bir::AddOp> {
+  using OpConversionPattern<bir::AddOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::AddOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::AddOp>(op, type, adaptor.getLhs(),
+                                               adaptor.getRhs());
+    } else if (mlir::isa<FloatType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::FAddOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct SubOpLowering final : public OpConversionPattern<bir::SubOp> {
+  using OpConversionPattern<bir::SubOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::SubOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::SubOp>(op, type, adaptor.getLhs(),
+                                               adaptor.getRhs());
+    } else if (mlir::isa<FloatType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::FSubOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct MulOpLowering final : public OpConversionPattern<bir::MulOp> {
+  using OpConversionPattern<bir::MulOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::MulOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::MulOp>(op, type, adaptor.getLhs(),
+                                               adaptor.getRhs());
+    } else if (mlir::isa<FloatType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::FMulOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct DivOpLowering final : public OpConversionPattern<bir::DivOp> {
+  using OpConversionPattern<bir::DivOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::DivOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::SDivOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else if (mlir::isa<FloatType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::FDivOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct ModOpLowering final : public OpConversionPattern<bir::ModOp> {
+  using OpConversionPattern<bir::ModOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::ModOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    // TODO: The operation in bir is Mod, while in LLVM its Rem.
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::SRemOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else if (mlir::isa<FloatType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::FRemOp>(op, type, adaptor.getLhs(),
+                                                adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
 struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
   BIRToLLVMTypeConverter() {
     addConversion([](bir::IntType ty) {
@@ -130,7 +251,9 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
     mlir::RewritePatternSet &patterns, mlir::TypeConverter &typeConverter) {
   patterns.add<ConstantOpLowering, FuncOpLowering, CallOpLowering,
-               ReturnOpLowering>(typeConverter, patterns.getContext());
+               ReturnOpLowering, AddOpLowering, SubOpLowering, MulOpLowering,
+               DivOpLowering, ModOpLowering>(typeConverter,
+                                             patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
