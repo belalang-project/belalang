@@ -121,17 +121,31 @@ bool BIRGen::lower_to_llvm_dialect() {
   return mlir::succeeded(pm.run(module));
 }
 
+std::unique_ptr<LLVMGen> BIRGen::llvmgen() {
+  return std::make_unique<LLVMGen>(&module);
+}
+
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
 
-rust::String BIRGen::translateToLLVMIR() {
-  llvm::LLVMContext llvmContext;
-  auto llvmModule = mlir::translateModuleToLLVMIR(module, llvmContext);
-  if (!llvmModule)
-    return rust::String();
+// -----------------------------------------------------------------------------
+// LLVMGen
+// -----------------------------------------------------------------------------
 
+LLVMGen::LLVMGen(mlir::ModuleOp *op) {
+  mlir::PassManager pm(op->getContext());
+  pm.addPass(bir::createBelalangBIRToLLVMPass());
+  assert(mlir::succeeded(pm.run(*op)));
+
+  auto llvmModule = mlir::translateModuleToLLVMIR(*op, context);
+  assert(llvmModule);
+
+  this->module = std::move(llvmModule);
+}
+
+rust::String LLVMGen::dump_to_string() const {
   std::string s;
   llvm::raw_string_ostream os(s);
-  llvmModule->print(os, nullptr);
+  module->print(os, nullptr);
   return rust::String(os.str());
 }
 

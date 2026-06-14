@@ -14,6 +14,18 @@
 namespace belalang {
 namespace birgen {
 
+class LLVMGen {
+public:
+  LLVMGen(mlir::ModuleOp *module);
+  ~LLVMGen() = default;
+
+  rust::String dump_to_string() const;
+
+private:
+  llvm::LLVMContext context;
+  std::unique_ptr<llvm::Module> module;
+};
+
 class BIRValue {
 public:
   BIRValue(mlir::Value value) : value(value) {}
@@ -44,15 +56,14 @@ public:
 
   bool optimize();
   bool lower_to_llvm_dialect();
-  rust::String translateToLLVMIR();
+
+  std::unique_ptr<LLVMGen> llvmgen();
 
 private:
   mlir::MLIRContext context;
   mlir::ModuleOp module;
   mlir::OpBuilder builder;
   mlir::Location loc;
-
-  std::unique_ptr<llvm::Module> llvmModule;
 };
 
 std::unique_ptr<BIRGen> create_birgen();
