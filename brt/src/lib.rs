@@ -1,4 +1,4 @@
-#![feature(thread_local, cfg_select, assert_matches)]
+#![feature(thread_local, assert_matches)]
 
 pub mod bytecode;
 pub mod gc;

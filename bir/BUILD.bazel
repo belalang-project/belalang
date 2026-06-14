@@ -79,15 +79,10 @@ cc_library(
         "//brt:brt-include",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
-        "@llvm-project//mlir:BytecodeOpInterface",
         "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:LLVMDialect",
         "@llvm-project//mlir:TransformUtils",
     ],
-    linkopts = select({
-        "@platforms//os:macos": ["-lc++"],
-        "//conditions:default": [],
-    }),
 )
 
 cc_library(

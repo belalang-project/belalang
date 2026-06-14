@@ -20,14 +20,10 @@ rust_library(
     deps = [
         "@crates//:bincode",
         "@crates//:crc32fast",
-        "@crates//:thiserror",
-        "@crates//:serde",
         "@crates//:libc",
+        "@crates//:thiserror",
         "@crates//:tracing",
-    ] + select({
-        "@platforms//os:windows": ["@crates//:windows-sys"],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 rust_library(
@@ -43,9 +39,6 @@ rust_library(
 rust_test(
     name = "brt_test",
     crate = ":brt",
-    deps = [
-        "@crates//:tracing-subscriber",
-    ],
 )
 
 rust_test(

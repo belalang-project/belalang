@@ -9,19 +9,8 @@ use crate::vm::heap::{
     HeapValue,
 };
 
-cfg_select! {
-    target_family = "unix" => {
-        mod unix;
-        use unix as sys;
-    }
-    target_os = "windows" => {
-        mod windows;
-        use windows as sys;
-    }
-    _ => {
-        compile_error!("Unsupported platform. Only Unix-like systems and Windows are currently supported.");
-    }
-}
+mod unix;
+use unix as sys;
 
 const STACK_SIZE: usize = 4096;
 
