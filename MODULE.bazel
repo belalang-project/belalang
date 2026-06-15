@@ -98,7 +98,6 @@ crate.spec(
     version = "0.32.0",
 )
 crate.annotation(
-    crate = "mmtk",
     build_script_env = {
         "CARGO_PKG_AUTHORS": "MMTk Developers",
         "CARGO_PKG_DESCRIPTION": "MMTk is a framework for the design and implementation of high-performance and portable memory managers.",
@@ -106,6 +105,7 @@ crate.annotation(
         "CARGO_PKG_LICENSE": "MIT OR Apache-2.0",
         "CARGO_PKG_REPOSITORY": "https://github.com/mmtk/mmtk-core",
     },
+    crate = "mmtk",
 )
 crate.spec(
     package = "tracing",
