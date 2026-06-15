@@ -151,7 +151,7 @@ LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   this->module = std::move(llvmModule);
 }
 
-rust::String LLVMGen::compile_object_file() const {
+rust::String LLVMGen::compile_object_file(rust::String out) const {
   InitializeAllTargetInfos();
   InitializeAllTargets();
   InitializeAllTargetMCs();
@@ -175,7 +175,7 @@ rust::String LLVMGen::compile_object_file() const {
   module->setDataLayout(tm->createDataLayout());
 
   std::error_code ec;
-  raw_fd_ostream dest("test.o", ec);
+  raw_fd_ostream dest(out.data(), ec);
   if (ec)
     return rust::String("failed to create destination");
 

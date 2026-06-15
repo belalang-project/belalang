@@ -3,6 +3,7 @@ use std::{
     path::PathBuf,
 };
 
+use anyhow::Context;
 use ast::Parser;
 use birgen::BIRGen;
 use clap::{
@@ -27,9 +28,27 @@ struct Belalang {
     /// Path to the .bel file to compile
     path: PathBuf,
 
+    /// Path to the output file
+    #[arg(long, short)]
+    out: Option<PathBuf>,
+
     /// What to emit
     #[arg(long, value_enum, default_value_t = EmitTarget::Bir)]
     emit: EmitTarget,
+}
+
+impl Belalang {
+    fn get_out_path(&self) -> Option<PathBuf> {
+        if let Some(out) = &self.out {
+            return Some(out.to_path_buf());
+        }
+
+        if let EmitTarget::Obj = self.emit {
+            return Some(self.path.with_added_extension("o"));
+        }
+
+        None
+    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -77,7 +96,13 @@ fn main() -> anyhow::Result<()> {
             birgen.optimize();
 
             let llvmgen = birgen.llvmgen();
-            println!("{}", llvmgen.compile_object_file());
+            let out = belalang
+                .get_out_path()
+                .context("Path is None")?
+                .to_str()
+                .context("Path contains invalid UTF-8 data")?
+                .to_string();
+            println!("{}", llvmgen.compile_object_file(out));
         },
         EmitTarget::Tokens => unreachable!(),
     }
