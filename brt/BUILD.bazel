@@ -12,4 +12,5 @@ cc_library(
 rust_static_library(
     name = "brt",
     srcs = ["src/lib.rs"],
+    deps = ["//brt/core:brt-core"],
 )

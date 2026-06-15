@@ -2,4 +2,5 @@
 
 pub mod bytecode;
 pub mod gc;
+pub mod mmtk;
 pub mod vm;
