@@ -76,7 +76,7 @@ cc_library(
         ":BelalangBIRDialectIncGen",
         ":BelalangBIROpsIncGen",
         ":BelalangPassIncGen",
-        "//brt:brt-include",
+        "//brt/core:brt-include",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:FunctionInterfaces",
