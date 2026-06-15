@@ -1,0 +1,15 @@
+load("@rules_rust//rust:defs.bzl", "rust_static_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "brt-include",
+    hdrs = ["include/belalang/BRT/BRT.h"],
+    includes = ["include"],
+)
+
+rust_static_library(
+    name = "brt",
+    srcs = ["src/lib.rs"],
+)

@@ -1,6 +1,6 @@
 use std::mem;
 
-use brt::gc::{
+use brt_core::gc::{
     gc_init,
     new_mutator,
 };
