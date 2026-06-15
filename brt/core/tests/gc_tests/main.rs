@@ -1,6 +1,6 @@
 use std::mem;
 
-use brt::gc::{
+use brt_core::gc::{
     gc_init,
     new_mutator,
 };
@@ -22,4 +22,17 @@ fn simple() {
         .as_ptr();
 
     unsafe { ptr.write(t) };
+}
+
+#[test]
+fn mmtk_simple_alloc() {
+    brt_core::mmtk::init();
+
+    let ptr = brt_core::mmtk::alloc(64);
+    assert!(!ptr.is_null());
+
+    unsafe {
+        std::ptr::write(ptr.cast::<i32>(), 42);
+        assert_eq!(std::ptr::read(ptr.cast::<i32>()), 42);
+    }
 }

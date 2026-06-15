@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_static_library", "rust_library", "rust_test", "rust_binary")
+load("@rules_rust//rust:defs.bzl", "rust_static_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,79 +10,7 @@ cc_library(
 )
 
 rust_static_library(
-    name = "brt-static",
-    srcs = ["src/static.rs"],
-)
-
-rust_library(
     name = "brt",
-    srcs = glob(["src/**/*.rs"]),
-    deps = [
-        "@crates//:bincode",
-        "@crates//:crc32fast",
-        "@crates//:libc",
-        "@crates//:thiserror",
-        "@crates//:tracing",
-    ],
-)
-
-rust_library(
-    name = "belalang_dev_tools",
-    srcs = glob(["dev_tools/*.rs"]),
-    deps = [
-        ":brt",
-        "//ast",
-        "//lexer",
-    ],
-)
-
-rust_test(
-    name = "brt_test",
-    crate = ":brt",
-)
-
-rust_test(
-    name = "brt_itest",
-    crate_root = "tests/testsuite/main.rs",
-    srcs = glob(["tests/testsuite/*.rs"]),
-    deps = [
-        ":brt",
-        ":belalang_dev_tools",
-    ],
-)
-
-rust_test(
-    name = "gc_itest",
-    crate_root = "tests/gc_tests/main.rs",
-    srcs = glob(["tests/gc_tests/**/*.rs"]),
-    deps = [":brt"],
-)
-
-rust_binary(
-    name = "addition_example",
-    srcs = ["examples/addition.rs"],
-    deps = [
-        ":brt",
-        ":belalang_dev_tools",
-    ],
-)
-
-rust_binary(
-    name = "print_string_example",
-    srcs = ["examples/print_string.rs"],
-    deps = [
-        ":brt",
-        ":belalang_dev_tools",
-        "@crates//:tracing-subscriber",
-    ],
-)
-
-rust_binary(
-    name = "write_file_example",
-    srcs = ["examples/write_file.rs"],
-    deps = [
-        ":brt",
-        ":belalang_dev_tools",
-        "@crates//:tracing-subscriber",
-    ],
+    srcs = ["src/lib.rs"],
+    deps = ["//brt/core:brt-core"],
 )

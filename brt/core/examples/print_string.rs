@@ -2,7 +2,7 @@ use belalang_dev_tools::{
     IntoInstructionBytes,
     instructions,
 };
-use brt::{
+use brt_core::{
     bytecode::{
         Bytecode,
         Constant,
@@ -12,8 +12,11 @@ use brt::{
 };
 
 fn main() {
-    let constants = vec![Constant::Integer(10), Constant::Integer(100)];
-    let instructions = instructions![opcode::constant(0), opcode::constant(1), opcode::ADD, opcode::PRINT];
+    tracing_subscriber::fmt().init();
+
+    let s = String::from("Hello, World!");
+    let constants = vec![Constant::String(s)];
+    let instructions = instructions![opcode::constant(0), opcode::PRINT];
 
     let mut vm = VM::default();
     vm.run(Bytecode {
@@ -21,4 +24,6 @@ fn main() {
         constants,
     })
     .unwrap();
+
+    vm.collect_garbage();
 }

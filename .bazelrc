@@ -17,3 +17,8 @@ build --@llvm//config:empty_sysroot=True
 build --@llvm//config:experimental_stub_libgcc_s=True
 
 test --test_output=all
+
+# Workaround: Rust nightly's libstd weakly references gettid (glibc >= 2.30),
+# but the hermetic LLVM toolchain ships glibc 2.28 stubs missing this symbol.
+# --defsym stubs it at link time; Rust's dlsym fallback means it's never called.
+build --linkopt=-Wl,--defsym,gettid=0

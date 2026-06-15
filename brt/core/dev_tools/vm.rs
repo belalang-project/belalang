@@ -1,4 +1,4 @@
-use brt::{
+use brt_core::{
     bytecode::{
         Bytecode,
         Constant,
