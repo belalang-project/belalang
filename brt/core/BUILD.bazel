@@ -10,6 +10,7 @@ rust_library(
         "@crates//:bincode",
         "@crates//:crc32fast",
         "@crates//:libc",
+        "@crates//:mmtk",
         "@crates//:thiserror",
         "@crates//:tracing",
     ],
