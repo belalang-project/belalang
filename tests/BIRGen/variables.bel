@@ -1,6 +1,7 @@
 # RUN: %belalang --emit=bir %s | %FileCheck %s
 
 # CHECK: module {
+# CHECK-NEXT: bir.func private @brt_print_int(!bir.int)
 # CHECK-NEXT: bir.func @main() {
 
 # CHECK-NEXT: %[[C0:.*]] = bir.constant 1 : !bir.int
@@ -13,6 +14,17 @@ x := 1;
 # CHECK-NEXT: %[[C3:.*]] = bir.var.declare "y" : <!bir.float>
 # CHECK-NEXT: bir.var.store %[[C2]] to %[[C3]] : !bir.float to <!bir.float>
 y := 1.0;
+
+# CHECK-NEXT: %[[C4:.*]] = bir.var.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
+# CHECK-NEXT: %[[C5:.*]] = bir.constant 1 : !bir.int
+# CHECK-NEXT: %[[C6:.*]] = bir.add %[[C4]], %[[C5]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C7:.*]] = bir.var.declare "z" : <!bir.int>
+# CHECK-NEXT: bir.var.store %[[C6]] to %[[C7]] : !bir.int to <!bir.int>
+# CHECK-NEXT: %[[C8:.*]] = bir.var.load %[[C7]] : (!bir.ref<!bir.int>) -> !bir.int
+z := x + 1;
+
+# CHECK-NEXT: bir.call @brt_print_int(%[[C8]]) : (!bir.int) -> ()
+print(z);
 
 # CHECK-NEXT: bir.return
 # CHECK-NEXT: }

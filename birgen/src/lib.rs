@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use ast::{
     Expression,
     InfixExpression,
@@ -48,6 +50,7 @@ pub struct BIRGen<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
+    symbol_table: HashMap<String, cxx::UniquePtr<ffi::BIRValue>>,
 }
 
 impl<'sess> BIRGen<'sess> {
@@ -55,6 +58,7 @@ impl<'sess> BIRGen<'sess> {
         Self {
             session,
             inner: ffi::create_birgen(),
+            symbol_table: HashMap::new(),
         }
     }
 
@@ -105,17 +109,33 @@ impl<'sess> BIRGen<'sess> {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
                         self.inner.pin_mut().build_var_store(&v, &declare);
-                        declare
+                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     Expression::Float(ref f) => {
                         let v = self.inner.pin_mut().build_constant_float(f.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
                         self.inner.pin_mut().build_var_store(&v, &declare);
-                        declare
+                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        cxx::UniquePtr::null() // FIXME: don't return nullptr
+                    },
+                    Expression::Identifier(_) | Expression::Infix(_) => {
+                        let v = self.generate_expression(&var.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     _ => todo!("Generation for expression {:?} not implemented", expr),
                 },
                 _ => todo!("Generation for expression {:?} not implemented", expr),
+            },
+            Expression::Identifier(ident) => {
+                if let Some(ssa) = self.symbol_table.get(&ident.value) {
+                    self.inner.pin_mut().build_var_load(ssa)
+                } else {
+                    cxx::UniquePtr::null() // FIXME: don't return nullptr
+                }
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
