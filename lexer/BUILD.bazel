@@ -4,6 +4,7 @@ rust_library(
 	name = "lexer",
 	srcs = glob(["src/*.rs"]),
 	deps = [
+		"//session",
 		"@crates//:thiserror",
 		"@crates//:unicode-ident",
 	],
@@ -18,5 +19,8 @@ rust_test(
 rust_test(
 	name = "belalang_lexer_itest",
 	srcs = glob(["tests/**/*.rs"]),
-	deps = [":lexer"],
+	deps = [
+		":lexer",
+		"//session",
+	],
 )

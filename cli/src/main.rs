@@ -1,6 +1,5 @@
 use std::{
     env,
-    fs,
     path::PathBuf,
 };
 
@@ -12,6 +11,7 @@ use clap::{
     ValueEnum,
 };
 use lexer::Lexer;
+use session::Session;
 
 #[derive(ValueEnum, Clone, Debug, Default)]
 enum EmitTarget {
@@ -56,10 +56,10 @@ impl Belalang {
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
 
-    let source = fs::read_to_string(&belalang.path)?;
+    let session = Session::for_file(belalang.path.clone())?;
 
     if let EmitTarget::Tokens = belalang.emit {
-        let mut lexer = Lexer::new(&source);
+        let mut lexer = Lexer::new(&session);
         loop {
             let token = lexer.next_token().map_err(|e| anyhow::anyhow!("{}", e))?;
             if token.kind == lexer::TokenKind::EOF {
@@ -70,7 +70,7 @@ fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let lexer = Lexer::new(&source);
+    let lexer = Lexer::new(&session);
     let mut parser = Parser::new(lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
 

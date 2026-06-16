@@ -3,6 +3,7 @@ use std::{
     str::Chars,
 };
 
+use session::Session;
 use unicode_ident::{
     is_xid_continue,
     is_xid_start,
@@ -28,10 +29,10 @@ pub enum LexerError {
 }
 
 pub struct Lexer<'a> {
+    #[allow(dead_code)]
+    session: &'a Session,
     current: Option<char>,
     chars: Peekable<Chars<'a>>,
-    #[allow(dead_code)]
-    source: &'a String,
 
     /// The current line number the lexer is at.
     ///
@@ -45,14 +46,14 @@ pub struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-    pub fn new(source: &'a String) -> Lexer<'a> {
-        let mut chars = source.chars().peekable();
+    pub fn new(session: &'a Session) -> Lexer<'a> {
+        let mut chars = session.source_text.chars().peekable();
         let current = chars.next();
 
         Lexer {
+            session,
             current,
             chars,
-            source,
             current_row: 1,
             current_col: 1,
         }
@@ -556,6 +557,8 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
+    use session::Session;
+
     use super::{
         Lexer,
         Token,
@@ -567,8 +570,9 @@ mod tests {
 
     #[test]
     fn str_ascii() {
-        let source = String::from("\"Hello\"");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("\"Hello\"".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
+
         let result = lexer.read_string();
 
         let expect = Token {
@@ -584,8 +588,8 @@ mod tests {
 
     #[test]
     fn str_japanese_chars() {
-        let source = String::from("\"こんにちわ\"");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("\"こんにちわ\"".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_string();
 
         let expect = Token {
@@ -601,8 +605,8 @@ mod tests {
 
     #[test]
     fn str_emojis() {
-        let source = String::from("\"🦗\"");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("\"🦗\"".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_string();
 
         let expect = Token {
@@ -618,8 +622,8 @@ mod tests {
 
     #[test]
     fn ident_ascii() {
-        let source = String::from("Hello");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("Hello".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -635,8 +639,8 @@ mod tests {
 
     #[test]
     fn ident_japanese_chars() {
-        let source = String::from("こんにちわ");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("こんにちわ".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -652,8 +656,8 @@ mod tests {
 
     #[test]
     fn ident_underscores() {
-        let source = String::from("hel_lo_");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("hel_lo_".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -669,8 +673,8 @@ mod tests {
 
     #[test]
     fn number_int_ascii() {
-        let source = String::from("123");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("123".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_number();
 
         let expect = Token {
@@ -686,8 +690,8 @@ mod tests {
 
     #[test]
     fn number_float_ascii() {
-        let source = String::from("123.123");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("123.123".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         let result = lexer.read_number();
 
         let expect = Token {
@@ -703,8 +707,8 @@ mod tests {
 
     #[test]
     fn multiline() {
-        let source = String::from("123.123\n\n");
-        let mut lexer = Lexer::new(&source);
+        let session = Session::for_text("123.123\n\n".to_string()).unwrap();
+        let mut lexer = Lexer::new(&session);
         lexer.next_token().unwrap();
         lexer.next_token().unwrap();
 
