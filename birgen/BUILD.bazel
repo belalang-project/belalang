@@ -37,6 +37,7 @@ rust_library(
         "//bir",
         "//ast",
         "//lexer",
+        "//session",
         "@crates//:cxx",
     ],
 )

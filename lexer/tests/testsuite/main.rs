@@ -5,11 +5,12 @@ use lexer::{
     Token,
     TokenKind,
 };
+use session::Session;
 
 #[track_caller]
 fn test_tokens(input: &str, expected: Vec<Token>) {
-    let source = input.to_owned();
-    let mut lexer = Lexer::new(&source);
+    let session = Session::for_text(input.to_owned()).unwrap();
+    let mut lexer = Lexer::new(&session);
     let mut result = Vec::new();
     while let Ok(token) = lexer.next_token() {
         if let TokenKind::EOF = token.kind {

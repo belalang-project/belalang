@@ -10,6 +10,7 @@ rust_binary(
         "//birgen",
         "//ast",
         "//lexer",
+        "//session",
         "@crates//:clap",
         "@crates//:anyhow",
     ],

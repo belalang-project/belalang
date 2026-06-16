@@ -1,12 +1,10 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
-	name = "ast",
+	name = "session",
 	srcs = glob(["src/*.rs"]),
 	deps = [
-		"//lexer",
-		"//session",
-		"@crates//:thiserror",
+		"@crates//:anyhow",
 	],
 	visibility = ["//visibility:public"],
 )
