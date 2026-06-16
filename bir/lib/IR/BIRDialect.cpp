@@ -1,5 +1,10 @@
 #include "belalang/BIR/IR/BIR.h"
 
+#include "mlir/IR/DialectImplementation.h"
+
+#define GET_TYPEDEF_CLASSES
+#include "belalang/BIR/IR/BIRTypes.cpp.inc"
+
 #include "belalang/BIR/IR/BIRDialect.cpp.inc"
 
 namespace belalang {

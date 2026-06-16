@@ -198,9 +198,18 @@ def BIR_VarDeclare : BIR_Op<"var.declare"> {
   let summary = "var.declare";
 
   let arguments = (ins StrAttr:$name);
-  let results = (outs BIR_AnyType:$result);
+  let results = (outs BIR_RefType:$result);
 
   let assemblyFormat = "$name attr-dict `:` type($result)";
+}
+
+def BIR_VarLoad : BIR_Op<"var.load"> {
+  let summary = "var.load";
+
+  let arguments = (ins BIR_RefType:$ref);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat = "$ref attr-dict `:` functional-type(operands, results)";
 }
 
 #endif // BELALANG_IR_OPS_TD_

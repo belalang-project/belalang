@@ -9,8 +9,6 @@
 #define GET_OP_CLASSES
 #include "belalang/BIR/IR/BIROps.cpp.inc"
 
-#define GET_TYPEDEF_CLASSES
-#include "belalang/BIR/IR/BIRTypes.cpp.inc"
 
 namespace belalang {
 namespace bir {
