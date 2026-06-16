@@ -4,7 +4,10 @@ use ast::{
     Program,
     Statement,
 };
-use lexer::InfixKind;
+use lexer::{
+    AssignmentKind,
+    InfixKind,
+};
 use session::Session;
 
 #[cxx::bridge(namespace = "belalang::birgen")]
@@ -26,6 +29,9 @@ mod ffi {
         fn build_div(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: String) -> UniquePtr<BIRValue>;
+        fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn lower_to_llvm_dialect(self: Pin<&mut BIRGen>) -> bool;
@@ -92,6 +98,24 @@ impl<'sess> BIRGen<'sess> {
                 }
 
                 todo!("Generation for call expression not implemented");
+            },
+            Expression::Var(var) => match var.kind {
+                AssignmentKind::ColonAssign => match *var.value {
+                    Expression::Integer(ref i) => {
+                        let v = self.inner.pin_mut().build_constant_int(i.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        declare
+                    },
+                    Expression::Float(ref f) => {
+                        let v = self.inner.pin_mut().build_constant_float(f.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        declare
+                    },
+                    _ => todo!("Generation for expression {:?} not implemented", expr),
+                },
+                _ => todo!("Generation for expression {:?} not implemented", expr),
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
