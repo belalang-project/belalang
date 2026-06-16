@@ -76,7 +76,7 @@ fn main() -> anyhow::Result<()> {
 
     match belalang.emit {
         EmitTarget::Bir => {
-            let mut generator = BIRGen::new();
+            let mut generator = BIRGen::new(&session);
             generator.generate_program(&program);
             generator.optimize();
             println!("{}", generator.dump_to_string());
@@ -85,7 +85,7 @@ fn main() -> anyhow::Result<()> {
             println!("{:#?}", program.statements);
         },
         EmitTarget::Llvm => {
-            let mut birgen = BIRGen::new();
+            let mut birgen = BIRGen::new(&session);
             birgen.generate_program(&program);
             birgen.optimize();
 
@@ -93,7 +93,7 @@ fn main() -> anyhow::Result<()> {
             println!("{}", llvmgen.dump_to_string());
         },
         EmitTarget::Obj => {
-            let mut birgen = BIRGen::new();
+            let mut birgen = BIRGen::new(&session);
             birgen.generate_program(&program);
             birgen.optimize();
 
@@ -107,7 +107,7 @@ fn main() -> anyhow::Result<()> {
             println!("{}", llvmgen.compile_object_file(out));
         },
         EmitTarget::Exe => {
-            let mut birgen = BIRGen::new();
+            let mut birgen = BIRGen::new(&session);
             birgen.generate_program(&program);
             birgen.optimize();
 

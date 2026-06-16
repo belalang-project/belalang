@@ -5,6 +5,7 @@ use ast::{
     Statement,
 };
 use lexer::InfixKind;
+use session::Session;
 
 #[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
@@ -37,13 +38,16 @@ mod ffi {
     }
 }
 
-pub struct BIRGen {
+pub struct BIRGen<'a> {
+    #[allow(dead_code)]
+    session: &'a Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
 }
 
-impl BIRGen {
-    pub fn new() -> Self {
+impl<'a> BIRGen<'a> {
+    pub fn new(session: &'a Session) -> Self {
         Self {
+            session,
             inner: ffi::create_birgen(),
         }
     }
@@ -141,11 +145,5 @@ impl LLVMGen {
 
     pub fn compile_object_file(&self, out: String) -> String {
         self.inner.compile_object_file(out)
-    }
-}
-
-impl Default for BIRGen {
-    fn default() -> Self {
-        Self::new()
     }
 }
