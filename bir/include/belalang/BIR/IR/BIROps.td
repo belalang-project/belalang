@@ -203,6 +203,14 @@ def BIR_VarDeclare : BIR_Op<"var.declare"> {
   let assemblyFormat = "$name attr-dict `:` type($result)";
 }
 
+def BIR_VarStoreOp : BIR_Op<"var.store"> {
+  let summary = "var.store";
+
+  let arguments = (ins BIR_AnyType:$src, BIR_RefType:$dest);
+
+  let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` type($dest)";
+}
+
 def BIR_VarLoad : BIR_Op<"var.load"> {
   let summary = "var.load";
 
