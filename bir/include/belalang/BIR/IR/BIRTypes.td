@@ -17,4 +17,12 @@ def BIR_FloatType : BIR_Type<"Float", "float"> {
   let summary = "Floating-point number type";
 }
 
+def BIR_RefType : BIR_Type<"Ref", "ref"> {
+  let summary = "Reference type";
+
+  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType]>:$el);
+
+  let assemblyFormat = "`<` $el `>`";
+}
+
 #endif // BELALANG_IR_TYPES_TD_
