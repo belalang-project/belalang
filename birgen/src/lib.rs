@@ -33,7 +33,7 @@ mod ffi {
         fn llvmgen(self: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
         fn dump_to_string(self: &LLVMGen) -> String;
-        fn compile_object_file(self: &LLVMGen) -> String;
+        fn compile_object_file(self: &LLVMGen, out: String) -> String;
     }
 }
 
@@ -139,8 +139,8 @@ impl LLVMGen {
         self.inner.dump_to_string()
     }
 
-    pub fn compile_object_file(&self) -> String {
-        self.inner.compile_object_file()
+    pub fn compile_object_file(&self, out: String) -> String {
+        self.inner.compile_object_file(out)
     }
 }
 
