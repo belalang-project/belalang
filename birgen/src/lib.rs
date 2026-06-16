@@ -127,18 +127,21 @@ impl<'a> BIRGen<'a> {
         self.inner.pin_mut().lower_to_llvm_dialect()
     }
 
-    pub fn llvmgen(&mut self) -> LLVMGen {
+    pub fn llvmgen(&mut self) -> LLVMGen<'a> {
         LLVMGen {
+            session: self.session,
             inner: self.inner.pin_mut().llvmgen(),
         }
     }
 }
 
-pub struct LLVMGen {
+pub struct LLVMGen<'a> {
+    #[allow(dead_code)]
+    session: &'a Session,
     inner: cxx::UniquePtr<ffi::LLVMGen>,
 }
 
-impl LLVMGen {
+impl<'a> LLVMGen<'a> {
     pub fn dump_to_string(&self) -> String {
         self.inner.dump_to_string()
     }
