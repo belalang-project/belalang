@@ -194,4 +194,13 @@ def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
   let assemblyFormat = "($input^ `:` type($input))? attr-dict";
 }
 
+def BIR_VarDeclare : BIR_Op<"var.declare"> {
+  let summary = "var.declare";
+
+  let arguments = (ins StrAttr:$name);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat = "$name attr-dict `:` type($result)";
+}
+
 #endif // BELALANG_IR_OPS_TD_
