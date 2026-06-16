@@ -71,7 +71,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     let lexer = Lexer::new(&session);
-    let mut parser = Parser::new(lexer);
+    let mut parser = Parser::new(&session, lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
 
     match belalang.emit {

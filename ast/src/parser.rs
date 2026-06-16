@@ -6,6 +6,7 @@ use lexer::{
     Token,
     TokenKind,
 };
+use session::Session;
 
 use super::{
     Expression,
@@ -100,6 +101,8 @@ macro_rules! optional_peek {
 /// Responsible for parsing a token stream into an abstract syntax tree. Also
 /// see [`Lexer`] and [`Token`].
 pub struct Parser<'a> {
+    #[allow(dead_code)]
+    session: &'a Session,
     lexer: Lexer<'a>,
     curr_token: Token,
     peek_token: Token,
@@ -108,10 +111,11 @@ pub struct Parser<'a> {
     has_semicolon: bool,
 }
 
-impl Parser<'_> {
+impl<'a> Parser<'a> {
     /// Creates a new Parser using a [`Lexer`].
-    pub fn new(lexer: Lexer<'_>) -> Parser<'_> {
+    pub fn new(session: &'a Session, lexer: Lexer<'a>) -> Parser<'a> {
         Parser {
+            session,
             lexer,
             curr_token: Token::default(),
             peek_token: Token::default(),
