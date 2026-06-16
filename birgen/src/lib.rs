@@ -38,14 +38,14 @@ mod ffi {
     }
 }
 
-pub struct BIRGen<'a> {
+pub struct BIRGen<'sess> {
     #[allow(dead_code)]
-    session: &'a Session,
+    session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
 }
 
-impl<'a> BIRGen<'a> {
-    pub fn new(session: &'a Session) -> Self {
+impl<'sess> BIRGen<'sess> {
+    pub fn new(session: &'sess Session) -> Self {
         Self {
             session,
             inner: ffi::create_birgen(),
@@ -127,7 +127,7 @@ impl<'a> BIRGen<'a> {
         self.inner.pin_mut().lower_to_llvm_dialect()
     }
 
-    pub fn llvmgen(&mut self) -> LLVMGen<'a> {
+    pub fn llvmgen(&mut self) -> LLVMGen<'sess> {
         LLVMGen {
             session: self.session,
             inner: self.inner.pin_mut().llvmgen(),
@@ -135,13 +135,13 @@ impl<'a> BIRGen<'a> {
     }
 }
 
-pub struct LLVMGen<'a> {
+pub struct LLVMGen<'sess> {
     #[allow(dead_code)]
-    session: &'a Session,
+    session: &'sess Session,
     inner: cxx::UniquePtr<ffi::LLVMGen>,
 }
 
-impl<'a> LLVMGen<'a> {
+impl<'sess> LLVMGen<'sess> {
     pub fn dump_to_string(&self) -> String {
         self.inner.dump_to_string()
     }

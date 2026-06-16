@@ -100,10 +100,10 @@ macro_rules! optional_peek {
 ///
 /// Responsible for parsing a token stream into an abstract syntax tree. Also
 /// see [`Lexer`] and [`Token`].
-pub struct Parser<'a> {
+pub struct Parser<'sess> {
     #[allow(dead_code)]
-    session: &'a Session,
-    lexer: Lexer<'a>,
+    session: &'sess Session,
+    lexer: Lexer<'sess>,
     curr_token: Token,
     peek_token: Token,
 
@@ -111,9 +111,9 @@ pub struct Parser<'a> {
     has_semicolon: bool,
 }
 
-impl<'a> Parser<'a> {
+impl<'sess> Parser<'sess> {
     /// Creates a new Parser using a [`Lexer`].
-    pub fn new(session: &'a Session, lexer: Lexer<'a>) -> Parser<'a> {
+    pub fn new(session: &'sess Session, lexer: Lexer<'sess>) -> Parser<'sess> {
         Parser {
             session,
             lexer,

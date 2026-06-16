@@ -28,11 +28,11 @@ pub enum LexerError {
     UnclosedString,
 }
 
-pub struct Lexer<'a> {
+pub struct Lexer<'sess> {
     #[allow(dead_code)]
-    session: &'a Session,
+    session: &'sess Session,
     current: Option<char>,
-    chars: Peekable<Chars<'a>>,
+    chars: Peekable<Chars<'sess>>,
 
     /// The current line number the lexer is at.
     ///
@@ -45,8 +45,8 @@ pub struct Lexer<'a> {
     current_col: u32,
 }
 
-impl<'a> Lexer<'a> {
-    pub fn new(session: &'a Session) -> Lexer<'a> {
+impl<'sess> Lexer<'sess> {
+    pub fn new(session: &'sess Session) -> Lexer<'sess> {
         let mut chars = session.source_text.chars().peekable();
         let current = chars.next();
 
