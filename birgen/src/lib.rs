@@ -102,12 +102,15 @@ impl<'sess> BIRGen<'sess> {
             Expression::Var(var) => match var.kind {
                 AssignmentKind::ColonAssign => match *var.value {
                     Expression::Integer(ref i) => {
-                        let int_value = self.inner.pin_mut().build_constant_int(i.value);
-                        let declare = self
-                            .inner
-                            .pin_mut()
-                            .build_var_declare(&int_value, var.name.value.clone());
-                        self.inner.pin_mut().build_var_store(&int_value, &declare);
+                        let v = self.inner.pin_mut().build_constant_int(i.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        declare
+                    },
+                    Expression::Float(ref f) => {
+                        let v = self.inner.pin_mut().build_constant_float(f.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        self.inner.pin_mut().build_var_store(&v, &declare);
                         declare
                     },
                     _ => todo!("Generation for expression {:?} not implemented", expr),

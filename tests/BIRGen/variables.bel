@@ -9,6 +9,11 @@
 
 x := 1;
 
+# CHECK-NEXT: %[[C2:.*]] = bir.constant 1.000000e+00 : !bir.float
+# CHECK-NEXT: %[[C3:.*]] = bir.var.declare "y" : <!bir.float>
+# CHECK-NEXT: bir.var.store %[[C2]] to %[[C3]] : !bir.float to <!bir.float>
+y := 1.0;
+
 # CHECK-NEXT: bir.return
 # CHECK-NEXT: }
 # CHECK-NEXT: }
