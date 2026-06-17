@@ -2,23 +2,8 @@
 true;
 false;
 
-# CHECK:      [
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Boolean(
-# CHECK-NEXT:                 BooleanExpression {
-# CHECK-NEXT:                     value: true,
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Boolean(
-# CHECK-NEXT:                 BooleanExpression {
-# CHECK-NEXT:                     value: false,
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT: ]
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     Boolean(true)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     Boolean(false)

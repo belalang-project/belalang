@@ -23,930 +23,193 @@ a + add(b * c) + d;
 add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8));
 add(a + b + c * d / f + g);
 
-# CHECK:      [
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Mul,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "c",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Not,
-# CHECK-NEXT:                     right: Prefix(
-# CHECK-NEXT:                         PrefixExpression {
-# CHECK-NEXT:                             operator: Sub,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "c",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Sub,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "c",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Mul,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Mul,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "c",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Mul,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Div,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "c",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "a",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "b",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Div,
-# CHECK-NEXT:                             right: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "c",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Identifier(
-# CHECK-NEXT:                                         Identifier {
-# CHECK-NEXT:                                             value: "a",
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Add,
-# CHECK-NEXT:                                     right: Infix(
-# CHECK-NEXT:                                         InfixExpression {
-# CHECK-NEXT:                                             left: Identifier(
-# CHECK-NEXT:                                                 Identifier {
-# CHECK-NEXT:                                                     value: "b",
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                             operator: Mul,
-# CHECK-NEXT:                                             right: Identifier(
-# CHECK-NEXT:                                                 Identifier {
-# CHECK-NEXT:                                                     value: "c",
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Identifier(
-# CHECK-NEXT:                                         Identifier {
-# CHECK-NEXT:                                             value: "d",
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Div,
-# CHECK-NEXT:                                     right: Identifier(
-# CHECK-NEXT:                                         Identifier {
-# CHECK-NEXT:                                             value: "e",
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Sub,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "f",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 3,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 4,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Prefix(
-# CHECK-NEXT:                         PrefixExpression {
-# CHECK-NEXT:                             operator: Sub,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Mul,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 5,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Gt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 4,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Eq,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Lt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 4,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Lt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 4,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Ne,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Gt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 4,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 4,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 5,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Eq,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 3,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 1,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 4,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 5,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 4,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 5,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Eq,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 3,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 1,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 4,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Mul,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 5,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Gt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Eq,
-# CHECK-NEXT:                     right: Boolean(
-# CHECK-NEXT:                         BooleanExpression {
-# CHECK-NEXT:                             value: false,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 3,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Lt,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Eq,
-# CHECK-NEXT:                     right: Boolean(
-# CHECK-NEXT:                         BooleanExpression {
-# CHECK-NEXT:                             value: true,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 1,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Infix(
-# CHECK-NEXT:                                 InfixExpression {
-# CHECK-NEXT:                                     left: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 2,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     operator: Add,
-# CHECK-NEXT:                                     right: Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 3,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 4,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Mul,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 2,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 2,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Div,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Sub,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Integer(
-# CHECK-NEXT:                                 IntegerLiteral {
-# CHECK-NEXT:                                     value: 5,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Not,
-# CHECK-NEXT:                     right: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Boolean(
-# CHECK-NEXT:                                 BooleanExpression {
-# CHECK-NEXT:                                     value: true,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Eq,
-# CHECK-NEXT:                             right: Boolean(
-# CHECK-NEXT:                                 BooleanExpression {
-# CHECK-NEXT:                                     value: true,
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Infix(
-# CHECK-NEXT:                 InfixExpression {
-# CHECK-NEXT:                     left: Infix(
-# CHECK-NEXT:                         InfixExpression {
-# CHECK-NEXT:                             left: Identifier(
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "a",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                             operator: Add,
-# CHECK-NEXT:                             right: Call(
-# CHECK-NEXT:                                 CallExpression {
-# CHECK-NEXT:                                     function: Identifier(
-# CHECK-NEXT:                                         Identifier {
-# CHECK-NEXT:                                             value: "add",
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     args: [
-# CHECK-NEXT:                                         Infix(
-# CHECK-NEXT:                                             InfixExpression {
-# CHECK-NEXT:                                                 left: Identifier(
-# CHECK-NEXT:                                                     Identifier {
-# CHECK-NEXT:                                                         value: "b",
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                                 operator: Mul,
-# CHECK-NEXT:                                                 right: Identifier(
-# CHECK-NEXT:                                                     Identifier {
-# CHECK-NEXT:                                                         value: "c",
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                             },
-# CHECK-NEXT:                                         ),
-# CHECK-NEXT:                                     ],
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ),
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     operator: Add,
-# CHECK-NEXT:                     right: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "d",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Call(
-# CHECK-NEXT:                 CallExpression {
-# CHECK-NEXT:                     function: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "add",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     args: [
-# CHECK-NEXT:                         Identifier(
-# CHECK-NEXT:                             Identifier {
-# CHECK-NEXT:                                 value: "a",
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Identifier(
-# CHECK-NEXT:                             Identifier {
-# CHECK-NEXT:                                 value: "b",
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Integer(
-# CHECK-NEXT:                             IntegerLiteral {
-# CHECK-NEXT:                                 value: 1,
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Infix(
-# CHECK-NEXT:                             InfixExpression {
-# CHECK-NEXT:                                 left: Integer(
-# CHECK-NEXT:                                     IntegerLiteral {
-# CHECK-NEXT:                                         value: 2,
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                                 operator: Mul,
-# CHECK-NEXT:                                 right: Integer(
-# CHECK-NEXT:                                     IntegerLiteral {
-# CHECK-NEXT:                                         value: 3,
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Infix(
-# CHECK-NEXT:                             InfixExpression {
-# CHECK-NEXT:                                 left: Integer(
-# CHECK-NEXT:                                     IntegerLiteral {
-# CHECK-NEXT:                                         value: 4,
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                                 operator: Add,
-# CHECK-NEXT:                                 right: Integer(
-# CHECK-NEXT:                                     IntegerLiteral {
-# CHECK-NEXT:                                         value: 5,
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Call(
-# CHECK-NEXT:                             CallExpression {
-# CHECK-NEXT:                                 function: Identifier(
-# CHECK-NEXT:                                     Identifier {
-# CHECK-NEXT:                                         value: "add",
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                                 args: [
-# CHECK-NEXT:                                     Integer(
-# CHECK-NEXT:                                         IntegerLiteral {
-# CHECK-NEXT:                                             value: 6,
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                     Infix(
-# CHECK-NEXT:                                         InfixExpression {
-# CHECK-NEXT:                                             left: Integer(
-# CHECK-NEXT:                                                 IntegerLiteral {
-# CHECK-NEXT:                                                     value: 7,
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                             operator: Mul,
-# CHECK-NEXT:                                             right: Integer(
-# CHECK-NEXT:                                                 IntegerLiteral {
-# CHECK-NEXT:                                                     value: 8,
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 ],
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                     ],
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Call(
-# CHECK-NEXT:                 CallExpression {
-# CHECK-NEXT:                     function: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "add",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     args: [
-# CHECK-NEXT:                         Infix(
-# CHECK-NEXT:                             InfixExpression {
-# CHECK-NEXT:                                 left: Infix(
-# CHECK-NEXT:                                     InfixExpression {
-# CHECK-NEXT:                                         left: Infix(
-# CHECK-NEXT:                                             InfixExpression {
-# CHECK-NEXT:                                                 left: Identifier(
-# CHECK-NEXT:                                                     Identifier {
-# CHECK-NEXT:                                                         value: "a",
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                                 operator: Add,
-# CHECK-NEXT:                                                 right: Identifier(
-# CHECK-NEXT:                                                     Identifier {
-# CHECK-NEXT:                                                         value: "b",
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                             },
-# CHECK-NEXT:                                         ),
-# CHECK-NEXT:                                         operator: Add,
-# CHECK-NEXT:                                         right: Infix(
-# CHECK-NEXT:                                             InfixExpression {
-# CHECK-NEXT:                                                 left: Infix(
-# CHECK-NEXT:                                                     InfixExpression {
-# CHECK-NEXT:                                                         left: Identifier(
-# CHECK-NEXT:                                                             Identifier {
-# CHECK-NEXT:                                                                 value: "c",
-# CHECK-NEXT:                                                             },
-# CHECK-NEXT:                                                         ),
-# CHECK-NEXT:                                                         operator: Mul,
-# CHECK-NEXT:                                                         right: Identifier(
-# CHECK-NEXT:                                                             Identifier {
-# CHECK-NEXT:                                                                 value: "d",
-# CHECK-NEXT:                                                             },
-# CHECK-NEXT:                                                         ),
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                                 operator: Div,
-# CHECK-NEXT:                                                 right: Identifier(
-# CHECK-NEXT:                                                     Identifier {
-# CHECK-NEXT:                                                         value: "f",
-# CHECK-NEXT:                                                     },
-# CHECK-NEXT:                                                 ),
-# CHECK-NEXT:                                             },
-# CHECK-NEXT:                                         ),
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                                 operator: Add,
-# CHECK-NEXT:                                 right: Identifier(
-# CHECK-NEXT:                                     Identifier {
-# CHECK-NEXT:                                         value: "g",
-# CHECK-NEXT:                                     },
-# CHECK-NEXT:                                 ),
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                     ],
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT: ]
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       InfixExpression(Mul)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:       Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Not)
+# CHECK-NEXT:       PrefixExpression(Sub)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:       Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Sub)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:       Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Mul)
+# CHECK-NEXT:       InfixExpression(Mul)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:       Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Div)
+# CHECK-NEXT:       InfixExpression(Mul)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:       Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       Identifier(a)
+# CHECK-NEXT:       InfixExpression(Div)
+# CHECK-NEXT:         Identifier(b)
+# CHECK-NEXT:         Identifier(c)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Sub)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         InfixExpression(Add)
+# CHECK-NEXT:           Identifier(a)
+# CHECK-NEXT:           InfixExpression(Mul)
+# CHECK-NEXT:             Identifier(b)
+# CHECK-NEXT:             Identifier(c)
+# CHECK-NEXT:         InfixExpression(Div)
+# CHECK-NEXT:           Identifier(d)
+# CHECK-NEXT:           Identifier(e)
+# CHECK-NEXT:       Identifier(f)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       Integer(3)
+# CHECK-NEXT:       Integer(4)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Mul)
+# CHECK-NEXT:       PrefixExpression(Sub)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:       Integer(5)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Eq)
+# CHECK-NEXT:       InfixExpression(Gt)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:         Integer(4)
+# CHECK-NEXT:       InfixExpression(Lt)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         Integer(4)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Ne)
+# CHECK-NEXT:       InfixExpression(Lt)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:         Integer(4)
+# CHECK-NEXT:       InfixExpression(Gt)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         Integer(4)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Eq)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(4)
+# CHECK-NEXT:           Integer(5)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(3)
+# CHECK-NEXT:           Integer(1)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(4)
+# CHECK-NEXT:           Integer(5)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Eq)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(4)
+# CHECK-NEXT:           Integer(5)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(3)
+# CHECK-NEXT:           Integer(1)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(4)
+# CHECK-NEXT:           Integer(5)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Eq)
+# CHECK-NEXT:       InfixExpression(Gt)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:       Boolean(false)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Eq)
+# CHECK-NEXT:       InfixExpression(Lt)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:       Boolean(true)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(1)
+# CHECK-NEXT:         InfixExpression(Add)
+# CHECK-NEXT:           Integer(2)
+# CHECK-NEXT:           Integer(3)
+# CHECK-NEXT:       Integer(4)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Mul)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:       Integer(2)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Div)
+# CHECK-NEXT:       Integer(2)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Sub)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Not)
+# CHECK-NEXT:       InfixExpression(Eq)
+# CHECK-NEXT:         Boolean(true)
+# CHECK-NEXT:         Boolean(true)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     InfixExpression(Add)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Identifier(a)
+# CHECK-NEXT:         CallExpression
+# CHECK-NEXT:           Identifier(add)
+# CHECK-NEXT:           InfixExpression(Mul)
+# CHECK-NEXT:             Identifier(b)
+# CHECK-NEXT:             Identifier(c)
+# CHECK-NEXT:       Identifier(d)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     CallExpression
+# CHECK-NEXT:       Identifier(add)
+# CHECK-NEXT:       Identifier(a)
+# CHECK-NEXT:       Identifier(b)
+# CHECK-NEXT:       Integer(1)
+# CHECK-NEXT:       InfixExpression(Mul)
+# CHECK-NEXT:         Integer(2)
+# CHECK-NEXT:         Integer(3)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         Integer(4)
+# CHECK-NEXT:         Integer(5)
+# CHECK-NEXT:       CallExpression
+# CHECK-NEXT:         Identifier(add)
+# CHECK-NEXT:         Integer(6)
+# CHECK-NEXT:         InfixExpression(Mul)
+# CHECK-NEXT:           Integer(7)
+# CHECK-NEXT:           Integer(8)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     CallExpression
+# CHECK-NEXT:       Identifier(add)
+# CHECK-NEXT:       InfixExpression(Add)
+# CHECK-NEXT:         InfixExpression(Add)
+# CHECK-NEXT:           InfixExpression(Add)
+# CHECK-NEXT:             Identifier(a)
+# CHECK-NEXT:             Identifier(b)
+# CHECK-NEXT:           InfixExpression(Div)
+# CHECK-NEXT:             InfixExpression(Mul)
+# CHECK-NEXT:               Identifier(c)
+# CHECK-NEXT:               Identifier(d)
+# CHECK-NEXT:             Identifier(f)
+# CHECK-NEXT:         Identifier(g)

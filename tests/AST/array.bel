@@ -2,48 +2,13 @@
 [1, 2, 3];
 arr[1];
 
-# CHECK:      [
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Array(
-# CHECK-NEXT:                 ArrayLiteral {
-# CHECK-NEXT:                     elements: [
-# CHECK-NEXT:                         Integer(
-# CHECK-NEXT:                             IntegerLiteral {
-# CHECK-NEXT:                                 value: 1,
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Integer(
-# CHECK-NEXT:                             IntegerLiteral {
-# CHECK-NEXT:                                 value: 2,
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                         Integer(
-# CHECK-NEXT:                             IntegerLiteral {
-# CHECK-NEXT:                                 value: 3,
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         ),
-# CHECK-NEXT:                     ],
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Index(
-# CHECK-NEXT:                 IndexExpression {
-# CHECK-NEXT:                     left: Identifier(
-# CHECK-NEXT:                         Identifier {
-# CHECK-NEXT:                             value: "arr",
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                     index: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 1,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT: ]
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     ArrayLiteral
+# CHECK-NEXT:       Integer(1)
+# CHECK-NEXT:       Integer(2)
+# CHECK-NEXT:       Integer(3)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     IndexExpression
+# CHECK-NEXT:       Identifier(arr)
+# CHECK-NEXT:       Integer(1)

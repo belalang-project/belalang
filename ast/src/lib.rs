@@ -1,8 +1,11 @@
+mod dump;
 mod expressions;
 mod parser;
 mod program;
 mod statements;
+mod visitor;
 
+pub use dump::*;
 pub use expressions::*;
 use lexer::{
     LexerError,
@@ -11,6 +14,7 @@ use lexer::{
 pub use parser::Parser;
 pub use program::Program;
 pub use statements::*;
+pub use visitor::*;
 
 pub enum Node {
     Expression(Expression),
