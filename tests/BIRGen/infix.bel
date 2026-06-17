@@ -1,4 +1,4 @@
-# RUN: %belalang --emit=bir %s | %FileCheck %s
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
 
 # CHECK: module {
 # CHECK-NEXT: bir.func @main() {

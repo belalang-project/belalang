@@ -1,4 +1,4 @@
-# RUN: %belalang --emit=llvm %s | %FileCheck %s
+# RUN: %belalang build --emit=llvm %s | %FileCheck %s
 
 # CHECK: declare void @brt_mmtk_init()
 # CHECK: declare void @brt_print_int(i32)

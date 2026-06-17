@@ -1,4 +1,4 @@
-# RUN: %belalang --emit ast %s | %FileCheck %s
+# RUN: %belalang build --emit ast %s | %FileCheck %s
 int_var := 123;
 flo_var := 44.2;
 str_var := "Hello, World!";
