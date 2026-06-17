@@ -20,6 +20,11 @@ use mmtk::{
 static MMTK_INSTANCE: OnceLock<&'static MMTK<BrVM>> = OnceLock::new();
 
 pub fn init() {
+    // SAFETY: This is called once at startup before any other threads are spawned.
+    // Setting the env var before mmtk_init ensures env_logger picks up Off level,
+    // suppressing all MMTk log output without needing a custom logger.
+    unsafe { std::env::set_var("RUST_LOG", "off") };
+
     let mut builder = MMTKBuilder::new();
     builder.options.plan.set(mmtk::util::options::PlanSelector::NoGC);
     let mmtk = memory_manager::mmtk_init::<BrVM>(&builder);
@@ -27,6 +32,8 @@ pub fn init() {
 }
 
 pub fn alloc(size: usize) -> *mut u8 {
+    let size = size.max(mmtk::util::constants::MIN_OBJECT_SIZE);
+
     let mmtk = MMTK_INSTANCE.get().expect("MMTk not initialized");
     let tls = VMMutatorThread(VMThread(OpaquePointer::UNINITIALIZED));
     let mut mutator = memory_manager::bind_mutator(mmtk, tls);

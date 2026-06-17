@@ -108,6 +108,10 @@ crate.annotation(
     crate = "mmtk",
 )
 crate.spec(
+    package = "log",
+    version = "0.4",
+)
+crate.spec(
     package = "tracing",
     version = "0.1.43",
 )

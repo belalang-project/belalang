@@ -1,5 +1,7 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
+#include "belalang/BRT/BRT.h"
+#include "mlir/IR/BuiltinOps.h"
 #include "mlir/Transforms/DialectConversion.h"
 
 namespace mlir {
@@ -218,6 +220,78 @@ struct ModOpLowering final : public OpConversionPattern<bir::ModOp> {
   }
 };
 
+struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclare> {
+  using OpConversionPattern<bir::VarDeclare>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::VarDeclare op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto refType = mlir::cast<bir::RefType>(op.getType());
+    auto elType = refType.getEl();
+    auto loc = op.getLoc();
+    auto ctx = op.getContext();
+
+    int64_t elSize;
+    if (mlir::isa<bir::IntType>(elType))
+      elSize = 4;
+    else if (mlir::isa<bir::FloatType>(elType))
+      elSize = 4;
+    else
+      return failure();
+
+    auto module = op->getParentOfType<mlir::ModuleOp>();
+    if (!module.lookupSymbol(brt::BRT_MMTK_ALLOC)) {
+      OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPointToStart(module.getBody());
+      auto funcType = LLVM::LLVMFunctionType::get(
+          LLVM::LLVMPointerType::get(ctx), IntegerType::get(ctx, 64));
+      OperationState funcState(UnknownLoc::get(ctx),
+                               LLVM::LLVMFuncOp::getOperationName());
+      LLVM::LLVMFuncOp::build(rewriter, funcState, brt::BRT_MMTK_ALLOC,
+                              funcType);
+      rewriter.create(funcState);
+    }
+
+    auto i64Type = IntegerType::get(ctx, 64);
+    auto sizeVal =
+        LLVM::ConstantOp::create(rewriter, loc, i64Type, rewriter.getI64IntegerAttr(elSize));
+
+    auto ptrType = LLVM::LLVMPointerType::get(ctx);
+    auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_MMTK_ALLOC);
+    auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr, sizeVal.getResult());
+
+    rewriter.replaceOp(op, allocCall.getResult());
+    return success();
+  };
+};
+
+struct VarStoreOpLowering final : public OpConversionPattern<bir::VarStoreOp> {
+  using OpConversionPattern<bir::VarStoreOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::VarStoreOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    rewriter.replaceOpWithNewOp<LLVM::StoreOp>(op, adaptor.getSrc(),
+                                               adaptor.getDest());
+    return success();
+  };
+};
+
+struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoad> {
+  using OpConversionPattern<bir::VarLoad>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::VarLoad op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    rewriter.replaceOpWithNewOp<LLVM::LoadOp>(op, type, adaptor.getRef());
+    return success();
+  };
+};
+
 struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
   BIRToLLVMTypeConverter() {
     addConversion([](bir::IntType ty) {
@@ -225,6 +299,9 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     });
     addConversion([](bir::FloatType ty) {
       return mlir::Float32Type::get(ty.getContext());
+    });
+    addConversion([](bir::RefType ty) {
+      return LLVM::LLVMPointerType::get(ty.getContext());
     });
     addConversion([this](mlir::FunctionType type) -> mlir::Type {
       SmallVector<mlir::Type> inputs;
@@ -252,8 +329,9 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
     mlir::RewritePatternSet &patterns, mlir::TypeConverter &typeConverter) {
   patterns.add<ConstantOpLowering, FuncOpLowering, CallOpLowering,
                ReturnOpLowering, AddOpLowering, SubOpLowering, MulOpLowering,
-               DivOpLowering, ModOpLowering>(typeConverter,
-                                             patterns.getContext());
+               DivOpLowering, ModOpLowering, VarDeclareOpLowering,
+               VarStoreOpLowering, VarLoadOpLowering>(typeConverter,
+                                                      patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
@@ -278,6 +356,39 @@ struct BelalangBIRToLLVMPass
     if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                   std::move(patterns)))) {
       signalPassFailure();
+      return;
+    }
+
+    auto module = mlir::dyn_cast<mlir::ModuleOp>(getOperation());
+    if (!module)
+      return;
+
+    MLIRContext *ctx = &getContext();
+    auto mainFunc = module.lookupSymbol<LLVM::LLVMFuncOp>("main");
+    if (!mainFunc || mainFunc.isExternal())
+      return;
+
+    if (!module.lookupSymbol(brt::BRT_MMTK_INIT)) {
+      OpBuilder builder(&module.getBodyRegion().front(),
+                        module.getBodyRegion().front().begin());
+      auto voidType = LLVM::LLVMVoidType::get(ctx);
+      auto funcType = LLVM::LLVMFunctionType::get(voidType, {});
+      OperationState funcState(UnknownLoc::get(ctx),
+                               LLVM::LLVMFuncOp::getOperationName());
+      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_MMTK_INIT,
+                              funcType);
+      builder.create(funcState);
+    }
+
+    {
+      Block &entryBlock = mainFunc.getBody().front();
+      OpBuilder builder(&entryBlock, entryBlock.begin());
+      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_MMTK_INIT);
+      OperationState callState(UnknownLoc::get(ctx),
+                               LLVM::CallOp::getOperationName());
+      LLVM::CallOp::build(builder, callState, TypeRange{}, calleeAttr,
+                          ValueRange{});
+      builder.create(callState);
     }
   }
 };
