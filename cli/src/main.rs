@@ -11,6 +11,7 @@ use ast::{
 use birgen::BIRGen;
 use clap::{
     Parser as ClapParser,
+    Subcommand,
     ValueEnum,
 };
 use lexer::Lexer;
@@ -27,9 +28,8 @@ enum EmitTarget {
     Exe,
 }
 
-#[derive(ClapParser)]
-#[command(version, about, long_about = None)]
-struct Belalang {
+#[derive(clap::Args)]
+struct BuildArgs {
     /// Path to the .bel file to compile
     path: PathBuf,
 
@@ -42,7 +42,7 @@ struct Belalang {
     emit: EmitTarget,
 }
 
-impl Belalang {
+impl BuildArgs {
     fn get_out_path(&self) -> Option<PathBuf> {
         if let Some(out) = &self.out {
             return Some(out.to_path_buf());
@@ -56,15 +56,30 @@ impl Belalang {
     }
 }
 
-fn main() -> anyhow::Result<()> {
-    let belalang = Belalang::parse();
-    build(belalang)
+#[derive(Subcommand)]
+enum Commands {
+    Build(BuildArgs),
 }
 
-fn build(belalang: Belalang) -> anyhow::Result<()> {
-    let session = Session::for_file(belalang.path.clone())?;
+#[derive(ClapParser)]
+#[command(version, about, long_about = None)]
+struct Belalang {
+    #[command(subcommand)]
+    command: Commands,
+}
 
-    if let EmitTarget::Tokens = belalang.emit {
+fn main() -> anyhow::Result<()> {
+    let belalang = Belalang::parse();
+
+    match belalang.command {
+        Commands::Build(args) => build(args),
+    }
+}
+
+fn build(args: BuildArgs) -> anyhow::Result<()> {
+    let session = Session::for_file(args.path.clone())?;
+
+    if let EmitTarget::Tokens = args.emit {
         let mut lexer = Lexer::new(&session);
         loop {
             let token = lexer.next_token().map_err(|e| anyhow::anyhow!("{}", e))?;
@@ -80,7 +95,7 @@ fn build(belalang: Belalang) -> anyhow::Result<()> {
     let mut parser = Parser::new(&session, lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
 
-    match belalang.emit {
+    match args.emit {
         EmitTarget::Bir => {
             let mut generator = BIRGen::new(&session);
             generator.generate_program(&program);
@@ -105,7 +120,7 @@ fn build(belalang: Belalang) -> anyhow::Result<()> {
             birgen.optimize();
 
             let llvmgen = birgen.llvmgen();
-            let out = belalang
+            let out = args
                 .get_out_path()
                 .context("Path is None")?
                 .to_str()
@@ -119,7 +134,7 @@ fn build(belalang: Belalang) -> anyhow::Result<()> {
             birgen.optimize();
 
             let llvmgen = birgen.llvmgen();
-            let obj_out = belalang
+            let obj_out = args
                 .path
                 .with_added_extension("o")
                 .to_str()
@@ -135,7 +150,7 @@ fn build(belalang: Belalang) -> anyhow::Result<()> {
                 .arg(format!("-L{}", brt))
                 .arg("-lbrt")
                 .arg("-o")
-                .arg(belalang.path.with_extension(""))
+                .arg(args.path.with_extension(""))
                 .status()?;
 
             if !status.success() {
