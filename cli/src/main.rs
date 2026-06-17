@@ -58,7 +58,10 @@ impl Belalang {
 
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
+    build(belalang)
+}
 
+fn build(belalang: Belalang) -> anyhow::Result<()> {
     let session = Session::for_file(belalang.path.clone())?;
 
     if let EmitTarget::Tokens = belalang.emit {
