@@ -1,5 +1,6 @@
 use std::{
     env,
+    os::unix::process::CommandExt,
     path::PathBuf,
 };
 
@@ -56,9 +57,16 @@ impl BuildArgs {
     }
 }
 
+#[derive(clap::Args)]
+struct RunArgs {
+    /// Path to the .bel file to run
+    path: PathBuf,
+}
+
 #[derive(Subcommand)]
 enum Commands {
     Build(BuildArgs),
+    Run(RunArgs),
 }
 
 #[derive(ClapParser)]
@@ -73,6 +81,7 @@ fn main() -> anyhow::Result<()> {
 
     match belalang.command {
         Commands::Build(args) => build(args),
+        Commands::Run(args) => run(args),
     }
 }
 
@@ -161,4 +170,45 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+fn run(args: RunArgs) -> anyhow::Result<()> {
+    let session = Session::for_file(args.path.clone())?;
+
+    let lexer = Lexer::new(&session);
+
+    let mut parser = Parser::new(&session, lexer);
+    let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+
+    let mut birgen = BIRGen::new(&session);
+    birgen.generate_program(&program);
+    birgen.optimize();
+
+    let llvmgen = birgen.llvmgen();
+    let obj_out = args
+        .path
+        .with_added_extension("o")
+        .to_str()
+        .context("invalid UTF-8 data")?
+        .to_string();
+    let _ = llvmgen.compile_object_file(obj_out.clone());
+
+    let cc = env::var("CC").unwrap_or("cc".to_string());
+    let brt = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
+
+    let status = std::process::Command::new(cc)
+        .arg(obj_out)
+        .arg(format!("-L{}", brt))
+        .arg("-lbrt")
+        .arg("-o")
+        .arg(args.path.with_extension(""))
+        .status()?;
+
+    if !status.success() {
+        anyhow::bail!("linker failed with exit code: {}", status);
+    }
+
+    let exe = std::fs::canonicalize(args.path.with_extension("")).context("Failed to canonicalize exe path")?;
+    let err = std::process::Command::new(exe).exec();
+    anyhow::bail!("Failed to exec: {}", err);
 }
