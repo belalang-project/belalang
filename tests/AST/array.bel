@@ -1,4 +1,4 @@
-# RUN: %belalang --emit ast %s | %FileCheck %s
+# RUN: %belalang build --emit ast %s | %FileCheck %s
 [1, 2, 3];
 arr[1];
 

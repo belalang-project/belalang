@@ -1,4 +1,4 @@
-# RUN: %belalang --emit=tokens %s | %FileCheck %s
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
 
 # CHECK: Token { kind: Ident, value: "print" }
 # CHECK: Token { kind: LeftParen, value: "" }
