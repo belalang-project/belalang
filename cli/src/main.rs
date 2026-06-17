@@ -4,7 +4,10 @@ use std::{
 };
 
 use anyhow::Context;
-use ast::Parser;
+use ast::{
+    Parser,
+    Visitor,
+};
 use birgen::BIRGen;
 use clap::{
     Parser as ClapParser,
@@ -82,7 +85,8 @@ fn main() -> anyhow::Result<()> {
             println!("{}", generator.dump_to_string());
         },
         EmitTarget::Ast => {
-            println!("{:#?}", program.statements);
+            let mut dumper = ast::ASTDumper::new();
+            dumper.visit_program(&program);
         },
         EmitTarget::Llvm => {
             let mut birgen = BIRGen::new(&session);

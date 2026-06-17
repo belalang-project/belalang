@@ -5,99 +5,26 @@ add := fn(x, y) {
 
 mul := fn(x, y) { x * y };
 
-# CHECK:      [
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Var(
-# CHECK-NEXT:                 VarExpression {
-# CHECK-NEXT:                     kind: ColonAssign,
-# CHECK-NEXT:                     name: Identifier {
-# CHECK-NEXT:                         value: "add",
-# CHECK-NEXT:                     },
-# CHECK-NEXT:                     value: Function(
-# CHECK-NEXT:                         FunctionLiteral {
-# CHECK-NEXT:                             params: [
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "x",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "y",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ],
-# CHECK-NEXT:                             body: BlockExpression {
-# CHECK-NEXT:                                 statements: [
-# CHECK-NEXT:                                     Return(
-# CHECK-NEXT:                                         ReturnStatement {
-# CHECK-NEXT:                                             return_value: Infix(
-# CHECK-NEXT:                                                 InfixExpression {
-# CHECK-NEXT:                                                     left: Identifier(
-# CHECK-NEXT:                                                         Identifier {
-# CHECK-NEXT:                                                             value: "x",
-# CHECK-NEXT:                                                         },
-# CHECK-NEXT:                                                     ),
-# CHECK-NEXT:                                                     operator: Add,
-# CHECK-NEXT:                                                     right: Identifier(
-# CHECK-NEXT:                                                         Identifier {
-# CHECK-NEXT:                                                             value: "y",
-# CHECK-NEXT:                                                         },
-# CHECK-NEXT:                                                     ),
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 ],
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Var(
-# CHECK-NEXT:                 VarExpression {
-# CHECK-NEXT:                     kind: ColonAssign,
-# CHECK-NEXT:                     name: Identifier {
-# CHECK-NEXT:                         value: "mul",
-# CHECK-NEXT:                     },
-# CHECK-NEXT:                     value: Function(
-# CHECK-NEXT:                         FunctionLiteral {
-# CHECK-NEXT:                             params: [
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "x",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                                 Identifier {
-# CHECK-NEXT:                                     value: "y",
-# CHECK-NEXT:                                 },
-# CHECK-NEXT:                             ],
-# CHECK-NEXT:                             body: BlockExpression {
-# CHECK-NEXT:                                 statements: [
-# CHECK-NEXT:                                     Expression(
-# CHECK-NEXT:                                         ExpressionStatement {
-# CHECK-NEXT:                                             expression: Infix(
-# CHECK-NEXT:                                                 InfixExpression {
-# CHECK-NEXT:                                                     left: Identifier(
-# CHECK-NEXT:                                                         Identifier {
-# CHECK-NEXT:                                                             value: "x",
-# CHECK-NEXT:                                                         },
-# CHECK-NEXT:                                                     ),
-# CHECK-NEXT:                                                     operator: Mul,
-# CHECK-NEXT:                                                     right: Identifier(
-# CHECK-NEXT:                                                         Identifier {
-# CHECK-NEXT:                                                             value: "y",
-# CHECK-NEXT:                                                         },
-# CHECK-NEXT:                                                     ),
-# CHECK-NEXT:                                                 },
-# CHECK-NEXT:                                             ),
-# CHECK-NEXT:                                         },
-# CHECK-NEXT:                                     ),
-# CHECK-NEXT:                                 ],
-# CHECK-NEXT:                             },
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT: ]
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:       Identifier(add)
+# CHECK-NEXT:       FunctionLiteral
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:         Identifier(y)
+# CHECK-NEXT:         BlockExpression
+# CHECK-NEXT:           ReturnStatement
+# CHECK-NEXT:             InfixExpression(Add)
+# CHECK-NEXT:               Identifier(x)
+# CHECK-NEXT:               Identifier(y)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:       Identifier(mul)
+# CHECK-NEXT:       FunctionLiteral
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:         Identifier(y)
+# CHECK-NEXT:         BlockExpression
+# CHECK-NEXT:           ExpressionStatement
+# CHECK-NEXT:             InfixExpression(Mul)
+# CHECK-NEXT:               Identifier(x)
+# CHECK-NEXT:               Identifier(y)

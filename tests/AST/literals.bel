@@ -8,79 +8,20 @@
 
 "Hello, World!";
 
-# CHECK:      [
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Integer(
-# CHECK-NEXT:                 IntegerLiteral {
-# CHECK-NEXT:                     value: 12,
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Sub,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 12,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Not,
-# CHECK-NEXT:                     right: Integer(
-# CHECK-NEXT:                         IntegerLiteral {
-# CHECK-NEXT:                             value: 12,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Sub,
-# CHECK-NEXT:                     right: Boolean(
-# CHECK-NEXT:                         BooleanExpression {
-# CHECK-NEXT:                             value: true,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: Prefix(
-# CHECK-NEXT:                 PrefixExpression {
-# CHECK-NEXT:                     operator: Not,
-# CHECK-NEXT:                     right: Boolean(
-# CHECK-NEXT:                         BooleanExpression {
-# CHECK-NEXT:                             value: true,
-# CHECK-NEXT:                         },
-# CHECK-NEXT:                     ),
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT:     Expression(
-# CHECK-NEXT:         ExpressionStatement {
-# CHECK-NEXT:             expression: String(
-# CHECK-NEXT:                 StringLiteral {
-# CHECK-NEXT:                     value: "Hello, World!",
-# CHECK-NEXT:                 },
-# CHECK-NEXT:             ),
-# CHECK-NEXT:         },
-# CHECK-NEXT:     ),
-# CHECK-NEXT: ]
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     Integer(12)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Sub)
+# CHECK-NEXT:       Integer(12)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Not)
+# CHECK-NEXT:       Integer(12)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Sub)
+# CHECK-NEXT:       Boolean(true)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     PrefixExpression(Not)
+# CHECK-NEXT:       Boolean(true)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     String("Hello, World!")
