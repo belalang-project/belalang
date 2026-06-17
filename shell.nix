@@ -8,4 +8,7 @@
    pkgs.python313
    pkgs.clang-tools
  ];
+ profile = ''
+   export BRT_DIR="${toString ./.}/bazel-bin/brt"
+ '';
 }).env
