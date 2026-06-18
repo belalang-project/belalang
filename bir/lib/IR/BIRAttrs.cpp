@@ -43,7 +43,7 @@ mlir::Attribute FloatAttr::parse(mlir::AsmParser &p, mlir::Type attrType) {
 
 void FloatAttr::print(mlir::AsmPrinter &p) const {
   p << "<";
-  getValue().print(p.getStream());
+  p.printFloat(getValue());
   p << ">";
 }
 
