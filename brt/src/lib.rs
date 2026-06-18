@@ -9,6 +9,11 @@ pub extern "C" fn brt_print_float(v: f64) {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn brt_print_string(v: brt_core::string::BrString) {
+    v.print();
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn brt_mmtk_init() {
     brt_core::mmtk::init();
 }
