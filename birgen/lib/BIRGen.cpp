@@ -41,15 +41,17 @@ BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
 
 std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
   auto type = builder.getType<bir::IntType>();
-  auto op = bir::ConstantOp::create(builder, loc, type,
-                                    builder.getI32IntegerAttr(val));
+  llvm::APInt value(64, val);
+  auto attr = bir::IntegerAttr::get(&context, type, value);
+  auto op = bir::ConstantOp::create(builder, loc, type, attr);
   return std::make_unique<BIRValue>(op.getResult());
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
   auto type = builder.getType<bir::FloatType>();
-  auto op =
-      bir::ConstantOp::create(builder, loc, type, builder.getF64FloatAttr(val));
+  llvm::APFloat value(val);
+  auto attr = bir::FloatAttr::get(&context, type, value);
+  auto op = bir::ConstantOp::create(builder, loc, type, attr);
   return std::make_unique<BIRValue>(op.getResult());
 }
 

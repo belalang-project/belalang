@@ -2,8 +2,8 @@
 
 // CHECK-LABEL: bir.func @basic
 bir.func @basic() -> !bir.int {
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int
     %3 = bir.sub %0, %1 : (!bir.int, !bir.int) -> !bir.int
     %4 = bir.mul %0, %1 : (!bir.int, !bir.int) -> !bir.int

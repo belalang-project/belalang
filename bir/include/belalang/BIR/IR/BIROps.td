@@ -14,19 +14,23 @@ class BIR_Op<string mnemonic, list<Trait> traits = []>
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
-def BIR_ConstantOp : BIR_Op<"constant"> {
+def BIR_ConstantOp : BIR_Op<"constant", [
+  AllTypesMatch<["value", "result"]>,
+]> {
   let summary = "constant";
 
   let description = [{
     ```mlir
-    %0 = bir.constant 1 : !bir.int
+    %0 = bir.constant #bir.int<1> : !bir.int
     ```
   }];
 
   let arguments = (ins TypedAttrInterface:$value);
   let results = (outs BIR_AnyType:$result);
 
-  let hasCustomAssemblyFormat = 1;
+  let assemblyFormat = "$value attr-dict";
+
+  let hasVerifier = 1;
 }
 
 def BIR_AddOp : BIR_Op<"add"> {
@@ -34,8 +38,8 @@ def BIR_AddOp : BIR_Op<"add"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int
     ```
   }];
@@ -52,8 +56,8 @@ def BIR_SubOp : BIR_Op<"sub"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.sub %0, %1 : (!bir.int, !bir.int) -> !bir.int
     ```
   }];
@@ -70,8 +74,8 @@ def BIR_MulOp : BIR_Op<"mul"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.mul %0, %1 : (!bir.int, !bir.int) -> !bir.int
     ```
   }];
@@ -88,8 +92,8 @@ def BIR_DivOp : BIR_Op<"div"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.div %0, %1 : (!bir.int, !bir.int) -> !bir.int
     ```
   }];
@@ -106,8 +110,8 @@ def BIR_ModOp : BIR_Op<"mod"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 4 : !bir.int
-    %1 = bir.constant 2 : !bir.int
+    %0 = bir.constant #bir.int<4> : !bir.int
+    %1 = bir.constant #bir.int<2> : !bir.int
     %2 = bir.mod %0, %1 : (!bir.int, !bir.int) -> !bir.int
     ```
   }];
@@ -124,7 +128,7 @@ def BIR_PrintOp : BIR_Op<"print"> {
 
   let description = [{
     ```mlir
-    %0 = bir.constant 0 : !bir.int
+    %0 = bir.constant #bir.int<0> : !bir.int
     bir.print %0 : !bir.int
     ```
   }];

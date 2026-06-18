@@ -16,6 +16,9 @@ using namespace llvm;
 
 #include "belalang/BIR/IR/BIRDialect.h.inc"
 
+#define GET_ATTRDEF_CLASSES
+#include "belalang/BIR/IR/BIRAttrs.h.inc"
+
 #define GET_TYPEDEF_CLASSES
 #include "belalang/BIR/IR/BIRTypes.h.inc"
 

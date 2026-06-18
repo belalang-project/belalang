@@ -5,6 +5,9 @@
 #define GET_TYPEDEF_CLASSES
 #include "belalang/BIR/IR/BIRTypes.cpp.inc"
 
+#define GET_ATTRDEF_CLASSES
+#include "belalang/BIR/IR/BIRAttrs.cpp.inc"
+
 #include "belalang/BIR/IR/BIRDialect.cpp.inc"
 
 namespace belalang {
@@ -19,6 +22,11 @@ void BIRDialect::initialize() {
   addOperations<
 #define GET_OP_LIST
 #include "belalang/BIR/IR/BIROps.cpp.inc"
+      >();
+
+  addAttributes<
+#define GET_ATTRDEF_LIST
+#include "belalang/BIR/IR/BIRAttrs.cpp.inc"
       >();
 }
 

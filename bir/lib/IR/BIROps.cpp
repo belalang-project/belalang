@@ -17,43 +17,19 @@ namespace bir {
 // ConstantOp
 // -----------------------------------------------------------------------------
 
-mlir::ParseResult ConstantOp::parse(mlir::OpAsmParser &parser,
-                                    mlir::OperationState &result) {
-  int64_t iVal;
-  if (auto res = parser.parseOptionalInteger(iVal); res.has_value()) {
-    if (mlir::failed(*res))
-      return mlir::failure();
-    result.addAttribute("value", parser.getBuilder().getI32IntegerAttr(iVal));
-  } else {
-    double fVal;
-    if (mlir::succeeded(parser.parseFloat(fVal))) {
-      result.addAttribute("value", parser.getBuilder().getF32FloatAttr(fVal));
-    } else {
-      mlir::Attribute valueAttr;
-      if (parser.parseAttribute(valueAttr, "value", result.attributes))
-        return mlir::failure();
-    }
+LogicalResult ConstantOp::verify() {
+  mlir::Type ty = getType();
+  mlir::Attribute attr = getValue();
+
+  if (isa<bir::IntType>(ty) && isa<bir::IntegerAttr>(attr)) {
+    return success();
   }
 
-  mlir::Type type;
-  if (parser.parseColonType(type))
-    return mlir::failure();
-
-  return parser.addTypeToList(type, result.types);
-}
-
-void ConstantOp::print(mlir::OpAsmPrinter &p) {
-  p << " ";
-  auto value = getValue();
-  if (auto intAttr = mlir::dyn_cast<mlir::IntegerAttr>(value)) {
-    p << intAttr.getInt();
-  } else if (auto floatAttr = mlir::dyn_cast<mlir::FloatAttr>(value)) {
-    p << floatAttr.getValueAsDouble();
-  } else {
-    p << value;
+  if (isa<bir::FloatType>(ty) && isa<bir::FloatAttr>(attr)) {
+    return success();
   }
-  p << " : " << getType();
-  p.printOptionalAttrDict((*this)->getAttrs(), {"value"});
+
+  return emitOpError() << "type and attribute mismatch.";
 }
 
 // -----------------------------------------------------------------------------

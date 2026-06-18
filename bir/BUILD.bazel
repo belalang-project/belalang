@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 td_library(
     name = "BelalangBIRTdFiles",
     srcs = [
+        "include/belalang/BIR/IR/BIRAttrs.td",
         "include/belalang/BIR/IR/BIRDialect.td",
         "include/belalang/BIR/IR/BIROps.td",
         "include/belalang/BIR/IR/BIRTypes.td",
@@ -52,6 +53,17 @@ gentbl_cc_library(
 )
 
 gentbl_cc_library(
+    name = "BelalangBIRAttrDefsGen",
+    tbl_outs = [
+        (["-gen-attrdef-decls"], "include/belalang/BIR/IR/BIRAttrs.h.inc"),
+        (["-gen-attrdef-defs"], "include/belalang/BIR/IR/BIRAttrs.cpp.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang/BIR/IR/BIRAttrs.td",
+    deps = [":BelalangBIRTdFiles"],
+)
+
+gentbl_cc_library(
     name = "BelalangBIROpGen",
     tbl_outs = [
         (["-gen-op-decls"], "include/belalang/BIR/IR/BIROps.h.inc"),
@@ -75,6 +87,7 @@ gentbl_cc_library(
 cc_library(
     name = "bir",
     srcs = [
+        "lib/IR/BIRAttrs.cpp",
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
         "lib/Transforms/Runtimize.cpp",
@@ -84,6 +97,7 @@ cc_library(
         ":bir-include",
         ":BelalangBIRDialectGen",
         ":BelalangBIRTypeGen",
+        ":BelalangBIRAttrDefsGen",
         ":BelalangBIROpGen",
         ":BelalangPassIncGen",
         "//brt:brt-include",
