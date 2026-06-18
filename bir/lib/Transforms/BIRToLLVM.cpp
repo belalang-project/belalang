@@ -3,6 +3,7 @@
 #include "belalang/BRT/BRT.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Transforms/DialectConversion.h"
+#include "mlir/Dialect/LLVMIR/LLVMTypes.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGBIRTOLLVMPASS
@@ -29,6 +30,25 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       value = rewriter.getIntegerAttr(type, intAttr.getValue());
     } else if (auto floatAttr = llvm::dyn_cast<bir::FloatAttr>(value)) {
       value = rewriter.getFloatAttr(type, floatAttr.getValue());
+    } else if (auto strAttr = llvm::dyn_cast<bir::StringAttr>(value)) {
+      auto module = op->getParentOfType<mlir::ModuleOp>();
+      auto ctx = op->getContext();
+      StringRef str = strAttr.getValue();
+
+      std::string globalName = ".str." + std::to_string(llvm::hash_value(str));
+
+      LLVM::GlobalOp global;
+      {
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointToStart(module.getBody());
+
+        global = module.lookupSymbol<LLVM::GlobalOp>(globalName);
+        if (!global) {
+          LLVM::GlobalOp::create(rewriter, op.getLoc(), type, true, LLVM::Linkage::Private, globalName, strAttr);
+        }
+      }
+
+      return success();
     } else {
       return failure();
     }
@@ -299,6 +319,12 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     });
     addConversion([](bir::FloatType ty) {
       return mlir::Float64Type::get(ty.getContext());
+    });
+    addConversion([](bir::StringType ty) {
+      mlir::MLIRContext *ctx = ty.getContext();
+      mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
+      mlir::Type iType = mlir::IntegerType::get(ctx, 64);
+      return LLVM::LLVMStructType::getLiteral(ctx, {ptrType, iType});
     });
     addConversion([](bir::RefType ty) {
       return LLVM::LLVMPointerType::get(ty.getContext());
