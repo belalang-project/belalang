@@ -2,13 +2,13 @@
 
 // CHECK:      module {
 // CHECK-NEXT:   bir.func @main() {
-// CHECK-NEXT:     %0 = bir.constant 1 : !bir.int
+// CHECK-NEXT:     %0 = bir.constant #bir.int<1> : !bir.int
 // CHECK-NEXT:     bir.return
 // CHECK-NEXT:   }
 // CHECK-NEXT: }
 
 bir.func @main() {
-  %0 = bir.constant 1 : !bir.int
+  %0 = bir.constant #bir.int<1> : !bir.int
   bir.return
 }
 
@@ -57,14 +57,14 @@ bir.func @f(%arg0 : !bir.int) -> !bir.int
 bir.func @g(%arg0 : !bir.int)
 
 // CHECK:      bir.func @main() -> !bir.int {
-// CHECK-NEXT:   %[[C0:.*]] = bir.constant 1 : !bir.int
+// CHECK-NEXT:   %[[C0:.*]] = bir.constant #bir.int<1> : !bir.int
 // CHECK-NEXT:   %[[C1:.*]] = bir.call @f(%[[C0]]) : (!bir.int) -> !bir.int
 // CHECK-NEXT:   bir.call @f(%[[C0]]) : (!bir.int) -> ()
 // CHECK-NEXT:   bir.return %[[C1]] : !bir.int
 // CHECK-NEXT: }
 
 bir.func @main() -> !bir.int {
-  %0 = bir.constant 1 : !bir.int
+  %0 = bir.constant #bir.int<1> : !bir.int
   %1 = bir.call @f(%0) : (!bir.int) -> !bir.int
   bir.call @f(%0) : (!bir.int) -> ()
   bir.return %1 : !bir.int

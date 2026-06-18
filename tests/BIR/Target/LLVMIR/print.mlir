@@ -10,7 +10,7 @@
 // CHECK-NEXT: }
 
 bir.func @print_belalang() {
-  %0 = bir.constant 3.0 : !bir.float
+  %0 = bir.constant #bir.float<3.0> : !bir.float
   bir.print %0 : !bir.float
   bir.return
 }

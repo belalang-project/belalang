@@ -5,10 +5,10 @@
 
 bir.func @basic() -> !bir.int {
   // CHECK-NEXT: %0 = llvm.mlir.constant(4 : i32) : i32
-  %0 = bir.constant 4 : !bir.int
+  %0 = bir.constant #bir.int<4> : !bir.int
 
   // CHECK-NEXT: %1 = llvm.mlir.constant(2 : i32) : i32
-  %1 = bir.constant 2 : !bir.int
+  %1 = bir.constant #bir.int<2> : !bir.int
 
   // CHECK-NEXT: %2 = llvm.add %0, %1 : i32
   %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int

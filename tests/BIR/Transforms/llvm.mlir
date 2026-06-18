@@ -10,7 +10,7 @@
 // CHECK-NEXT: }
 
 bir.func @main() {
-  %0 = bir.constant 0 : !bir.int
+  %0 = bir.constant #bir.int<0> : !bir.int
   bir.return
 }
 
@@ -26,7 +26,7 @@ bir.func @main() {
 // CHECK-NEXT: }
 
 bir.func @main() {
-  %0 = bir.constant 0.00 : !bir.float
+  %0 = bir.constant #bir.float<0.00> : !bir.float
   bir.return
 }
 
@@ -42,7 +42,7 @@ bir.func @main() {
 // CHECK-NEXT: }
 
 bir.func @main() {
-  %0 = bir.constant 1.23 : !bir.float
+  %0 = bir.constant #bir.float<1.23> : !bir.float
   bir.return
 }
 
@@ -63,7 +63,7 @@ bir.func @f(%arg0 : !bir.int) -> !bir.int
 bir.func @g(%arg0 : !bir.int)
 
 bir.func @main() -> !bir.int {
-  %0 = bir.constant 1 : !bir.int
+  %0 = bir.constant #bir.int<1> : !bir.int
   %1 = bir.call @f(%0) : (!bir.int) -> !bir.int
   bir.call @f(%0) : (!bir.int) -> !bir.int
   bir.return %1 : !bir.int
@@ -85,7 +85,7 @@ bir.func @main() -> !bir.int {
 
 bir.func @main() -> !bir.int {
   %0 = bir.var.declare "x" : !bir.ref<!bir.int>
-  %1 = bir.constant 12 : !bir.int
+  %1 = bir.constant #bir.int<12> : !bir.int
   bir.var.store %1 to %0 : !bir.int to !bir.ref<!bir.int>
   %2 = bir.var.load %0 : (!bir.ref<!bir.int>) -> !bir.int
   bir.return %2 : !bir.int

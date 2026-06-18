@@ -7,6 +7,6 @@
 // CHECK-NEXT: }
 
 bir.func @basic() -> !bir.int {
-  %0 = bir.constant 42 : !bir.int
+  %0 = bir.constant #bir.int<42> : !bir.int
   bir.return %0 : !bir.int
 }
