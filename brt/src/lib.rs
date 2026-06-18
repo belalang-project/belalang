@@ -1,10 +1,10 @@
 #[unsafe(no_mangle)]
-pub extern "C" fn brt_print_int(v: i32) {
+pub extern "C" fn brt_print_int(v: i64) {
     println!("{}", v)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn brt_print_float(v: f32) {
+pub extern "C" fn brt_print_float(v: f64) {
     println!("{}", v)
 }
 
