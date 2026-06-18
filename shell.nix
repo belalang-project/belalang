@@ -7,6 +7,7 @@
    pkgs.zlib
    pkgs.python313
    pkgs.clang-tools
+   pkgs.just
  ];
  profile = ''
    export BRT_DIR="${toString ./.}/bazel-bin/brt"
