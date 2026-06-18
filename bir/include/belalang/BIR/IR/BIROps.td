@@ -14,7 +14,9 @@ class BIR_Op<string mnemonic, list<Trait> traits = []>
 
 def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType]>;
 
-def BIR_ConstantOp : BIR_Op<"constant"> {
+def BIR_ConstantOp : BIR_Op<"constant", [
+  AllTypesMatch<["value", "result"]>,
+]> {
   let summary = "constant";
 
   let description = [{
@@ -26,7 +28,7 @@ def BIR_ConstantOp : BIR_Op<"constant"> {
   let arguments = (ins TypedAttrInterface:$value);
   let results = (outs BIR_AnyType:$result);
 
-  let hasCustomAssemblyFormat = 1;
+  let assemblyFormat = "$value attr-dict";
 }
 
 def BIR_AddOp : BIR_Op<"add"> {
