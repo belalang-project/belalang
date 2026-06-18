@@ -8,6 +8,7 @@ def BIR_Dialect : Dialect {
   let cppNamespace = "::belalang::bir";
 
   let useDefaultTypePrinterParser = 1;
+  let useDefaultAttributePrinterParser = 1;
 }
 
 #endif // BELALANG_IR_DIALECT_TD_
