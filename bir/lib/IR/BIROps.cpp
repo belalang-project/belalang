@@ -17,6 +17,21 @@ namespace bir {
 // ConstantOp
 // -----------------------------------------------------------------------------
 
+LogicalResult ConstantOp::verify() {
+  mlir::Type ty = getType();
+  mlir::Attribute attr = getValue();
+
+  if (isa<bir::IntType>(ty) && isa<bir::IntegerAttr>(attr)) {
+    return success();
+  }
+
+  if (isa<bir::FloatType>(ty) && isa<bir::FloatAttr>(attr)) {
+    return success();
+  }
+
+  return emitOpError() << "type and attribute mismatch.";
+}
+
 // -----------------------------------------------------------------------------
 // FuncOp
 // -----------------------------------------------------------------------------

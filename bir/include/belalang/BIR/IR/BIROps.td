@@ -29,6 +29,8 @@ def BIR_ConstantOp : BIR_Op<"constant", [
   let results = (outs BIR_AnyType:$result);
 
   let assemblyFormat = "$value attr-dict";
+
+  let hasVerifier = 1;
 }
 
 def BIR_AddOp : BIR_Op<"add"> {
