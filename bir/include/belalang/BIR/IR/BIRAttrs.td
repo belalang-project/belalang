@@ -33,4 +33,15 @@ def BIR_FloatAttr : BIR_Attr<"Float", "float", [TypedAttrInterface]> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_StringAttr : BIR_Attr<"String", "string", [TypedAttrInterface]> {
+  let summary = "An attribute containing a string value";
+
+  let parameters = (ins
+    AttributeSelfTypeParameter<"">:$type,
+    StringRefParameter<"">:$value
+  );
+
+  let hasCustomAssemblyFormat = 1;
+}
+
 #endif // BELALANG_BIR_IR_BIRATTRS_TD_

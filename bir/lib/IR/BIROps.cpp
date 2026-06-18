@@ -29,6 +29,10 @@ LogicalResult ConstantOp::verify() {
     return success();
   }
 
+  if (isa<bir::StringType>(ty) && isa<bir::StringAttr>(attr)) {
+    return success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 

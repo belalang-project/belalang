@@ -47,5 +47,26 @@ void FloatAttr::print(mlir::AsmPrinter &p) const {
   p << ">";
 }
 
+mlir::Attribute StringAttr::parse(mlir::AsmParser &p, mlir::Type attrType) {
+  if (p.parseLess())
+    return {};
+
+  std::string sVal;
+  if (p.parseString(&sVal))
+    return {};
+  llvm::StringRef value(sVal);
+
+  if (p.parseGreater())
+    return {};
+
+  return StringAttr::get(p.getContext(), attrType, value);
+}
+
+void StringAttr::print(mlir::AsmPrinter &p) const {
+  p << "<";
+  p.printString(getValue());
+  p << ">";
+}
+
 } // namespace bir
 } // namespace belalang

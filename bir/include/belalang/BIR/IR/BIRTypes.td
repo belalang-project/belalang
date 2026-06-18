@@ -17,6 +17,10 @@ def BIR_FloatType : BIR_Type<"Float", "float"> {
   let summary = "Floating-point number type";
 }
 
+def BIR_StringType : BIR_Type<"String", "string"> {
+  let summary = "String type";
+}
+
 def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let summary = "Reference type";
 
