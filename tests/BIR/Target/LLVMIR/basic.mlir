@@ -2,8 +2,8 @@
 // RUN: | %bir-translate --mlir-to-llvmir \
 // RUN: | %FileCheck %s
 
-// CHECK:      define i32 @basic() {
-// CHECK-NEXT:   ret i32 42
+// CHECK:      define i64 @basic() {
+// CHECK-NEXT:   ret i64 42
 // CHECK-NEXT: }
 
 bir.func @basic() -> !bir.int {

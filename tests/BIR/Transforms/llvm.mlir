@@ -4,7 +4,7 @@
 // CHECK-NEXT:   llvm.func @brt_mmtk_init()
 // CHECK-NEXT:   llvm.func @main() {
 // CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
-// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0 : i32) : i32
+// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0 : i64) : i64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
 // CHECK-NEXT: }
@@ -20,7 +20,7 @@ bir.func @main() {
 // CHECK-NEXT:   llvm.func @brt_mmtk_init()
 // CHECK-NEXT:   llvm.func @main() {
 // CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
-// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f32) : f32
+// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
 // CHECK-NEXT: }
@@ -36,7 +36,7 @@ bir.func @main() {
 // CHECK-NEXT:   llvm.func @brt_mmtk_init()
 // CHECK-NEXT:   llvm.func @main() {
 // CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
-// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(1.230000e+00 : f32) : f32
+// CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(1.230000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
 // CHECK-NEXT: }
@@ -49,15 +49,15 @@ bir.func @main() {
 // -----
 
 // CHECK: llvm.func @brt_mmtk_init()
-// CHECK: llvm.func @f(i32) -> i32
-// CHECK: llvm.func @g(i32)
+// CHECK: llvm.func @f(i64) -> i64
+// CHECK: llvm.func @g(i64)
 
-// CHECK-LABEL: llvm.func @main() -> i32
+// CHECK-LABEL: llvm.func @main() -> i64
 // CHECK: llvm.call @brt_mmtk_init() : () -> ()
-// CHECK: %[[C1:.*]] = llvm.mlir.constant(1 : i32) : i32
-// CHECK: %[[CALL:.*]] = llvm.call @f(%[[C1]]) : (i32) -> i32
-// CHECK: llvm.call @f(%[[C1]]) : (i32) -> i32
-// CHECK: llvm.return %[[CALL]] : i32
+// CHECK: %[[C1:.*]] = llvm.mlir.constant(1 : i64) : i64
+// CHECK: %[[CALL:.*]] = llvm.call @f(%[[C1]]) : (i64) -> i64
+// CHECK: llvm.call @f(%[[C1]]) : (i64) -> i64
+// CHECK: llvm.return %[[CALL]] : i64
 
 bir.func @f(%arg0 : !bir.int) -> !bir.int
 bir.func @g(%arg0 : !bir.int)
@@ -74,14 +74,14 @@ bir.func @main() -> !bir.int {
 // CHECK: llvm.func @brt_mmtk_init()
 // CHECK: llvm.func @brt_mmtk_alloc(i64) -> !llvm.ptr
 
-// CHECK-LABEL: llvm.func @main() -> i32
+// CHECK-LABEL: llvm.func @main() -> i64
 // CHECK: llvm.call @brt_mmtk_init() : () -> ()
-// CHECK: %[[SIZE:.*]] = llvm.mlir.constant(4 : i64) : i64
+// CHECK: %[[SIZE:.*]] = llvm.mlir.constant(8 : i64) : i64
 // CHECK: %[[PTR:.*]] = llvm.call @brt_mmtk_alloc(%[[SIZE]]) : (i64) -> !llvm.ptr
-// CHECK: %[[VAL:.*]] = llvm.mlir.constant(12 : i32) : i32
-// CHECK: llvm.store %[[VAL]], %[[PTR]] : i32, !llvm.ptr
-// CHECK: %[[LOAD:.*]] = llvm.load %[[PTR]] : !llvm.ptr -> i32
-// CHECK: llvm.return %[[LOAD]] : i32
+// CHECK: %[[VAL:.*]] = llvm.mlir.constant(12 : i64) : i64
+// CHECK: llvm.store %[[VAL]], %[[PTR]] : i64, !llvm.ptr
+// CHECK: %[[LOAD:.*]] = llvm.load %[[PTR]] : !llvm.ptr -> i64
+// CHECK: llvm.return %[[LOAD]] : i64
 
 bir.func @main() -> !bir.int {
   %0 = bir.var.declare "x" : !bir.ref<!bir.int>

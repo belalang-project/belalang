@@ -25,9 +25,9 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       return failure();
 
     Attribute value = op.getValue();
-    if (auto intAttr = llvm::dyn_cast<IntegerAttr>(value)) {
+    if (auto intAttr = llvm::dyn_cast<bir::IntegerAttr>(value)) {
       value = rewriter.getIntegerAttr(type, intAttr.getValue());
-    } else if (auto floatAttr = llvm::dyn_cast<FloatAttr>(value)) {
+    } else if (auto floatAttr = llvm::dyn_cast<bir::FloatAttr>(value)) {
       value = rewriter.getFloatAttr(type, floatAttr.getValue());
     } else {
       return failure();
@@ -233,9 +233,9 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclare> 
 
     int64_t elSize;
     if (mlir::isa<bir::IntType>(elType))
-      elSize = 4;
+      elSize = 8;
     else if (mlir::isa<bir::FloatType>(elType))
-      elSize = 4;
+      elSize = 8;
     else
       return failure();
 
@@ -295,10 +295,10 @@ struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoad> {
 struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
   BIRToLLVMTypeConverter() {
     addConversion([](bir::IntType ty) {
-      return mlir::IntegerType::get(ty.getContext(), 32);
+      return mlir::IntegerType::get(ty.getContext(), 64);
     });
     addConversion([](bir::FloatType ty) {
-      return mlir::Float32Type::get(ty.getContext());
+      return mlir::Float64Type::get(ty.getContext());
     });
     addConversion([](bir::RefType ty) {
       return LLVM::LLVMPointerType::get(ty.getContext());

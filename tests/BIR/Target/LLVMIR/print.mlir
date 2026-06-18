@@ -2,10 +2,10 @@
 // RUN: | %bir-translate --mlir-to-llvmir \
 // RUN: | %FileCheck %s
 
-// CHECK: declare void @brt_print_float(float)
+// CHECK: declare void @brt_print_float(double)
 
 //      CHECK: define void @print_belalang() {
-// CHECK-NEXT:   call void @brt_print_float(float 3.000000e+00)
+// CHECK-NEXT:   call void @brt_print_float(double 3.000000e+00)
 // CHECK-NEXT:   ret void
 // CHECK-NEXT: }
 
