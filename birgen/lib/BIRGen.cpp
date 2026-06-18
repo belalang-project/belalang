@@ -55,6 +55,14 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
+std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::String val) {
+  auto type = builder.getType<bir::StringType>();
+  llvm::StringRef value(val.data());
+  auto attr = bir::StringAttr::get(&context, type, value);
+  auto op = bir::ConstantOp::create(builder, loc, type, attr);
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
 std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
                                             const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
@@ -197,7 +205,7 @@ rust::String LLVMGen::compile_object_file(rust::String out) const {
   auto cpu = "generic";
   auto features = "";
   TargetOptions opt;
-  auto rm = std::optional<Reloc::Model>();
+  auto rm = llvm::Reloc::PIC_;
 
   auto tm = target->createTargetMachine(triple, cpu, features, opt, rm);
   module->setDataLayout(tm->createDataLayout());
