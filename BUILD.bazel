@@ -2,3 +2,8 @@ exports_files(
     srcs = [".rustfmt.toml"],
     visibility = ["@rules_rust//:__pkg__"],
 )
+
+exports_files(
+    srcs = ["LICENSE-MIT", "LICENSE-APACHE"],
+    visibility = ["//pkg:__pkg__"],
+)

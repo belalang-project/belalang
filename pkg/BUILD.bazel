@@ -1,0 +1,45 @@
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", "pkg_attributes")
+load(":utils.bzl", "get_full_name")
+
+package(default_visibility = ["//visibility:public"])
+
+pkg_files(
+    name = "belalang_binary",
+    srcs = ["//cli:belalang"],
+    prefix = "bin",
+    attributes = pkg_attributes(
+        mode = "0755",
+    ),
+)
+
+pkg_files(
+    name = "brt_library",
+    srcs = ["//brt:brt"],
+    prefix = "lib",
+)
+
+pkg_files(
+    name = "doc_files",
+    srcs = [
+        "//:LICENSE-APACHE",
+        "//:LICENSE-MIT",
+    ],
+)
+
+pkg_filegroup(
+    name = "belalang_dist",
+    srcs = [
+        ":belalang_binary",
+        ":brt_library",
+        ":doc_files",
+    ],
+)
+
+pkg_tar(
+    name = "belalang_tar_gz",
+    srcs = [":belalang_dist"],
+    extension = "tar.gz",
+    out = get_full_name() + ".tar.gz",
+    package_dir = get_full_name(),
+)
