@@ -55,6 +55,7 @@ public:
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
   void build_empty_return();
+  void build_main_return();
 
   void dump() const;
   rust::String dump_to_string() const;
