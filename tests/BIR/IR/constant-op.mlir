@@ -16,6 +16,14 @@ bir.func @floatfloat() {
 
 // -----
 
+bir.func @stringstring() {
+  // CHECK: %[[C0:.*]] = bir.constant #bir.string<"hello"> : !bir.string
+  %0 = bir.constant #bir.string<"hello"> : !bir.string
+  bir.return
+}
+
+// -----
+
 bir.func @intfloat() {
   // expected-error@+1 {{type and attribute mismatch}}
   %0 = bir.constant #bir.int<4> : !bir.float
@@ -27,5 +35,13 @@ bir.func @intfloat() {
 bir.func @floatint() {
   // expected-error@+1 {{type and attribute mismatch}}
   %0 = bir.constant #bir.float<4.00> : !bir.int
+  bir.return
+}
+
+// -----
+
+bir.func @stringint() {
+  // expected-error@+1 {{type and attribute mismatch}}
+  %0 = bir.constant #bir.string<"hello"> : !bir.int
   bir.return
 }

@@ -3,6 +3,7 @@
 #include "belalang/BRT/BRT.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Transforms/DialectConversion.h"
+#include "mlir/Dialect/LLVMIR/LLVMTypes.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGBIRTOLLVMPASS
@@ -29,6 +30,36 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       value = rewriter.getIntegerAttr(type, intAttr.getValue());
     } else if (auto floatAttr = llvm::dyn_cast<bir::FloatAttr>(value)) {
       value = rewriter.getFloatAttr(type, floatAttr.getValue());
+    } else if (auto strAttr = llvm::dyn_cast<bir::StringAttr>(value)) {
+      auto module = op->getParentOfType<mlir::ModuleOp>();
+      auto ctx = op->getContext();
+      StringRef str = strAttr.getValue();
+
+      std::string globalName = "str." + std::to_string(llvm::hash_value(str));
+
+      LLVM::GlobalOp global;
+      {
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointToStart(module.getBody());
+        auto arrTy = LLVM::LLVMArrayType::get(IntegerType::get(ctx, 8), str.size());
+
+        global = module.lookupSymbol<LLVM::GlobalOp>(globalName);
+        if (!global) {
+          auto attr = mlir::StringAttr::get(ctx, str);
+          global = LLVM::GlobalOp::create(rewriter, op.getLoc(), arrTy, true, LLVM::Linkage::Private, globalName, attr);
+        }
+      }
+
+      auto addrOfOp = LLVM::AddressOfOp::create(rewriter, op.getLoc(), global);
+
+      auto lenTy = IntegerType::get(ctx, 64);
+      auto len = LLVM::ConstantOp::create(rewriter, op.getLoc(), lenTy, str.size());
+
+      auto container = LLVM::UndefOp::create(rewriter, op.getLoc(), type);
+      auto c1 = LLVM::InsertValueOp::create(rewriter, op.getLoc(), container.getType(), container, addrOfOp, rewriter.getDenseI64ArrayAttr({0}));
+      rewriter.replaceOpWithNewOp<LLVM::InsertValueOp>(op, c1.getType(), c1, len, rewriter.getDenseI64ArrayAttr({1}));
+
+      return success();
     } else {
       return failure();
     }
@@ -236,6 +267,8 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclare> 
       elSize = 8;
     else if (mlir::isa<bir::FloatType>(elType))
       elSize = 8;
+    else if (mlir::isa<bir::StringType>(elType))
+      elSize = 16;
     else
       return failure();
 
@@ -271,6 +304,13 @@ struct VarStoreOpLowering final : public OpConversionPattern<bir::VarStoreOp> {
   LogicalResult
   matchAndRewrite(bir::VarStoreOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
+    if (auto str = llvm::dyn_cast<bir::StringType>(adaptor.getSrc().getType())) {
+      auto type = getTypeConverter()->convertType(adaptor.getSrc().getType());
+      LLVM::UndefOp::create(rewriter, op.getLoc(), type);
+      rewriter.eraseOp(op);
+      return success();
+    }
+
     rewriter.replaceOpWithNewOp<LLVM::StoreOp>(op, adaptor.getSrc(),
                                                adaptor.getDest());
     return success();
@@ -287,6 +327,8 @@ struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoad> {
     if (!type)
       return failure();
 
+    // TODO: this should return the GC-allocated pointer instead of loading
+    // a new one
     rewriter.replaceOpWithNewOp<LLVM::LoadOp>(op, type, adaptor.getRef());
     return success();
   };
@@ -299,6 +341,12 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     });
     addConversion([](bir::FloatType ty) {
       return mlir::Float64Type::get(ty.getContext());
+    });
+    addConversion([](bir::StringType ty) {
+      mlir::MLIRContext *ctx = ty.getContext();
+      mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
+      mlir::Type iType = mlir::IntegerType::get(ctx, 64);
+      return LLVM::LLVMStructType::getLiteral(ctx, {ptrType, iType});
     });
     addConversion([](bir::RefType ty) {
       return LLVM::LLVMPointerType::get(ty.getContext());

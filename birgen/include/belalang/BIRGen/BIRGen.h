@@ -43,6 +43,7 @@ public:
 
   std::unique_ptr<BIRValue> build_constant_int(int64_t val);
   std::unique_ptr<BIRValue> build_constant_float(double val);
+  std::unique_ptr<BIRValue> build_constant_string(rust::String val);
   std::unique_ptr<BIRValue> build_add(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_sub(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_mul(const BIRValue &lhs, const BIRValue &rhs);

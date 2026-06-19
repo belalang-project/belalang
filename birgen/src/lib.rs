@@ -25,6 +25,7 @@ mod ffi {
 
         fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
         fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
+        fn build_constant_string(self: Pin<&mut BIRGen>, val: String) -> UniquePtr<BIRValue>;
         fn build_add(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_sub(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mul(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
@@ -119,7 +120,7 @@ impl<'sess> BIRGen<'sess> {
                         self.symbol_table.insert(var.name.value.clone(), declare);
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
-                    Expression::Identifier(_) | Expression::Infix(_) => {
+                    Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
                         let v = self.generate_expression(&var.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
                         self.inner.pin_mut().build_var_store(&v, &declare);
@@ -137,6 +138,7 @@ impl<'sess> BIRGen<'sess> {
                     cxx::UniquePtr::null() // FIXME: don't return nullptr
                 }
             },
+            Expression::String(s) => self.inner.pin_mut().build_constant_string(s.value.clone()),
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
     }
