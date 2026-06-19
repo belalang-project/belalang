@@ -107,7 +107,7 @@ std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
 std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v, rust::String name) {
   auto nakedType = v.getValue().getType();
   auto refType = bir::RefType::get(&context, nakedType);
-  auto op = bir::VarDeclare::create(builder, loc, refType, name.c_str());
+  auto op = bir::VarDeclareOp::create(builder, loc, refType, name.c_str());
   return std::make_unique<BIRValue>(op.getResult());
 }
 
@@ -126,7 +126,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
 
   auto resultType = refType.getEl();
 
-  auto op = bir::VarLoad::create(builder, loc, resultType, refValue.getValue());
+  auto op = bir::VarLoadOp::create(builder, loc, resultType, refValue.getValue());
   return std::make_unique<BIRValue>(op.getResult());
 }
 

@@ -251,11 +251,11 @@ struct ModOpLowering final : public OpConversionPattern<bir::ModOp> {
   }
 };
 
-struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclare> {
-  using OpConversionPattern<bir::VarDeclare>::OpConversionPattern;
+struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp> {
+  using OpConversionPattern<bir::VarDeclareOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::VarDeclare op, OpAdaptor adaptor,
+  matchAndRewrite(bir::VarDeclareOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     auto refType = mlir::cast<bir::RefType>(op.getType());
     auto elType = refType.getEl();
@@ -317,11 +317,11 @@ struct VarStoreOpLowering final : public OpConversionPattern<bir::VarStoreOp> {
   };
 };
 
-struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoad> {
-  using OpConversionPattern<bir::VarLoad>::OpConversionPattern;
+struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoadOp> {
+  using OpConversionPattern<bir::VarLoadOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::VarLoad op, OpAdaptor adaptor,
+  matchAndRewrite(bir::VarLoadOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     auto type = getTypeConverter()->convertType(op.getType());
     if (!type)

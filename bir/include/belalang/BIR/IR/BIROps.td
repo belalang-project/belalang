@@ -138,7 +138,7 @@ def BIR_PrintOp : BIR_Op<"print"> {
   let assemblyFormat = "attr-dict $value `:` type($value)";
 }
 
-def FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
+def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
                              IsolatedFromAbove]> {
   let summary = "func";
 
@@ -190,7 +190,7 @@ def CallOp
   let hasCustomAssemblyFormat = 1;
 }
 
-def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
+def BIR_ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
   let summary = "return";
 
   let arguments = (ins Variadic<BIR_AnyType>:$input);
@@ -198,7 +198,7 @@ def ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
   let assemblyFormat = "($input^ `:` type($input))? attr-dict";
 }
 
-def BIR_VarDeclare : BIR_Op<"var.declare"> {
+def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
   let summary = "var.declare";
 
   let arguments = (ins StrAttr:$name);
@@ -215,7 +215,7 @@ def BIR_VarStoreOp : BIR_Op<"var.store"> {
   let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` type($dest)";
 }
 
-def BIR_VarLoad : BIR_Op<"var.load"> {
+def BIR_VarLoadOp : BIR_Op<"var.load"> {
   let summary = "var.load";
 
   let arguments = (ins BIR_RefType:$ref);
