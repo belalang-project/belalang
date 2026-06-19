@@ -3,10 +3,11 @@
 # CHECK: module {
 
 # CHECK-NEXT: bir.func private @brt_print_int(!bir.int)
-# CHECK-NEXT: bir.func @main() {
+# CHECK-NEXT: bir.func @main() -> !bir.int {
 # CHECK-NEXT:   %[[C0:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT:   bir.call @brt_print_int(%[[C0]]) : (!bir.int) -> ()
-# CHECK-NEXT:   bir.return
+# CHECK-NEXT:   %[[C1:.*]] = bir.constant #bir.int<0> : !bir.int
+# CHECK-NEXT:   bir.return %[[C1]] : !bir.int
 # CHECK-NEXT: }
 print(1);
 

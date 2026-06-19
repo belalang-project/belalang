@@ -33,8 +33,9 @@ BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   module = mlir::ModuleOp::create(loc);
   builder.setInsertionPointToStart(module.getBody());
 
+  auto retTy = bir::IntType::get(&context);
   auto main = bir::FuncOp::create(builder, loc, "main",
-                                  mlir::FunctionType::get(&context, {}, {}));
+                                  mlir::FunctionType::get(&context, {}, {retTy}));
   mlir::Block *entry = main.addEntryBlock();
   builder.setInsertionPointToStart(entry);
 }
@@ -139,6 +140,14 @@ void BIRGen::build_return(const BIRValue &val) {
 
 void BIRGen::build_empty_return() {
   bir::ReturnOp::create(builder, loc, {});
+}
+
+void BIRGen::build_main_return() {
+  auto typ = bir::IntType::get(&context);
+  auto val = llvm::APInt(64, 0); // return 0
+  auto atr = bir::IntegerAttr::get(&context, typ, val);
+  auto ret = bir::ConstantOp::create(builder, loc, typ, atr);
+  bir::ReturnOp::create(builder, loc, {ret});
 }
 
 void BIRGen::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }

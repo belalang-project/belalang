@@ -36,6 +36,7 @@ mod ffi {
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
+        fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn lower_to_llvm_dialect(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
@@ -67,7 +68,7 @@ impl<'sess> BIRGen<'sess> {
         for stmt in &program.statements {
             self.generate_statement(stmt);
         }
-        self.inner.pin_mut().build_empty_return();
+        self.inner.pin_mut().build_main_return();
     }
 
     pub fn generate_statement(&mut self, stmt: &Statement) {
