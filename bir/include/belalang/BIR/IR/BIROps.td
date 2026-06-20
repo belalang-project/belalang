@@ -187,7 +187,7 @@ def BIR_FuncExprOp : BIR_Op<"func_expr", [
   let hasVerifier = 1;
 }
 
-def CallOp
+def BIR_CallOp
     : BIR_Op<"call", [DeclareOpInterfaceMethods<CallOpInterface>,
                       DeclareOpInterfaceMethods<SymbolUserOpInterface>]> {
   let summary = "call";
@@ -206,6 +206,51 @@ def CallOp
 
   let skipDefaultBuilders = 1;
   let hasCustomAssemblyFormat = 1;
+}
+
+def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
+  CallOpInterface,
+  TypesMatchWith<
+    "callee input types match argument types",
+    "callee", "callee_operands",
+    "::llvm::cast<FunctionType>($_self).getInputs()"
+  >,
+  TypesMatchWith<
+    "callee result types match result types",
+    "callee", "results",
+    "::llvm::cast<FunctionType>($_self).getResults()"
+  >
+]> {
+  let summary = "call_indirect";
+
+  let arguments = (ins
+    FunctionType:$callee,
+    Variadic<AnyType>:$callee_operands,
+    OptionalAttr<DictArrayAttr>:$arg_attrs,
+    OptionalAttr<DictArrayAttr>:$res_attrs
+  );
+
+  let results = (outs Variadic<AnyType>:$results);
+
+  let assemblyFormat = "$callee `(` $callee_operands `)` attr-dict `:` type($callee)";
+
+  let extraClassDeclaration = [{
+    operand_range getArgOperands() {
+      return {operand_begin(), operand_end()};
+    }
+
+    MutableOperandRange getArgOperandsMutable() {
+      return getCalleeOperandsMutable();
+    }
+
+    CallInterfaceCallable getCallableForCallee() {
+      return getCallee();
+    }
+
+    void setCalleeFromCallable(CallInterfaceCallable callee) {
+      setOperand(0, cast<mlir::Value>(callee));
+    }
+  }];
 }
 
 def BIR_ReturnOp : BIR_Op<"return", [
