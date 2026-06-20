@@ -169,6 +169,24 @@ def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_FuncExprOp : BIR_Op<"func_expr", [
+  // TODO: support closure variable captures
+  IsolatedFromAbove,
+  SingleBlock,
+  SingleBlockImplicitTerminator<"bir::ReturnOp">,
+]> {
+  let summary = "func_expr";
+
+  let arguments = (ins);
+
+  let regions = (region AnyRegion:$body);
+
+  let results = (outs FunctionType:$result);
+
+  let assemblyFormat = "attr-dict `:` type($result) $body";
+  let hasVerifier = 1;
+}
+
 def CallOp
     : BIR_Op<"call", [DeclareOpInterfaceMethods<CallOpInterface>,
                       DeclareOpInterfaceMethods<SymbolUserOpInterface>]> {
@@ -190,10 +208,17 @@ def CallOp
   let hasCustomAssemblyFormat = 1;
 }
 
-def BIR_ReturnOp : BIR_Op<"return", [ParentOneOf<["FuncOp"]>, Terminator]> {
+def BIR_ReturnOp : BIR_Op<"return", [
+  ParentOneOf<["FuncOp", "FuncExprOp"]>,
+  Terminator,
+]> {
   let summary = "return";
 
   let arguments = (ins Variadic<BIR_AnyType>:$input);
+
+  let builders = [
+    OpBuilder<(ins), [{ }]>,
+  ];
 
   let assemblyFormat = "($input^ `:` type($input))? attr-dict";
 }

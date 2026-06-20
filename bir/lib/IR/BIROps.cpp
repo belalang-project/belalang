@@ -76,6 +76,27 @@ mlir::Type FuncOp::getResType() {
 }
 
 // -----------------------------------------------------------------------------
+// FuncExprOp
+// -----------------------------------------------------------------------------
+
+LogicalResult FuncExprOp::verify() {
+  auto &body = getBody().front();
+  auto term = body.getTerminator();
+
+  auto returnOp = dyn_cast_or_null<bir::ReturnOp>(term);
+  if (!returnOp)
+    return emitOpError() << "body must be terminated by a 'bir.return' op";
+
+  auto funcTypes = getResult().getType().getResults();
+  auto returnTypes = returnOp.getOperandTypes();
+  if (!llvm::equal(funcTypes, returnTypes)) {
+    return emitOpError() << "returned types do not match function signature types";
+  }
+
+  return success();
+}
+
+// -----------------------------------------------------------------------------
 // CallOp
 // -----------------------------------------------------------------------------
 
