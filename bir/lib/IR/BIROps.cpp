@@ -33,6 +33,10 @@ LogicalResult ConstantOp::verify() {
     return success();
   }
 
+  if (isa<FunctionType>(ty) && isa<bir::FnAttr>(attr)) {
+    return success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 

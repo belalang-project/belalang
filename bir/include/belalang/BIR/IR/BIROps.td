@@ -12,7 +12,7 @@ include "mlir/Interfaces/CallInterfaces.td"
 class BIR_Op<string mnemonic, list<Trait> traits = []>
     : Op<BIR_Dialect, mnemonic, traits>;
 
-def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType]>;
+def BIR_AnyType : AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType, FunctionType]>;
 
 def BIR_ConstantOp : BIR_Op<"constant", [
   AllTypesMatch<["value", "result"]>,
