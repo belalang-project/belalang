@@ -91,6 +91,7 @@ cc_library(
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
         "lib/Transforms/Runtimize.cpp",
+        "lib/Transforms/LowerFuncExpr.cpp",
         "lib/Transforms/BIRToLLVM.cpp",
     ],
     deps = [
