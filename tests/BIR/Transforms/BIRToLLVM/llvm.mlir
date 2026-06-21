@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-bir-to-llvm %s | %FileCheck %s
 
 // CHECK:      module {
 // CHECK-NEXT:   llvm.func @brt_mmtk_init()

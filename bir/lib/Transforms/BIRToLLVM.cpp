@@ -2,6 +2,7 @@
 #include "belalang/BIR/Passes.h"
 #include "belalang/BRT/BRT.h"
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
 
@@ -434,13 +435,13 @@ struct BelalangBIRToLLVMPass
     BIRToLLVMTypeConverter typeConverter;
 
     mlir::ConversionTarget target(getContext());
-    target.addLegalDialect<mlir::LLVM::LLVMDialect>();
+    target.addLegalDialect<mlir::LLVM::LLVMDialect, mlir::BuiltinDialect>();
     target.addIllegalDialect<bir::BIRDialect>();
 
     mlir::RewritePatternSet patterns(&getContext());
     belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
 
-    if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
+    if (mlir::failed(mlir::applyFullConversion(getOperation(), target,
                                                   std::move(patterns)))) {
       signalPassFailure();
       return;
