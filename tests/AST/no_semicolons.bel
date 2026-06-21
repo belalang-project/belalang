@@ -1,0 +1,26 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+name
+
+int_var := 123
+flo_var := 44.2
+str_var := "Hello, World!"
+
+return 5
+
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     Identifier(name)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:       Identifier(int_var)
+# CHECK-NEXT:       Integer(123)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:       Identifier(flo_var)
+# CHECK-NEXT:       Float(44.2)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:       Identifier(str_var)
+# CHECK-NEXT:       String("Hello, World!")
+# CHECK-NEXT:   ReturnStatement
+# CHECK-NEXT:     Integer(5)
