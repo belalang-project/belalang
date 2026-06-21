@@ -157,7 +157,7 @@ impl<'sess> Parser<'sess> {
                 self.next_token()?;
                 let return_value = self.parse_expression(Precedence::Lowest)?;
 
-                self.has_semicolon = expect_peek!(self, TokenKind::Semicolon);
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::Return(ReturnStatement { return_value }))
             },
@@ -193,11 +193,7 @@ impl<'sess> Parser<'sess> {
                     expression: self.parse_expression(Precedence::Lowest)?,
                 };
 
-                self.has_semicolon = if self.depth == 0 {
-                    expect_peek!(self, TokenKind::Semicolon)
-                } else {
-                    optional_peek!(self, TokenKind::Semicolon)
-                };
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::Expression(stmt))
             },
