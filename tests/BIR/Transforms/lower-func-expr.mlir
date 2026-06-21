@@ -55,6 +55,7 @@ bir.func @void_return() {
 // CHECK: bir.return
 
 // CHECK-LABEL: bir.func @void_return
+// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.void_return.anon_0> : () -> ()
 // CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.void_return.anon> : () -> ()
 // CHECK-NEXT:   bir.return
 bir.func @void_return() {

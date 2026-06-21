@@ -90,3 +90,18 @@ bir.func @main() -> !bir.int {
   %2 = bir.var.load %0 : (!bir.ref<!bir.int>) -> !bir.int
   bir.return %2 : !bir.int
 }
+
+// -----
+
+// CHECK:      llvm.func @brt_mmtk_init()
+// CHECK-NEXT: llvm.func @f()
+// CHECK-LABEL: llvm.func @main()
+// CHECK:        llvm.call @brt_mmtk_init() : () -> ()
+// CHECK-NEXT:   %[[ADDR:.*]] = llvm.mlir.addressof @f : !llvm.ptr
+// CHECK-NEXT:   llvm.return
+bir.func @f()
+
+bir.func @main() {
+  %0 = bir.constant #bir.fn<@f> : () -> ()
+  bir.return
+}

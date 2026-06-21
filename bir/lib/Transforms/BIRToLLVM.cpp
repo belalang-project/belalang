@@ -60,6 +60,11 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       rewriter.replaceOpWithNewOp<LLVM::InsertValueOp>(op, c1.getType(), c1, len, rewriter.getDenseI64ArrayAttr({1}));
 
       return success();
+    } else if (auto fnAttr = llvm::dyn_cast<bir::FnAttr>(value)) {
+      FlatSymbolRefAttr attr = fnAttr.getValue();
+      mlir::Type ty = LLVM::LLVMPointerType::get(getContext());
+      rewriter.replaceOpWithNewOp<LLVM::AddressOfOp>(op, ty, attr);
+      return success();
     } else {
       return failure();
     }
