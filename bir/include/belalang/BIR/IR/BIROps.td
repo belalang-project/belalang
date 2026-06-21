@@ -310,7 +310,7 @@ def BIR_ScopeOp : BIR_Op<"scope", [
 }
 
 def BIR_YieldOp : BIR_Op<"yield", [
-  ParentOneOf<["ScopeOp"]>,
+  ParentOneOf<["ScopeOp", "IfOp"]>,
   Terminator,
 ]> {
   let summary = "yield";
@@ -323,4 +323,19 @@ def BIR_YieldOp : BIR_Op<"yield", [
   ];
 }
 
+def BIR_IfOp : BIR_Op<"if", [
+  NoRegionArguments,
+]> {
+  let summary = "if";
+
+  let arguments = (ins BIR_BoolType:$cond);
+  let regions = (region AnyRegion:$thenRegion, AnyRegion:$elseRegion);
+  let results = (outs Optional<BIR_AnyType>:$result);
+
+  let extraClassDeclaration = [{
+    bool hasElse() { return getElseRegion().empty(); }
+  }];
+
+  let hasCustomAssemblyFormat = 1;
+}
 #endif // BELALANG_IR_OPS_TD_
