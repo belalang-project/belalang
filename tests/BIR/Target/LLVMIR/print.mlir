@@ -1,5 +1,5 @@
-// RUN: %bir-opt --split-input-file --runtimize --bir-to-llvm %s \
-// RUN: | %bir-translate --mlir-to-llvmir \
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s \
+// RUN: | %bir-translate --bir-to-llvmir \
 // RUN: | %FileCheck %s
 
 // CHECK: declare void @brt_print_float(double)
