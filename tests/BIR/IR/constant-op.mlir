@@ -59,3 +59,19 @@ bir.func @main() -> !bir.int {
   %1 = bir.call_indirect %0() : () -> !bir.int
   bir.return %1 : !bir.int
 }
+
+// -----
+
+bir.func @boolbool() {
+  // CHECK: bir.constant #bir.bool<true> : !bir.bool
+  %0 = bir.constant #bir.bool<true> : !bir.bool
+  bir.return
+}
+
+// -----
+
+bir.func @boolint() {
+  // expected-error@+1 {{type and attribute mismatch}}
+  %0 = bir.constant #bir.bool<true> : !bir.int
+  bir.return
+}

@@ -29,4 +29,8 @@ def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let assemblyFormat = "`<` $el `>`";
 }
 
+def BIR_BoolType : BIR_Type<"Bool", "bool"> {
+  let summary = "Boolean type";
+}
+
 #endif // BELALANG_IR_TYPES_TD_

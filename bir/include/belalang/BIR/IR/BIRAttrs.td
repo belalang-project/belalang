@@ -2,6 +2,7 @@
 #define BELALANG_BIR_IR_BIRATTRS_TD_
 
 include "belalang/BIR/IR/BIRDialect.td"
+include "belalang/BIR/IR/BIRTypes.td"
 
 include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/BuiltinAttributeInterfaces.td"
@@ -50,6 +51,17 @@ def BIR_FnAttr : BIR_Attr<"Fn", "fn", [TypedAttrInterface]> {
   let parameters = (ins
     AttributeSelfTypeParameter<"">:$type,
     "FlatSymbolRefAttr":$value
+  );
+
+  let assemblyFormat = "`<` $value `>`";
+}
+
+def BIR_BoolAttr : BIR_Attr<"Bool", "bool", [TypedAttrInterface]> {
+  let summary = "boolean";
+
+  let parameters = (ins
+    AttributeSelfTypeParameter<"">:$type,
+    "bool":$value
   );
 
   let assemblyFormat = "`<` $value `>`";

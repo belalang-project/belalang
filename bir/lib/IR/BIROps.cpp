@@ -37,6 +37,10 @@ LogicalResult ConstantOp::verify() {
     return success();
   }
 
+  if (isa<bir::BoolType>(ty) && isa<bir::BoolAttr>(attr)) {
+    return success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 
