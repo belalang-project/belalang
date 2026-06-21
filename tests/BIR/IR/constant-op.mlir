@@ -45,3 +45,17 @@ bir.func @stringint() {
   %0 = bir.constant #bir.string<"hello"> : !bir.int
   bir.return
 }
+
+// -----
+
+bir.func @fn.main.anon_0() -> !bir.int {
+  %0 = bir.constant #bir.int<4> : !bir.int
+  bir.return %0 : !bir.int
+}
+
+bir.func @main() -> !bir.int {
+  // CHECK: %[[C0:.*]] = bir.constant #bir.fn<@fn.main.anon_0> : () -> !bir.int
+  %0 = bir.constant #bir.fn<@fn.main.anon_0> : () -> !bir.int
+  %1 = bir.call_indirect %0() : () -> !bir.int
+  bir.return %1 : !bir.int
+}

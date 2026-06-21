@@ -44,4 +44,15 @@ def BIR_StringAttr : BIR_Attr<"String", "string", [TypedAttrInterface]> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_FnAttr : BIR_Attr<"Fn", "fn", [TypedAttrInterface]> {
+  let summary = "function";
+
+  let parameters = (ins
+    AttributeSelfTypeParameter<"">:$type,
+    "FlatSymbolRefAttr":$value
+  );
+
+  let assemblyFormat = "`<` $value `>`";
+}
+
 #endif // BELALANG_BIR_IR_BIRATTRS_TD_

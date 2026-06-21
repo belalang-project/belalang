@@ -14,7 +14,7 @@ namespace bir {
 #define GEN_PASS_REGISTRATION
 #include "belalang/BIR/Passes.h.inc"
 
-void populateBelalangConstantsPatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                        mlir::TypeConverter &typeConverter);

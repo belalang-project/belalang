@@ -33,6 +33,10 @@ LogicalResult ConstantOp::verify() {
     return success();
   }
 
+  if (isa<FunctionType>(ty) && isa<bir::FnAttr>(attr)) {
+    return success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 
@@ -73,6 +77,27 @@ void FuncOp::print(mlir::OpAsmPrinter &p) {
 
 mlir::Type FuncOp::getResType() {
   return getNumResults() > 0 ? getResultTypes()[0] : mlir::Type();
+}
+
+// -----------------------------------------------------------------------------
+// FuncExprOp
+// -----------------------------------------------------------------------------
+
+LogicalResult FuncExprOp::verify() {
+  auto &body = getBody().front();
+  auto term = body.getTerminator();
+
+  auto returnOp = dyn_cast_or_null<bir::ReturnOp>(term);
+  if (!returnOp)
+    return emitOpError() << "body must be terminated by a 'bir.return' op";
+
+  auto funcTypes = getResult().getType().getResults();
+  auto returnTypes = returnOp.getOperandTypes();
+  if (!llvm::equal(funcTypes, returnTypes)) {
+    return emitOpError() << "returned types do not match function signature types";
+  }
+
+  return success();
 }
 
 // -----------------------------------------------------------------------------
