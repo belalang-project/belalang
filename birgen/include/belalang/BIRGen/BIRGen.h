@@ -61,7 +61,6 @@ public:
   rust::String dump_to_string() const;
 
   bool optimize();
-  bool lower_to_llvm_dialect();
 
   std::unique_ptr<LLVMGen> llvmgen();
 

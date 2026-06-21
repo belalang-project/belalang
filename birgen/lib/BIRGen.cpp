@@ -165,12 +165,6 @@ bool BIRGen::optimize() {
   return mlir::succeeded(pm.run(module));
 }
 
-bool BIRGen::lower_to_llvm_dialect() {
-  mlir::PassManager pm(&context);
-  pm.addPass(bir::createBelalangBIRToLLVMPass());
-  return mlir::succeeded(pm.run(module));
-}
-
 std::unique_ptr<LLVMGen> BIRGen::llvmgen() {
   return std::make_unique<LLVMGen>(&module);
 }

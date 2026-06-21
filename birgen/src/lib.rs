@@ -38,7 +38,6 @@ mod ffi {
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
-        fn lower_to_llvm_dialect(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
         fn llvmgen(self: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
@@ -168,10 +167,6 @@ impl<'sess> BIRGen<'sess> {
 
     pub fn optimize(&mut self) -> bool {
         self.inner.pin_mut().optimize()
-    }
-
-    pub fn lower_to_llvm_dialect(&mut self) -> bool {
-        self.inner.pin_mut().lower_to_llvm_dialect()
     }
 
     pub fn llvmgen(&mut self) -> LLVMGen<'sess> {
