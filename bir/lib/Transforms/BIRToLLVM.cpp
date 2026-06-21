@@ -64,6 +64,8 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       FlatSymbolRefAttr attr = fnAttr.getValue();
       rewriter.replaceOpWithNewOp<LLVM::AddressOfOp>(op, type, attr);
       return success();
+    } else if (auto boolAttr = llvm::dyn_cast<bir::BoolAttr>(value)) {
+      value = rewriter.getIntegerAttr(type, boolAttr.getValue());
     } else {
       return failure();
     }
@@ -389,6 +391,9 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     });
     addConversion([](bir::FloatType ty) {
       return mlir::Float64Type::get(ty.getContext());
+    });
+    addConversion([](bir::BoolType ty) {
+      return mlir::IntegerType::get(ty.getContext(), 1);
     });
     addConversion([](bir::StringType ty) {
       mlir::MLIRContext *ctx = ty.getContext();

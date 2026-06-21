@@ -23,3 +23,16 @@ bir.func @print_belalang() {
   bir.print %0 : !bir.float
   bir.return
 }
+
+// -----
+
+// CHECK: bir.func private @brt_print_bool(!bir.bool)
+
+// CHECK-LABEL: bir.func @print_belalang
+bir.func @print_belalang() {
+  // CHECK: %[[C0:.*]] = bir.constant #bir.bool<true> : !bir.bool
+  // CHECK-NEXT: call @brt_print_bool(%[[C0]]) : (!bir.bool) -> ()
+  %0 = bir.constant #bir.bool<true> : !bir.bool
+  bir.print %0 : !bir.bool
+  bir.return
+}

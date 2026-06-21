@@ -1,0 +1,4 @@
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
+
+# CHECK: bir.constant #bir.bool<true> : !bir.bool
+true;
