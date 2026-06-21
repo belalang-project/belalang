@@ -62,8 +62,7 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       return success();
     } else if (auto fnAttr = llvm::dyn_cast<bir::FnAttr>(value)) {
       FlatSymbolRefAttr attr = fnAttr.getValue();
-      mlir::Type ty = LLVM::LLVMPointerType::get(getContext());
-      rewriter.replaceOpWithNewOp<LLVM::AddressOfOp>(op, ty, attr);
+      rewriter.replaceOpWithNewOp<LLVM::AddressOfOp>(op, type, attr);
       return success();
     } else {
       return failure();
@@ -80,14 +79,30 @@ struct FuncOpLowering final : public OpConversionPattern<bir::FuncOp> {
   LogicalResult
   matchAndRewrite(bir::FuncOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
+    auto srcType = op.getFunctionType();
+
+    SmallVector<mlir::Type> inputTypes;
+    for (auto t : srcType.getInputs()) {
+      auto converted = getTypeConverter()->convertType(t);
+      if (!converted)
+        return failure();
+      inputTypes.push_back(converted);
+    }
+
+    mlir::Type resultType;
+    if (srcType.getNumResults() == 0)
+      resultType = LLVM::LLVMVoidType::get(getContext());
+    else if (srcType.getNumResults() == 1)
+      resultType = getTypeConverter()->convertType(srcType.getResult(0));
+    else {
+      // TODO: decide on num results
+      return failure();
+    }
+
+    auto llvmFuncType = LLVM::LLVMFunctionType::get(resultType, inputTypes);
+
     TypeConverter::SignatureConversion signatureConverter(
         op.getFunctionType().getNumInputs());
-
-    auto funcType = getTypeConverter()->convertType(op.getFunctionType());
-    if (!funcType || !mlir::isa<LLVM::LLVMFunctionType>(funcType))
-      return failure();
-
-    auto llvmFuncType = mlir::cast<LLVM::LLVMFunctionType>(funcType);
     for (unsigned i = 0; i < op.getFunctionType().getNumInputs(); ++i)
       signatureConverter.addInputs(i, llvmFuncType.getParamType(i));
 
@@ -120,6 +135,34 @@ struct CallOpLowering final : public OpConversionPattern<bir::CallOp> {
     }
     rewriter.replaceOpWithNewOp<LLVM::CallOp>(
         op, resultTypes, op.getCalleeAttr(), adaptor.getOperands());
+    return success();
+  }
+};
+
+struct CallIndirectOpLowering final
+    : public OpConversionPattern<bir::CallIndirectOp> {
+  using OpConversionPattern<bir::CallIndirectOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::CallIndirectOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto funcType = mlir::cast<FunctionType>(op.getCallee().getType());
+
+    SmallVector<mlir::Type> paramTypes;
+    for (auto t : funcType.getInputs())
+      paramTypes.push_back(getTypeConverter()->convertType(t));
+
+    SmallVector<mlir::Type> resultTypes;
+    for (auto t : funcType.getResults())
+      resultTypes.push_back(getTypeConverter()->convertType(t));
+    mlir::Type llvmResultType = resultTypes.empty()
+                                    ? LLVM::LLVMVoidType::get(getContext())
+                                    : resultTypes.front();
+
+    auto llvmFuncType = LLVM::LLVMFunctionType::get(llvmResultType, paramTypes);
+
+    rewriter.replaceOpWithNewOp<LLVM::CallOp>(op, llvmFuncType,
+                                              adaptor.getOperands());
     return success();
   }
 };
@@ -356,22 +399,8 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
     addConversion([](bir::RefType ty) {
       return LLVM::LLVMPointerType::get(ty.getContext());
     });
-    addConversion([this](mlir::FunctionType type) -> mlir::Type {
-      SmallVector<mlir::Type> inputs;
-      for (mlir::Type t : type.getInputs())
-        inputs.push_back(convertType(t));
-
-      mlir::Type result;
-      if (type.getNumResults() == 0)
-        result = LLVM::LLVMVoidType::get(type.getContext());
-      else if (type.getNumResults() == 1)
-        result = convertType(type.getResult(0));
-      else {
-        // TODO: decide on num results
-        return mlir::Type();
-      }
-
-      return LLVM::LLVMFunctionType::get(result, inputs);
+    addConversion([](mlir::FunctionType type) -> mlir::Type {
+      return LLVM::LLVMPointerType::get(type.getContext());
     });
   }
 };
@@ -381,10 +410,10 @@ struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
     mlir::RewritePatternSet &patterns, mlir::TypeConverter &typeConverter) {
   patterns.add<ConstantOpLowering, FuncOpLowering, CallOpLowering,
-               ReturnOpLowering, AddOpLowering, SubOpLowering, MulOpLowering,
-               DivOpLowering, ModOpLowering, VarDeclareOpLowering,
-               VarStoreOpLowering, VarLoadOpLowering>(typeConverter,
-                                                      patterns.getContext());
+               CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
+               SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
+               VarDeclareOpLowering, VarStoreOpLowering, VarLoadOpLowering>(
+      typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
