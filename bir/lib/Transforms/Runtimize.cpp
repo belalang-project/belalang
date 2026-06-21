@@ -79,6 +79,25 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
       return mlir::success();
     }
 
+    if (auto v = mlir::dyn_cast<bir::BoolType>(value.getType())) {
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_BOOL);
+
+      if (!f) {
+        mlir::Type ty = rewriter.getType<bir::BoolType>();
+        mlir::FunctionType funcType = rewriter.getFunctionType({ty}, {});
+
+        mlir::OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointToStart(mod.getBody());
+
+        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_BOOL,
+                                funcType);
+        f.setPrivate();
+      }
+
+      rewriter.replaceOpWithNewOp<bir::CallOp>(op, f, op->getOperands());
+      return mlir::success();
+    }
+
     return mlir::failure();
   }
 };

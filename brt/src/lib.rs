@@ -14,6 +14,11 @@ pub extern "C" fn brt_print_string(v: brt_core::string::BrString) {
 }
 
 #[unsafe(no_mangle)]
+pub extern "C" fn brt_print_bool(v: bool) {
+    println!("{}", v)
+}
+
+#[unsafe(no_mangle)]
 pub extern "C" fn brt_mmtk_init() {
     brt_core::mmtk::init();
 }
