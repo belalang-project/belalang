@@ -26,6 +26,7 @@ mod ffi {
         fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
         fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
         fn build_constant_string(self: Pin<&mut BIRGen>, val: String) -> UniquePtr<BIRValue>;
+        fn build_constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
         fn build_add(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_sub(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mul(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
@@ -88,6 +89,7 @@ impl<'sess> BIRGen<'sess> {
         match expr {
             Expression::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
             Expression::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
+            Expression::Boolean(lit) => self.inner.pin_mut().build_constant_bool(lit.value),
             Expression::Infix(infix) => self.generate_infix(infix),
             Expression::Call(call) => {
                 // HACK: this checks for the print function hardcoded-ly

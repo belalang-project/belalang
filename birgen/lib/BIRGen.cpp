@@ -64,6 +64,13 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::String val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
+std::unique_ptr<BIRValue> BIRGen::build_constant_bool(bool val) {
+  auto type = builder.getType<bir::BoolType>();
+  auto attr = bir::BoolAttr::get(&context, type, val);
+  auto op = bir::ConstantOp::create(builder, loc, type, attr);
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
 std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
                                             const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
