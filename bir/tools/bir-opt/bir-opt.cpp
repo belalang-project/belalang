@@ -8,6 +8,7 @@ int main(int argc, char **argv) {
   registry.insert<belalang::bir::BIRDialect>();
 
   belalang::bir::registerPasses();
+  belalang::bir::registerBIRPipelines();
 
   return mlir::asMainReturnCode(mlir::MlirOptMain(
       argc, argv, "Belalang IR analysis and optimization tool\n", registry));

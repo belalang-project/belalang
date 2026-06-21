@@ -90,6 +90,7 @@ cc_library(
         "lib/IR/BIRAttrs.cpp",
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
+        "lib/Pipelines.cpp",
         "lib/Transforms/Runtimize.cpp",
         "lib/Transforms/LowerFuncExpr.cpp",
         "lib/Transforms/BIRToLLVM.cpp",
@@ -139,6 +140,7 @@ cc_binary(
     name = "bir-translate",
     srcs = ["tools/bir-translate/bir-translate.cpp"],
     deps = [
+        ":bir",
         "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
         "@llvm-project//mlir:LLVMToLLVMIRTranslation",
         "@llvm-project//mlir:TranslateLib",

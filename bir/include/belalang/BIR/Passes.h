@@ -3,6 +3,7 @@
 
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Pass/Pass.h"
+#include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
 
 namespace belalang {
@@ -18,6 +19,19 @@ void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangRuntimizePatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                        mlir::TypeConverter &typeConverter);
+
+// -----------------------------------------------------------------------------
+// Pipelines
+// -----------------------------------------------------------------------------
+
+struct BIRLoweringPipelineOptions
+    : public mlir::PassPipelineOptions<BIRLoweringPipelineOptions> {};
+
+void buildBIRLoweringPipeline(mlir::OpPassManager &pm);
+void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
+                              const BIRLoweringPipelineOptions &options);
+
+void registerBIRPipelines();
 
 } // namespace bir
 } // namespace belalang

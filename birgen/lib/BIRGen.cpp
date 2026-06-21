@@ -161,14 +161,7 @@ rust::String BIRGen::dump_to_string() const {
 
 bool BIRGen::optimize() {
   mlir::PassManager pm(&context);
-  // TODO: change this with actual optimizers.
-  pm.addPass(bir::createBelalangRuntimizePass());
-  return mlir::succeeded(pm.run(module));
-}
-
-bool BIRGen::lower_to_llvm_dialect() {
-  mlir::PassManager pm(&context);
-  pm.addPass(bir::createBelalangBIRToLLVMPass());
+  bir::buildBIRLoweringPipeline(pm);
   return mlir::succeeded(pm.run(module));
 }
 
