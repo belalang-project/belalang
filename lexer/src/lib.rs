@@ -1,3 +1,5 @@
+use session::SourceSpan;
+
 mod lexer;
 
 pub use lexer::*;
@@ -6,27 +8,7 @@ pub use lexer::*;
 pub struct Token {
     pub kind: TokenKind,
     pub value: String,
-}
-
-impl From<&str> for Token {
-    fn from(value: &str) -> Self {
-        let kind = match value {
-            "fn" => TokenKind::Function,
-            "while" => TokenKind::While,
-            "true" | "false" => TokenKind::Literal {
-                kind: LiteralKind::Boolean,
-            },
-            "if" => TokenKind::If,
-            "else" => TokenKind::Else,
-            "return" => TokenKind::Return,
-            _ => TokenKind::Ident,
-        };
-
-        Self {
-            kind,
-            value: value.to_string(),
-        }
-    }
+    pub span: SourceSpan,
 }
 
 /// Belalang language's tokens

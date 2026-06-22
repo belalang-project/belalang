@@ -3,7 +3,10 @@ use std::{
     str::Chars,
 };
 
-use session::Session;
+use session::{
+    Session,
+    SourceSpan,
+};
 use unicode_ident::{
     is_xid_continue,
     is_xid_start,
@@ -34,15 +37,8 @@ pub struct Lexer<'sess> {
     current: Option<char>,
     chars: Peekable<Chars<'sess>>,
 
-    /// The current line number the lexer is at.
-    ///
-    /// Points to the next line to process.
-    current_row: u32,
-
-    /// The current column number the lexer is at.
-    ///
-    /// Points to the next character to process.
-    current_col: u32,
+    /// The current byte offset the lexer is at.
+    current_offset: usize,
 }
 
 impl<'sess> Lexer<'sess> {
@@ -54,15 +50,16 @@ impl<'sess> Lexer<'sess> {
             session,
             current,
             chars,
-            current_row: 1,
-            current_col: 1,
+            current_offset: 0,
         }
     }
 
     fn advance(&mut self) -> Option<char> {
         let result = self.current;
+        if let Some(c) = result {
+            self.current_offset += c.len_utf8();
+        }
         self.current = self.chars.next();
-        self.current_col += 1;
         result
     }
 
@@ -85,28 +82,30 @@ impl<'sess> Lexer<'sess> {
                 // skips newlines
                 Some('\n') => {
                     self.advance();
-                    self.current_row += 1;
-                    self.current_col = 1;
                 },
                 // break the loop if it isn't a whitespace or a comment
                 _ => break,
             };
         }
 
+        let start_offset = self.current_offset;
+
         if self.current.is_none() {
             return Ok(Token {
+                span: SourceSpan::new(start_offset, start_offset),
                 kind: TokenKind::EOF,
                 value: String::new(),
             });
         }
 
-        match self.current {
+        let mut token = match self.current {
             Some(':') => {
                 self.advance();
                 match self.current {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::ColonAssign,
                             },
@@ -122,11 +121,13 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Eq,
                             value: String::new(),
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Assign {
                             kind: AssignmentKind::Assign,
                         },
@@ -140,11 +141,13 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Ne,
                             value: String::new(),
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Not,
                         value: String::new(),
                     }),
@@ -156,6 +159,7 @@ impl<'sess> Lexer<'sess> {
                     Some('&') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::And,
                             value: String::new(),
                         })
@@ -163,6 +167,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitAndAssign,
                             },
@@ -170,6 +175,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::BitAnd,
                         value: String::new(),
                     }),
@@ -181,6 +187,7 @@ impl<'sess> Lexer<'sess> {
                     Some('|') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Or,
                             value: String::new(),
                         })
@@ -188,6 +195,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitOrAssign,
                             },
@@ -195,6 +203,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::BitOr,
                         value: String::new(),
                     }),
@@ -206,6 +215,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitXorAssign,
                             },
@@ -213,6 +223,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::BitXor,
                         value: String::new(),
                     }),
@@ -224,6 +235,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Le,
                             value: String::new(),
                         })
@@ -234,6 +246,7 @@ impl<'sess> Lexer<'sess> {
                             Some('=') => {
                                 self.advance();
                                 Ok(Token {
+                                    span: SourceSpan::default(),
                                     kind: TokenKind::Assign {
                                         kind: AssignmentKind::ShiftLeftAssign,
                                     },
@@ -241,12 +254,14 @@ impl<'sess> Lexer<'sess> {
                                 })
                             },
                             _ => Ok(Token {
+                                span: SourceSpan::default(),
                                 kind: TokenKind::ShiftLeft,
                                 value: String::new(),
                             }),
                         }
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Lt,
                         value: String::new(),
                     }),
@@ -258,6 +273,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Ge,
                             value: String::new(),
                         })
@@ -268,6 +284,7 @@ impl<'sess> Lexer<'sess> {
                             Some('=') => {
                                 self.advance();
                                 Ok(Token {
+                                    span: SourceSpan::default(),
                                     kind: TokenKind::Assign {
                                         kind: AssignmentKind::ShiftRightAssign,
                                     },
@@ -275,12 +292,14 @@ impl<'sess> Lexer<'sess> {
                                 })
                             },
                             _ => Ok(Token {
+                                span: SourceSpan::default(),
                                 kind: TokenKind::ShiftLeft,
                                 value: String::new(),
                             }),
                         }
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Gt,
                         value: String::new(),
                     }),
@@ -292,6 +311,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::AddAssign,
                             },
@@ -299,6 +319,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Add,
                         value: String::new(),
                     }),
@@ -310,6 +331,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::SubAssign,
                             },
@@ -317,6 +339,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Sub,
                         value: String::new(),
                     }),
@@ -328,6 +351,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::MulAssign,
                             },
@@ -335,6 +359,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Mul,
                         value: String::new(),
                     }),
@@ -346,6 +371,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::DivAssign,
                             },
@@ -353,6 +379,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Div,
                         value: String::new(),
                     }),
@@ -364,6 +391,7 @@ impl<'sess> Lexer<'sess> {
                     Some('=') => {
                         self.advance();
                         Ok(Token {
+                            span: SourceSpan::default(),
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::ModAssign,
                             },
@@ -371,6 +399,7 @@ impl<'sess> Lexer<'sess> {
                         })
                     },
                     _ => Ok(Token {
+                        span: SourceSpan::default(),
                         kind: TokenKind::Mod,
                         value: String::new(),
                     }),
@@ -379,6 +408,7 @@ impl<'sess> Lexer<'sess> {
             Some('(') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::LeftParen,
                     value: String::new(),
                 })
@@ -386,6 +416,7 @@ impl<'sess> Lexer<'sess> {
             Some(')') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::RightParen,
                     value: String::new(),
                 })
@@ -393,6 +424,7 @@ impl<'sess> Lexer<'sess> {
             Some('{') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::LeftBrace,
                     value: String::new(),
                 })
@@ -400,6 +432,7 @@ impl<'sess> Lexer<'sess> {
             Some('}') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::RightBrace,
                     value: String::new(),
                 })
@@ -407,6 +440,7 @@ impl<'sess> Lexer<'sess> {
             Some('[') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::LeftBracket,
                     value: String::new(),
                 })
@@ -414,6 +448,7 @@ impl<'sess> Lexer<'sess> {
             Some(']') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::RightBracket,
                     value: String::new(),
                 })
@@ -421,6 +456,7 @@ impl<'sess> Lexer<'sess> {
             Some(';') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::Semicolon,
                     value: String::new(),
                 })
@@ -428,6 +464,7 @@ impl<'sess> Lexer<'sess> {
             Some(',') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::Comma,
                     value: String::new(),
                 })
@@ -435,15 +472,19 @@ impl<'sess> Lexer<'sess> {
             Some('\\') => {
                 self.advance();
                 Ok(Token {
+                    span: SourceSpan::default(),
                     kind: TokenKind::Backslash,
                     value: String::new(),
                 })
             },
             Some('"') => self.read_string(),
-            Some(c) if c.is_numeric() => Ok(self.read_number()?),
-            Some(_) => Ok(self.read_identifier()?),
+            Some(c) if c.is_numeric() => self.read_number(),
+            Some(_) => self.read_identifier(),
             _ => unreachable!(),
-        }
+        }?;
+
+        token.span = SourceSpan::new(start_offset, self.current_offset);
+        Ok(token)
     }
 
     fn read_string(&mut self) -> Result<Token, LexerError> {
@@ -494,6 +535,7 @@ impl<'sess> Lexer<'sess> {
         }
 
         Ok(Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
             },
@@ -516,10 +558,26 @@ impl<'sess> Lexer<'sess> {
                     }
                 }
 
-                Ok(Token::from(identifier.as_str()))
+                let kind = match identifier.as_str() {
+                    "fn" => TokenKind::Function,
+                    "while" => TokenKind::While,
+                    "true" | "false" => TokenKind::Literal {
+                        kind: LiteralKind::Boolean,
+                    },
+                    "if" => TokenKind::If,
+                    "else" => TokenKind::Else,
+                    "return" => TokenKind::Return,
+                    _ => TokenKind::Ident,
+                };
+                Ok(Token {
+                    kind,
+                    value: identifier,
+                    span: SourceSpan::default(),
+                })
             },
             Some(c) => Err(LexerError::UnknownToken(c.to_string())),
             _ => Ok(Token {
+                span: SourceSpan::default(),
                 kind: TokenKind::EOF,
                 value: String::new(),
             }),
@@ -549,6 +607,7 @@ impl<'sess> Lexer<'sess> {
             LiteralKind::Integer
         };
         Ok(Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal { kind },
             value: number,
         })
@@ -557,7 +616,10 @@ impl<'sess> Lexer<'sess> {
 
 #[cfg(test)]
 mod tests {
-    use session::Session;
+    use session::{
+        Session,
+        SourceSpan,
+    };
 
     use super::{
         Lexer,
@@ -576,14 +638,14 @@ mod tests {
         let result = lexer.read_string();
 
         let expect = Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
             },
             value: "Hello".into(),
         };
         assert_eq!(result.unwrap(), expect);
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 8);
+        assert_eq!(lexer.current_offset, 7);
     }
 
     #[test]
@@ -593,14 +655,14 @@ mod tests {
         let result = lexer.read_string();
 
         let expect = Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
             },
             value: "こんにちわ".into(),
         };
         assert_eq!(result.unwrap(), expect);
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 8);
+        assert_eq!(lexer.current_offset, 17);
     }
 
     #[test]
@@ -610,14 +672,14 @@ mod tests {
         let result = lexer.read_string();
 
         let expect = Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
             },
             value: "🦗".into(),
         };
         assert_eq!(result.unwrap(), expect);
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 4);
+        assert_eq!(lexer.current_offset, 6);
     }
 
     #[test]
@@ -629,12 +691,12 @@ mod tests {
         assert_eq!(
             result.unwrap(),
             Token {
+                span: SourceSpan::default(),
                 kind: TokenKind::Ident,
                 value: "Hello".into()
             }
         );
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 6);
+        assert_eq!(lexer.current_offset, 5);
     }
 
     #[test]
@@ -646,12 +708,12 @@ mod tests {
         assert_eq!(
             result.unwrap(),
             Token {
+                span: SourceSpan::default(),
                 kind: TokenKind::Ident,
                 value: "こんにちわ".into()
             }
         );
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 6);
+        assert_eq!(lexer.current_offset, 15);
     }
 
     #[test]
@@ -663,12 +725,12 @@ mod tests {
         assert_eq!(
             result.unwrap(),
             Token {
+                span: SourceSpan::default(),
                 kind: TokenKind::Ident,
                 value: "hel_lo_".into(),
             }
         );
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 8);
+        assert_eq!(lexer.current_offset, 7);
     }
 
     #[test]
@@ -678,14 +740,14 @@ mod tests {
         let result = lexer.read_number();
 
         let expect = Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::Integer,
             },
             value: "123".into(),
         };
         assert_eq!(result.unwrap(), expect);
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 4);
+        assert_eq!(lexer.current_offset, 3);
     }
 
     #[test]
@@ -695,14 +757,14 @@ mod tests {
         let result = lexer.read_number();
 
         let expect = Token {
+            span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::Float,
             },
             value: "123.123".into(),
         };
         assert_eq!(result.unwrap(), expect);
-        assert_eq!(lexer.current_row, 1);
-        assert_eq!(lexer.current_col, 8);
+        assert_eq!(lexer.current_offset, 7);
     }
 
     #[test]
@@ -712,7 +774,6 @@ mod tests {
         lexer.next_token().unwrap();
         lexer.next_token().unwrap();
 
-        assert_eq!(lexer.current_row, 3);
-        assert_eq!(lexer.current_col, 1);
+        assert_eq!(lexer.current_offset, 9);
     }
 }
