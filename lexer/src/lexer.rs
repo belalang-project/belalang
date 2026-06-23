@@ -128,7 +128,11 @@ impl<'sess> LexerInner<'sess> {
                             value: String::new(),
                         })
                     },
-                    _ => Err(LexerError::UnknownToken(":".into())),
+                    _ => Ok(Token {
+                        span: SourceSpan::default(),
+                        kind: TokenKind::Colon,
+                        value: String::new(),
+                    }),
                 }
             },
             Some('=') => {
