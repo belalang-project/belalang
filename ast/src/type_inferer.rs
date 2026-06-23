@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use lexer::AssignmentKind;
+use session::Session;
 
 use super::Visitor;
 
@@ -12,12 +13,31 @@ pub enum Type {
     None,
 }
 
-pub struct TypeInferer {
+pub struct TypeInferer<'sess> {
+    #[allow(dead_code)]
+    session: &'sess Session,
+    inner: TypeInfererInner,
+}
+
+impl<'sess> TypeInferer<'sess> {
+    pub fn new(session: &'sess Session) -> TypeInferer<'sess> {
+        TypeInferer {
+            session,
+            inner: TypeInfererInner::new(),
+        }
+    }
+
+    pub fn infer(&mut self, program: &crate::Program) {
+        self.inner.visit_program(program);
+    }
+}
+
+pub(crate) struct TypeInfererInner {
     env: HashMap<String, Type>,
     current_type: Type,
 }
 
-impl TypeInferer {
+impl TypeInfererInner {
     pub fn new() -> Self {
         Self {
             env: HashMap::new(),
@@ -26,7 +46,7 @@ impl TypeInferer {
     }
 }
 
-impl Visitor for TypeInferer {
+impl Visitor for TypeInfererInner {
     fn visit_integer(&mut self, _node: &crate::IntegerLiteral) {
         self.current_type = Type::Integer;
     }
@@ -68,11 +88,11 @@ impl Visitor for TypeInferer {
 mod tests {
     use lexer::AssignmentKind;
 
+    use super::TypeInfererInner;
     use crate::{
         Expression,
         Identifier,
         StringLiteral,
-        TypeInferer,
         VarExpression,
         Visitor,
         type_inferer::Type,
@@ -88,7 +108,7 @@ mod tests {
             })),
         };
 
-        let mut ty_infer = TypeInferer::new();
+        let mut ty_infer = TypeInfererInner::new();
         ty_infer.visit_var(&expr);
 
         assert_eq!(*ty_infer.env.get("x").unwrap(), Type::String);
