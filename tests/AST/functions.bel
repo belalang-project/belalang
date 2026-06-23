@@ -7,7 +7,7 @@ mul := fn(x, y) { x * y };
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(add)
 # CHECK-NEXT:       FunctionLiteral
 # CHECK-NEXT:         Identifier(x)
@@ -18,7 +18,7 @@ mul := fn(x, y) { x * y };
 # CHECK-NEXT:               Identifier(x)
 # CHECK-NEXT:               Identifier(y)
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(mul)
 # CHECK-NEXT:       FunctionLiteral
 # CHECK-NEXT:         Identifier(x)

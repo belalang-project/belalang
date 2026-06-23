@@ -7,17 +7,20 @@ int_var = 1;
 flo_var = 1.4;
 str_var = "Hello, Mom!";
 
+explicit_ty: Int = 12
+implicit_ty := 12
+
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(int_var)
 # CHECK-NEXT:       Integer(123)
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(flo_var)
 # CHECK-NEXT:       Float(44.2)
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(str_var)
 # CHECK-NEXT:       String("Hello, World!")
 # CHECK-NEXT:   ExpressionStatement
@@ -32,3 +35,11 @@ str_var = "Hello, Mom!";
 # CHECK-NEXT:     VarExpression(Assign)
 # CHECK-NEXT:       Identifier(str_var)
 # CHECK-NEXT:       String("Hello, Mom!")
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarDeclExpression(Some(Integer))
+# CHECK-NEXT:       Identifier(explicit_ty)
+# CHECK-NEXT:       Integer(12)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     VarDeclExpression(None)
+# CHECK-NEXT:       Identifier(implicit_ty)
+# CHECK-NEXT:       Integer(12)

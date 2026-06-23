@@ -1,4 +1,5 @@
 use lexer::{
+    AssignmentKind,
     InfixKind,
     Lexer,
     LiteralKind,
@@ -372,7 +373,15 @@ impl<'sess> Parser<'sess> {
                 self.next_token()?;
                 let value = Box::new(self.parse_expression(Precedence::Lowest)?);
 
-                Ok(Some(Expression::Var(VarExpression { kind, name, value })))
+                Ok(Some(if let AssignmentKind::ColonAssign = kind {
+                    Expression::VarDecl(VarDeclExpression {
+                        explicit_ty: None,
+                        name,
+                        value,
+                    })
+                } else {
+                    Expression::Var(VarExpression { kind, name, value })
+                }))
             },
 
             TokenKind::Colon => {
