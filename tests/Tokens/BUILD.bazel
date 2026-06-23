@@ -1,3 +1,4 @@
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//tests:lit.bzl", "lit_test")
 
 BELALANG_TESTS = glob(["*.bel"])
@@ -12,3 +13,15 @@ lit_test(
         "BELALANG": "$(rlocationpath //cli:belalang)",
     },
 )
+
+py_binary(
+    name = "update",
+    srcs = ["update.py"],
+    data = [
+        "//cli:belalang",
+    ],
+    args = [
+        "$(location //cli:belalang)",
+    ],
+)
+
