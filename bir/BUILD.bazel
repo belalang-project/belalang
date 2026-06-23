@@ -91,7 +91,7 @@ cc_library(
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
         "lib/Pipelines.cpp",
-        "lib/Transforms/Runtimize.cpp",
+        "lib/Transforms/LowerPrintToRuntime.cpp",
         "lib/Transforms/LowerFuncExpr.cpp",
         "lib/Transforms/BIRToLLVM.cpp",
     ],

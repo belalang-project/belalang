@@ -3,8 +3,8 @@
 
 include "mlir/Pass/PassBase.td"
 
-def BelalangRuntimizePass : Pass<"runtimize"> {
-  let summary = "lower belalang ops to calls to runtime functions";
+def BelalangLowerPrintToRuntimePass : Pass<"bir-lower-print-to-runtime"> {
+  let summary = "lower bir print ops to calls to runtime functions";
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
