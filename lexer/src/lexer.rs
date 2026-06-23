@@ -34,6 +34,23 @@ pub enum LexerError {
 pub struct Lexer<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
+    inner: LexerInner<'sess>,
+}
+
+impl<'sess> Lexer<'sess> {
+    pub fn new(session: &'sess Session) -> Lexer<'sess> {
+        Lexer {
+            session,
+            inner: LexerInner::new(&session.source_text),
+        }
+    }
+
+    pub fn next_token(&mut self) -> Result<Token, LexerError> {
+        self.inner.next_token()
+    }
+}
+
+pub(crate) struct LexerInner<'sess> {
     current: Option<char>,
     chars: Peekable<Chars<'sess>>,
 
@@ -41,13 +58,12 @@ pub struct Lexer<'sess> {
     current_offset: usize,
 }
 
-impl<'sess> Lexer<'sess> {
-    pub fn new(session: &'sess Session) -> Lexer<'sess> {
-        let mut chars = session.source_text.chars().peekable();
+impl<'sess> LexerInner<'sess> {
+    pub fn new(source: &'sess str) -> LexerInner<'sess> {
+        let mut chars = source.chars().peekable();
         let current = chars.next();
 
-        Lexer {
-            session,
+        LexerInner {
             current,
             chars,
             current_offset: 0,
@@ -616,13 +632,10 @@ impl<'sess> Lexer<'sess> {
 
 #[cfg(test)]
 mod tests {
-    use session::{
-        Session,
-        SourceSpan,
-    };
+    use session::SourceSpan;
 
     use super::{
-        Lexer,
+        LexerInner,
         Token,
     };
     use crate::{
@@ -632,8 +645,7 @@ mod tests {
 
     #[test]
     fn str_ascii() {
-        let session = Session::for_text("\"Hello\"".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("\"Hello\"");
 
         let result = lexer.read_string();
 
@@ -650,8 +662,7 @@ mod tests {
 
     #[test]
     fn str_japanese_chars() {
-        let session = Session::for_text("\"こんにちわ\"".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("\"こんにちは\"");
         let result = lexer.read_string();
 
         let expect = Token {
@@ -659,7 +670,7 @@ mod tests {
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
             },
-            value: "こんにちわ".into(),
+            value: "こんにちは".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 17);
@@ -667,8 +678,7 @@ mod tests {
 
     #[test]
     fn str_emojis() {
-        let session = Session::for_text("\"🦗\"".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("\"🦗\"");
         let result = lexer.read_string();
 
         let expect = Token {
@@ -683,9 +693,24 @@ mod tests {
     }
 
     #[test]
+    fn tokens_escape_strings() {
+        let mut lexer = LexerInner::new(r#""\n\r\t\"\x41""#);
+        let result = lexer.read_string();
+
+        let expect = Token {
+            span: SourceSpan::default(),
+            kind: TokenKind::Literal {
+                kind: LiteralKind::String,
+            },
+            value: "\n\r\t\"A".into(),
+        };
+        assert_eq!(result.unwrap(), expect);
+        assert_eq!(lexer.current_offset, 14);
+    }
+
+    #[test]
     fn ident_ascii() {
-        let session = Session::for_text("Hello".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("Hello");
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -701,8 +726,7 @@ mod tests {
 
     #[test]
     fn ident_japanese_chars() {
-        let session = Session::for_text("こんにちわ".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("こんにちは");
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -710,7 +734,7 @@ mod tests {
             Token {
                 span: SourceSpan::default(),
                 kind: TokenKind::Ident,
-                value: "こんにちわ".into()
+                value: "こんにちは".into()
             }
         );
         assert_eq!(lexer.current_offset, 15);
@@ -718,8 +742,7 @@ mod tests {
 
     #[test]
     fn ident_underscores() {
-        let session = Session::for_text("hel_lo_".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("hel_lo_");
         let result = lexer.read_identifier();
 
         assert_eq!(
@@ -735,8 +758,7 @@ mod tests {
 
     #[test]
     fn number_int_ascii() {
-        let session = Session::for_text("123".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("123");
         let result = lexer.read_number();
 
         let expect = Token {
@@ -752,8 +774,7 @@ mod tests {
 
     #[test]
     fn number_float_ascii() {
-        let session = Session::for_text("123.123".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("123.123");
         let result = lexer.read_number();
 
         let expect = Token {
@@ -769,8 +790,7 @@ mod tests {
 
     #[test]
     fn multiline() {
-        let session = Session::for_text("123.123\n\n".to_string()).unwrap();
-        let mut lexer = Lexer::new(&session);
+        let mut lexer = LexerInner::new("123.123\n\n");
         lexer.next_token().unwrap();
         lexer.next_token().unwrap();
 

@@ -16,11 +16,3 @@ rust_test(
 	crate = ":lexer",
 )
 
-rust_test(
-	name = "belalang_lexer_itest",
-	srcs = glob(["tests/**/*.rs"]),
-	deps = [
-		":lexer",
-		"//session",
-	],
-)
