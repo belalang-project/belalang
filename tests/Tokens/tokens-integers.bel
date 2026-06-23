@@ -1,11 +1,10 @@
-# RUN: %belalang build --emit=tokens %s | %FileCheck %s
-
 123; 456; 789 + 1
 
-# CHECK: Token { kind: Literal { kind: Integer }, value: "123", span: SourceSpan { start: 57, end: 60 } }
-# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 60, end: 61 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "456", span: SourceSpan { start: 62, end: 65 } }
-# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 65, end: 66 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "789", span: SourceSpan { start: 67, end: 70 } }
-# CHECK: Token { kind: Add, value: "", span: SourceSpan { start: 71, end: 72 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "1", span: SourceSpan { start: 73, end: 74 } }
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+# CHECK: Token { kind: Literal { kind: Integer }, value: "123", span: SourceSpan { start: 0, end: 3 } }
+# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 3, end: 4 } }
+# CHECK: Token { kind: Literal { kind: Integer }, value: "456", span: SourceSpan { start: 5, end: 8 } }
+# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 8, end: 9 } }
+# CHECK: Token { kind: Literal { kind: Integer }, value: "789", span: SourceSpan { start: 10, end: 13 } }
+# CHECK: Token { kind: Add, value: "", span: SourceSpan { start: 14, end: 15 } }
+# CHECK: Token { kind: Literal { kind: Integer }, value: "1", span: SourceSpan { start: 16, end: 17 } }
