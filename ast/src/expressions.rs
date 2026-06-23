@@ -5,6 +5,7 @@ use lexer::{
 };
 
 use super::Statement;
+use crate::type_inferer::Type;
 
 /// Represents a boolean literal expression.
 ///
@@ -120,6 +121,27 @@ impl std::fmt::Display for ArrayLiteral {
             .join(", ");
 
         write!(f, "[{elements}]")
+    }
+}
+
+/// Represents a variable declaration expression.
+///
+/// # Examples
+///
+/// ```belalang
+/// x := 12
+/// y: Int = 12
+/// ```
+#[derive(Debug, Clone)]
+pub struct VarDeclExpression {
+    pub name: Identifier,
+    pub value: Box<Expression>,
+    pub explicit_ty: Option<Type>,
+}
+
+impl std::fmt::Display for VarDeclExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {:?} {}", self.name, self.explicit_ty, self.value)
     }
 }
 
@@ -338,6 +360,7 @@ pub enum Expression {
     Null(NullLiteral),
     Array(ArrayLiteral),
     Var(VarExpression),
+    VarDecl(VarDeclExpression),
     Call(CallExpression),
     Index(IndexExpression),
     Function(FunctionLiteral),
@@ -358,6 +381,7 @@ impl std::fmt::Display for Expression {
             Expression::Null(v) => v.to_string(),
             Expression::Array(v) => v.to_string(),
             Expression::Var(v) => v.to_string(),
+            Expression::VarDecl(v) => v.to_string(),
             Expression::Call(v) => v.to_string(),
             Expression::Index(v) => v.to_string(),
             Expression::Function(v) => v.to_string(),

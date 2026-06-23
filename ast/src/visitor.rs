@@ -18,6 +18,7 @@ use super::{
     ReturnStatement,
     Statement,
     StringLiteral,
+    VarDeclExpression,
     VarExpression,
     WhileStatement,
 };
@@ -53,6 +54,10 @@ pub trait Visitor {
 
     fn visit_var(&mut self, node: &VarExpression) {
         self.walk_var(node);
+    }
+
+    fn visit_var_decl(&mut self, node: &VarDeclExpression) {
+        self.walk_var_decl(node);
     }
 
     fn visit_call(&mut self, node: &CallExpression) {
@@ -118,6 +123,7 @@ pub trait Visitor {
             Expression::Null(v) => self.visit_null(v),
             Expression::Array(v) => self.visit_array(v),
             Expression::Var(v) => self.visit_var(v),
+            Expression::VarDecl(v) => self.visit_var_decl(v),
             Expression::Call(v) => self.visit_call(v),
             Expression::Index(v) => self.visit_index(v),
             Expression::Function(v) => self.visit_function(v),
@@ -136,6 +142,11 @@ pub trait Visitor {
     }
 
     fn walk_var(&mut self, node: &VarExpression) {
+        self.visit_identifier(&node.name);
+        self.visit_expression(&node.value);
+    }
+
+    fn walk_var_decl(&mut self, node: &VarDeclExpression) {
         self.visit_identifier(&node.name);
         self.visit_expression(&node.value);
     }

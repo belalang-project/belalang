@@ -16,6 +16,7 @@ use super::{
     Program,
     ReturnStatement,
     StringLiteral,
+    VarDeclExpression,
     VarExpression,
     Visitor,
     WhileStatement,
@@ -113,6 +114,18 @@ impl Visitor for ASTDumper {
         println!("{:indent$}VarExpression({:?})", "", node.kind, indent = self.indent);
         self.indent += 2;
         self.walk_var(node);
+        self.indent -= 2;
+    }
+
+    fn visit_var_decl(&mut self, node: &VarDeclExpression) {
+        println!(
+            "{:indent$}VarDeclExpression({:?})",
+            "",
+            node.explicit_ty,
+            indent = self.indent
+        );
+        self.indent += 2;
+        self.walk_var_decl(node);
         self.indent -= 2;
     }
 

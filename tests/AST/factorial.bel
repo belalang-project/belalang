@@ -9,7 +9,7 @@ fact := fn(n) {
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(fact)
 # CHECK-NEXT:       FunctionLiteral
 # CHECK-NEXT:         Identifier(n)

@@ -26,11 +26,11 @@ if x < y {
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(price)
 # CHECK-NEXT:       Integer(50)
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(status)
 # CHECK-NEXT:       IfExpression
 # CHECK-NEXT:         InfixExpression(Lt)
@@ -75,7 +75,7 @@ if x < y {
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           VarExpression(ColonAssign)
+# CHECK-NEXT:           VarDeclExpression(None)
 # CHECK-NEXT:             Identifier(a)
 # CHECK-NEXT:             Integer(10)
 # CHECK-NEXT:         ExpressionStatement

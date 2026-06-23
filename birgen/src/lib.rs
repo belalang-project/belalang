@@ -107,7 +107,10 @@ impl<'sess> BIRGen<'sess> {
                 todo!("Generation for call expression not implemented");
             },
             Expression::Var(var) => match var.kind {
-                AssignmentKind::ColonAssign => match *var.value {
+                _ => todo!("Generation for expression {:?} not implemented", expr),
+            },
+            Expression::VarDecl(var) => {
+                match *var.value {
                     Expression::Integer(ref i) => {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
@@ -130,8 +133,7 @@ impl<'sess> BIRGen<'sess> {
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     _ => todo!("Generation for expression {:?} not implemented", expr),
-                },
-                _ => todo!("Generation for expression {:?} not implemented", expr),
+                }
             },
             Expression::Identifier(ident) => {
                 if let Some(ssa) = self.symbol_table.get(&ident.value) {

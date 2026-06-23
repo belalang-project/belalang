@@ -6,7 +6,7 @@ while i < 10 {
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(ColonAssign)
+# CHECK-NEXT:     VarDeclExpression(None)
 # CHECK-NEXT:       Identifier(i)
 # CHECK-NEXT:       Integer(0)
 # CHECK-NEXT:   WhileStatement
