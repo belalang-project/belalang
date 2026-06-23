@@ -30,8 +30,10 @@ use crate::{
     Program,
     ReturnStatement,
     StringLiteral,
+    VarDeclExpression,
     VarExpression,
     WhileStatement,
+    type_inferer::Type,
 };
 
 #[derive(Debug, PartialEq, PartialOrd)]
@@ -56,7 +58,7 @@ pub enum Precedence {
 impl From<&TokenKind> for Precedence {
     fn from(value: &TokenKind) -> Self {
         match value {
-            TokenKind::Assign { .. } => Self::AssignmentOps,
+            TokenKind::Assign { .. } | TokenKind::Colon => Self::AssignmentOps,
             TokenKind::Or => Self::LogicalOr,
             TokenKind::And => Self::LogicalAnd,
             TokenKind::BitOr => Self::BitOr,
@@ -371,6 +373,35 @@ impl<'sess> Parser<'sess> {
                 let value = Box::new(self.parse_expression(Precedence::Lowest)?);
 
                 Ok(Some(Expression::Var(VarExpression { kind, name, value })))
+            },
+
+            TokenKind::Colon => {
+                let name = Identifier {
+                    value: self.curr_token.value.clone(),
+                };
+
+                self.next_token()?; // consume name
+                self.next_token()?; // consume colon
+
+                let ty = if let TokenKind::Ident = self.curr_token.kind {
+                    match self.curr_token.value.as_str() {
+                        "Int" => Type::Integer,
+                        _ => Type::None, // TODO: fill this in
+                    }
+                } else {
+                    // TODO: verify this
+                    return Err(ParserError::InvalidLHS(left.clone()));
+                };
+
+                self.next_token()?; // consume type
+
+                self.next_token()?; // consume equal sign
+                let value = Box::new(self.parse_expression(Precedence::Lowest)?);
+                Ok(Some(Expression::VarDecl(VarDeclExpression {
+                    name,
+                    value,
+                    explicit_ty: Some(ty),
+                })))
             },
 
             _ => Ok(None),
