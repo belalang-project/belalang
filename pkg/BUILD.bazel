@@ -11,12 +11,14 @@ pkg_files(
     attributes = pkg_attributes(
         mode = "0755",
     ),
+    tags = ["manual"],
 )
 
 pkg_files(
     name = "brt_library",
     srcs = ["//brt:brt"],
     prefix = "lib",
+    tags = ["manual"],
 )
 
 pkg_files(
@@ -25,6 +27,7 @@ pkg_files(
         "//:LICENSE-APACHE",
         "//:LICENSE-MIT",
     ],
+    tags = ["manual"],
 )
 
 pkg_filegroup(
@@ -34,6 +37,7 @@ pkg_filegroup(
         ":brt_library",
         ":doc_files",
     ],
+    tags = ["manual"],
 )
 
 pkg_tar(
@@ -42,4 +46,5 @@ pkg_tar(
     extension = "tar.gz",
     out = get_full_name() + ".tar.gz",
     package_dir = get_full_name(),
+    tags = ["manual"],
 )
