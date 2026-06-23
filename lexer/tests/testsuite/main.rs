@@ -234,18 +234,3 @@ fn tokens_identifiers() {
         ],
     );
 }
-
-#[test]
-fn tokens_escape_strings() {
-    test_tokens(
-        r#""\n\r\t\"\x41""#,
-        vec![token(
-            TokenKind::Literal {
-                kind: LiteralKind::String,
-            },
-            "\n\r\t\"A",
-            0,
-            14,
-        )],
-    );
-}

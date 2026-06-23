@@ -693,6 +693,22 @@ mod tests {
     }
 
     #[test]
+    fn tokens_escape_strings() {
+        let mut lexer = LexerInner::new(r#""\n\r\t\"\x41""#);
+        let result = lexer.read_string();
+
+        let expect = Token {
+            span: SourceSpan::default(),
+            kind: TokenKind::Literal {
+                kind: LiteralKind::String,
+            },
+            value: "\n\r\t\"A".into(),
+        };
+        assert_eq!(result.unwrap(), expect);
+        assert_eq!(lexer.current_offset, 14);
+    }
+
+    #[test]
     fn ident_ascii() {
         let mut lexer = LexerInner::new("Hello");
         let result = lexer.read_identifier();
