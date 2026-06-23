@@ -3,6 +3,7 @@ mod expressions;
 mod parser;
 mod program;
 mod statements;
+mod type_inferer;
 mod visitor;
 
 pub use dump::*;
@@ -14,6 +15,7 @@ use lexer::{
 pub use parser::Parser;
 pub use program::Program;
 pub use statements::*;
+pub use type_inferer::TypeInferer;
 pub use visitor::*;
 
 pub enum Node {
