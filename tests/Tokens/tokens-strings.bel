@@ -1,0 +1,7 @@
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+
+"Hello, World"; "Test"
+
+# CHECK: Token { kind: Literal { kind: String }, value: "Hello, World", span: SourceSpan { start: 57, end: 71 } }
+# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 71, end: 72 } }
+# CHECK: Token { kind: Literal { kind: String }, value: "Test", span: SourceSpan { start: 73, end: 79 } }
