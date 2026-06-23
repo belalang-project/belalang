@@ -6,12 +6,10 @@ use ast::{
     Program,
     Statement,
 };
-use lexer::{
-    AssignmentKind,
-    InfixKind,
-};
+use lexer::InfixKind;
 use session::Session;
 
+#[allow(dead_code)]
 #[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
     unsafe extern "C++" {
@@ -106,9 +104,7 @@ impl<'sess> BIRGen<'sess> {
 
                 todo!("Generation for call expression not implemented");
             },
-            Expression::Var(var) => match var.kind {
-                _ => todo!("Generation for expression {:?} not implemented", expr),
-            },
+            Expression::Var(_) => todo!("Generation for expression {:?} not implemented", expr),
             Expression::VarDecl(var) => {
                 match *var.value {
                     Expression::Integer(ref i) => {

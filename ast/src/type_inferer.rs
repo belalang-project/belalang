@@ -61,7 +61,7 @@ impl Visitor for TypeInfererInner {
 
     fn visit_identifier(&mut self, node: &crate::Identifier) {
         if let Some(ty) = self.env.get(&node.value) {
-            self.current_type = ty.clone();
+            self.current_type = *ty;
         } else {
             // TODO: handle unknown variables
         }
@@ -69,7 +69,7 @@ impl Visitor for TypeInfererInner {
 
     fn visit_var(&mut self, node: &crate::VarExpression) {
         self.visit_expression(&node.value);
-        let rhs_ty = self.current_type.clone();
+        let rhs_ty = self.current_type;
 
         match node.kind {
             AssignmentKind::ColonAssign => {
