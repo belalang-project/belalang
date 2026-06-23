@@ -6,7 +6,7 @@
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 namespace mlir {
-#define GEN_PASS_DEF_BELALANGRUNTIMIZEPASS
+#define GEN_PASS_DEF_BELALANGLOWERPRINTTORUNTIMEPASS
 #include "belalang/BIR/Passes.h.inc"
 } // namespace mlir
 
@@ -103,7 +103,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 };
 } // namespace
 
-void belalang::bir::populateBelalangRuntimizePatterns(
+void belalang::bir::populateBelalangLowerPrintToRuntimePatterns(
     mlir::RewritePatternSet &patterns) {
   patterns.add<PrintOpLowering>(patterns.getContext());
 }
@@ -112,14 +112,14 @@ void belalang::bir::populateBelalangRuntimizePatterns(
 // The Pass
 // -----------------------------------------------------------------------------
 
-struct BelalangRuntimizePass
-    : public impl::BelalangRuntimizePassBase<BelalangRuntimizePass> {
-  using impl::BelalangRuntimizePassBase<
-      BelalangRuntimizePass>::BelalangRuntimizePassBase;
+struct BelalangLowerPrintToRuntimePass
+    : public impl::BelalangLowerPrintToRuntimePassBase<BelalangLowerPrintToRuntimePass> {
+  using impl::BelalangLowerPrintToRuntimePassBase<
+      BelalangLowerPrintToRuntimePass>::BelalangLowerPrintToRuntimePassBase;
 
   void runOnOperation() override {
     mlir::RewritePatternSet patterns(&getContext());
-    populateBelalangRuntimizePatterns(patterns);
+    populateBelalangLowerPrintToRuntimePatterns(patterns);
 
     if (mlir::failed(
             mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
@@ -128,6 +128,6 @@ struct BelalangRuntimizePass
   }
 };
 
-std::unique_ptr<mlir::Pass> belalang::bir::createBelalangRuntimizePass() {
-  return std::make_unique<BelalangRuntimizePass>();
+std::unique_ptr<mlir::Pass> belalang::bir::createBelalangLowerPrintToRuntimePass() {
+  return std::make_unique<BelalangLowerPrintToRuntimePass>();
 }
