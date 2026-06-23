@@ -107,6 +107,8 @@ pub enum TokenKind {
     Semicolon,
     /// Backslash character `\`
     Backslash,
+    /// Colon separator `:`
+    Colon,
 }
 
 /// Literal types supported by the lexer
@@ -282,6 +284,7 @@ impl std::fmt::Display for TokenKind {
             TokenKind::Comma => ",",
             TokenKind::Semicolon => ";",
             TokenKind::Backslash => r"\",
+            TokenKind::Colon => ":",
 
             _ => unreachable!(),
         })
