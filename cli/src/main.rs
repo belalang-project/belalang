@@ -7,6 +7,7 @@ use std::{
 use anyhow::Context;
 use ast::{
     Parser,
+    TypeInferer,
     Visitor,
 };
 use birgen::BIRGen;
@@ -107,6 +108,9 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
 
     let mut parser = Parser::new(&session, lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+
+    let mut ty_infer = TypeInferer::new(&session);
+    ty_infer.infer(&program);
 
     if let EmitTarget::Ast = args.emit {
         let mut dumper = ast::ASTDumper::new();

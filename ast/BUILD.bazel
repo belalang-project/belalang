@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 rust_library(
 	name = "ast",
@@ -9,4 +9,9 @@ rust_library(
 		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],
+)
+
+rust_test(
+	name = "ast-test",
+	crate = ":ast",
 )
