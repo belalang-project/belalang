@@ -1,36 +1,36 @@
 =+(){}[],;!-/*5;5 < 10 > 5;:= >= <= += -= /= %= *= || &&
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 0, end: 1 } }
-# CHECK: Token { kind: Add, value: "", span: SourceSpan { start: 1, end: 2 } }
-# CHECK: Token { kind: LeftParen, value: "", span: SourceSpan { start: 2, end: 3 } }
-# CHECK: Token { kind: RightParen, value: "", span: SourceSpan { start: 3, end: 4 } }
-# CHECK: Token { kind: LeftBrace, value: "", span: SourceSpan { start: 4, end: 5 } }
-# CHECK: Token { kind: RightBrace, value: "", span: SourceSpan { start: 5, end: 6 } }
-# CHECK: Token { kind: LeftBracket, value: "", span: SourceSpan { start: 6, end: 7 } }
-# CHECK: Token { kind: RightBracket, value: "", span: SourceSpan { start: 7, end: 8 } }
-# CHECK: Token { kind: Comma, value: "", span: SourceSpan { start: 8, end: 9 } }
-# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 9, end: 10 } }
-# CHECK: Token { kind: Not, value: "", span: SourceSpan { start: 10, end: 11 } }
-# CHECK: Token { kind: Sub, value: "", span: SourceSpan { start: 11, end: 12 } }
-# CHECK: Token { kind: Div, value: "", span: SourceSpan { start: 12, end: 13 } }
-# CHECK: Token { kind: Mul, value: "", span: SourceSpan { start: 13, end: 14 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "5", span: SourceSpan { start: 14, end: 15 } }
-# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 15, end: 16 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "5", span: SourceSpan { start: 16, end: 17 } }
-# CHECK: Token { kind: Lt, value: "", span: SourceSpan { start: 18, end: 19 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "10", span: SourceSpan { start: 20, end: 22 } }
-# CHECK: Token { kind: Gt, value: "", span: SourceSpan { start: 23, end: 24 } }
-# CHECK: Token { kind: Literal { kind: Integer }, value: "5", span: SourceSpan { start: 25, end: 26 } }
-# CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 26, end: 27 } }
-# CHECK: Token { kind: Colon, value: "", span: SourceSpan { start: 27, end: 28 } }
-# CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 28, end: 29 } }
-# CHECK: Token { kind: Ge, value: "", span: SourceSpan { start: 30, end: 32 } }
-# CHECK: Token { kind: Le, value: "", span: SourceSpan { start: 33, end: 35 } }
-# CHECK: Token { kind: Assign { kind: AddAssign }, value: "", span: SourceSpan { start: 36, end: 38 } }
-# CHECK: Token { kind: Assign { kind: SubAssign }, value: "", span: SourceSpan { start: 39, end: 41 } }
-# CHECK: Token { kind: Assign { kind: DivAssign }, value: "", span: SourceSpan { start: 42, end: 44 } }
-# CHECK: Token { kind: Assign { kind: ModAssign }, value: "", span: SourceSpan { start: 45, end: 47 } }
-# CHECK: Token { kind: Assign { kind: MulAssign }, value: "", span: SourceSpan { start: 48, end: 50 } }
-# CHECK: Token { kind: Or, value: "", span: SourceSpan { start: 51, end: 53 } }
-# CHECK: Token { kind: And, value: "", span: SourceSpan { start: 54, end: 56 } }
+# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 0, end: 1 } }
+# CHECK: Token { kind: Add, span: SourceSpan { start: 1, end: 2 } }
+# CHECK: Token { kind: LeftParen, span: SourceSpan { start: 2, end: 3 } }
+# CHECK: Token { kind: RightParen, span: SourceSpan { start: 3, end: 4 } }
+# CHECK: Token { kind: LeftBrace, span: SourceSpan { start: 4, end: 5 } }
+# CHECK: Token { kind: RightBrace, span: SourceSpan { start: 5, end: 6 } }
+# CHECK: Token { kind: LeftBracket, span: SourceSpan { start: 6, end: 7 } }
+# CHECK: Token { kind: RightBracket, span: SourceSpan { start: 7, end: 8 } }
+# CHECK: Token { kind: Comma, span: SourceSpan { start: 8, end: 9 } }
+# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 9, end: 10 } }
+# CHECK: Token { kind: Not, span: SourceSpan { start: 10, end: 11 } }
+# CHECK: Token { kind: Sub, span: SourceSpan { start: 11, end: 12 } }
+# CHECK: Token { kind: Div, span: SourceSpan { start: 12, end: 13 } }
+# CHECK: Token { kind: Mul, span: SourceSpan { start: 13, end: 14 } }
+# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(2) }, span: SourceSpan { start: 14, end: 15 } }
+# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 15, end: 16 } }
+# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(2) }, span: SourceSpan { start: 16, end: 17 } }
+# CHECK: Token { kind: Lt, span: SourceSpan { start: 18, end: 19 } }
+# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(3) }, span: SourceSpan { start: 20, end: 22 } }
+# CHECK: Token { kind: Gt, span: SourceSpan { start: 23, end: 24 } }
+# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(2) }, span: SourceSpan { start: 25, end: 26 } }
+# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 26, end: 27 } }
+# CHECK: Token { kind: Colon, span: SourceSpan { start: 27, end: 28 } }
+# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 28, end: 29 } }
+# CHECK: Token { kind: Ge, span: SourceSpan { start: 30, end: 32 } }
+# CHECK: Token { kind: Le, span: SourceSpan { start: 33, end: 35 } }
+# CHECK: Token { kind: Assign { kind: AddAssign }, span: SourceSpan { start: 36, end: 38 } }
+# CHECK: Token { kind: Assign { kind: SubAssign }, span: SourceSpan { start: 39, end: 41 } }
+# CHECK: Token { kind: Assign { kind: DivAssign }, span: SourceSpan { start: 42, end: 44 } }
+# CHECK: Token { kind: Assign { kind: ModAssign }, span: SourceSpan { start: 45, end: 47 } }
+# CHECK: Token { kind: Assign { kind: MulAssign }, span: SourceSpan { start: 48, end: 50 } }
+# CHECK: Token { kind: Or, span: SourceSpan { start: 51, end: 53 } }
+# CHECK: Token { kind: And, span: SourceSpan { start: 54, end: 56 } }

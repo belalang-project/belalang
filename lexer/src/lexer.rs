@@ -407,6 +407,13 @@ impl<'sess> LexerInner<'sess> {
                     kind: TokenKind::LeftBrace,
                 })
             },
+            Some('}') => {
+                self.advance();
+                Ok(Token {
+                    span: SourceSpan::default(),
+                    kind: TokenKind::RightBrace,
+                })
+            },
             Some('[') => {
                 self.advance();
                 Ok(Token {

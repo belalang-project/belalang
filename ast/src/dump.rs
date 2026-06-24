@@ -1,3 +1,5 @@
+use session::Session;
+
 use super::{
     ArrayLiteral,
     BlockExpression,
@@ -22,18 +24,18 @@ use super::{
     WhileStatement,
 };
 
-#[derive(Default)]
-pub struct ASTDumper {
+pub struct ASTDumper<'sess> {
+    session: &'sess Session,
     indent: usize,
 }
 
-impl ASTDumper {
-    pub fn new() -> Self {
-        Self::default()
+impl<'sess> ASTDumper<'sess> {
+    pub fn new(session: &'sess Session) -> Self {
+        Self { indent: 0, session }
     }
 }
 
-impl Visitor for ASTDumper {
+impl Visitor for ASTDumper<'_> {
     fn visit_program(&mut self, program: &Program) {
         println!("{:indent$}Program", "", indent = self.indent);
         self.indent += 2;
@@ -75,7 +77,8 @@ impl Visitor for ASTDumper {
     }
 
     fn visit_string(&mut self, node: &StringLiteral) {
-        println!("{:indent$}String({:?})", "", node.value, indent = self.indent);
+        let v = self.session.interner.borrow().lookup(node.value).to_string();
+        println!("{:indent$}String({:?})", "", v, indent = self.indent);
     }
 
     fn visit_null(&mut self, _node: &NullLiteral) {
@@ -83,7 +86,8 @@ impl Visitor for ASTDumper {
     }
 
     fn visit_identifier(&mut self, node: &Identifier) {
-        println!("{:indent$}Identifier({})", "", node.value, indent = self.indent);
+        let v = self.session.interner.borrow().lookup(node.value).to_string();
+        println!("{:indent$}Identifier({})", "", v, indent = self.indent);
     }
 
     fn visit_infix(&mut self, node: &InfixExpression) {
