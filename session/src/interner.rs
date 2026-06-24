@@ -23,12 +23,14 @@ pub mod syms {
     use crate::interner::Symbol;
 
     pub const INT: Symbol = Symbol(0);
+    pub const PRINT: Symbol = Symbol(1);
 }
 
 impl Interner {
     pub fn with_pre_interned_symbols() -> Self {
         let mut s = Self::default();
         s.intern("Int");
+        s.intern("print");
         s
     }
 

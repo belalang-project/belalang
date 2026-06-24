@@ -10,7 +10,13 @@ use lexer::{
     AssignmentKind,
     InfixKind,
 };
-use session::Session;
+use session::{
+    Session,
+    interner::{
+        Symbol,
+        syms,
+    },
+};
 
 #[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
@@ -52,7 +58,7 @@ pub struct BIRGen<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
-    symbol_table: HashMap<String, cxx::UniquePtr<ffi::BIRValue>>,
+    symbol_table: HashMap<Symbol, cxx::UniquePtr<ffi::BIRValue>>,
 }
 
 impl<'sess> BIRGen<'sess> {
@@ -94,7 +100,7 @@ impl<'sess> BIRGen<'sess> {
             Expression::Call(call) => {
                 // HACK: this checks for the print function hardcoded-ly
                 if let Expression::Identifier(ref ident) = *call.function
-                    && ident.value == "print"
+                    && ident.value == syms::PRINT
                 {
                     // TODO: handle more than one arguments
                     let arg = self.generate_expression(&call.args[0]);
@@ -110,26 +116,30 @@ impl<'sess> BIRGen<'sess> {
                 _ => todo!("Generation for expression {:?} not implemented", expr),
             },
             Expression::VarDecl(var) => {
+                let interner = self.session.interner.borrow();
                 match *var.value {
                     Expression::Integer(ref i) => {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        let name = interner.lookup(var.name.value).to_string();
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
-                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        self.symbol_table.insert(var.name.value, declare);
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     Expression::Float(ref f) => {
                         let v = self.inner.pin_mut().build_constant_float(f.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        let name = interner.lookup(var.name.value).to_string();
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
-                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        self.symbol_table.insert(var.name.value, declare);
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
                         let v = self.generate_expression(&var.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, var.name.value.clone());
+                        let name = interner.lookup(var.name.value).to_string();
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
-                        self.symbol_table.insert(var.name.value.clone(), declare);
+                        self.symbol_table.insert(var.name.value, declare);
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     _ => todo!("Generation for expression {:?} not implemented", expr),
@@ -142,7 +152,11 @@ impl<'sess> BIRGen<'sess> {
                     cxx::UniquePtr::null() // FIXME: don't return nullptr
                 }
             },
-            Expression::String(s) => self.inner.pin_mut().build_constant_string(s.value.clone()),
+            Expression::String(s) => {
+                let interner = self.session.interner.borrow();
+                let v = interner.lookup(s.value);
+                self.inner.pin_mut().build_constant_string(v.to_string())
+            },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
     }
