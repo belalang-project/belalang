@@ -1,10 +1,10 @@
 123; 456; 789 + 1
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(2) }, span: SourceSpan { start: 0, end: 3 } }
-# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 3, end: 4 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(3) }, span: SourceSpan { start: 5, end: 8 } }
-# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 8, end: 9 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(4) }, span: SourceSpan { start: 10, end: 13 } }
-# CHECK: Token { kind: Add, span: SourceSpan { start: 14, end: 15 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(5) }, span: SourceSpan { start: 16, end: 17 } }
+# CHECK: Literal(Integer, "123") <0..3>
+# CHECK: Semicolon <3..4>
+# CHECK: Literal(Integer, "456") <5..8>
+# CHECK: Semicolon <8..9>
+# CHECK: Literal(Integer, "789") <10..13>
+# CHECK: Add <14..15>
+# CHECK: Literal(Integer, "1") <16..17>

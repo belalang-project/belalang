@@ -1,10 +1,10 @@
 print(1 + 2);
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: Ident { sym: Symbol(1) }, span: SourceSpan { start: 0, end: 5 } }
-# CHECK: Token { kind: LeftParen, span: SourceSpan { start: 5, end: 6 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(2) }, span: SourceSpan { start: 6, end: 7 } }
-# CHECK: Token { kind: Add, span: SourceSpan { start: 8, end: 9 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(3) }, span: SourceSpan { start: 10, end: 11 } }
-# CHECK: Token { kind: RightParen, span: SourceSpan { start: 11, end: 12 } }
-# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 12, end: 13 } }
+# CHECK: Ident("print") <0..5>
+# CHECK: LeftParen <5..6>
+# CHECK: Literal(Integer, "1") <6..7>
+# CHECK: Add <8..9>
+# CHECK: Literal(Integer, "2") <10..11>
+# CHECK: RightParen <11..12>
+# CHECK: Semicolon <12..13>

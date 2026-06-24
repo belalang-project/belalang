@@ -4,21 +4,21 @@ x := 12.0
 x: String = "Hello, world!"
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 0, end: 1 } }
-# CHECK: Token { kind: Colon, span: SourceSpan { start: 1, end: 2 } }
-# CHECK: Token { kind: Ident { sym: Symbol(0) }, span: SourceSpan { start: 3, end: 6 } }
-# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 7, end: 8 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(3) }, span: SourceSpan { start: 9, end: 11 } }
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 12, end: 13 } }
-# CHECK: Token { kind: Colon, span: SourceSpan { start: 14, end: 15 } }
-# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 15, end: 16 } }
-# CHECK: Token { kind: Literal { kind: Integer, sym: Symbol(3) }, span: SourceSpan { start: 17, end: 19 } }
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 20, end: 21 } }
-# CHECK: Token { kind: Colon, span: SourceSpan { start: 22, end: 23 } }
-# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 23, end: 24 } }
-# CHECK: Token { kind: Literal { kind: Float, sym: Symbol(4) }, span: SourceSpan { start: 25, end: 29 } }
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 30, end: 31 } }
-# CHECK: Token { kind: Colon, span: SourceSpan { start: 31, end: 32 } }
-# CHECK: Token { kind: Ident { sym: Symbol(5) }, span: SourceSpan { start: 33, end: 39 } }
-# CHECK: Token { kind: Assign { kind: Assign }, span: SourceSpan { start: 40, end: 41 } }
-# CHECK: Token { kind: Literal { kind: String, sym: Symbol(6) }, span: SourceSpan { start: 42, end: 57 } }
+# CHECK: Ident("x") <0..1>
+# CHECK: Colon <1..2>
+# CHECK: Ident("Int") <3..6>
+# CHECK: Assign(Assign) <7..8>
+# CHECK: Literal(Integer, "12") <9..11>
+# CHECK: Ident("x") <12..13>
+# CHECK: Colon <14..15>
+# CHECK: Assign(Assign) <15..16>
+# CHECK: Literal(Integer, "12") <17..19>
+# CHECK: Ident("x") <20..21>
+# CHECK: Colon <22..23>
+# CHECK: Assign(Assign) <23..24>
+# CHECK: Literal(Float, "12.0") <25..29>
+# CHECK: Ident("x") <30..31>
+# CHECK: Colon <31..32>
+# CHECK: Ident("String") <33..39>
+# CHECK: Assign(Assign) <40..41>
+# CHECK: Literal(String, "Hello, world!") <42..57>
