@@ -28,6 +28,11 @@ impl<'sess, 'lexer> TokensDumper<'sess, 'lexer> {
                 },
                 TokenKind::Literal { kind, sym } => {
                     let val = self.session.interner.borrow().lookup(sym).to_string();
+                    let val = if kind == crate::LiteralKind::String {
+                        val.escape_debug().to_string()
+                    } else {
+                        val
+                    };
                     format!("Literal({:?}, \"{}\")", kind, val)
                 },
                 TokenKind::Assign { kind } => {

@@ -1,4 +1,5 @@
 x; x + y
+Hello; こんにちは; hel_lo_
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
 # CHECK: Ident("x") <0..1>
@@ -6,3 +7,8 @@ x; x + y
 # CHECK: Ident("x") <3..4>
 # CHECK: Add <5..6>
 # CHECK: Ident("y") <7..8>
+# CHECK: Ident("Hello") <9..14>
+# CHECK: Semicolon <14..15>
+# CHECK: Ident("こんにちは") <16..31>
+# CHECK: Semicolon <31..32>
+# CHECK: Ident("hel_lo_") <33..40>
