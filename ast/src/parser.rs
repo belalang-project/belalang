@@ -7,7 +7,10 @@ use lexer::{
     Token,
     TokenKind,
 };
-use session::Session;
+use session::{
+    Session,
+    interner::syms,
+};
 
 use super::{
     Expression,
@@ -364,9 +367,11 @@ impl<'sess> Parser<'sess> {
                     return Err(ParserError::InvalidLHS(left.clone()));
                 }
 
-                let name = Identifier {
-                    value: self.curr_token.value,
+                let TokenKind::Ident { sym } = self.curr_token.kind else {
+                    todo!()
                 };
+
+                let name = Identifier { value: sym };
 
                 self.next_token()?;
 
@@ -394,11 +399,11 @@ impl<'sess> Parser<'sess> {
                 {
                     None
                 } else {
-                    if !matches!(self.curr_token.kind, TokenKind::Ident) {
+                    let TokenKind::Ident { sym } = self.curr_token.kind else {
                         return Err(ParserError::UnexpectedToken(self.curr_token.kind));
-                    }
-                    let ty = match self.curr_token.value.as_str() {
-                        "Int" => Type::Integer,
+                    };
+                    let ty = match sym {
+                        syms::INT => Type::Integer,
                         _ => Type::None, // TODO: fill this in
                     };
 
@@ -427,12 +432,11 @@ impl<'sess> Parser<'sess> {
     fn parse_prefix(&mut self) -> Result<Expression, ParserError> {
         match self.curr_token.kind {
             // parse_identifier: parse current token as identifier
-            TokenKind::Ident => Ok(Expression::Identifier(Identifier {
-                value: self.curr_token.value,
-            })),
+            TokenKind::Ident { sym } => Ok(Expression::Identifier(Identifier { value: sym })),
 
-            TokenKind::Literal { ref kind } => {
-                let str_value = self.session.interner.lookup(self.curr_token.value);
+            TokenKind::Literal { ref kind, sym } => {
+                let interner = self.session.interner.borrow();
+                let str_value = interner.lookup(sym);
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
                         Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
@@ -442,9 +446,7 @@ impl<'sess> Parser<'sess> {
                         Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
                         Err(_) => Err(ParserError::ParsingFloat(str_value.to_string())),
                     },
-                    LiteralKind::String => Ok(Expression::String(StringLiteral {
-                        value: self.curr_token.value,
-                    })),
+                    LiteralKind::String => Ok(Expression::String(StringLiteral { value: sym })),
                 }
             },
 
@@ -524,17 +526,21 @@ impl<'sess> Parser<'sess> {
                 self.next_token()?;
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
-                    params.push(Identifier {
-                        value: self.curr_token.value,
-                    });
+                    let TokenKind::Ident { sym } = self.curr_token.kind else {
+                        todo!()
+                    };
+
+                    params.push(Identifier { value: sym });
 
                     while matches!(self.peek_token.kind, TokenKind::Comma) {
                         self.next_token()?;
                         self.next_token()?;
 
-                        params.push(Identifier {
-                            value: self.curr_token.value,
-                        });
+                        let TokenKind::Ident { sym } = self.curr_token.kind else {
+                            todo!()
+                        };
+
+                        params.push(Identifier { value: sym });
                     }
 
                     expect_peek!(self, TokenKind::RightParen);

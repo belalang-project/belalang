@@ -1,10 +1,17 @@
 use std::{
     collections::HashMap,
+    fmt::Display,
     rc::Rc,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Symbol(pub u32);
+
+impl Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Default)]
 pub struct Interner {
@@ -12,7 +19,19 @@ pub struct Interner {
     map: HashMap<Rc<str>, Symbol>,
 }
 
+pub mod syms {
+    use crate::interner::Symbol;
+
+    pub const INT: Symbol = Symbol(0);
+}
+
 impl Interner {
+    pub fn with_pre_interned_symbols() -> Self {
+        let mut s = Self::default();
+        s.intern("Int");
+        s
+    }
+
     pub fn intern(&mut self, value: &str) -> Symbol {
         if let Some(&sym) = self.map.get(value) {
             return sym;

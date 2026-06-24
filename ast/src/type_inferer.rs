@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use lexer::AssignmentKind;
-use session::Session;
+use session::{
+    Session,
+    interner::Symbol,
+};
 
 use super::Visitor;
 
@@ -33,7 +35,7 @@ impl<'sess> TypeInferer<'sess> {
 }
 
 pub(crate) struct TypeInfererInner {
-    env: HashMap<String, Type>,
+    env: HashMap<Symbol, Type>,
     current_type: Type,
 }
 
@@ -61,7 +63,7 @@ impl Visitor for TypeInfererInner {
 
     fn visit_identifier(&mut self, node: &crate::Identifier) {
         if let Some(ty) = self.env.get(&node.value) {
-            self.current_type = ty.clone();
+            self.current_type = *ty;
         } else {
             // TODO: handle unknown variables
         }
@@ -73,14 +75,14 @@ impl Visitor for TypeInfererInner {
             self.current_type
         });
 
-        self.env.insert(node.name.value.clone(), rhs_ty);
+        self.env.insert(node.name.value, rhs_ty);
         self.current_type = rhs_ty;
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use lexer::AssignmentKind;
+    use session::interner::Symbol;
 
     use super::TypeInfererInner;
     use crate::{
@@ -96,24 +98,22 @@ mod tests {
     #[test]
     fn test_implicit_string() {
         let expr = VarDeclExpression {
-            name: Identifier { value: "x".to_string() },
+            name: Identifier { value: Symbol(0) },
             explicit_ty: None,
-            value: Box::new(Expression::String(StringLiteral {
-                value: "Hello".to_string(),
-            })),
+            value: Box::new(Expression::String(StringLiteral { value: Symbol(1) })),
         };
 
         let mut ty_infer = TypeInfererInner::new();
         ty_infer.visit_var_decl(&expr);
 
-        assert_eq!(*ty_infer.env.get("x").unwrap(), Type::String);
+        assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::String);
         assert_eq!(ty_infer.env.len(), 1);
     }
 
     #[test]
     fn test_explicit_int() {
         let expr = VarDeclExpression {
-            name: Identifier { value: "x".to_string() },
+            name: Identifier { value: Symbol(0) },
             explicit_ty: Some(Type::Integer),
             value: Box::new(Expression::Integer(IntegerLiteral { value: 12 })),
         };
@@ -121,7 +121,7 @@ mod tests {
         let mut ty_infer = TypeInfererInner::new();
         ty_infer.visit_var_decl(&expr);
 
-        assert_eq!(*ty_infer.env.get("x").unwrap(), Type::Integer);
+        assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::Integer);
         assert_eq!(ty_infer.env.len(), 1);
     }
 }
