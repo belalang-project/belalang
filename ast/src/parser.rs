@@ -373,43 +373,50 @@ impl<'sess> Parser<'sess> {
                 self.next_token()?;
                 let value = Box::new(self.parse_expression(Precedence::Lowest)?);
 
-                Ok(Some(if let AssignmentKind::ColonAssign = kind {
-                    Expression::VarDecl(VarDeclExpression {
-                        explicit_ty: None,
-                        name,
-                        value,
-                    })
-                } else {
-                    Expression::Var(VarExpression { kind, name, value })
-                }))
+                Ok(Some(Expression::Var(VarExpression { kind, name, value })))
             },
 
             TokenKind::Colon => {
-                let name = Identifier {
-                    value: self.curr_token.value.clone(),
+                if !matches!(left, Expression::Identifier(_)) {
+                    return Err(ParserError::InvalidLHS(left.clone()));
+                }
+                let name = match left {
+                    Expression::Identifier(ident) => ident.clone(),
+                    _ => unreachable!(),
                 };
 
-                self.next_token()?; // consume name
-                self.next_token()?; // consume colon
+                self.next_token()?; // consume name; curr_token is colon
+                self.next_token()?; // consume colon; curr_token is type name or assign
 
-                let ty = if let TokenKind::Ident = self.curr_token.kind {
-                    match self.curr_token.value.as_str() {
+                let explicit_ty = if let TokenKind::Assign {
+                    kind: AssignmentKind::Assign,
+                } = self.curr_token.kind
+                {
+                    None
+                } else {
+                    if !matches!(self.curr_token.kind, TokenKind::Ident) {
+                        return Err(ParserError::UnexpectedToken(self.curr_token.kind));
+                    }
+                    let ty = match self.curr_token.value.as_str() {
                         "Int" => Type::Integer,
                         _ => Type::None, // TODO: fill this in
-                    }
-                } else {
-                    // TODO: verify this
-                    return Err(ParserError::InvalidLHS(left.clone()));
+                    };
+
+                    expect_peek!(
+                        self,
+                        TokenKind::Assign {
+                            kind: AssignmentKind::Assign
+                        }
+                    ); // consumes equal sign; curr_token is Assign
+                    Some(ty)
                 };
 
-                self.next_token()?; // consume type
-
-                self.next_token()?; // consume equal sign
+                self.next_token()?; // consume equal sign; curr_token is start of RHS value
                 let value = Box::new(self.parse_expression(Precedence::Lowest)?);
                 Ok(Some(Expression::VarDecl(VarDeclExpression {
                     name,
                     value,
-                    explicit_ty: Some(ty),
+                    explicit_ty,
                 })))
             },
 

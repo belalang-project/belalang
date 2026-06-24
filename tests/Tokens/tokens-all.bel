@@ -23,7 +23,8 @@
 # CHECK: Token { kind: Gt, value: "", span: SourceSpan { start: 23, end: 24 } }
 # CHECK: Token { kind: Literal { kind: Integer }, value: "5", span: SourceSpan { start: 25, end: 26 } }
 # CHECK: Token { kind: Semicolon, value: "", span: SourceSpan { start: 26, end: 27 } }
-# CHECK: Token { kind: Assign { kind: ColonAssign }, value: "", span: SourceSpan { start: 27, end: 29 } }
+# CHECK: Token { kind: Colon, value: "", span: SourceSpan { start: 27, end: 28 } }
+# CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 28, end: 29 } }
 # CHECK: Token { kind: Ge, value: "", span: SourceSpan { start: 30, end: 32 } }
 # CHECK: Token { kind: Le, value: "", span: SourceSpan { start: 33, end: 35 } }
 # CHECK: Token { kind: Assign { kind: AddAssign }, value: "", span: SourceSpan { start: 36, end: 38 } }
