@@ -3,8 +3,10 @@ use session::{
     interner::Symbol,
 };
 
+mod dump;
 mod lexer;
 
+pub use dump::*;
 pub use lexer::*;
 
 #[derive(PartialEq, Eq, Debug, Clone, Default)]

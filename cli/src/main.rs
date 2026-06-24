@@ -96,13 +96,8 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     let mut lexer = Lexer::new(&session);
 
     if let EmitTarget::Tokens = args.emit {
-        loop {
-            let token = lexer.next_token().map_err(|e| anyhow::anyhow!("{}", e))?;
-            if token.kind == lexer::TokenKind::EOF {
-                break;
-            }
-            println!("{:?}", token);
-        }
+        let mut dumper = lexer::TokensDumper::new(&session, &mut lexer);
+        dumper.dump()?;
         return Ok(());
     }
 

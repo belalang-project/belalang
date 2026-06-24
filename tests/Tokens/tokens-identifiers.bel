@@ -1,8 +1,8 @@
 x; x + y
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 0, end: 1 } }
-# CHECK: Token { kind: Semicolon, span: SourceSpan { start: 1, end: 2 } }
-# CHECK: Token { kind: Ident { sym: Symbol(2) }, span: SourceSpan { start: 3, end: 4 } }
-# CHECK: Token { kind: Add, span: SourceSpan { start: 5, end: 6 } }
-# CHECK: Token { kind: Ident { sym: Symbol(3) }, span: SourceSpan { start: 7, end: 8 } }
+# CHECK: Ident("x") <0..1>
+# CHECK: Semicolon <1..2>
+# CHECK: Ident("x") <3..4>
+# CHECK: Add <5..6>
+# CHECK: Ident("y") <7..8>

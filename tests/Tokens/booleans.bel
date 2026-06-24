@@ -2,5 +2,5 @@ true
 false
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Token { kind: KwTrue, span: SourceSpan { start: 0, end: 4 } }
-# CHECK: Token { kind: KwFalse, span: SourceSpan { start: 5, end: 10 } }
+# CHECK: KwTrue <0..4>
+# CHECK: KwFalse <5..10>
