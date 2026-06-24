@@ -1,0 +1,4 @@
+123.123
+
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+# CHECK: Literal(Float, "123.123") <0..7>

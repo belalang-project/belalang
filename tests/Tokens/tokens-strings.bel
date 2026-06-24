@@ -1,6 +1,12 @@
 "Hello, World"; "Test"
+"こんにちは"; "🦗"
+"\n\r\t\"\x41"
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
 # CHECK: Literal(String, "Hello, World") <0..14>
 # CHECK: Semicolon <14..15>
 # CHECK: Literal(String, "Test") <16..22>
+# CHECK: Literal(String, "こんにちは") <23..40>
+# CHECK: Semicolon <40..41>
+# CHECK: Literal(String, "🦗") <42..48>
+# CHECK: Literal(String, "\n\r\t\"A") <49..63>
