@@ -10,10 +10,12 @@ x: String = "Hello, world!"
 # CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 7, end: 8 } }
 # CHECK: Token { kind: Literal { kind: Integer }, value: "12", span: SourceSpan { start: 9, end: 11 } }
 # CHECK: Token { kind: Ident, value: "x", span: SourceSpan { start: 12, end: 13 } }
-# CHECK: Token { kind: Assign { kind: ColonAssign }, value: "", span: SourceSpan { start: 14, end: 16 } }
+# CHECK: Token { kind: Colon, value: "", span: SourceSpan { start: 14, end: 15 } }
+# CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 15, end: 16 } }
 # CHECK: Token { kind: Literal { kind: Integer }, value: "12", span: SourceSpan { start: 17, end: 19 } }
 # CHECK: Token { kind: Ident, value: "x", span: SourceSpan { start: 20, end: 21 } }
-# CHECK: Token { kind: Assign { kind: ColonAssign }, value: "", span: SourceSpan { start: 22, end: 24 } }
+# CHECK: Token { kind: Colon, value: "", span: SourceSpan { start: 22, end: 23 } }
+# CHECK: Token { kind: Assign { kind: Assign }, value: "", span: SourceSpan { start: 23, end: 24 } }
 # CHECK: Token { kind: Literal { kind: Float }, value: "12.0", span: SourceSpan { start: 25, end: 29 } }
 # CHECK: Token { kind: Ident, value: "x", span: SourceSpan { start: 30, end: 31 } }
 # CHECK: Token { kind: Colon, value: "", span: SourceSpan { start: 31, end: 32 } }

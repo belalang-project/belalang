@@ -117,23 +117,11 @@ impl<'sess> LexerInner<'sess> {
         let mut token = match self.current {
             Some(':') => {
                 self.advance();
-                match self.current {
-                    Some('=') => {
-                        self.advance();
-                        Ok(Token {
-                            span: SourceSpan::default(),
-                            kind: TokenKind::Assign {
-                                kind: AssignmentKind::ColonAssign,
-                            },
-                            value: String::new(),
-                        })
-                    },
-                    _ => Ok(Token {
-                        span: SourceSpan::default(),
-                        kind: TokenKind::Colon,
-                        value: String::new(),
-                    }),
-                }
+                Ok(Token {
+                    span: SourceSpan::default(),
+                    kind: TokenKind::Colon,
+                    value: String::new(),
+                })
             },
             Some('=') => {
                 self.advance();

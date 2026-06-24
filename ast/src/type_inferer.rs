@@ -67,19 +67,13 @@ impl Visitor for TypeInfererInner {
         }
     }
 
-    fn visit_var(&mut self, node: &crate::VarExpression) {
-        self.visit_expression(&node.value);
-        let rhs_ty = self.current_type.clone();
+    fn visit_var_decl(&mut self, node: &crate::VarDeclExpression) {
+        let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
+            self.visit_expression(&node.value);
+            self.current_type
+        });
 
-        match node.kind {
-            AssignmentKind::ColonAssign => {
-                self.env.insert(node.name.value.clone(), rhs_ty);
-            },
-            _ => {
-                // TODO: handle other kinds of assignment
-            },
-        }
-
+        self.env.insert(node.name.value.clone(), rhs_ty);
         self.current_type = rhs_ty;
     }
 }
@@ -92,26 +86,42 @@ mod tests {
     use crate::{
         Expression,
         Identifier,
+        IntegerLiteral,
         StringLiteral,
-        VarExpression,
+        VarDeclExpression,
         Visitor,
         type_inferer::Type,
     };
 
     #[test]
-    fn test_infer_str() {
-        let expr = VarExpression {
-            kind: AssignmentKind::ColonAssign,
+    fn test_implicit_string() {
+        let expr = VarDeclExpression {
             name: Identifier { value: "x".to_string() },
+            explicit_ty: None,
             value: Box::new(Expression::String(StringLiteral {
                 value: "Hello".to_string(),
             })),
         };
 
         let mut ty_infer = TypeInfererInner::new();
-        ty_infer.visit_var(&expr);
+        ty_infer.visit_var_decl(&expr);
 
         assert_eq!(*ty_infer.env.get("x").unwrap(), Type::String);
+        assert_eq!(ty_infer.env.len(), 1);
+    }
+
+    #[test]
+    fn test_explicit_int() {
+        let expr = VarDeclExpression {
+            name: Identifier { value: "x".to_string() },
+            explicit_ty: Some(Type::Integer),
+            value: Box::new(Expression::Integer(IntegerLiteral { value: 12 })),
+        };
+
+        let mut ty_infer = TypeInfererInner::new();
+        ty_infer.visit_var_decl(&expr);
+
+        assert_eq!(*ty_infer.env.get("x").unwrap(), Type::Integer);
         assert_eq!(ty_infer.env.len(), 1);
     }
 }

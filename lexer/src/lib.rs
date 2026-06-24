@@ -130,8 +130,6 @@ pub enum LiteralKind {
 pub enum AssignmentKind {
     /// Assignment operator `=`
     Assign,
-    /// Colon assignment operator `:=`
-    ColonAssign,
     /// Addition assignment operator `+=`
     AddAssign,
     /// Subtraction assignment operator `-=`
@@ -158,7 +156,6 @@ impl std::fmt::Display for AssignmentKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             Self::Assign => "=",
-            Self::ColonAssign => ":=",
             Self::AddAssign => "+=",
             Self::SubAssign => "-=",
             Self::MulAssign => "*=",
