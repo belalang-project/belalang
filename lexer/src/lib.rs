@@ -29,6 +29,12 @@ pub enum TokenKind {
     /// Literals
     Literal { kind: LiteralKind },
 
+    /// Keyword `true`
+    KwTrue,
+
+    /// Keyword `false`
+    KwFalse,
+
     /// Assignments
     Assign { kind: AssignmentKind },
 
@@ -117,7 +123,6 @@ pub enum LiteralKind {
     Integer,
     Float,
     String,
-    Boolean,
 }
 
 /// Assignment types supported by the lexer

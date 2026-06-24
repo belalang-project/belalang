@@ -436,10 +436,11 @@ impl<'sess> Parser<'sess> {
                 LiteralKind::String => Ok(Expression::String(StringLiteral {
                     value: self.curr_token.value.clone(),
                 })),
-                LiteralKind::Boolean => Ok(Expression::Boolean(BooleanExpression {
-                    value: self.curr_token.value == "true",
-                })),
             },
+
+            TokenKind::KwTrue => Ok(Expression::Boolean(BooleanExpression { value: true })),
+
+            TokenKind::KwFalse => Ok(Expression::Boolean(BooleanExpression { value: false })),
 
             // parse_array
             TokenKind::LeftBracket => Ok(Expression::Array(ArrayLiteral {
