@@ -3,6 +3,7 @@ use lexer::{
     InfixKind,
     PrefixKind,
 };
+use session::interner::Symbol;
 
 use super::Statement;
 use crate::type_inferer::Type;
@@ -74,7 +75,7 @@ impl std::fmt::Display for FloatLiteral {
 /// ```
 #[derive(Debug, Clone)]
 pub struct StringLiteral {
-    pub value: String,
+    pub value: Symbol,
 }
 
 impl std::fmt::Display for StringLiteral {
@@ -245,7 +246,7 @@ impl std::fmt::Display for FunctionLiteral {
 /// ```
 #[derive(Debug, Clone)]
 pub struct Identifier {
-    pub value: String,
+    pub value: Symbol,
 }
 
 impl std::fmt::Display for Identifier {

@@ -113,7 +113,7 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     ty_infer.infer(&program);
 
     if let EmitTarget::Ast = args.emit {
-        let mut dumper = ast::ASTDumper::new();
+        let mut dumper = ast::ASTDumper::new(&session);
         dumper.visit_program(&program);
         return Ok(());
     }
