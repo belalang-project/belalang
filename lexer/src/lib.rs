@@ -1,4 +1,7 @@
-use session::SourceSpan;
+use session::{
+    SourceSpan,
+    interner::Symbol,
+};
 
 mod lexer;
 
@@ -7,7 +10,6 @@ pub use lexer::*;
 #[derive(PartialEq, Eq, Debug, Clone, Default)]
 pub struct Token {
     pub kind: TokenKind,
-    pub value: String,
     pub span: SourceSpan,
 }
 
@@ -24,10 +26,10 @@ pub enum TokenKind {
     Empty,
 
     /// Identifier token containing a variable or function name
-    Ident,
+    Ident { sym: Symbol },
 
     /// Literals
-    Literal { kind: LiteralKind },
+    Literal { kind: LiteralKind, sym: Symbol },
 
     /// Keyword `true`
     KwTrue,
@@ -244,7 +246,7 @@ impl std::fmt::Display for TokenKind {
             TokenKind::Empty => "<empty>",
             TokenKind::EOF => "EOF",
 
-            TokenKind::Ident => "<ident>",
+            TokenKind::Ident { .. } => "<ident>",
             TokenKind::Literal { .. } => "<literal>",
 
             TokenKind::Add => "+",

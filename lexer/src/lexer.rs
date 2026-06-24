@@ -1,4 +1,5 @@
 use std::{
+    cell::RefCell,
     iter::Peekable,
     str::Chars,
 };
@@ -6,6 +7,7 @@ use std::{
 use session::{
     Session,
     SourceSpan,
+    interner::Interner,
 };
 use unicode_ident::{
     is_xid_continue,
@@ -41,7 +43,7 @@ impl<'sess> Lexer<'sess> {
     pub fn new(session: &'sess Session) -> Lexer<'sess> {
         Lexer {
             session,
-            inner: LexerInner::new(&session.source_text),
+            inner: LexerInner::new(&session.source_text, &session.interner),
         }
     }
 
@@ -56,10 +58,12 @@ pub(crate) struct LexerInner<'sess> {
 
     /// The current byte offset the lexer is at.
     current_offset: usize,
+
+    interner: &'sess RefCell<Interner>,
 }
 
 impl<'sess> LexerInner<'sess> {
-    pub fn new(source: &'sess str) -> LexerInner<'sess> {
+    pub fn new(source: &'sess str, interner: &'sess RefCell<Interner>) -> LexerInner<'sess> {
         let mut chars = source.chars().peekable();
         let current = chars.next();
 
@@ -67,6 +71,7 @@ impl<'sess> LexerInner<'sess> {
             current,
             chars,
             current_offset: 0,
+            interner,
         }
     }
 
@@ -110,7 +115,6 @@ impl<'sess> LexerInner<'sess> {
             return Ok(Token {
                 span: SourceSpan::new(start_offset, start_offset),
                 kind: TokenKind::EOF,
-                value: String::new(),
             });
         }
 
@@ -120,7 +124,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::Colon,
-                    value: String::new(),
                 })
             },
             Some('=') => {
@@ -131,7 +134,6 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::Eq,
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
@@ -139,7 +141,6 @@ impl<'sess> LexerInner<'sess> {
                         kind: TokenKind::Assign {
                             kind: AssignmentKind::Assign,
                         },
-                        value: String::new(),
                     }),
                 }
             },
@@ -151,13 +152,11 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::Ne,
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Not,
-                        value: String::new(),
                     }),
                 }
             },
@@ -169,7 +168,6 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::And,
-                            value: String::new(),
                         })
                     },
                     Some('=') => {
@@ -179,13 +177,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitAndAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::BitAnd,
-                        value: String::new(),
                     }),
                 }
             },
@@ -197,7 +193,6 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::Or,
-                            value: String::new(),
                         })
                     },
                     Some('=') => {
@@ -207,13 +202,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitOrAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::BitOr,
-                        value: String::new(),
                     }),
                 }
             },
@@ -227,13 +220,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::BitXorAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::BitXor,
-                        value: String::new(),
                     }),
                 }
             },
@@ -245,7 +236,6 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::Le,
-                            value: String::new(),
                         })
                     },
                     Some('<') => {
@@ -258,20 +248,17 @@ impl<'sess> LexerInner<'sess> {
                                     kind: TokenKind::Assign {
                                         kind: AssignmentKind::ShiftLeftAssign,
                                     },
-                                    value: String::new(),
                                 })
                             },
                             _ => Ok(Token {
                                 span: SourceSpan::default(),
                                 kind: TokenKind::ShiftLeft,
-                                value: String::new(),
                             }),
                         }
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Lt,
-                        value: String::new(),
                     }),
                 }
             },
@@ -283,7 +270,6 @@ impl<'sess> LexerInner<'sess> {
                         Ok(Token {
                             span: SourceSpan::default(),
                             kind: TokenKind::Ge,
-                            value: String::new(),
                         })
                     },
                     Some('>') => {
@@ -296,20 +282,17 @@ impl<'sess> LexerInner<'sess> {
                                     kind: TokenKind::Assign {
                                         kind: AssignmentKind::ShiftRightAssign,
                                     },
-                                    value: String::new(),
                                 })
                             },
                             _ => Ok(Token {
                                 span: SourceSpan::default(),
                                 kind: TokenKind::ShiftLeft,
-                                value: String::new(),
                             }),
                         }
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Gt,
-                        value: String::new(),
                     }),
                 }
             },
@@ -323,13 +306,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::AddAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Add,
-                        value: String::new(),
                     }),
                 }
             },
@@ -343,13 +324,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::SubAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Sub,
-                        value: String::new(),
                     }),
                 }
             },
@@ -363,13 +342,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::MulAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Mul,
-                        value: String::new(),
                     }),
                 }
             },
@@ -383,13 +360,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::DivAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Div,
-                        value: String::new(),
                     }),
                 }
             },
@@ -403,13 +378,11 @@ impl<'sess> LexerInner<'sess> {
                             kind: TokenKind::Assign {
                                 kind: AssignmentKind::ModAssign,
                             },
-                            value: String::new(),
                         })
                     },
                     _ => Ok(Token {
                         span: SourceSpan::default(),
                         kind: TokenKind::Mod,
-                        value: String::new(),
                     }),
                 }
             },
@@ -418,7 +391,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::LeftParen,
-                    value: String::new(),
                 })
             },
             Some(')') => {
@@ -426,7 +398,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::RightParen,
-                    value: String::new(),
                 })
             },
             Some('{') => {
@@ -434,15 +405,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::LeftBrace,
-                    value: String::new(),
-                })
-            },
-            Some('}') => {
-                self.advance();
-                Ok(Token {
-                    span: SourceSpan::default(),
-                    kind: TokenKind::RightBrace,
-                    value: String::new(),
                 })
             },
             Some('[') => {
@@ -450,7 +412,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::LeftBracket,
-                    value: String::new(),
                 })
             },
             Some(']') => {
@@ -458,7 +419,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::RightBracket,
-                    value: String::new(),
                 })
             },
             Some(';') => {
@@ -466,7 +426,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::Semicolon,
-                    value: String::new(),
                 })
             },
             Some(',') => {
@@ -474,7 +433,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::Comma,
-                    value: String::new(),
                 })
             },
             Some('\\') => {
@@ -482,7 +440,6 @@ impl<'sess> LexerInner<'sess> {
                 Ok(Token {
                     span: SourceSpan::default(),
                     kind: TokenKind::Backslash,
-                    value: String::new(),
                 })
             },
             Some('"') => self.read_string(),
@@ -542,12 +499,14 @@ impl<'sess> LexerInner<'sess> {
             }
         }
 
+        let sym = self.interner.borrow_mut().intern(&result);
+
         Ok(Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
+                sym,
             },
-            value: result,
         })
     }
 
@@ -574,11 +533,14 @@ impl<'sess> LexerInner<'sess> {
                     "if" => TokenKind::If,
                     "else" => TokenKind::Else,
                     "return" => TokenKind::Return,
-                    _ => TokenKind::Ident,
+                    _ => {
+                        let sym = self.interner.borrow_mut().intern(&identifier);
+                        TokenKind::Ident { sym }
+                    },
                 };
+
                 Ok(Token {
                     kind,
-                    value: identifier,
                     span: SourceSpan::default(),
                 })
             },
@@ -586,7 +548,6 @@ impl<'sess> LexerInner<'sess> {
             _ => Ok(Token {
                 span: SourceSpan::default(),
                 kind: TokenKind::EOF,
-                value: String::new(),
             }),
         }
     }
@@ -613,17 +574,27 @@ impl<'sess> LexerInner<'sess> {
         } else {
             LiteralKind::Integer
         };
+
+        let sym = self.interner.borrow_mut().intern(&number);
+
         Ok(Token {
             span: SourceSpan::default(),
-            kind: TokenKind::Literal { kind },
-            value: number,
+            kind: TokenKind::Literal { kind, sym },
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use session::SourceSpan;
+    use std::cell::RefCell;
+
+    use session::{
+        SourceSpan,
+        interner::{
+            Interner,
+            Symbol,
+        },
+    };
 
     use super::{
         LexerInner,
@@ -636,7 +607,8 @@ mod tests {
 
     #[test]
     fn str_ascii() {
-        let mut lexer = LexerInner::new("\"Hello\"");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("\"Hello\"", &interner);
 
         let result = lexer.read_string();
 
@@ -644,144 +616,159 @@ mod tests {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
+                sym: Symbol(0),
             },
-            value: "Hello".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 7);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "Hello");
     }
 
     #[test]
     fn str_japanese_chars() {
-        let mut lexer = LexerInner::new("\"こんにちは\"");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("\"こんにちは\"", &interner);
         let result = lexer.read_string();
 
         let expect = Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
+                sym: Symbol(0),
             },
-            value: "こんにちは".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 17);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "こんにちは");
     }
 
     #[test]
     fn str_emojis() {
-        let mut lexer = LexerInner::new("\"🦗\"");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("\"🦗\"", &interner);
         let result = lexer.read_string();
 
         let expect = Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
+                sym: Symbol(0),
             },
-            value: "🦗".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 6);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "🦗");
     }
 
     #[test]
     fn tokens_escape_strings() {
-        let mut lexer = LexerInner::new(r#""\n\r\t\"\x41""#);
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new(r#""\n\r\t\"\x41""#, &interner);
         let result = lexer.read_string();
 
         let expect = Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::String,
+                sym: Symbol(0),
             },
-            value: "\n\r\t\"A".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 14);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "\n\r\t\"A");
     }
 
     #[test]
     fn ident_ascii() {
-        let mut lexer = LexerInner::new("Hello");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("Hello", &interner);
         let result = lexer.read_identifier();
 
         assert_eq!(
             result.unwrap(),
             Token {
                 span: SourceSpan::default(),
-                kind: TokenKind::Ident,
-                value: "Hello".into()
+                kind: TokenKind::Ident { sym: Symbol(0) },
             }
         );
         assert_eq!(lexer.current_offset, 5);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "Hello");
     }
 
     #[test]
     fn ident_japanese_chars() {
-        let mut lexer = LexerInner::new("こんにちは");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("こんにちは", &interner);
         let result = lexer.read_identifier();
 
         assert_eq!(
             result.unwrap(),
             Token {
                 span: SourceSpan::default(),
-                kind: TokenKind::Ident,
-                value: "こんにちは".into()
+                kind: TokenKind::Ident { sym: Symbol(0) },
             }
         );
         assert_eq!(lexer.current_offset, 15);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "こんにちは");
     }
 
     #[test]
     fn ident_underscores() {
-        let mut lexer = LexerInner::new("hel_lo_");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("hel_lo_", &interner);
         let result = lexer.read_identifier();
 
         assert_eq!(
             result.unwrap(),
             Token {
                 span: SourceSpan::default(),
-                kind: TokenKind::Ident,
-                value: "hel_lo_".into(),
+                kind: TokenKind::Ident { sym: Symbol(0) },
             }
         );
         assert_eq!(lexer.current_offset, 7);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "hel_lo_");
     }
 
     #[test]
     fn number_int_ascii() {
-        let mut lexer = LexerInner::new("123");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("123", &interner);
         let result = lexer.read_number();
 
         let expect = Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::Integer,
+                sym: Symbol(0),
             },
-            value: "123".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 3);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "123");
     }
 
     #[test]
     fn number_float_ascii() {
-        let mut lexer = LexerInner::new("123.123");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("123.123", &interner);
         let result = lexer.read_number();
 
         let expect = Token {
             span: SourceSpan::default(),
             kind: TokenKind::Literal {
                 kind: LiteralKind::Float,
+                sym: Symbol(0),
             },
-            value: "123.123".into(),
         };
         assert_eq!(result.unwrap(), expect);
         assert_eq!(lexer.current_offset, 7);
+        assert_eq!(interner.borrow().lookup(Symbol(0)), "123.123");
     }
 
     #[test]
     fn multiline() {
-        let mut lexer = LexerInner::new("123.123\n\n");
+        let interner = RefCell::new(Interner::default());
+        let mut lexer = LexerInner::new("123.123\n\n", &interner);
         lexer.next_token().unwrap();
         lexer.next_token().unwrap();
 

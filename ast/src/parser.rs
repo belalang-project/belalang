@@ -365,7 +365,7 @@ impl<'sess> Parser<'sess> {
                 }
 
                 let name = Identifier {
-                    value: self.curr_token.value.clone(),
+                    value: self.curr_token.value,
                 };
 
                 self.next_token()?;
@@ -428,21 +428,24 @@ impl<'sess> Parser<'sess> {
         match self.curr_token.kind {
             // parse_identifier: parse current token as identifier
             TokenKind::Ident => Ok(Expression::Identifier(Identifier {
-                value: self.curr_token.value.clone(),
+                value: self.curr_token.value,
             })),
 
-            TokenKind::Literal { ref kind } => match kind {
-                LiteralKind::Integer => match self.curr_token.value.parse::<i64>() {
-                    Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
-                    Err(_) => Err(ParserError::ParsingInteger(self.curr_token.value.clone())),
-                },
-                LiteralKind::Float => match self.curr_token.value.parse::<f64>() {
-                    Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
-                    Err(_) => Err(ParserError::ParsingFloat(self.curr_token.value.clone())),
-                },
-                LiteralKind::String => Ok(Expression::String(StringLiteral {
-                    value: self.curr_token.value.clone(),
-                })),
+            TokenKind::Literal { ref kind } => {
+                let str_value = self.session.interner.lookup(self.curr_token.value);
+                match kind {
+                    LiteralKind::Integer => match str_value.parse::<i64>() {
+                        Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
+                        Err(_) => Err(ParserError::ParsingInteger(str_value.to_string())),
+                    },
+                    LiteralKind::Float => match str_value.parse::<f64>() {
+                        Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
+                        Err(_) => Err(ParserError::ParsingFloat(str_value.to_string())),
+                    },
+                    LiteralKind::String => Ok(Expression::String(StringLiteral {
+                        value: self.curr_token.value,
+                    })),
+                }
             },
 
             TokenKind::KwTrue => Ok(Expression::Boolean(BooleanExpression { value: true })),
@@ -522,7 +525,7 @@ impl<'sess> Parser<'sess> {
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     params.push(Identifier {
-                        value: self.curr_token.value.clone(),
+                        value: self.curr_token.value,
                     });
 
                     while matches!(self.peek_token.kind, TokenKind::Comma) {
@@ -530,7 +533,7 @@ impl<'sess> Parser<'sess> {
                         self.next_token()?;
 
                         params.push(Identifier {
-                            value: self.curr_token.value.clone(),
+                            value: self.curr_token.value,
                         });
                     }
 

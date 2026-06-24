@@ -3,8 +3,8 @@ use std::{
     rc::Rc,
 };
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Symbol(u32);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Symbol(pub u32);
 
 #[derive(Default)]
 pub struct Interner {

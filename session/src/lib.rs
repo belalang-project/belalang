@@ -1,6 +1,9 @@
 pub mod interner;
 
-use std::path::PathBuf;
+use std::{
+    cell::RefCell,
+    path::PathBuf,
+};
 
 use interner::Interner;
 
@@ -18,7 +21,7 @@ impl SourceSpan {
 
 pub struct Session {
     pub source_text: String,
-    interner: Interner,
+    pub interner: RefCell<Interner>,
 }
 
 impl Session {
@@ -26,14 +29,14 @@ impl Session {
         let source_text = std::fs::read_to_string(input)?;
         Ok(Self {
             source_text,
-            interner: Interner::default(),
+            interner: RefCell::new(Interner::default()),
         })
     }
 
     pub fn for_text(source_text: String) -> anyhow::Result<Self> {
         Ok(Self {
             source_text,
-            interner: Interner::default(),
+            interner: RefCell::new(Interner::default()),
         })
     }
 }
