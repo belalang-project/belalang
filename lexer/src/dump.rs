@@ -23,15 +23,15 @@ impl<'sess, 'lexer> TokensDumper<'sess, 'lexer> {
             }
             let kind_str = match token.kind {
                 TokenKind::Ident { sym } => {
-                    let val = self.session.interner.borrow().lookup(sym).to_string();
+                    let val = self.session.lookup_string(sym);
                     format!("Ident(\"{}\")", val)
                 },
                 TokenKind::Literal { kind, sym } => {
-                    let val = self.session.interner.borrow().lookup(sym).to_string();
+                    let val = self.session.lookup_string(sym);
                     let val = if kind == crate::LiteralKind::String {
                         val.escape_debug().to_string()
                     } else {
-                        val
+                        val.to_string()
                     };
                     format!("Literal({:?}, \"{}\")", kind, val)
                 },

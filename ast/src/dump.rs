@@ -77,7 +77,7 @@ impl Visitor for ASTDumper<'_> {
     }
 
     fn visit_string(&mut self, node: &StringLiteral) {
-        let v = self.session.interner.borrow().lookup(node.value).to_string();
+        let v = self.session.lookup_string(node.value);
         println!("{:indent$}String({:?})", "", v, indent = self.indent);
     }
 
@@ -86,7 +86,7 @@ impl Visitor for ASTDumper<'_> {
     }
 
     fn visit_identifier(&mut self, node: &Identifier) {
-        let v = self.session.interner.borrow().lookup(node.value).to_string();
+        let v = self.session.lookup_string(node.value);
         println!("{:indent$}Identifier({})", "", v, indent = self.indent);
     }
 

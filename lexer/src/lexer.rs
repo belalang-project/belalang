@@ -34,44 +34,24 @@ pub enum LexerError {
 }
 
 pub struct Lexer<'sess> {
-    #[allow(dead_code)]
     session: &'sess Session,
-    inner: LexerInner<'sess>,
-}
-
-impl<'sess> Lexer<'sess> {
-    pub fn new(session: &'sess Session) -> Lexer<'sess> {
-        Lexer {
-            session,
-            inner: LexerInner::new(&session.source_text, &session.interner),
-        }
-    }
-
-    pub fn next_token(&mut self) -> Result<Token, LexerError> {
-        self.inner.next_token()
-    }
-}
-
-pub(crate) struct LexerInner<'sess> {
     current: Option<char>,
     chars: Peekable<Chars<'sess>>,
 
     /// The current byte offset the lexer is at.
     current_offset: usize,
-
-    interner: &'sess RefCell<Interner>,
 }
 
-impl<'sess> LexerInner<'sess> {
-    pub fn new(source: &'sess str, interner: &'sess RefCell<Interner>) -> LexerInner<'sess> {
-        let mut chars = source.chars().peekable();
+impl<'sess> Lexer<'sess> {
+    pub fn new(session: &'sess Session) -> Lexer<'sess> {
+        let mut chars = session.source_text.chars().peekable();
         let current = chars.next();
 
-        LexerInner {
+        Lexer {
+            session,
             current,
             chars,
             current_offset: 0,
-            interner,
         }
     }
 
@@ -506,7 +486,7 @@ impl<'sess> LexerInner<'sess> {
             }
         }
 
-        let sym = self.interner.borrow_mut().intern(&result);
+        let sym = self.session.intern_string(&result);
 
         Ok(Token {
             span: SourceSpan::default(),
@@ -541,7 +521,7 @@ impl<'sess> LexerInner<'sess> {
                     "else" => TokenKind::Else,
                     "return" => TokenKind::Return,
                     _ => {
-                        let sym = self.interner.borrow_mut().intern(&identifier);
+                        let sym = self.session.intern_string(&identifier);
                         TokenKind::Ident { sym }
                     },
                 };
@@ -582,7 +562,7 @@ impl<'sess> LexerInner<'sess> {
             LiteralKind::Integer
         };
 
-        let sym = self.interner.borrow_mut().intern(&number);
+        let sym = self.session.intern_string(&number);
 
         Ok(Token {
             span: SourceSpan::default(),

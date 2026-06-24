@@ -43,14 +43,14 @@ public:
 
   std::unique_ptr<BIRValue> build_constant_int(int64_t val);
   std::unique_ptr<BIRValue> build_constant_float(double val);
-  std::unique_ptr<BIRValue> build_constant_string(rust::String val);
+  std::unique_ptr<BIRValue> build_constant_string(rust::Str val);
   std::unique_ptr<BIRValue> build_constant_bool(bool val);
   std::unique_ptr<BIRValue> build_add(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_sub(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_mul(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_div(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_mod(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::String name);
+  std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
