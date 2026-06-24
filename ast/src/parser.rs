@@ -435,8 +435,7 @@ impl<'sess> Parser<'sess> {
             TokenKind::Ident { sym } => Ok(Expression::Identifier(Identifier { value: sym })),
 
             TokenKind::Literal { ref kind, sym } => {
-                let interner = self.session.interner.borrow();
-                let str_value = interner.lookup(sym);
+                let str_value = self.session.lookup_string(sym);
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
                         Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),

@@ -31,7 +31,7 @@ mod ffi {
 
         fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
         fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
-        fn build_constant_string(self: Pin<&mut BIRGen>, val: String) -> UniquePtr<BIRValue>;
+        fn build_constant_string(self: Pin<&mut BIRGen>, val: &str) -> UniquePtr<BIRValue>;
         fn build_constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
         fn build_add(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_sub(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
@@ -39,7 +39,7 @@ mod ffi {
         fn build_div(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: String) -> UniquePtr<BIRValue>;
+        fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
@@ -116,11 +116,10 @@ impl<'sess> BIRGen<'sess> {
                 _ => todo!("Generation for expression {:?} not implemented", expr),
             },
             Expression::VarDecl(var) => {
-                let interner = self.session.interner.borrow();
                 match *var.value {
                     Expression::Integer(ref i) => {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
-                        let name = interner.lookup(var.name.value).to_string();
+                        let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
@@ -128,7 +127,7 @@ impl<'sess> BIRGen<'sess> {
                     },
                     Expression::Float(ref f) => {
                         let v = self.inner.pin_mut().build_constant_float(f.value);
-                        let name = interner.lookup(var.name.value).to_string();
+                        let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
@@ -136,7 +135,7 @@ impl<'sess> BIRGen<'sess> {
                     },
                     Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
                         let v = self.generate_expression(&var.value);
-                        let name = interner.lookup(var.name.value).to_string();
+                        let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
@@ -153,9 +152,8 @@ impl<'sess> BIRGen<'sess> {
                 }
             },
             Expression::String(s) => {
-                let interner = self.session.interner.borrow();
-                let v = interner.lookup(s.value);
-                self.inner.pin_mut().build_constant_string(v.to_string())
+                let v = self.session.lookup_string(s.value);
+                self.inner.pin_mut().build_constant_string(v)
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }

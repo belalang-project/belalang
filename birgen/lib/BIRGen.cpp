@@ -56,9 +56,9 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::String val) {
+std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::Str val) {
   auto type = builder.getType<bir::StringType>();
-  llvm::StringRef value(val.data());
+  llvm::StringRef value(val.data(), val.size());
   auto attr = bir::StringAttr::get(&context, type, value);
   auto op = bir::ConstantOp::create(builder, loc, type, attr);
   return std::make_unique<BIRValue>(op.getResult());
@@ -111,10 +111,10 @@ std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v, rust::String name) {
+std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v, rust::Str name) {
   auto nakedType = v.getValue().getType();
   auto refType = bir::RefType::get(&context, nakedType);
-  auto op = bir::VarDeclareOp::create(builder, loc, refType, name.c_str());
+  auto op = bir::VarDeclareOp::create(builder, loc, refType, llvm::StringRef(name.data(), name.size()));
   return std::make_unique<BIRValue>(op.getResult());
 }
 
@@ -220,7 +220,7 @@ rust::String LLVMGen::compile_object_file(rust::String out) const {
   module->setDataLayout(tm->createDataLayout());
 
   std::error_code ec;
-  raw_fd_ostream dest(out.data(), ec);
+  raw_fd_ostream dest(llvm::StringRef(out.data(), out.size()), ec);
   if (ec)
     return rust::String("failed to create destination");
 
