@@ -581,9 +581,8 @@ impl<'sess> LexerInner<'sess> {
                 let kind = match identifier.as_str() {
                     "fn" => TokenKind::Function,
                     "while" => TokenKind::While,
-                    "true" | "false" => TokenKind::Literal {
-                        kind: LiteralKind::Boolean,
-                    },
+                    "true" => TokenKind::KwTrue,
+                    "false" => TokenKind::KwFalse,
                     "if" => TokenKind::If,
                     "else" => TokenKind::Else,
                     "return" => TokenKind::Return,
