@@ -10,9 +10,11 @@ def lit_test(name, tests, data = [], env = {}, **kwargs):
         data = tests + data + [
             "//tests:lit.cfg.py",
             "@llvm-project//llvm:FileCheck",
+            "@llvm-project//llvm:not",
         ],
         env = dict({
             "FILECHECK": "$(rlocationpath @llvm-project//llvm:FileCheck)",
+            "NOT": "$(rlocationpath @llvm-project//llvm:not)",
         }, **env),
         deps = [requirement("lit")],
         **kwargs

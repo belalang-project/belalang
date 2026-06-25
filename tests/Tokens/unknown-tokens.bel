@@ -1,0 +1,6 @@
+§
+
+# RUN: %not %belalang build %s 2>&1 | %FileCheck %s
+# CHECK: Error: Unknown token
+# CHECK:   at span SourceSpan { start: 0, end: 1 }: Unknown token
+# CHECK: Error: compilation failed due to previous errors

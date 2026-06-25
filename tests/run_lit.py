@@ -11,7 +11,7 @@ def main():
     test_srcdir = os.environ.get("TEST_SRCDIR", "")
     cwd = os.getcwd()
 
-    tool_vars = ["BIR_OPT", "BIR_TRANSLATE", "BELALANG", "FILECHECK"]
+    tool_vars = ["BIR_OPT", "BIR_TRANSLATE", "BELALANG", "FILECHECK", "NOT"]
 
     for var in tool_vars:
         val = os.environ.get(var)

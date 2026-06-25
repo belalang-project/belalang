@@ -16,9 +16,9 @@ def main():
         lines = content.splitlines()
 
         cmd = [belalang_exe, "build", "--emit=tokens", file_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        new_tokens = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        new_tokens = [line for line in result.stdout.splitlines() if line.strip()]
 
         new_lines = [line for line in lines if not line.lstrip().startswith("# CHECK:")]
         while new_lines and not new_lines[-1].strip():
