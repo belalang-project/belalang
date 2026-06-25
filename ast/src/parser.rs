@@ -404,6 +404,8 @@ impl<'sess> Parser<'sess> {
                     };
                     let ty = match sym {
                         syms::INT => Type::Integer,
+                        syms::FLOAT => Type::Float,
+                        syms::STRING => Type::String,
                         _ => Type::None, // TODO: fill this in
                     };
 
