@@ -1,5 +1,9 @@
 use std::{
     env,
+    io::{
+        self,
+        IsTerminal,
+    },
     os::unix::process::CommandExt,
     path::PathBuf,
 };
@@ -28,6 +32,14 @@ enum EmitTarget {
     Obj,
     #[default]
     Exe,
+}
+
+#[derive(ValueEnum, Clone, Debug, Default)]
+enum ColorChoice {
+    Always,
+    Never,
+    #[default]
+    Auto,
 }
 
 #[derive(clap::Args)]
@@ -79,18 +91,33 @@ enum Commands {
 struct Belalang {
     #[command(subcommand)]
     command: Commands,
+
+    /// Use color
+    #[arg(long, value_enum)]
+    color: ColorChoice,
+}
+
+impl Belalang {
+    fn use_color(&self) -> bool {
+        match self.color {
+            ColorChoice::Always => true,
+            ColorChoice::Never => false,
+            ColorChoice::Auto => io::stdout().is_terminal(),
+        }
+    }
 }
 
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
+    let use_color = belalang.use_color();
 
     match belalang.command {
-        Commands::Build(args) => build(args),
-        Commands::Run(args) => run(args),
+        Commands::Build(args) => build(args, use_color),
+        Commands::Run(args) => run(args, use_color),
     }
 }
 
-fn build(args: BuildArgs) -> anyhow::Result<()> {
+fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     let session = Session::for_file(args.path.clone())?;
 
     let mut lexer = Lexer::new(&session);
@@ -166,7 +193,7 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn run(args: RunArgs) -> anyhow::Result<()> {
+fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
     let session = Session::for_file(args.path.clone())?;
 
     let lexer = Lexer::new(&session);
