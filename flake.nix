@@ -29,7 +29,7 @@
               pkgs.just
             ];
             profile = ''
-              export BRT_DIR="${toString ./.}/bazel-bin/brt"
+              export BRT_DIR="$PWD/bazel-bin/brt"
             '';
           }).env;
         };
