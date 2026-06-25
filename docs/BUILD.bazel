@@ -1,0 +1,15 @@
+load("@rules_rust_mdbook//:defs.bzl", "mdbook", "mdbook_server")
+
+mdbook(
+    name = "contrib",
+    book = "book.toml",
+    srcs = glob(["src/**/*.md"]),
+    tags = ["manual"],
+)
+
+mdbook_server(
+    name = "contrib-server",
+    book = ":contrib",
+    hostname = "0.0.0.0",
+    tags = ["manual"],
+)
