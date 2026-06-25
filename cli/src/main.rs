@@ -172,7 +172,10 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
     let lexer = Lexer::new(&session);
 
     let mut parser = Parser::new(&session, lexer);
-    let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+    let Ok(program) = parser.parse_program() else {
+        check_errors(&session)?;
+        return Ok(());
+    };
     check_errors(&session)?;
 
     let mut birgen = BIRGen::new(&session);
