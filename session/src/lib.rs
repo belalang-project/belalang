@@ -76,12 +76,12 @@ impl Session {
         self.diagnostics.borrow_mut().drain(..).collect()
     }
 
-    pub fn print_diagnostics(&self) {
+    pub fn print_diagnostics(&self, use_color: bool) {
         let source_file = self.source_file.as_deref().and_then(|p| p.to_str()).unwrap_or("<none>");
         let diagnostics = self.take_diagnostics();
 
         for d in diagnostics {
-            diag::print_diagnostics(&self.source_text, source_file, &d);
+            diag::print_diagnostics(&self.source_text, source_file, &d, use_color);
         }
     }
 }

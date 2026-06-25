@@ -93,7 +93,7 @@ struct Belalang {
     command: Commands,
 
     /// Use color
-    #[arg(long, value_enum)]
+    #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
     color: ColorChoice,
 }
 
@@ -125,21 +125,21 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     if let EmitTarget::Tokens = args.emit {
         let mut dumper = lexer::TokensDumper::new(&session, &mut lexer);
         let res = dumper.dump();
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         res?;
         return Ok(());
     }
 
     let mut parser = Parser::new(&session, lexer);
     let Ok(program) = parser.parse_program() else {
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         return Ok(());
     };
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     let mut ty_infer = TypeInferer::new(&session);
     ty_infer.infer(&program);
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     if let EmitTarget::Ast = args.emit {
         let mut dumper = ast::ASTDumper::new(&session);
@@ -200,10 +200,10 @@ fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
 
     let mut parser = Parser::new(&session, lexer);
     let Ok(program) = parser.parse_program() else {
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         return Ok(());
     };
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     let mut birgen = BIRGen::new(&session);
     birgen.generate_program(&program);
@@ -238,9 +238,9 @@ fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
     anyhow::bail!("Failed to exec: {}", err);
 }
 
-fn check_errors(session: &Session) -> anyhow::Result<()> {
+fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
     if session.has_errors() {
-        session.print_diagnostics();
+        session.print_diagnostics(use_color);
         anyhow::bail!("compilation failed due to previous errors");
     }
     Ok(())
