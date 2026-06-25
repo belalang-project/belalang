@@ -97,12 +97,17 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
 
     if let EmitTarget::Tokens = args.emit {
         let mut dumper = lexer::TokensDumper::new(&session, &mut lexer);
-        dumper.dump()?;
+        let res = dumper.dump();
+        check_errors(&session)?;
+        res?;
         return Ok(());
     }
 
     let mut parser = Parser::new(&session, lexer);
-    let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+    let Ok(program) = parser.parse_program() else {
+        check_errors(&session)?;
+        return Ok(());
+    };
     check_errors(&session)?;
 
     let mut ty_infer = TypeInferer::new(&session);

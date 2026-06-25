@@ -7,6 +7,11 @@ use std::{
 use session::{
     Session,
     SourceSpan,
+    diag::{
+        Diagnostic,
+        Label,
+        Severity,
+    },
     interner::{
         Interner,
         syms,
@@ -443,49 +448,80 @@ impl<'sess> Lexer<'sess> {
     }
 
     fn read_string(&mut self) -> Result<Token, LexerError> {
+        let string_start = self.current_offset;
         self.advance(); // consume the opening "
         let mut result = String::new();
 
         loop {
             match self.advance() {
-                Some('\\') => match self.current {
-                    Some('n') => {
-                        self.advance();
-                        result.push('\n');
-                    },
-                    Some('r') => {
-                        self.advance();
-                        result.push('\r');
-                    },
-                    Some('t') => {
-                        self.advance();
-                        result.push('\t');
-                    },
-                    Some('"') => {
-                        self.advance();
-                        result.push('"');
-                    },
-                    Some('\\') => {
-                        self.advance();
-                        result.push('\\');
-                    },
-                    Some('x') => {
-                        self.advance(); // consume the 'x'
+                Some('\\') => {
+                    let escape_start = self.current_offset - 1;
+                    match self.current {
+                        Some('n') => {
+                            self.advance();
+                            result.push('\n');
+                        },
+                        Some('r') => {
+                            self.advance();
+                            result.push('\r');
+                        },
+                        Some('t') => {
+                            self.advance();
+                            result.push('\t');
+                        },
+                        Some('"') => {
+                            self.advance();
+                            result.push('"');
+                        },
+                        Some('\\') => {
+                            self.advance();
+                            result.push('\\');
+                        },
+                        Some('x') => {
+                            self.advance(); // consume the 'x'
 
-                        let hi = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
-                        let lo = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
+                            let hi = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
+                            let lo = self.advance().and_then(|c| c.to_digit(16)).map(|d| d as u8);
 
-                        match (hi, lo) {
-                            (Some(hi), Some(lo)) => result.push(((hi << 4) | lo) as char),
-                            (_, _) => return Err(LexerError::UnknownEscapeString),
-                        }
-                    },
-                    Some(_) => return Err(LexerError::UnknownEscapeString),
-                    None => return Err(LexerError::UnclosedString),
+                            match (hi, lo) {
+                                (Some(hi), Some(lo)) => result.push(((hi << 4) | lo) as char),
+                                (_, _) => {
+                                    let span = SourceSpan::new(escape_start, self.current_offset);
+                                    self.session.emit(
+                                        Diagnostic::error("Unknown escape string")
+                                            .with_label(Label::primary(span, "Unknown escape string")),
+                                    );
+                                    return Err(LexerError::UnknownEscapeString);
+                                },
+                            }
+                        },
+                        Some(_) => {
+                            self.advance();
+                            let span = SourceSpan::new(escape_start, self.current_offset);
+                            self.session.emit(
+                                Diagnostic::error("Unknown escape string")
+                                    .with_label(Label::primary(span, "Unknown escape string")),
+                            );
+                            return Err(LexerError::UnknownEscapeString);
+                        },
+                        None => {
+                            let span = SourceSpan::new(string_start, self.current_offset);
+                            self.session.emit(
+                                Diagnostic::error("Unclosed string")
+                                    .with_label(Label::primary(span, "Unclosed string")),
+                            );
+                            return Err(LexerError::UnclosedString);
+                        },
+                    }
                 },
                 Some('"') => break,
                 Some(c) => result.push(c),
-                None => return Err(LexerError::UnclosedString),
+                None => {
+                    let span = SourceSpan::new(string_start, self.current_offset);
+                    self.session
+                        .emit(Diagnostic::error("Unclosed string").with_label(Label::primary(span, "Unclosed string")));
+                    return Err(LexerError::UnclosedString);
+                },
             }
         }
 
@@ -532,7 +568,12 @@ impl<'sess> Lexer<'sess> {
                     span: SourceSpan::default(),
                 })
             },
-            Some(c) => Err(LexerError::UnknownToken(c.to_string())),
+            Some(c) => {
+                let span = SourceSpan::new(self.current_offset, self.current_offset + 1);
+                self.session
+                    .emit(Diagnostic::error("Unknown token").with_label(Label::primary(span, "Unknown token")));
+                Err(LexerError::UnknownToken(c.to_string()))
+            },
             _ => Ok(Token {
                 span: SourceSpan::default(),
                 kind: TokenKind::EOF,
