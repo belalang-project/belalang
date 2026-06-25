@@ -7,6 +7,11 @@ use std::{
 use session::{
     Session,
     SourceSpan,
+    diag::{
+        Diagnostic,
+        Label,
+        Severity,
+    },
     interner::{
         Interner,
         syms,
@@ -532,7 +537,12 @@ impl<'sess> Lexer<'sess> {
                     span: SourceSpan::default(),
                 })
             },
-            Some(c) => Err(LexerError::UnknownToken(c.to_string())),
+            Some(c) => {
+                let span = SourceSpan::new(self.current_offset, self.current_offset + 1);
+                self.session
+                    .emit(Diagnostic::error("Unknown token").with_label(Label::primary(span, "Unknown token")));
+                Err(LexerError::UnknownToken(c.to_string()))
+            },
             _ => Ok(Token {
                 span: SourceSpan::default(),
                 kind: TokenKind::EOF,
