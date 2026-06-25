@@ -7,7 +7,10 @@ use std::{
 use session::{
     Session,
     SourceSpan,
-    interner::Interner,
+    interner::{
+        Interner,
+        syms,
+    },
 };
 use unicode_ident::{
     is_xid_continue,
@@ -512,18 +515,16 @@ impl<'sess> Lexer<'sess> {
                     }
                 }
 
-                let kind = match identifier.as_str() {
-                    "fn" => TokenKind::Function,
-                    "while" => TokenKind::While,
-                    "true" => TokenKind::KwTrue,
-                    "false" => TokenKind::KwFalse,
-                    "if" => TokenKind::If,
-                    "else" => TokenKind::Else,
-                    "return" => TokenKind::Return,
-                    _ => {
-                        let sym = self.session.intern_string(&identifier);
-                        TokenKind::Ident { sym }
-                    },
+                let sym = self.session.intern_string(&identifier);
+                let kind = match sym {
+                    syms::FN => TokenKind::Function,
+                    syms::WHILE => TokenKind::While,
+                    syms::TRUE => TokenKind::KwTrue,
+                    syms::FALSE => TokenKind::KwFalse,
+                    syms::IF => TokenKind::If,
+                    syms::ELSE => TokenKind::Else,
+                    syms::RETURN => TokenKind::Return,
+                    _ => TokenKind::Ident { sym },
                 };
 
                 Ok(Token {
