@@ -81,7 +81,7 @@ impl Diagnostic {
     }
 }
 
-pub(crate) fn print_diagnostics(source_text: &str, source_file: &str, diag: &Diagnostic) {
+pub(crate) fn print_diagnostics(source_text: &str, source_file: &str, diag: &Diagnostic, use_color: bool) {
     let mut annotations = Vec::new();
     for label in &diag.labels {
         let span = label.span.start..label.span.end;
@@ -94,10 +94,15 @@ pub(crate) fn print_diagnostics(source_text: &str, source_file: &str, diag: &Dia
         .annotations(annotations);
     let msg = Level::ERROR.primary_title(&diag.message).element(snippet);
 
-    let renderer = get_renderer();
+    let renderer = get_renderer(use_color);
     println!("{}", renderer.render(&[msg]));
 }
 
-fn get_renderer() -> Renderer {
-    Renderer::plain().decor_style(DecorStyle::Ascii)
+fn get_renderer(use_color: bool) -> Renderer {
+    if use_color {
+        Renderer::styled()
+    } else {
+        Renderer::plain()
+    }
+    .decor_style(DecorStyle::Ascii)
 }

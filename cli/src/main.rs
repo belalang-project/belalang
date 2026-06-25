@@ -1,5 +1,9 @@
 use std::{
     env,
+    io::{
+        self,
+        IsTerminal,
+    },
     os::unix::process::CommandExt,
     path::PathBuf,
 };
@@ -28,6 +32,14 @@ enum EmitTarget {
     Obj,
     #[default]
     Exe,
+}
+
+#[derive(ValueEnum, Clone, Debug, Default)]
+enum ColorChoice {
+    Always,
+    Never,
+    #[default]
+    Auto,
 }
 
 #[derive(clap::Args)]
@@ -79,18 +91,33 @@ enum Commands {
 struct Belalang {
     #[command(subcommand)]
     command: Commands,
+
+    /// Use color
+    #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
+    color: ColorChoice,
+}
+
+impl Belalang {
+    fn use_color(&self) -> bool {
+        match self.color {
+            ColorChoice::Always => true,
+            ColorChoice::Never => false,
+            ColorChoice::Auto => io::stdout().is_terminal(),
+        }
+    }
 }
 
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
+    let use_color = belalang.use_color();
 
     match belalang.command {
-        Commands::Build(args) => build(args),
-        Commands::Run(args) => run(args),
+        Commands::Build(args) => build(args, use_color),
+        Commands::Run(args) => run(args, use_color),
     }
 }
 
-fn build(args: BuildArgs) -> anyhow::Result<()> {
+fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     let session = Session::for_file(args.path.clone())?;
 
     let mut lexer = Lexer::new(&session);
@@ -98,21 +125,21 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     if let EmitTarget::Tokens = args.emit {
         let mut dumper = lexer::TokensDumper::new(&session, &mut lexer);
         let res = dumper.dump();
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         res?;
         return Ok(());
     }
 
     let mut parser = Parser::new(&session, lexer);
     let Ok(program) = parser.parse_program() else {
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         return Ok(());
     };
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     let mut ty_infer = TypeInferer::new(&session);
     ty_infer.infer(&program);
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     if let EmitTarget::Ast = args.emit {
         let mut dumper = ast::ASTDumper::new(&session);
@@ -166,17 +193,17 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn run(args: RunArgs) -> anyhow::Result<()> {
+fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
     let session = Session::for_file(args.path.clone())?;
 
     let lexer = Lexer::new(&session);
 
     let mut parser = Parser::new(&session, lexer);
     let Ok(program) = parser.parse_program() else {
-        check_errors(&session)?;
+        check_errors(&session, use_color)?;
         return Ok(());
     };
-    check_errors(&session)?;
+    check_errors(&session, use_color)?;
 
     let mut birgen = BIRGen::new(&session);
     birgen.generate_program(&program);
@@ -211,9 +238,9 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
     anyhow::bail!("Failed to exec: {}", err);
 }
 
-fn check_errors(session: &Session) -> anyhow::Result<()> {
+fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
     if session.has_errors() {
-        session.print_diagnostics();
+        session.print_diagnostics(use_color);
         anyhow::bail!("compilation failed due to previous errors");
     }
     Ok(())
