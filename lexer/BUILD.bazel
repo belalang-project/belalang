@@ -4,7 +4,9 @@ rust_library(
 	name = "lexer",
 	srcs = glob(["src/*.rs"]),
 	deps = [
+		"//diag",
 		"//session",
+		"//span",
 		"@crates//:thiserror",
 		"@crates//:unicode-ident",
 	],

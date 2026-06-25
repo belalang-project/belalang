@@ -7,8 +7,7 @@ use annotate_snippets::{
         Renderer,
     },
 };
-
-use crate::SourceSpan;
+use span::SourceSpan;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Severity {
@@ -81,7 +80,7 @@ impl Diagnostic {
     }
 }
 
-pub(crate) fn print_diagnostics(source_text: &str, source_file: &str, diag: &Diagnostic, use_color: bool) {
+pub fn print_diagnostics(source_text: &str, source_file: &str, diag: &Diagnostic, use_color: bool) {
     let mut annotations = Vec::new();
     for label in &diag.labels {
         let span = label.span.start..label.span.end;

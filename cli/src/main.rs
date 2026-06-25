@@ -240,7 +240,9 @@ fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
 
 fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
     if session.has_errors() {
-        session.print_diagnostics(use_color);
+        for d in session.take_diagnostics() {
+            diag::print_diagnostics(&session.source_text, session.get_source_file(), &d, use_color);
+        }
         anyhow::bail!("compilation failed due to previous errors");
     }
     Ok(())

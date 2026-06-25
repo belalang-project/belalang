@@ -4,19 +4,16 @@ use std::{
     str::Chars,
 };
 
+use diag::{
+    Diagnostic,
+    Label,
+    Severity,
+};
 use session::{
     Session,
-    SourceSpan,
-    diag::{
-        Diagnostic,
-        Label,
-        Severity,
-    },
-    interner::{
-        Interner,
-        syms,
-    },
+    interner::syms,
 };
+use span::SourceSpan;
 use unicode_ident::{
     is_xid_continue,
     is_xid_start,
