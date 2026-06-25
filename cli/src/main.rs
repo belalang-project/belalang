@@ -172,7 +172,10 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
     let lexer = Lexer::new(&session);
 
     let mut parser = Parser::new(&session, lexer);
-    let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+    let Ok(program) = parser.parse_program() else {
+        check_errors(&session)?;
+        return Ok(());
+    };
     check_errors(&session)?;
 
     let mut birgen = BIRGen::new(&session);
@@ -210,13 +213,7 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
 
 fn check_errors(session: &Session) -> anyhow::Result<()> {
     if session.has_errors() {
-        let diagnostics = session.take_diagnostics();
-        for diag in diagnostics {
-            eprintln!("{:?}: {}", diag.severity, diag.message);
-            for label in diag.labels {
-                eprintln!("  at span {:?}: {}", label.span, label.message);
-            }
-        }
+        session.print_diagnostics();
         anyhow::bail!("compilation failed due to previous errors");
     }
     Ok(())

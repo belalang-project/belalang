@@ -569,7 +569,8 @@ impl<'sess> Lexer<'sess> {
                 })
             },
             Some(c) => {
-                let span = SourceSpan::new(self.current_offset, self.current_offset + 1);
+                let char_len = c.len_utf8();
+                let span = SourceSpan::new(self.current_offset, self.current_offset + char_len);
                 self.session
                     .emit(Diagnostic::error("Unknown token").with_label(Label::primary(span, "Unknown token")));
                 Err(LexerError::UnknownToken(c.to_string()))
