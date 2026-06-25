@@ -1,6 +1,14 @@
 "hello
 
 # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
-# CHECK: Error: Unclosed string
-# CHECK:   at span SourceSpan { start: 0, end: 220 }: Unclosed string
-# CHECK: Error: compilation failed due to previous errors
+# CHECK: error: Unclosed string
+# CHECK:  --> /home/guest/belalang/tests/Tokens/unclosed-string.bel:1:1
+# CHECK:   |
+# CHECK: 1 | / "hello
+# CHECK: 2 | |
+# CHECK: 3 | | # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
+# CHECK: 4 | | # CHECK: Error: Unclosed string
+# CHECK: 5 | | # CHECK:   at span SourceSpan { start: 0, end: 220 }: Unclosed string
+# CHECK: 6 | | # CHECK: Error: compilation failed due to previous errors
+# CHECK:   | |__________________________________________________________^ Unclosed string
+# CHECK: Error: unclosed string

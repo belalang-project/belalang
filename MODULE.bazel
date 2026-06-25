@@ -133,6 +133,10 @@ crate.spec(
     package = "cxx",
     version = "1.0.194",
 )
+crate.spec(
+    package = "annotate-snippets",
+    version = "0.12.16",
+)
 crate.from_specs()
 use_repo(crate, "crates")
 

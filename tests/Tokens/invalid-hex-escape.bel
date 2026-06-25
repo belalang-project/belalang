@@ -1,6 +1,9 @@
 "\x1g"
 
 # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
-# CHECK: Error: Unknown escape string
-# CHECK:   at span SourceSpan { start: 1, end: 5 }: Unknown escape string
-# CHECK: Error: compilation failed due to previous errors
+# CHECK: error: Unknown escape string
+# CHECK:  --> /home/guest/belalang/tests/Tokens/invalid-hex-escape.bel:1:2
+# CHECK:   |
+# CHECK: 1 | "\x1g"
+# CHECK:   |  ^^^^ Unknown escape string
+# CHECK: Error: unknown escape string
