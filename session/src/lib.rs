@@ -1,3 +1,4 @@
+pub mod diag;
 pub mod interner;
 
 use std::{
@@ -5,6 +6,10 @@ use std::{
     path::PathBuf,
 };
 
+use diag::{
+    Diagnostic,
+    Severity,
+};
 use interner::Interner;
 
 use crate::interner::Symbol;
@@ -24,14 +29,16 @@ impl SourceSpan {
 pub struct Session {
     pub source_text: String,
     interner: RefCell<Interner>,
+    diagnostics: RefCell<Vec<Diagnostic>>,
 }
 
 impl Session {
     pub fn for_file(input: PathBuf) -> anyhow::Result<Self> {
-        let source_text = std::fs::read_to_string(input)?;
+        let source_text = std::fs::read_to_string(&input)?;
         Ok(Self {
             source_text,
             interner: RefCell::new(Interner::with_pre_interned_symbols()),
+            diagnostics: RefCell::new(Vec::new()),
         })
     }
 
@@ -39,6 +46,7 @@ impl Session {
         Ok(Self {
             source_text,
             interner: RefCell::new(Interner::with_pre_interned_symbols()),
+            diagnostics: RefCell::new(Vec::new()),
         })
     }
 
@@ -51,5 +59,17 @@ impl Session {
         let s = interner.lookup(sym);
         // SAFETY: the interned string does have the 'sess lifetime
         unsafe { std::mem::transmute::<&str, &'sess str>(s) }
+    }
+
+    pub fn emit(&self, diag: Diagnostic) {
+        self.diagnostics.borrow_mut().push(diag);
+    }
+
+    pub fn has_errors(&self) -> bool {
+        self.diagnostics.borrow().iter().any(|d| d.severity == Severity::Error)
+    }
+
+    pub fn take_diagnostics(&self) -> Vec<Diagnostic> {
+        self.diagnostics.borrow_mut().drain(..).collect()
     }
 }

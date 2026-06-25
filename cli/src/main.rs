@@ -103,9 +103,11 @@ fn build(args: BuildArgs) -> anyhow::Result<()> {
 
     let mut parser = Parser::new(&session, lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+    check_errors(&session)?;
 
     let mut ty_infer = TypeInferer::new(&session);
     ty_infer.infer(&program);
+    check_errors(&session)?;
 
     if let EmitTarget::Ast = args.emit {
         let mut dumper = ast::ASTDumper::new(&session);
@@ -166,6 +168,7 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
 
     let mut parser = Parser::new(&session, lexer);
     let program = parser.parse_program().map_err(|e| anyhow::anyhow!("{}", e))?;
+    check_errors(&session)?;
 
     let mut birgen = BIRGen::new(&session);
     birgen.generate_program(&program);
@@ -198,4 +201,18 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
     let exe = std::fs::canonicalize(args.path.with_extension("")).context("Failed to canonicalize exe path")?;
     let err = std::process::Command::new(exe).exec();
     anyhow::bail!("Failed to exec: {}", err);
+}
+
+fn check_errors(session: &Session) -> anyhow::Result<()> {
+    if session.has_errors() {
+        let diagnostics = session.take_diagnostics();
+        for diag in diagnostics {
+            eprintln!("{:?}: {}", diag.severity, diag.message);
+            for label in diag.labels {
+                eprintln!("  at span {:?}: {}", label.span, label.message);
+            }
+        }
+        anyhow::bail!("compilation failed due to previous errors");
+    }
+    Ok(())
 }
