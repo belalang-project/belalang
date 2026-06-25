@@ -1,5 +1,8 @@
 "hello
 
 # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
-# CHECK: Literal(String, "hello\n\n# RUN: %not %belalang build %s 2>&1 | %FileCheck %s\n# CHECK: error: Unclosed string\n# CHECK:  --> /home/guest/belalang/tests/Tokens/unclosed-string.bel:1:1\n# CHECK:   |\n# CHECK: 1 | / ") <0..193>
-# CHECK: Ident("hello") <193..198>
+# CHECK: error: Unclosed string
+# CHECK:  --> {{.*}}/tests/Tokens/unclosed-string.bel:1:1
+# CHECK:   |
+# CHECK: 1 | / {{.*}}hello
+# CHECK: Error: compilation failed due to previous errors

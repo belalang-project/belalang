@@ -214,6 +214,7 @@ fn run(args: RunArgs) -> anyhow::Result<()> {
 fn check_errors(session: &Session) -> anyhow::Result<()> {
     if session.has_errors() {
         session.print_diagnostics();
+        anyhow::bail!("compilation failed due to previous errors");
     }
     Ok(())
 }

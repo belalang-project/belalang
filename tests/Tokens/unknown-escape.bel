@@ -2,8 +2,8 @@
 
 # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
 # CHECK: error: Unknown escape string
-# CHECK:  --> /home/guest/belalang/tests/Tokens/unknown-escape.bel:1:2
+# CHECK:  --> {{.*}}/tests/Tokens/unknown-escape.bel:1:2
 # CHECK:   |
 # CHECK: 1 | "\g"
 # CHECK:   |  ^^ Unknown escape string
-# CHECK: Error: unknown escape string
+# CHECK: Error: compilation failed due to previous errors

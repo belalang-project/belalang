@@ -10,6 +10,9 @@ def main():
     tokens_dir = os.path.join(workspace_dir, "tests", "Tokens")
 
     for file_path in glob.glob(os.path.join(tokens_dir, "*.bel")):
+        # FIXME: skip unclosed-string because of current limitations of string
+        if os.path.basename(file_path) == "unclosed-string.bel":
+            continue
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
@@ -18,7 +21,11 @@ def main():
         cmd = [belalang_exe, "build", "--emit=tokens", file_path]
         result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        new_tokens = [line for line in result.stdout.splitlines() if line.strip()]
+        new_tokens = []
+        for line in result.stdout.splitlines():
+            if line.strip():
+                line = line.replace(workspace_dir.rstrip("/"), "{{.*}}")
+                new_tokens.append(line)
 
         new_lines = [line for line in lines if not line.lstrip().startswith("# CHECK:")]
         while new_lines and not new_lines[-1].strip():
