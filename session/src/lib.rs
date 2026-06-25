@@ -1,4 +1,3 @@
-pub mod diag;
 pub mod interner;
 
 use std::{
@@ -13,18 +12,6 @@ use diag::{
 use interner::Interner;
 
 use crate::interner::Symbol;
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
-pub struct SourceSpan {
-    pub start: usize,
-    pub end: usize,
-}
-
-impl SourceSpan {
-    pub fn new(start: usize, end: usize) -> Self {
-        Self { start, end }
-    }
-}
 
 pub struct Session {
     pub source_text: String,
@@ -76,12 +63,7 @@ impl Session {
         self.diagnostics.borrow_mut().drain(..).collect()
     }
 
-    pub fn print_diagnostics(&self, use_color: bool) {
-        let source_file = self.source_file.as_deref().and_then(|p| p.to_str()).unwrap_or("<none>");
-        let diagnostics = self.take_diagnostics();
-
-        for d in diagnostics {
-            diag::print_diagnostics(&self.source_text, source_file, &d, use_color);
-        }
+    pub fn get_source_file(&self) -> &str {
+        self.source_file.as_deref().and_then(|p| p.to_str()).unwrap_or("<none>")
     }
 }

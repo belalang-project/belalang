@@ -1,12 +1,7 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
-	name = "session",
+	name = "span",
 	srcs = glob(["src/*.rs"]),
-	deps = [
-		"//diag",
-		"@crates//:anyhow",
-		"@crates//:annotate-snippets",
-	],
 	visibility = ["//visibility:public"],
 )

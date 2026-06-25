@@ -1,7 +1,5 @@
-use session::{
-    SourceSpan,
-    interner::Symbol,
-};
+use session::interner::Symbol;
+use span::SourceSpan;
 
 mod dump;
 mod lexer;
