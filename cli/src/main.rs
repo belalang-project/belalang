@@ -194,6 +194,7 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
 }
 
 fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
+    let bb = bbuild::BBuild::new(&args.path);
     let session = Session::for_file(args.path.clone())?;
 
     let lexer = Lexer::new(&session);
@@ -218,20 +219,7 @@ fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
         .to_string();
     let _ = llvmgen.compile_object_file(obj_out.clone());
 
-    let cc = env::var("CC").unwrap_or("cc".to_string());
-    let brt = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
-
-    let status = std::process::Command::new(cc)
-        .arg(obj_out)
-        .arg(format!("-L{}", brt))
-        .arg("-lbrt")
-        .arg("-o")
-        .arg(args.path.with_extension(""))
-        .status()?;
-
-    if !status.success() {
-        anyhow::bail!("linker failed with exit code: {}", status);
-    }
+    bb.link_objects()?;
 
     let exe = std::fs::canonicalize(args.path.with_extension("")).context("Failed to canonicalize exe path")?;
     let err = std::process::Command::new(exe).exec();
