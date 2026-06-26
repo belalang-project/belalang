@@ -445,11 +445,11 @@ impl<'sess> Parser<'sess> {
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
                         Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
-                        Err(_) => Err(ParserError::ParsingInteger(str_value.to_string())),
+                        Err(_) => Err(self.error_parsing_integer(str_value)),
                     },
                     LiteralKind::Float => match str_value.parse::<f64>() {
                         Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
-                        Err(_) => Err(ParserError::ParsingFloat(str_value.to_string())),
+                        Err(_) => Err(self.error_parsing_float(str_value)),
                     },
                     LiteralKind::String => Ok(Expression::String(StringLiteral { value: sym })),
                 }
@@ -580,5 +580,19 @@ impl<'sess> Parser<'sess> {
         let label = Label::primary(self.curr_token.span, "invalid lhs");
         self.session.emit(Diagnostic::error("invalid lhs").with_label(label));
         ParserError::InvalidLHS(left.clone())
+    }
+
+    fn error_parsing_integer(&self, v: &str) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "error parsing integer");
+        self.session
+            .emit(Diagnostic::error("error parsing integer").with_label(label));
+        ParserError::ParsingInteger(v.to_string())
+    }
+
+    fn error_parsing_float(&self, v: &str) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "error parsing float");
+        self.session
+            .emit(Diagnostic::error("error parsing float").with_label(label));
+        ParserError::ParsingFloat(v.to_string())
     }
 }
