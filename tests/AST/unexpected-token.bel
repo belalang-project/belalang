@@ -1,0 +1,8 @@
+# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+x ::
+
+# CHECK:      error: unexpected token
+# CHECK-NEXT:  --> {{.*}}/tests/AST/unexpected-token.bel:2:4
+# CHECK-NEXT:   |
+# CHECK-NEXT: 2 | x ::
+# CHECK-NEXT:   |    ^ unexpected token

@@ -1,3 +1,7 @@
+use diag::{
+    Diagnostic,
+    Label,
+};
 use lexer::{
     AssignmentKind,
     InfixKind,
@@ -86,7 +90,7 @@ macro_rules! expect_peek {
             $self.next_token()?;
             true
         } else {
-            return Err(ParserError::UnexpectedToken($self.peek_token.kind));
+            return Err($self.error_unexpected_token());
         }
     };
 }
@@ -249,7 +253,7 @@ impl<'sess> Parser<'sess> {
             Some(Box::new(match self.curr_token.kind {
                 TokenKind::If => self.parse_if()?,
                 TokenKind::LeftBrace => Expression::Block(self.parse_block()?),
-                _ => return Err(ParserError::UnexpectedToken(self.curr_token.kind)),
+                _ => return Err(self.error_unexpected_token()),
             }))
         } else {
             None
@@ -400,7 +404,7 @@ impl<'sess> Parser<'sess> {
                     None
                 } else {
                     let TokenKind::Ident { sym } = self.curr_token.kind else {
-                        return Err(ParserError::UnexpectedToken(self.curr_token.kind));
+                        return Err(self.error_unexpected_token());
                     };
                     let ty = match sym {
                         syms::INT => Type::Integer,
@@ -556,5 +560,12 @@ impl<'sess> Parser<'sess> {
 
             _ => Err(ParserError::UnknownPrefixOperator(self.curr_token.kind)),
         }
+    }
+
+    fn error_unexpected_token(&self) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "unexpected token");
+        self.session
+            .emit(Diagnostic::error("unexpected token").with_label(label));
+        ParserError::UnexpectedToken(self.curr_token.kind)
     }
 }

@@ -4,8 +4,10 @@ rust_library(
 	name = "ast",
 	srcs = glob(["src/*.rs"]),
 	deps = [
+		"//diag",
 		"//lexer",
 		"//session",
+		"//span",
 		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],
