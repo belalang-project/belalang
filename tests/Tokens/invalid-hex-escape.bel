@@ -6,4 +6,3 @@
 # CHECK:   |
 # CHECK: 1 | "\x1g"
 # CHECK:   |  ^^^^ Unknown escape string
-# CHECK: Error: compilation failed due to previous errors

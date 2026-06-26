@@ -164,7 +164,7 @@ impl BBuild {
                     self.bctx.use_color,
                 );
             }
-            anyhow::bail!("compilation failed due to previous errors");
+            anyhow::bail!("");
         }
         Ok(())
     }
