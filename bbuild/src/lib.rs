@@ -10,8 +10,11 @@ use std::{
 
 use anyhow::Context;
 use ast::{
+    ASTDumper,
     Parser,
     Program,
+    TypeInferer,
+    Visitor,
 };
 use birgen::BIRGen;
 use lexer::Lexer;
@@ -34,7 +37,7 @@ impl BBuild {
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
 
         let out_obj = source_path.with_added_extension("o");
-        let out_exe = source_path.with_added_extension("");
+        let out_exe = source_path.with_extension("");
 
         let session = Session::for_file(source_path.to_path_buf())?;
 
@@ -61,16 +64,53 @@ impl BBuild {
         Ok(program)
     }
 
-    pub fn compile_object_file(&self, program: Program) -> anyhow::Result<()> {
+    pub fn dump_tokens(&self) -> anyhow::Result<()> {
+        let mut lexer = Lexer::new(&self.session);
+        let mut dumper = lexer::TokensDumper::new(&self.session, &mut lexer);
+        let res = dumper.dump();
+        check_errors(&self.session, self.use_color)?;
+        res?;
+        Ok(())
+    }
+
+    pub fn infer_types(&self, program: &Program) -> anyhow::Result<()> {
+        let mut ty_infer = TypeInferer::new(&self.session);
+        ty_infer.infer(program);
+        check_errors(&self.session, self.use_color)?;
+        Ok(())
+    }
+
+    pub fn dump_ast(&self, program: &Program) -> anyhow::Result<()> {
+        let mut dumper = ASTDumper::new(&self.session);
+        dumper.visit_program(program);
+        Ok(())
+    }
+
+    pub fn dump_bir(&self, program: &Program) -> String {
         let mut birgen = BIRGen::new(&self.session);
-        birgen.generate_program(&program);
+        birgen.generate_program(program);
+        birgen.optimize();
+        birgen.dump_to_string()
+    }
+
+    pub fn dump_llvm(&self, program: &Program) -> String {
+        let mut birgen = BIRGen::new(&self.session);
+        birgen.generate_program(program);
+        birgen.optimize();
+        let llvmgen = birgen.llvmgen();
+        llvmgen.dump_to_string()
+    }
+
+    pub fn compile_object_file(&self, program: &Program) -> anyhow::Result<String> {
+        let mut birgen = BIRGen::new(&self.session);
+        birgen.generate_program(program);
         birgen.optimize();
 
         let llvmgen = birgen.llvmgen();
         let obj_out = self.out_obj.to_str().context("invalid UTF-8 data")?.to_string();
-        let _ = llvmgen.compile_object_file(obj_out);
+        let compiled = llvmgen.compile_object_file(obj_out);
 
-        Ok(())
+        Ok(compiled)
     }
 
     pub fn link_objects(&self) -> anyhow::Result<()> {

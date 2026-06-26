@@ -1,27 +1,16 @@
 use std::{
-    env,
     io::{
         self,
         IsTerminal,
     },
-    os::unix::process::CommandExt,
     path::PathBuf,
 };
 
-use anyhow::Context;
-use ast::{
-    Parser,
-    TypeInferer,
-    Visitor,
-};
-use birgen::BIRGen;
 use clap::{
     Parser as ClapParser,
     Subcommand,
     ValueEnum,
 };
-use lexer::Lexer;
-use session::Session;
 
 #[derive(ValueEnum, Clone, Debug, Default)]
 enum EmitTarget {
@@ -54,24 +43,6 @@ struct BuildArgs {
     /// What to emit
     #[arg(long, value_enum, default_value_t = EmitTarget::Exe)]
     emit: EmitTarget,
-}
-
-impl BuildArgs {
-    fn get_out_path(&self) -> Option<PathBuf> {
-        if let Some(out) = &self.out {
-            return Some(out.to_path_buf());
-        }
-
-        if let EmitTarget::Obj = self.emit {
-            return Some(self.path.with_added_extension("o"));
-        }
-
-        if let EmitTarget::Exe = self.emit {
-            return Some(self.path.with_added_extension("o"));
-        }
-
-        None
-    }
 }
 
 #[derive(clap::Args)]
@@ -118,77 +89,39 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
-    let session = Session::for_file(args.path.clone())?;
-
-    let mut lexer = Lexer::new(&session);
+    let bb = bbuild::BBuild::new(&args.path, use_color)?;
 
     if let EmitTarget::Tokens = args.emit {
-        let mut dumper = lexer::TokensDumper::new(&session, &mut lexer);
-        let res = dumper.dump();
-        check_errors(&session, use_color)?;
-        res?;
+        bb.dump_tokens()?;
         return Ok(());
     }
 
-    let mut parser = Parser::new(&session, lexer);
-    let Ok(program) = parser.parse_program() else {
-        check_errors(&session, use_color)?;
-        return Ok(());
-    };
-    check_errors(&session, use_color)?;
-
-    let mut ty_infer = TypeInferer::new(&session);
-    ty_infer.infer(&program);
-    check_errors(&session, use_color)?;
+    let program = bb.parse_program()?;
+    bb.infer_types(&program)?;
 
     if let EmitTarget::Ast = args.emit {
-        let mut dumper = ast::ASTDumper::new(&session);
-        dumper.visit_program(&program);
+        bb.dump_ast(&program)?;
         return Ok(());
     }
-
-    let mut birgen = BIRGen::new(&session);
-    birgen.generate_program(&program);
-    birgen.optimize();
 
     if let EmitTarget::Bir = args.emit {
-        println!("{}", birgen.dump_to_string());
+        println!("{}", bb.dump_bir(&program));
         return Ok(());
     }
-
-    let llvmgen = birgen.llvmgen();
 
     if let EmitTarget::Llvm = args.emit {
-        println!("{}", llvmgen.dump_to_string());
+        println!("{}", bb.dump_llvm(&program));
         return Ok(());
     }
 
-    let out = args
-        .get_out_path()
-        .context("Path is None")?
-        .to_str()
-        .context("Path contains invalid UTF-8 data")?
-        .to_string();
-    println!("{}", llvmgen.compile_object_file(out.clone()));
+    let compiled_msg = bb.compile_object_file(&program)?;
+    println!("{}", compiled_msg);
 
     if let EmitTarget::Obj = args.emit {
         return Ok(());
     }
 
-    let cc = env::var("CC").unwrap_or("cc".to_string());
-    let brt = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
-
-    let status = std::process::Command::new(cc)
-        .arg(out)
-        .arg(format!("-L{}", brt))
-        .arg("-lbrt")
-        .arg("-o")
-        .arg(args.path.with_extension(""))
-        .status()?;
-
-    if !status.success() {
-        anyhow::bail!("linker failed with exit code: {}", status);
-    }
+    bb.link_objects()?;
 
     Ok(())
 }
@@ -197,19 +130,10 @@ fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
     let bb = bbuild::BBuild::new(&args.path, use_color)?;
 
     let program = bb.parse_program()?;
-    bb.compile_object_file(program)?;
+    bb.infer_types(&program)?;
+    bb.compile_object_file(&program)?;
     bb.link_objects()?;
     bb.execute_artifact();
 
-    Ok(())
-}
-
-fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
-    if session.has_errors() {
-        for d in session.take_diagnostics() {
-            diag::print_diagnostics(&session.source_text, session.get_source_file(), &d, use_color);
-        }
-        anyhow::bail!("compilation failed due to previous errors");
-    }
     Ok(())
 }
