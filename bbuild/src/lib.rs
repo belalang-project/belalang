@@ -56,10 +56,10 @@ impl BBuild {
         let mut parser = Parser::new(&self.session, lexer);
 
         let Ok(program) = parser.parse_program() else {
-            check_errors(&self.session, self.use_color)?;
+            self.check_errors()?;
             anyhow::bail!("compilation failed due to previous errors");
         };
-        check_errors(&self.session, self.use_color)?;
+        self.check_errors()?;
 
         Ok(program)
     }
@@ -68,7 +68,7 @@ impl BBuild {
         let mut lexer = Lexer::new(&self.session);
         let mut dumper = lexer::TokensDumper::new(&self.session, &mut lexer);
         let res = dumper.dump();
-        check_errors(&self.session, self.use_color)?;
+        self.check_errors()?;
         res?;
         Ok(())
     }
@@ -76,7 +76,7 @@ impl BBuild {
     pub fn infer_types(&self, program: &Program) -> anyhow::Result<()> {
         let mut ty_infer = TypeInferer::new(&self.session);
         ty_infer.infer(program);
-        check_errors(&self.session, self.use_color)?;
+        self.check_errors()?;
         Ok(())
     }
 
@@ -133,14 +133,19 @@ impl BBuild {
         let exe = std::fs::canonicalize(&self.out_exe).unwrap();
         let err = Command::new(exe).exec();
     }
-}
 
-fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
-    if session.has_errors() {
-        for d in session.take_diagnostics() {
-            diag::print_diagnostics(&session.source_text, session.get_source_file(), &d, use_color);
+    fn check_errors(&self) -> anyhow::Result<()> {
+        if self.session.has_errors() {
+            for d in self.session.take_diagnostics() {
+                diag::print_diagnostics(
+                    &self.session.source_text,
+                    self.session.get_source_file(),
+                    &d,
+                    self.use_color,
+                );
+            }
+            anyhow::bail!("compilation failed due to previous errors");
         }
-        anyhow::bail!("compilation failed due to previous errors");
+        Ok(())
     }
-    Ok(())
 }
