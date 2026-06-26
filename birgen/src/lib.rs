@@ -116,7 +116,13 @@ impl<'sess> BIRGen<'sess> {
                 _ => todo!("Generation for expression {:?} not implemented", expr),
             },
             Expression::VarDecl(var) => {
-                match *var.value {
+                let value = &var.value;
+
+                let Some(value) = value else {
+                    return cxx::UniquePtr::null();
+                };
+
+                match **value {
                     Expression::Integer(ref i) => {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
                         let name = self.session.lookup_string(var.name.value);
@@ -134,7 +140,7 @@ impl<'sess> BIRGen<'sess> {
                         cxx::UniquePtr::null() // FIXME: don't return nullptr
                     },
                     Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
-                        let v = self.generate_expression(&var.value);
+                        let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);

@@ -136,13 +136,13 @@ impl std::fmt::Display for ArrayLiteral {
 #[derive(Debug, Clone)]
 pub struct VarDeclExpression {
     pub name: Identifier,
-    pub value: Box<Expression>,
+    pub value: Option<Box<Expression>>,
     pub explicit_ty: Option<Type>,
 }
 
 impl std::fmt::Display for VarDeclExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {:?} {}", self.name, self.explicit_ty, self.value)
+        write!(f, "{} {:?} {:?}", self.name, self.explicit_ty, self.value)
     }
 }
 

@@ -413,7 +413,7 @@ impl<'sess> Parser<'sess> {
                         _ => Type::None, // TODO: fill this in
                     };
 
-                    expect_peek!(
+                    optional_peek!(
                         self,
                         TokenKind::Assign {
                             kind: AssignmentKind::Assign
@@ -422,13 +422,24 @@ impl<'sess> Parser<'sess> {
                     Some(ty)
                 };
 
-                self.next_token()?; // consume equal sign; curr_token is start of RHS value
-                let value = Box::new(self.parse_expression(Precedence::Lowest)?);
-                Ok(Some(Expression::VarDecl(VarDeclExpression {
-                    name,
-                    value,
-                    explicit_ty,
-                })))
+                if let TokenKind::Assign {
+                    kind: AssignmentKind::Assign,
+                } = self.curr_token.kind
+                {
+                    self.next_token()?; // consume equal sign; curr_token is start of RHS value
+                    let value = Box::new(self.parse_expression(Precedence::Lowest)?);
+                    Ok(Some(Expression::VarDecl(VarDeclExpression {
+                        name,
+                        value: Some(value),
+                        explicit_ty,
+                    })))
+                } else {
+                    Ok(Some(Expression::VarDecl(VarDeclExpression {
+                        name,
+                        value: None,
+                        explicit_ty,
+                    })))
+                }
             },
 
             _ => Ok(None),

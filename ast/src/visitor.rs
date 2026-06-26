@@ -148,7 +148,9 @@ pub trait Visitor {
 
     fn walk_var_decl(&mut self, node: &VarDeclExpression) {
         self.visit_identifier(&node.name);
-        self.visit_expression(&node.value);
+        if let Some(value) = &node.value {
+            self.visit_expression(value);
+        }
     }
 
     fn walk_call(&mut self, node: &CallExpression) {
