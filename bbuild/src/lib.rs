@@ -1,5 +1,9 @@
 use std::{
     env,
+    io::{
+        self,
+        Read,
+    },
     os::unix::process::CommandExt,
     path::{
         Path,
@@ -52,6 +56,31 @@ impl BBuild {
     pub fn emit(&self) -> EmitTarget {
         self.bctx.emit
     }
+
+    pub fn from_stdin(bctx: BuildContext) -> anyhow::Result<Self> {
+        let cc = env::var("CC").unwrap_or("cc".to_string());
+        let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
+
+        let out_obj = PathBuf::from("belalang_out.o");
+        let out_exe = PathBuf::from("belalang_out");
+
+        let mut source_text = String::new();
+        io::stdin()
+            .read_to_string(&mut source_text)
+            .context("unable to read input from stdin")?;
+
+        let session = Session::for_text(source_text)?;
+
+        Ok(Self {
+            cc,
+            brt_dir,
+            out_obj,
+            out_exe,
+            session,
+            bctx,
+        })
+    }
+
     pub fn new(source_path: &Path, bctx: BuildContext) -> anyhow::Result<Self> {
         let cc = env::var("CC").unwrap_or("cc".to_string());
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
