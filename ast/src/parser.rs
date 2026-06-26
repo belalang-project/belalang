@@ -368,7 +368,7 @@ impl<'sess> Parser<'sess> {
             TokenKind::Assign { ref kind } => {
                 let kind = *kind;
                 if !matches!(left, Expression::Identifier(_)) {
-                    return Err(ParserError::InvalidLHS(left.clone()));
+                    return Err(self.error_invalid_lhs(&left));
                 }
 
                 let TokenKind::Ident { sym } = self.curr_token.kind else {
@@ -387,7 +387,7 @@ impl<'sess> Parser<'sess> {
 
             TokenKind::Colon => {
                 if !matches!(left, Expression::Identifier(_)) {
-                    return Err(ParserError::InvalidLHS(left.clone()));
+                    return Err(self.error_invalid_lhs(&left));
                 }
                 let name = match left {
                     Expression::Identifier(ident) => ident.clone(),
@@ -567,5 +567,12 @@ impl<'sess> Parser<'sess> {
         self.session
             .emit(Diagnostic::error("unexpected token").with_label(label));
         ParserError::UnexpectedToken(self.curr_token.kind)
+    }
+
+    fn error_invalid_lhs(&self, left: &Expression) -> ParserError {
+        // TODO: change this with expression span
+        let label = Label::primary(self.curr_token.span, "invalid lhs");
+        self.session.emit(Diagnostic::error("invalid lhs").with_label(label));
+        ParserError::InvalidLHS(left.clone())
     }
 }
