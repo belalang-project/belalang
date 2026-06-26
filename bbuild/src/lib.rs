@@ -104,13 +104,9 @@ impl BBuild {
         let lexer = Lexer::new(&self.session);
         let mut parser = Parser::new(&self.session, lexer);
 
-        let Ok(program) = parser.parse_program() else {
-            self.check_errors()?;
-            anyhow::bail!("compilation failed due to previous errors");
-        };
+        let program = parser.parse_program();
         self.check_errors()?;
-
-        Ok(program)
+        Ok(program?)
     }
 
     pub fn dump_tokens(&self) -> anyhow::Result<()> {

@@ -1,3 +1,7 @@
+use diag::{
+    Diagnostic,
+    Label,
+};
 use lexer::{
     AssignmentKind,
     InfixKind,
@@ -86,7 +90,7 @@ macro_rules! expect_peek {
             $self.next_token()?;
             true
         } else {
-            return Err(ParserError::UnexpectedToken($self.peek_token.kind));
+            return Err($self.error_unexpected_token());
         }
     };
 }
@@ -249,7 +253,7 @@ impl<'sess> Parser<'sess> {
             Some(Box::new(match self.curr_token.kind {
                 TokenKind::If => self.parse_if()?,
                 TokenKind::LeftBrace => Expression::Block(self.parse_block()?),
-                _ => return Err(ParserError::UnexpectedToken(self.curr_token.kind)),
+                _ => return Err(self.error_unexpected_token()),
             }))
         } else {
             None
@@ -364,7 +368,7 @@ impl<'sess> Parser<'sess> {
             TokenKind::Assign { ref kind } => {
                 let kind = *kind;
                 if !matches!(left, Expression::Identifier(_)) {
-                    return Err(ParserError::InvalidLHS(left.clone()));
+                    return Err(self.error_invalid_lhs(&left));
                 }
 
                 let TokenKind::Ident { sym } = self.curr_token.kind else {
@@ -383,7 +387,7 @@ impl<'sess> Parser<'sess> {
 
             TokenKind::Colon => {
                 if !matches!(left, Expression::Identifier(_)) {
-                    return Err(ParserError::InvalidLHS(left.clone()));
+                    return Err(self.error_invalid_lhs(&left));
                 }
                 let name = match left {
                     Expression::Identifier(ident) => ident.clone(),
@@ -400,7 +404,7 @@ impl<'sess> Parser<'sess> {
                     None
                 } else {
                     let TokenKind::Ident { sym } = self.curr_token.kind else {
-                        return Err(ParserError::UnexpectedToken(self.curr_token.kind));
+                        return Err(self.error_unexpected_token());
                     };
                     let ty = match sym {
                         syms::INT => Type::Integer,
@@ -441,11 +445,11 @@ impl<'sess> Parser<'sess> {
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
                         Ok(lit) => Ok(Expression::Integer(IntegerLiteral { value: lit })),
-                        Err(_) => Err(ParserError::ParsingInteger(str_value.to_string())),
+                        Err(_) => Err(self.error_parsing_integer(str_value)),
                     },
                     LiteralKind::Float => match str_value.parse::<f64>() {
                         Ok(lit) => Ok(Expression::Float(FloatLiteral { value: lit })),
-                        Err(_) => Err(ParserError::ParsingFloat(str_value.to_string())),
+                        Err(_) => Err(self.error_parsing_float(str_value)),
                     },
                     LiteralKind::String => Ok(Expression::String(StringLiteral { value: sym })),
                 }
@@ -554,7 +558,41 @@ impl<'sess> Parser<'sess> {
                 Ok(Expression::Function(FunctionLiteral { params, body }))
             },
 
-            _ => Err(ParserError::UnknownPrefixOperator(self.curr_token.kind)),
+            _ => Err(self.error_unknown_prefix_op()),
         }
+    }
+
+    fn error_unexpected_token(&self) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "unexpected token");
+        self.session
+            .emit(Diagnostic::error("unexpected token").with_label(label));
+        ParserError::UnexpectedToken(self.curr_token.kind)
+    }
+
+    fn error_unknown_prefix_op(&self) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "unknown prefix");
+        self.session.emit(Diagnostic::error("unknown prefix").with_label(label));
+        ParserError::UnknownPrefixOperator(self.curr_token.kind)
+    }
+
+    fn error_invalid_lhs(&self, left: &Expression) -> ParserError {
+        // TODO: change this with expression span
+        let label = Label::primary(self.curr_token.span, "invalid lhs");
+        self.session.emit(Diagnostic::error("invalid lhs").with_label(label));
+        ParserError::InvalidLHS(left.clone())
+    }
+
+    fn error_parsing_integer(&self, v: &str) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "error parsing integer");
+        self.session
+            .emit(Diagnostic::error("error parsing integer").with_label(label));
+        ParserError::ParsingInteger(v.to_string())
+    }
+
+    fn error_parsing_float(&self, v: &str) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "error parsing float");
+        self.session
+            .emit(Diagnostic::error("error parsing float").with_label(label));
+        ParserError::ParsingFloat(v.to_string())
     }
 }
