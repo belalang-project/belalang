@@ -6,4 +6,3 @@
 # CHECK:   |
 # CHECK: 1 | §
 # CHECK:   | ^ Unknown token
-# CHECK: Error: compilation failed due to previous errors

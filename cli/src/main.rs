@@ -150,11 +150,18 @@ fn main() -> anyhow::Result<()> {
     let bctx = BuildContext { use_color, emit };
     let bb = bbuild::BBuild::new(&path, bctx)?;
 
-    match subcommand {
+    let res = match subcommand {
         Subcommands::Build => build(bb),
         Subcommands::Run => run(bb),
         Subcommands::None => unreachable!(),
+    };
+
+    if res.is_err() {
+        // the error messages are already handled by diagnostics
+        std::process::exit(1);
     }
+
+    Ok(())
 }
 
 fn build(bb: bbuild::BBuild) -> anyhow::Result<()> {
