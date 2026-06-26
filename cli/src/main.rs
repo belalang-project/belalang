@@ -12,7 +12,7 @@ use clap::{
     ValueEnum,
 };
 
-#[derive(ValueEnum, Clone, Debug, Default)]
+#[derive(ValueEnum, Clone, Copy, Debug, Default)]
 enum EmitTarget {
     Bir,
     Ast,
@@ -37,13 +37,15 @@ struct BuildArgs {
     #[arg(long, short)]
     out: Option<PathBuf>,
 
-    /// What to emit
-    #[arg(long, value_enum, default_value_t = EmitTarget::Exe)]
-    emit: EmitTarget,
+    /// Path to the .bel file to compile
+    path: PathBuf,
 }
 
 #[derive(clap::Args)]
-struct RunArgs {}
+struct RunArgs {
+    /// Path to the .bel file to run
+    path: PathBuf,
+}
 
 #[derive(Subcommand)]
 enum Commands {
@@ -61,8 +63,9 @@ struct Belalang {
     #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
     color: ColorChoice,
 
-    /// Path to the .bel file to run
-    path: PathBuf,
+    /// What to emit
+    #[arg(long, global = true, value_enum, default_value_t = EmitTarget::Exe)]
+    emit: EmitTarget,
 }
 
 impl Belalang {
@@ -75,22 +78,43 @@ impl Belalang {
     }
 }
 
+impl From<EmitTarget> for bbuild::EmitTarget {
+    fn from(target: EmitTarget) -> Self {
+        match target {
+            EmitTarget::Bir => bbuild::EmitTarget::Bir,
+            EmitTarget::Ast => bbuild::EmitTarget::Ast,
+            EmitTarget::Tokens => bbuild::EmitTarget::Tokens,
+            EmitTarget::Llvm => bbuild::EmitTarget::Llvm,
+            EmitTarget::Obj => bbuild::EmitTarget::Obj,
+            EmitTarget::Exe => bbuild::EmitTarget::Exe,
+        }
+    }
+}
+
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
-    let bctx = bbuild::BuildContext {
-        use_color: belalang.use_color(),
+    let (path, emit) = match &belalang.command {
+        Commands::Build(args) => (args.path.clone(), belalang.emit.into()),
+        Commands::Run(args) => (args.path.clone(), bbuild::EmitTarget::Exe),
     };
 
-    let bb = bbuild::BBuild::new(&belalang.path, bctx)?;
+    let bctx = bbuild::BuildContext {
+        use_color: belalang.use_color(),
+        emit,
+    };
+
+    let bb = bbuild::BBuild::new(&path, bctx)?;
 
     match belalang.command {
-        Commands::Build(args) => build(args.emit, bb),
+        Commands::Build(..) => build(bb),
         Commands::Run(..) => run(bb),
     }
 }
 
-fn build(emit: EmitTarget, bb: bbuild::BBuild) -> anyhow::Result<()> {
-    if let EmitTarget::Tokens = emit {
+fn build(bb: bbuild::BBuild) -> anyhow::Result<()> {
+    use bbuild::EmitTarget;
+
+    if let EmitTarget::Tokens = bb.emit() {
         bb.dump_tokens()?;
         return Ok(());
     }
@@ -98,17 +122,17 @@ fn build(emit: EmitTarget, bb: bbuild::BBuild) -> anyhow::Result<()> {
     let program = bb.parse_program()?;
     bb.infer_types(&program)?;
 
-    if let EmitTarget::Ast = emit {
+    if let EmitTarget::Ast = bb.emit() {
         bb.dump_ast(&program)?;
         return Ok(());
     }
 
-    if let EmitTarget::Bir = emit {
+    if let EmitTarget::Bir = bb.emit() {
         println!("{}", bb.dump_bir(&program));
         return Ok(());
     }
 
-    if let EmitTarget::Llvm = emit {
+    if let EmitTarget::Llvm = bb.emit() {
         println!("{}", bb.dump_llvm(&program));
         return Ok(());
     }
@@ -116,7 +140,7 @@ fn build(emit: EmitTarget, bb: bbuild::BBuild) -> anyhow::Result<()> {
     let compiled_msg = bb.compile_object_file(&program)?;
     println!("{}", compiled_msg);
 
-    if let EmitTarget::Obj = emit {
+    if let EmitTarget::Obj = bb.emit() {
         return Ok(());
     }
 

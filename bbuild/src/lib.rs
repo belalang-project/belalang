@@ -22,6 +22,18 @@ use session::Session;
 
 pub struct BuildContext {
     pub use_color: bool,
+    pub emit: EmitTarget,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum EmitTarget {
+    Bir,
+    Ast,
+    Tokens,
+    Llvm,
+    Obj,
+    #[default]
+    Exe,
 }
 
 pub struct BBuild {
@@ -37,6 +49,9 @@ pub struct BBuild {
 }
 
 impl BBuild {
+    pub fn emit(&self) -> EmitTarget {
+        self.bctx.emit
+    }
     pub fn new(source_path: &Path, bctx: BuildContext) -> anyhow::Result<Self> {
         let cc = env::var("CC").unwrap_or("cc".to_string());
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
