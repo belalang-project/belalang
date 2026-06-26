@@ -534,20 +534,20 @@ impl<'sess> Lexer<'sess> {
     }
 
     fn read_identifier(&mut self) -> Result<Token, LexerError> {
+        let start_offset = self.current_offset;
         match self.current {
             Some(c) if is_xid_start(c) => {
-                let mut identifier = String::from(c);
                 self.advance();
 
                 while let Some(c) = self.current {
                     if is_xid_continue(c) {
-                        identifier.push(c);
                         self.advance();
                     } else {
                         break;
                     }
                 }
 
+                let identifier = &self.session.source_text[start_offset..self.current_offset];
                 let sym = self.session.intern_string(&identifier);
                 let kind = match sym {
                     syms::FN => TokenKind::Function,
