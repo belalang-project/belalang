@@ -33,9 +33,6 @@ enum ColorChoice {
 
 #[derive(clap::Args)]
 struct BuildArgs {
-    /// Path to the .bel file to compile
-    path: PathBuf,
-
     /// Path to the output file
     #[arg(long, short)]
     out: Option<PathBuf>,
@@ -46,10 +43,7 @@ struct BuildArgs {
 }
 
 #[derive(clap::Args)]
-struct RunArgs {
-    /// Path to the .bel file to run
-    path: PathBuf,
-}
+struct RunArgs {}
 
 #[derive(Subcommand)]
 enum Commands {
@@ -66,6 +60,9 @@ struct Belalang {
     /// Use color
     #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
     color: ColorChoice,
+
+    /// Path to the .bel file to run
+    path: PathBuf,
 }
 
 impl Belalang {
@@ -80,18 +77,20 @@ impl Belalang {
 
 fn main() -> anyhow::Result<()> {
     let belalang = Belalang::parse();
-    let use_color = belalang.use_color();
+    let bctx = bbuild::BuildContext {
+        use_color: belalang.use_color(),
+    };
+
+    let bb = bbuild::BBuild::new(&belalang.path, bctx)?;
 
     match belalang.command {
-        Commands::Build(args) => build(args, use_color),
-        Commands::Run(args) => run(args, use_color),
+        Commands::Build(args) => build(args.emit, bb),
+        Commands::Run(..) => run(bb),
     }
 }
 
-fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
-    let bb = bbuild::BBuild::new(&args.path, use_color)?;
-
-    if let EmitTarget::Tokens = args.emit {
+fn build(emit: EmitTarget, bb: bbuild::BBuild) -> anyhow::Result<()> {
+    if let EmitTarget::Tokens = emit {
         bb.dump_tokens()?;
         return Ok(());
     }
@@ -99,17 +98,17 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     let program = bb.parse_program()?;
     bb.infer_types(&program)?;
 
-    if let EmitTarget::Ast = args.emit {
+    if let EmitTarget::Ast = emit {
         bb.dump_ast(&program)?;
         return Ok(());
     }
 
-    if let EmitTarget::Bir = args.emit {
+    if let EmitTarget::Bir = emit {
         println!("{}", bb.dump_bir(&program));
         return Ok(());
     }
 
-    if let EmitTarget::Llvm = args.emit {
+    if let EmitTarget::Llvm = emit {
         println!("{}", bb.dump_llvm(&program));
         return Ok(());
     }
@@ -117,7 +116,7 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     let compiled_msg = bb.compile_object_file(&program)?;
     println!("{}", compiled_msg);
 
-    if let EmitTarget::Obj = args.emit {
+    if let EmitTarget::Obj = emit {
         return Ok(());
     }
 
@@ -126,9 +125,7 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
-    let bb = bbuild::BBuild::new(&args.path, use_color)?;
-
+fn run(bb: bbuild::BBuild) -> anyhow::Result<()> {
     let program = bb.parse_program()?;
     bb.infer_types(&program)?;
     bb.compile_object_file(&program)?;

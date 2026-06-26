@@ -20,7 +20,13 @@ use birgen::BIRGen;
 use lexer::Lexer;
 use session::Session;
 
+pub struct BuildContext {
+    pub use_color: bool,
+}
+
 pub struct BBuild {
+    bctx: BuildContext,
+
     cc: String,
     brt_dir: String,
 
@@ -28,11 +34,10 @@ pub struct BBuild {
     out_exe: PathBuf,
 
     session: Session,
-    use_color: bool,
 }
 
 impl BBuild {
-    pub fn new(source_path: &Path, use_color: bool) -> anyhow::Result<Self> {
+    pub fn new(source_path: &Path, bctx: BuildContext) -> anyhow::Result<Self> {
         let cc = env::var("CC").unwrap_or("cc".to_string());
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
 
@@ -47,7 +52,7 @@ impl BBuild {
             out_obj,
             out_exe,
             session,
-            use_color,
+            bctx,
         })
     }
 
@@ -141,7 +146,7 @@ impl BBuild {
                     &self.session.source_text,
                     self.session.get_source_file(),
                     &d,
-                    self.use_color,
+                    self.bctx.use_color,
                 );
             }
             anyhow::bail!("compilation failed due to previous errors");
