@@ -3,6 +3,9 @@ x := 12
 x := 12.0
 x: String = "Hello, world!"
 
+x: Int
+x: String
+
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
 # CHECK: Ident("x") <0..1>
 # CHECK: Colon <1..2>
@@ -22,3 +25,9 @@ x: String = "Hello, world!"
 # CHECK: Ident("String") <33..39>
 # CHECK: Assign(Assign) <40..41>
 # CHECK: Literal(String, "Hello, world!") <42..57>
+# CHECK: Ident("x") <59..60>
+# CHECK: Colon <60..61>
+# CHECK: Ident("Int") <62..65>
+# CHECK: Ident("x") <66..67>
+# CHECK: Colon <67..68>
+# CHECK: Ident("String") <69..75>
