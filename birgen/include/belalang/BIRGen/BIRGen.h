@@ -10,6 +10,7 @@
 #include "mlir/Target/LLVMIR/Export.h"
 #include "rust/cxx.h"
 #include <memory>
+#include <stdint.h>
 
 namespace belalang {
 namespace birgen {
@@ -51,6 +52,7 @@ public:
   std::unique_ptr<BIRValue> build_div(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_mod(const BIRValue &lhs, const BIRValue &rhs);
   std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
+  std::unique_ptr<BIRValue> build_var_declare_ty(uint8_t v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);

@@ -5,6 +5,7 @@ use ast::{
     InfixExpression,
     Program,
     Statement,
+    Type,
 };
 use lexer::{
     AssignmentKind,
@@ -40,6 +41,7 @@ mod ffi {
         fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
+        fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: u8, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
@@ -119,7 +121,17 @@ impl<'sess> BIRGen<'sess> {
                 let value = &var.value;
 
                 let Some(value) = value else {
-                    return cxx::UniquePtr::null();
+                    let id = match var.explicit_ty.unwrap() {
+                        Type::String => 0,
+                        Type::Integer => 1,
+                        Type::Float => 2,
+                        Type::None => unreachable!(),
+                    };
+
+                    let name = self.session.lookup_string(var.name.value);
+                    let declare = self.inner.pin_mut().build_var_declare_ty(id, name);
+                    self.symbol_table.insert(var.name.value, declare);
+                    return cxx::UniquePtr::null(); // FIXME: don't return nullptr
                 };
 
                 match **value {
