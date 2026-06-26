@@ -30,6 +30,12 @@ enum ColorChoice {
     Auto,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Source {
+    File(PathBuf),
+    Stdin,
+}
+
 impl FromStr for ColorChoice {
     type Err = String;
 
@@ -78,7 +84,7 @@ Options:
 
 fn main() -> anyhow::Result<()> {
     let mut subcommand = Subcommands::None;
-    let mut path = None;
+    let mut src = None;
     let mut color = ColorChoice::Auto;
     let mut emit = EmitTarget::Exe;
 
@@ -114,10 +120,14 @@ fn main() -> anyhow::Result<()> {
                         },
                     },
                     Subcommands::Build | Subcommands::Run => {
-                        if path.is_some() {
+                        if src.is_some() {
                             anyhow::bail!("unexpected argument '{}'", value_str);
                         }
-                        path = Some(PathBuf::from(value_str));
+                        if value_str == "-" {
+                            src = Some(Source::Stdin);
+                        } else {
+                            src = Some(Source::File(PathBuf::from(value_str)));
+                        }
                     },
                 }
             },
@@ -130,7 +140,7 @@ fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let path = match path {
+    let src = match src {
         Some(p) => p,
         None => {
             anyhow::bail!("missing path to the .bel file");
@@ -148,7 +158,11 @@ fn main() -> anyhow::Result<()> {
     }
 
     let bctx = BuildContext { use_color, emit };
-    let bb = bbuild::BBuild::new(&path, bctx)?;
+    let bb = if let Source::File(path) = src {
+        bbuild::BBuild::new(&path, bctx)
+    } else {
+        bbuild::BBuild::from_stdin(bctx)
+    }?;
 
     let res = match subcommand {
         Subcommands::Build => build(bb),
