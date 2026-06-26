@@ -194,36 +194,14 @@ fn build(args: BuildArgs, use_color: bool) -> anyhow::Result<()> {
 }
 
 fn run(args: RunArgs, use_color: bool) -> anyhow::Result<()> {
-    let bb = bbuild::BBuild::new(&args.path);
-    let session = Session::for_file(args.path.clone())?;
+    let bb = bbuild::BBuild::new(&args.path, use_color)?;
 
-    let lexer = Lexer::new(&session);
-
-    let mut parser = Parser::new(&session, lexer);
-    let Ok(program) = parser.parse_program() else {
-        check_errors(&session, use_color)?;
-        return Ok(());
-    };
-    check_errors(&session, use_color)?;
-
-    let mut birgen = BIRGen::new(&session);
-    birgen.generate_program(&program);
-    birgen.optimize();
-
-    let llvmgen = birgen.llvmgen();
-    let obj_out = args
-        .path
-        .with_added_extension("o")
-        .to_str()
-        .context("invalid UTF-8 data")?
-        .to_string();
-    let _ = llvmgen.compile_object_file(obj_out.clone());
-
+    let program = bb.parse_program()?;
+    bb.compile_object_file(program)?;
     bb.link_objects()?;
+    bb.execute_artifact();
 
-    let exe = std::fs::canonicalize(args.path.with_extension("")).context("Failed to canonicalize exe path")?;
-    let err = std::process::Command::new(exe).exec();
-    anyhow::bail!("Failed to exec: {}", err);
+    Ok(())
 }
 
 fn check_errors(session: &Session, use_color: bool) -> anyhow::Result<()> {
