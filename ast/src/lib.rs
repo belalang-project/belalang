@@ -15,7 +15,10 @@ use lexer::{
 pub use parser::Parser;
 pub use program::Program;
 pub use statements::*;
-pub use type_inferer::TypeInferer;
+pub use type_inferer::{
+    Type,
+    TypeInferer,
+};
 pub use visitor::*;
 
 pub enum Node {

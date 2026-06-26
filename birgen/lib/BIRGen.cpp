@@ -18,6 +18,7 @@
 #include "llvm/TargetParser/Host.h"
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/Target/TargetMachine.h"
+#include <optional>
 
 namespace belalang {
 namespace birgen {
@@ -114,6 +115,25 @@ std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
 std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v, rust::Str name) {
   auto nakedType = v.getValue().getType();
   auto refType = bir::RefType::get(&context, nakedType);
+  auto op = bir::VarDeclareOp::create(builder, loc, refType, llvm::StringRef(name.data(), name.size()));
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
+std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(uint8_t v, rust::Str name) {
+  mlir::Type ty;
+
+  // TODO: this is not elegant, but works
+  if (v == 0) {
+    ty = bir::StringType::get(&context);
+  } else if (v == 1) {
+    ty = bir::IntType::get(&context);
+  } else if (v == 2) {
+    ty = bir::FloatType::get(&context);
+  } else {
+    return nullptr;
+  }
+
+  auto refType = bir::RefType::get(&context, ty);
   auto op = bir::VarDeclareOp::create(builder, loc, refType, llvm::StringRef(name.data(), name.size()));
   return std::make_unique<BIRValue>(op.getResult());
 }

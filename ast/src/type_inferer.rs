@@ -71,7 +71,9 @@ impl Visitor for TypeInfererInner {
 
     fn visit_var_decl(&mut self, node: &crate::VarDeclExpression) {
         let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
-            self.visit_expression(&node.value);
+            if let Some(value) = &node.value {
+                self.visit_expression(value);
+            }
             self.current_type
         });
 
@@ -100,7 +102,7 @@ mod tests {
         let expr = VarDeclExpression {
             name: Identifier { value: Symbol(0) },
             explicit_ty: None,
-            value: Box::new(Expression::String(StringLiteral { value: Symbol(1) })),
+            value: Some(Box::new(Expression::String(StringLiteral { value: Symbol(1) }))),
         };
 
         let mut ty_infer = TypeInfererInner::new();
@@ -115,7 +117,7 @@ mod tests {
         let expr = VarDeclExpression {
             name: Identifier { value: Symbol(0) },
             explicit_ty: Some(Type::Integer),
-            value: Box::new(Expression::Integer(IntegerLiteral { value: 12 })),
+            value: Some(Box::new(Expression::Integer(IntegerLiteral { value: 12 }))),
         };
 
         let mut ty_infer = TypeInfererInner::new();
