@@ -137,6 +137,10 @@ crate.spec(
     package = "annotate-snippets",
     version = "0.12.16",
 )
+crate.spec(
+    package = "lexopt",
+    version = "0.3.2",
+)
 crate.from_specs()
 use_repo(crate, "crates")
 
