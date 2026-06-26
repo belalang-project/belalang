@@ -5,4 +5,6 @@
 # CHECK:  --> {{.*}}/tests/Tokens/unclosed-string.bel:1:1
 # CHECK:   |
 # CHECK: 1 | / {{.*}}hello
-# CHECK: Error: compilation failed due to previous errors
+# CHECK: 2 | |
+# CHECK: 3 | | # RUN: %not %belalang build %s 2>&1 | %FileCheck %s
+# CHECK:   | |____________________________________________________^ Unclosed string
