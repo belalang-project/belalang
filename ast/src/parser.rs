@@ -558,7 +558,7 @@ impl<'sess> Parser<'sess> {
                 Ok(Expression::Function(FunctionLiteral { params, body }))
             },
 
-            _ => Err(ParserError::UnknownPrefixOperator(self.curr_token.kind)),
+            _ => Err(self.error_unknown_prefix_op()),
         }
     }
 
@@ -567,6 +567,12 @@ impl<'sess> Parser<'sess> {
         self.session
             .emit(Diagnostic::error("unexpected token").with_label(label));
         ParserError::UnexpectedToken(self.curr_token.kind)
+    }
+
+    fn error_unknown_prefix_op(&self) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "unknown prefix");
+        self.session.emit(Diagnostic::error("unknown prefix").with_label(label));
+        ParserError::UnknownPrefixOperator(self.curr_token.kind)
     }
 
     fn error_invalid_lhs(&self, left: &Expression) -> ParserError {
