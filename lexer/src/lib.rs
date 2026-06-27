@@ -173,7 +173,7 @@ impl std::fmt::Display for AssignmentKind {
 }
 
 /// Prefix operators supported by the lexer
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum PrefixKind {
     Not,
     Sub,
@@ -188,7 +188,7 @@ impl std::fmt::Display for PrefixKind {
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum InfixKind {
     Add,
     Sub,

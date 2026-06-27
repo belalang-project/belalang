@@ -170,7 +170,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_return
             TokenKind::Return => {
                 self.next_token()?;
-                let return_value = self.parse_expression(Precedence::Lowest)?.clone();
+                let return_value = *self.parse_expression(Precedence::Lowest)?;
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
@@ -193,7 +193,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
             // parse_if: parse if expression as statement
             TokenKind::If => {
-                let expression = self.parse_if()?.clone();
+                let expression = *self.parse_if()?;
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
@@ -202,7 +202,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
             _ => {
                 let stmt = ExpressionStatement {
-                    expression: self.parse_expression(Precedence::Lowest)?.clone(),
+                    expression: *self.parse_expression(Precedence::Lowest)?,
                 };
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
@@ -336,7 +336,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     loop {
-                        args.push(self.parse_expression(Precedence::Lowest)?.clone());
+                        args.push(*self.parse_expression(Precedence::Lowest)?);
 
                         if !matches!(self.peek_token.kind, TokenKind::Comma) {
                             break;
@@ -397,7 +397,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     return Err(self.error_invalid_lhs(left));
                 }
                 let name = match left {
-                    Expression::Identifier(ident) => ident.clone(),
+                    Expression::Identifier(ident) => *ident,
                     _ => unreachable!(),
                 };
 
@@ -485,7 +485,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 if !matches!(self.curr_token.kind, TokenKind::RightBracket) {
                     loop {
-                        elements.push(self.parse_expression(Precedence::Lowest)?.clone());
+                        elements.push(*self.parse_expression(Precedence::Lowest)?);
 
                         if !matches!(self.peek_token.kind, TokenKind::Comma) {
                             break;

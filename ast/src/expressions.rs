@@ -19,7 +19,7 @@ use crate::type_inferer::Type;
 /// ```belalang
 /// false
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct BooleanExpression {
     pub value: bool,
 }
@@ -31,7 +31,7 @@ pub struct BooleanExpression {
 /// ```belalang
 /// 42
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntegerLiteral {
     pub value: i64,
 }
@@ -43,7 +43,7 @@ pub struct IntegerLiteral {
 /// ```belalang
 /// 3.14
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct FloatLiteral {
     pub value: f64,
 }
@@ -55,7 +55,7 @@ pub struct FloatLiteral {
 /// ```belalang
 /// "hello, world"
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct StringLiteral {
     pub value: Symbol,
 }
@@ -67,7 +67,7 @@ pub struct StringLiteral {
 /// ```belalang
 /// null
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct NullLiteral {}
 
 /// Represents an array literal expression.
@@ -77,7 +77,7 @@ pub struct NullLiteral {}
 /// ```belalang
 /// [1, 2, 3, "Hello"]
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct ArrayLiteral<'ast> {
     pub elements: &'ast [Expression<'ast>],
 }
@@ -90,7 +90,7 @@ pub struct ArrayLiteral<'ast> {
 /// x := 12
 /// y: Int = 12
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct VarDeclExpression<'ast> {
     pub name: Identifier,
     pub value: Option<&'ast Expression<'ast>>,
@@ -104,7 +104,7 @@ pub struct VarDeclExpression<'ast> {
 /// ```belalang
 /// x = 12
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct VarExpression<'ast> {
     pub kind: AssignmentKind,
     pub name: Identifier,
@@ -118,7 +118,7 @@ pub struct VarExpression<'ast> {
 /// ```belalang
 /// foo()
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct CallExpression<'ast> {
     pub function: &'ast Expression<'ast>,
     pub args: &'ast [Expression<'ast>],
@@ -131,7 +131,7 @@ pub struct CallExpression<'ast> {
 /// ```belalang
 /// foo[1]
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct IndexExpression<'ast> {
     pub left: &'ast Expression<'ast>,
     pub index: &'ast Expression<'ast>,
@@ -144,7 +144,7 @@ pub struct IndexExpression<'ast> {
 /// ```belalang
 /// fn() {}
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct FunctionLiteral<'ast> {
     pub params: &'ast [Identifier],
     pub body: BlockExpression<'ast>,
@@ -157,7 +157,7 @@ pub struct FunctionLiteral<'ast> {
 /// ```belalang
 /// foo
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Identifier {
     pub value: Symbol,
 }
@@ -169,7 +169,7 @@ pub struct Identifier {
 /// ```belalang
 /// if () {} else {}
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct IfExpression<'ast> {
     pub condition: &'ast Expression<'ast>,
     pub consequence: BlockExpression<'ast>,
@@ -183,7 +183,7 @@ pub struct IfExpression<'ast> {
 /// ```belalang
 /// 1 + 1
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct InfixExpression<'ast> {
     pub left: &'ast Expression<'ast>,
     pub operator: InfixKind,
@@ -197,7 +197,7 @@ pub struct InfixExpression<'ast> {
 /// ```belalang
 /// -1
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct PrefixExpression<'ast> {
     pub operator: PrefixKind,
     pub right: &'ast Expression<'ast>,
@@ -213,13 +213,13 @@ pub struct PrefixExpression<'ast> {
 /// ```belalang
 /// {}
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct BlockExpression<'ast> {
     pub statements: &'ast [Statement<'ast>],
 }
 
 /// Represents all expressions supported by The Belalang Compiler.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Expression<'ast> {
     Boolean(BooleanExpression),
     Integer(IntegerLiteral),
