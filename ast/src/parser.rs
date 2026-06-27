@@ -570,13 +570,13 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_if: parse current if expression
             TokenKind::If => self.parse_if(),
 
-            // parse_function: parse current expression as function
+            // match `fn`
             TokenKind::Function => {
                 let mut params = Vec::new();
 
-                expect_peek!(self, TokenKind::LeftParen);
+                expect_peek!(self, TokenKind::LeftParen); // curr_token is now `(`
 
-                self.next_token()?;
+                self.next_token()?; // curr_token is now first argument
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     let TokenKind::Ident { sym } = self.curr_token.kind else {
@@ -597,15 +597,33 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     }
 
                     expect_peek!(self, TokenKind::RightParen);
-                }
+                } // curr_token is now `)`
 
-                expect_peek!(self, TokenKind::LeftBrace);
+                let explicit_ty = if let TokenKind::Colon = self.peek_token.kind {
+                    self.next_token(); // curr_token is now `:`
+                    expect_peek!(self, TokenKind::Ident { .. }); // curr_token is now `<typename>`
+
+                    let TokenKind::Ident { sym } = self.curr_token.kind else {
+                        unreachable!()
+                    };
+                    Some(match sym {
+                        syms::INT => Type::Integer,
+                        syms::FLOAT => Type::Float,
+                        syms::STRING => Type::String,
+                        _ => Type::None,
+                    })
+                } else {
+                    None
+                };
+
+                expect_peek!(self, TokenKind::LeftBrace); // curr_token is now `{`
 
                 let body = self.parse_block()?;
 
                 Ok(self.ast.alloc(Expression::Function(FunctionLiteral {
                     params: self.ast.alloc_slice_clone(&params),
                     body,
+                    explicit_ty,
                 })))
             },
 

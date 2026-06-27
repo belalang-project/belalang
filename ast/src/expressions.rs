@@ -133,6 +133,7 @@ pub struct IndexExpression<'ast> {
 pub struct FunctionLiteral<'ast> {
     pub params: &'ast [Identifier],
     pub body: BlockExpression<'ast>,
+    pub explicit_ty: Option<Type>,
 }
 
 /// Represents an identifier expression.

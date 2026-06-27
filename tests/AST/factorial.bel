@@ -10,7 +10,7 @@ fact := fn(n) {
 # CHECK:      Program
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(fact)
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       Identifier(n)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement

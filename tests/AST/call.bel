@@ -15,7 +15,7 @@ fn(x, y) { x + y }(2, 3);
 # CHECK-NEXT:         Integer(5)
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     CallExpression
-# CHECK-NEXT:       FunctionLiteral
+# CHECK-NEXT:       FunctionLiteral(None)
 # CHECK-NEXT:         Identifier(x)
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:         BlockExpression

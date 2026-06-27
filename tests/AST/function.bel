@@ -8,7 +8,7 @@ fn(x, y, z) {};
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       Identifier(x)
 # CHECK-NEXT:       Identifier(y)
 # CHECK-NEXT:       BlockExpression
@@ -17,19 +17,19 @@ fn(x, y, z) {};
 # CHECK-NEXT:             Identifier(x)
 # CHECK-NEXT:             Identifier(y)
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       Identifier(x)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       Identifier(x)
 # CHECK-NEXT:       Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral
+# CHECK-NEXT:     FunctionLiteral(None)
 # CHECK-NEXT:       Identifier(x)
 # CHECK-NEXT:       Identifier(y)
 # CHECK-NEXT:       Identifier(z)

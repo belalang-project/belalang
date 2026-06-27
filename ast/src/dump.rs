@@ -163,7 +163,12 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
     }
 
     fn visit_function(&mut self, node: &FunctionLiteral<'ast>) {
-        println!("{:indent$}FunctionLiteral", "", indent = self.indent);
+        println!(
+            "{:indent$}FunctionLiteral({:?})",
+            "",
+            node.explicit_ty,
+            indent = self.indent
+        );
         self.indent += 2;
         self.walk_function(node);
         self.indent -= 2;
