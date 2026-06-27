@@ -166,7 +166,7 @@ pub trait Visitor<'ast> {
 
     fn walk_function(&mut self, node: &FunctionLiteral<'ast>) {
         for param in node.params {
-            self.visit_identifier(param);
+            self.visit_var_decl_statement(param);
         }
         self.visit_block(&node.body);
     }
