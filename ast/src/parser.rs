@@ -586,11 +586,11 @@ impl<'sess> Parser<'sess> {
         ParserError::UnknownPrefixOperator(self.curr_token.kind)
     }
 
-    fn error_invalid_lhs(&self, left: &Expression) -> ParserError {
+    fn error_invalid_lhs(&self, _left: &Expression) -> ParserError {
         // TODO: change this with expression span
         let label = Label::primary(self.curr_token.span, "invalid lhs");
         self.session.emit(Diagnostic::error("invalid lhs").with_label(label));
-        ParserError::InvalidLHS(left.clone())
+        ParserError::InvalidLHS
     }
 
     fn error_parsing_integer(&self, v: &str) -> ParserError {
