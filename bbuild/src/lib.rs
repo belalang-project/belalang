@@ -15,6 +15,7 @@ use std::{
 use anyhow::Context;
 use ast::{
     ASTDumper,
+    Ast,
     Parser,
     Program,
     TypeInferer,
@@ -50,7 +51,7 @@ pub struct BBuild {
     out_exe: PathBuf,
 
     session: Session,
-    bump: bumpalo::Bump,
+    ast: Ast,
 }
 
 impl BBuild {
@@ -79,7 +80,7 @@ impl BBuild {
             out_exe,
             session,
             bctx,
-            bump: bumpalo::Bump::new(),
+            ast: Ast::new(),
         })
     }
 
@@ -99,13 +100,13 @@ impl BBuild {
             out_exe,
             session,
             bctx,
-            bump: bumpalo::Bump::new(),
+            ast: Ast::new(),
         })
     }
 
     pub fn parse_program<'ast>(&'ast self) -> anyhow::Result<Program<'ast>> {
         let lexer = Lexer::new(&self.session);
-        let mut parser = Parser::new(&self.session, lexer, &self.bump);
+        let mut parser = Parser::new(&self.session, lexer, &self.ast);
 
         let program = parser.parse_program();
         self.check_errors()?;

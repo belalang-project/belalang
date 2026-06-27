@@ -13,6 +13,5 @@ rust_library(
         "//lexer",
         "//session",
         "@crates//:anyhow",
-        "@crates//:bumpalo",
     ],
 )

@@ -47,3 +47,29 @@ pub enum ParserError {
     #[error("unknown prefix operator: {0}")]
     UnknownPrefixOperator(TokenKind),
 }
+
+pub struct Ast {
+    bump: bumpalo::Bump,
+}
+
+impl Ast {
+    pub fn new() -> Self {
+        Self {
+            bump: bumpalo::Bump::new(),
+        }
+    }
+
+    pub fn alloc<T>(&self, val: T) -> &T {
+        self.bump.alloc(val)
+    }
+
+    pub fn alloc_slice_clone<T: Clone>(&self, slice: &[T]) -> &[T] {
+        self.bump.alloc_slice_clone(slice)
+    }
+}
+
+impl Default for Ast {
+    fn default() -> Self {
+        Self::new()
+    }
+}

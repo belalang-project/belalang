@@ -1,4 +1,3 @@
-use bumpalo::Bump;
 use diag::{
     Diagnostic,
     Label,
@@ -24,6 +23,7 @@ use super::{
 };
 use crate::{
     ArrayLiteral,
+    Ast,
     BlockExpression,
     BooleanExpression,
     CallExpression,
@@ -118,7 +118,7 @@ pub struct Parser<'sess, 'ast> {
     curr_token: Token,
     peek_token: Token,
 
-    bump: &'ast Bump,
+    ast: &'ast Ast,
 
     depth: i32,
     has_semicolon: bool,
@@ -126,13 +126,13 @@ pub struct Parser<'sess, 'ast> {
 
 impl<'sess, 'ast> Parser<'sess, 'ast> {
     /// Creates a new Parser using a [`Lexer`].
-    pub fn new(session: &'sess Session, lexer: Lexer<'sess>, bump: &'ast Bump) -> Parser<'sess, 'ast> {
+    pub fn new(session: &'sess Session, lexer: Lexer<'sess>, ast: &'ast Ast) -> Parser<'sess, 'ast> {
         Parser {
             session,
             lexer,
             curr_token: Token::default(),
             peek_token: Token::default(),
-            bump,
+            ast,
             depth: 0,
             has_semicolon: false,
         }
@@ -161,7 +161,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         }
 
         Ok(Program {
-            statements: self.bump.alloc_slice_clone(&statements),
+            statements: self.ast.alloc_slice_clone(&statements),
         })
     }
 
@@ -238,7 +238,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         self.depth -= 1;
 
         Ok(BlockExpression {
-            statements: self.bump.alloc_slice_clone(&statements),
+            statements: self.ast.alloc_slice_clone(&statements),
         })
     }
 
@@ -256,14 +256,14 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
             Some(match self.curr_token.kind {
                 TokenKind::If => self.parse_if()?,
-                TokenKind::LeftBrace => self.bump.alloc(Expression::Block(self.parse_block()?)),
+                TokenKind::LeftBrace => self.ast.alloc(Expression::Block(self.parse_block()?)),
                 _ => return Err(self.error_unexpected_token()),
             })
         } else {
             None
         };
 
-        Ok(self.bump.alloc(Expression::If(IfExpression {
+        Ok(self.ast.alloc(Expression::If(IfExpression {
             condition,
             consequence,
             alternative,
@@ -300,7 +300,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 let right = self.parse_expression(precedence)?;
 
-                Ok(Some(self.bump.alloc(Expression::Infix(InfixExpression {
+                Ok(Some(self.ast.alloc(Expression::Infix(InfixExpression {
                     left,
                     operator: match operator.kind {
                         TokenKind::Add => InfixKind::Add,
@@ -349,9 +349,9 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     expect_peek!(self, TokenKind::RightParen);
                 }
 
-                Ok(Some(self.bump.alloc(Expression::Call(CallExpression {
+                Ok(Some(self.ast.alloc(Expression::Call(CallExpression {
                     function: left,
-                    args: self.bump.alloc_slice_clone(&args),
+                    args: self.ast.alloc_slice_clone(&args),
                 }))))
             },
 
@@ -363,9 +363,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 expect_peek!(self, TokenKind::RightBracket);
 
-                Ok(Some(
-                    self.bump.alloc(Expression::Index(IndexExpression { left, index })),
-                ))
+                Ok(Some(self.ast.alloc(Expression::Index(IndexExpression { left, index }))))
             },
 
             TokenKind::Assign { ref kind } => {
@@ -385,7 +383,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.next_token()?;
                 let value = self.parse_expression(Precedence::Lowest)?;
 
-                Ok(Some(self.bump.alloc(Expression::Var(VarExpression {
+                Ok(Some(self.ast.alloc(Expression::Var(VarExpression {
                     kind,
                     name,
                     value,
@@ -435,13 +433,13 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 {
                     self.next_token()?; // consume equal sign; curr_token is start of RHS value
                     let value = self.parse_expression(Precedence::Lowest)?;
-                    Ok(Some(self.bump.alloc(Expression::VarDecl(VarDeclExpression {
+                    Ok(Some(self.ast.alloc(Expression::VarDecl(VarDeclExpression {
                         name,
                         value: Some(value),
                         explicit_ty,
                     }))))
                 } else {
-                    Ok(Some(self.bump.alloc(Expression::VarDecl(VarDeclExpression {
+                    Ok(Some(self.ast.alloc(Expression::VarDecl(VarDeclExpression {
                         name,
                         value: None,
                         explicit_ty,
@@ -456,26 +454,26 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
     fn parse_prefix(&mut self) -> Result<&'ast Expression<'ast>, ParserError> {
         match self.curr_token.kind {
             // parse_identifier: parse current token as identifier
-            TokenKind::Ident { sym } => Ok(self.bump.alloc(Expression::Identifier(Identifier { value: sym }))),
+            TokenKind::Ident { sym } => Ok(self.ast.alloc(Expression::Identifier(Identifier { value: sym }))),
 
             TokenKind::Literal { ref kind, sym } => {
                 let str_value = self.session.lookup_string(sym);
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
-                        Ok(lit) => Ok(self.bump.alloc(Expression::Integer(IntegerLiteral { value: lit }))),
+                        Ok(lit) => Ok(self.ast.alloc(Expression::Integer(IntegerLiteral { value: lit }))),
                         Err(_) => Err(self.error_parsing_integer(str_value)),
                     },
                     LiteralKind::Float => match str_value.parse::<f64>() {
-                        Ok(lit) => Ok(self.bump.alloc(Expression::Float(FloatLiteral { value: lit }))),
+                        Ok(lit) => Ok(self.ast.alloc(Expression::Float(FloatLiteral { value: lit }))),
                         Err(_) => Err(self.error_parsing_float(str_value)),
                     },
-                    LiteralKind::String => Ok(self.bump.alloc(Expression::String(StringLiteral { value: sym }))),
+                    LiteralKind::String => Ok(self.ast.alloc(Expression::String(StringLiteral { value: sym }))),
                 }
             },
 
-            TokenKind::KwTrue => Ok(self.bump.alloc(Expression::Boolean(BooleanExpression { value: true }))),
+            TokenKind::KwTrue => Ok(self.ast.alloc(Expression::Boolean(BooleanExpression { value: true }))),
 
-            TokenKind::KwFalse => Ok(self.bump.alloc(Expression::Boolean(BooleanExpression { value: false }))),
+            TokenKind::KwFalse => Ok(self.ast.alloc(Expression::Boolean(BooleanExpression { value: false }))),
 
             // parse_array
             TokenKind::LeftBracket => {
@@ -498,8 +496,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     expect_peek!(self, TokenKind::RightBracket);
                 }
 
-                Ok(self.bump.alloc(Expression::Array(ArrayLiteral {
-                    elements: self.bump.alloc_slice_clone(&elements),
+                Ok(self.ast.alloc(Expression::Array(ArrayLiteral {
+                    elements: self.ast.alloc_slice_clone(&elements),
                 })))
             },
 
@@ -511,7 +509,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 let right = self.parse_expression(Precedence::Prefix).unwrap();
 
-                Ok(self.bump.alloc(Expression::Prefix(PrefixExpression {
+                Ok(self.ast.alloc(Expression::Prefix(PrefixExpression {
                     operator: match prev_token.kind {
                         TokenKind::Not => PrefixKind::Not,
                         TokenKind::Sub => PrefixKind::Sub,
@@ -534,7 +532,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_block
             TokenKind::LeftBrace => {
                 let block = self.parse_block()?;
-                Ok(self.bump.alloc(Expression::Block(block)))
+                Ok(self.ast.alloc(Expression::Block(block)))
             },
 
             // parse_if: parse current if expression
@@ -573,8 +571,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 let body = self.parse_block()?;
 
-                Ok(self.bump.alloc(Expression::Function(FunctionLiteral {
-                    params: self.bump.alloc_slice_clone(&params),
+                Ok(self.ast.alloc(Expression::Function(FunctionLiteral {
+                    params: self.ast.alloc_slice_clone(&params),
                     body,
                 })))
             },
