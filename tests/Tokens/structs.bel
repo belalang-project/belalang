@@ -1,0 +1,9 @@
+struct Person {
+
+}
+
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+# CHECK: Struct <0..6>
+# CHECK: Ident("Person") <7..13>
+# CHECK: LeftBrace <14..15>
+# CHECK: RightBrace <17..18>

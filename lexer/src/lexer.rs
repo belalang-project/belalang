@@ -557,6 +557,7 @@ impl<'sess> Lexer<'sess> {
                     syms::IF => TokenKind::If,
                     syms::ELSE => TokenKind::Else,
                     syms::RETURN => TokenKind::Return,
+                    syms::STRUCT => TokenKind::Struct,
                     _ => TokenKind::Ident { sym },
                 };
 
