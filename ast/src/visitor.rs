@@ -23,16 +23,16 @@ use super::{
     WhileStatement,
 };
 
-pub trait Visitor {
-    fn visit_program(&mut self, program: &Program) {
+pub trait Visitor<'ast> {
+    fn visit_program(&mut self, program: &Program<'ast>) {
         self.walk_program(program);
     }
 
-    fn visit_statement(&mut self, stmt: &Statement) {
+    fn visit_statement(&mut self, stmt: &Statement<'ast>) {
         self.walk_statement(stmt);
     }
 
-    fn visit_expression(&mut self, expr: &Expression) {
+    fn visit_expression(&mut self, expr: &Expression<'ast>) {
         self.walk_expression(expr);
     }
 
@@ -48,65 +48,65 @@ pub trait Visitor {
 
     fn visit_identifier(&mut self, _node: &Identifier) {}
 
-    fn visit_array(&mut self, node: &ArrayLiteral) {
+    fn visit_array(&mut self, node: &ArrayLiteral<'ast>) {
         self.walk_array(node);
     }
 
-    fn visit_var(&mut self, node: &VarExpression) {
+    fn visit_var(&mut self, node: &VarExpression<'ast>) {
         self.walk_var(node);
     }
 
-    fn visit_var_decl(&mut self, node: &VarDeclExpression) {
+    fn visit_var_decl(&mut self, node: &VarDeclExpression<'ast>) {
         self.walk_var_decl(node);
     }
 
-    fn visit_call(&mut self, node: &CallExpression) {
+    fn visit_call(&mut self, node: &CallExpression<'ast>) {
         self.walk_call(node);
     }
 
-    fn visit_index(&mut self, node: &IndexExpression) {
+    fn visit_index(&mut self, node: &IndexExpression<'ast>) {
         self.walk_index(node);
     }
 
-    fn visit_function(&mut self, node: &FunctionLiteral) {
+    fn visit_function(&mut self, node: &FunctionLiteral<'ast>) {
         self.walk_function(node);
     }
 
-    fn visit_if(&mut self, node: &IfExpression) {
+    fn visit_if(&mut self, node: &IfExpression<'ast>) {
         self.walk_if(node);
     }
 
-    fn visit_infix(&mut self, node: &InfixExpression) {
+    fn visit_infix(&mut self, node: &InfixExpression<'ast>) {
         self.walk_infix(node);
     }
 
-    fn visit_prefix(&mut self, node: &PrefixExpression) {
+    fn visit_prefix(&mut self, node: &PrefixExpression<'ast>) {
         self.walk_prefix(node);
     }
 
-    fn visit_block(&mut self, node: &BlockExpression) {
+    fn visit_block(&mut self, node: &BlockExpression<'ast>) {
         self.walk_block(node);
     }
 
-    fn visit_expression_statement(&mut self, node: &ExpressionStatement) {
+    fn visit_expression_statement(&mut self, node: &ExpressionStatement<'ast>) {
         self.walk_expression_statement(node);
     }
 
-    fn visit_return_statement(&mut self, node: &ReturnStatement) {
+    fn visit_return_statement(&mut self, node: &ReturnStatement<'ast>) {
         self.walk_return_statement(node);
     }
 
-    fn visit_while_statement(&mut self, node: &WhileStatement) {
+    fn visit_while_statement(&mut self, node: &WhileStatement<'ast>) {
         self.walk_while_statement(node);
     }
 
-    fn walk_program(&mut self, program: &Program) {
-        for stmt in &program.statements {
+    fn walk_program(&mut self, program: &Program<'ast>) {
+        for stmt in program.statements {
             self.visit_statement(stmt);
         }
     }
 
-    fn walk_statement(&mut self, stmt: &Statement) {
+    fn walk_statement(&mut self, stmt: &Statement<'ast>) {
         match stmt {
             Statement::Expression(v) => self.visit_expression_statement(v),
             Statement::Return(v) => self.visit_return_statement(v),
@@ -114,7 +114,7 @@ pub trait Visitor {
         }
     }
 
-    fn walk_expression(&mut self, expr: &Expression) {
+    fn walk_expression(&mut self, expr: &Expression<'ast>) {
         match expr {
             Expression::Boolean(v) => self.visit_boolean(v),
             Expression::Integer(v) => self.visit_integer(v),
@@ -135,75 +135,75 @@ pub trait Visitor {
         }
     }
 
-    fn walk_array(&mut self, node: &ArrayLiteral) {
-        for elem in &node.elements {
+    fn walk_array(&mut self, node: &ArrayLiteral<'ast>) {
+        for elem in node.elements {
             self.visit_expression(elem);
         }
     }
 
-    fn walk_var(&mut self, node: &VarExpression) {
+    fn walk_var(&mut self, node: &VarExpression<'ast>) {
         self.visit_identifier(&node.name);
-        self.visit_expression(&node.value);
+        self.visit_expression(node.value);
     }
 
-    fn walk_var_decl(&mut self, node: &VarDeclExpression) {
+    fn walk_var_decl(&mut self, node: &VarDeclExpression<'ast>) {
         self.visit_identifier(&node.name);
-        if let Some(value) = &node.value {
+        if let Some(value) = node.value {
             self.visit_expression(value);
         }
     }
 
-    fn walk_call(&mut self, node: &CallExpression) {
-        self.visit_expression(&node.function);
-        for arg in &node.args {
+    fn walk_call(&mut self, node: &CallExpression<'ast>) {
+        self.visit_expression(node.function);
+        for arg in node.args {
             self.visit_expression(arg);
         }
     }
 
-    fn walk_index(&mut self, node: &IndexExpression) {
-        self.visit_expression(&node.left);
-        self.visit_expression(&node.index);
+    fn walk_index(&mut self, node: &IndexExpression<'ast>) {
+        self.visit_expression(node.left);
+        self.visit_expression(node.index);
     }
 
-    fn walk_function(&mut self, node: &FunctionLiteral) {
-        for param in &node.params {
+    fn walk_function(&mut self, node: &FunctionLiteral<'ast>) {
+        for param in node.params {
             self.visit_identifier(param);
         }
         self.visit_block(&node.body);
     }
 
-    fn walk_if(&mut self, node: &IfExpression) {
-        self.visit_expression(&node.condition);
+    fn walk_if(&mut self, node: &IfExpression<'ast>) {
+        self.visit_expression(node.condition);
         self.visit_block(&node.consequence);
-        if let Some(alt) = &node.alternative {
+        if let Some(alt) = node.alternative {
             self.visit_expression(alt);
         }
     }
 
-    fn walk_infix(&mut self, node: &InfixExpression) {
-        self.visit_expression(&node.left);
-        self.visit_expression(&node.right);
+    fn walk_infix(&mut self, node: &InfixExpression<'ast>) {
+        self.visit_expression(node.left);
+        self.visit_expression(node.right);
     }
 
-    fn walk_prefix(&mut self, node: &PrefixExpression) {
-        self.visit_expression(&node.right);
+    fn walk_prefix(&mut self, node: &PrefixExpression<'ast>) {
+        self.visit_expression(node.right);
     }
 
-    fn walk_block(&mut self, node: &BlockExpression) {
-        for stmt in &node.statements {
+    fn walk_block(&mut self, node: &BlockExpression<'ast>) {
+        for stmt in node.statements {
             self.visit_statement(stmt);
         }
     }
 
-    fn walk_expression_statement(&mut self, node: &ExpressionStatement) {
+    fn walk_expression_statement(&mut self, node: &ExpressionStatement<'ast>) {
         self.visit_expression(&node.expression);
     }
 
-    fn walk_return_statement(&mut self, node: &ReturnStatement) {
+    fn walk_return_statement(&mut self, node: &ReturnStatement<'ast>) {
         self.visit_expression(&node.return_value);
     }
 
-    fn walk_while_statement(&mut self, node: &WhileStatement) {
+    fn walk_while_statement(&mut self, node: &WhileStatement<'ast>) {
         self.visit_expression(&node.condition);
         self.visit_block(&node.block);
     }

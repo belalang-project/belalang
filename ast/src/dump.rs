@@ -35,29 +35,29 @@ impl<'sess> ASTDumper<'sess> {
     }
 }
 
-impl Visitor for ASTDumper<'_> {
-    fn visit_program(&mut self, program: &Program) {
+impl<'ast> Visitor<'ast> for ASTDumper<'_> {
+    fn visit_program(&mut self, program: &Program<'ast>) {
         println!("{:indent$}Program", "", indent = self.indent);
         self.indent += 2;
         self.walk_program(program);
         self.indent -= 2;
     }
 
-    fn visit_expression_statement(&mut self, _node: &ExpressionStatement) {
+    fn visit_expression_statement(&mut self, _node: &ExpressionStatement<'ast>) {
         println!("{:indent$}ExpressionStatement", "", indent = self.indent);
         self.indent += 2;
         self.walk_expression_statement(_node);
         self.indent -= 2;
     }
 
-    fn visit_return_statement(&mut self, node: &ReturnStatement) {
+    fn visit_return_statement(&mut self, node: &ReturnStatement<'ast>) {
         println!("{:indent$}ReturnStatement", "", indent = self.indent);
         self.indent += 2;
         self.walk_return_statement(node);
         self.indent -= 2;
     }
 
-    fn visit_while_statement(&mut self, node: &WhileStatement) {
+    fn visit_while_statement(&mut self, node: &WhileStatement<'ast>) {
         println!("{:indent$}WhileStatement", "", indent = self.indent);
         self.indent += 2;
         self.walk_while_statement(node);
@@ -90,7 +90,7 @@ impl Visitor for ASTDumper<'_> {
         println!("{:indent$}Identifier({})", "", v, indent = self.indent);
     }
 
-    fn visit_infix(&mut self, node: &InfixExpression) {
+    fn visit_infix(&mut self, node: &InfixExpression<'ast>) {
         println!(
             "{:indent$}InfixExpression({:?})",
             "",
@@ -102,7 +102,7 @@ impl Visitor for ASTDumper<'_> {
         self.indent -= 2;
     }
 
-    fn visit_prefix(&mut self, node: &PrefixExpression) {
+    fn visit_prefix(&mut self, node: &PrefixExpression<'ast>) {
         println!(
             "{:indent$}PrefixExpression({:?})",
             "",
@@ -114,14 +114,14 @@ impl Visitor for ASTDumper<'_> {
         self.indent -= 2;
     }
 
-    fn visit_var(&mut self, node: &VarExpression) {
+    fn visit_var(&mut self, node: &VarExpression<'ast>) {
         println!("{:indent$}VarExpression({:?})", "", node.kind, indent = self.indent);
         self.indent += 2;
         self.walk_var(node);
         self.indent -= 2;
     }
 
-    fn visit_var_decl(&mut self, node: &VarDeclExpression) {
+    fn visit_var_decl(&mut self, node: &VarDeclExpression<'ast>) {
         println!(
             "{:indent$}VarDeclExpression({:?})",
             "",
@@ -133,42 +133,42 @@ impl Visitor for ASTDumper<'_> {
         self.indent -= 2;
     }
 
-    fn visit_call(&mut self, node: &CallExpression) {
+    fn visit_call(&mut self, node: &CallExpression<'ast>) {
         println!("{:indent$}CallExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_call(node);
         self.indent -= 2;
     }
 
-    fn visit_index(&mut self, node: &IndexExpression) {
+    fn visit_index(&mut self, node: &IndexExpression<'ast>) {
         println!("{:indent$}IndexExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_index(node);
         self.indent -= 2;
     }
 
-    fn visit_if(&mut self, node: &IfExpression) {
+    fn visit_if(&mut self, node: &IfExpression<'ast>) {
         println!("{:indent$}IfExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_if(node);
         self.indent -= 2;
     }
 
-    fn visit_function(&mut self, node: &FunctionLiteral) {
+    fn visit_function(&mut self, node: &FunctionLiteral<'ast>) {
         println!("{:indent$}FunctionLiteral", "", indent = self.indent);
         self.indent += 2;
         self.walk_function(node);
         self.indent -= 2;
     }
 
-    fn visit_array(&mut self, node: &ArrayLiteral) {
+    fn visit_array(&mut self, node: &ArrayLiteral<'ast>) {
         println!("{:indent$}ArrayLiteral", "", indent = self.indent);
         self.indent += 2;
         self.walk_array(node);
         self.indent -= 2;
     }
 
-    fn visit_block(&mut self, node: &BlockExpression) {
+    fn visit_block(&mut self, node: &BlockExpression<'ast>) {
         println!("{:indent$}BlockExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_block(node);

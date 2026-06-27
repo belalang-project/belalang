@@ -8,6 +8,7 @@ rust_library(
 		"//lexer",
 		"//session",
 		"//span",
+		"@crates//:bumpalo",
 		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],

@@ -15,6 +15,7 @@ use std::{
 use anyhow::Context;
 use ast::{
     ASTDumper,
+    Ast,
     Parser,
     Program,
     TypeInferer,
@@ -50,6 +51,7 @@ pub struct BBuild {
     out_exe: PathBuf,
 
     session: Session,
+    ast: Ast,
 }
 
 impl BBuild {
@@ -78,6 +80,7 @@ impl BBuild {
             out_exe,
             session,
             bctx,
+            ast: Ast::new(),
         })
     }
 
@@ -97,12 +100,13 @@ impl BBuild {
             out_exe,
             session,
             bctx,
+            ast: Ast::new(),
         })
     }
 
-    pub fn parse_program(&self) -> anyhow::Result<Program> {
+    pub fn parse_program<'ast>(&'ast self) -> anyhow::Result<Program<'ast>> {
         let lexer = Lexer::new(&self.session);
-        let mut parser = Parser::new(&self.session, lexer);
+        let mut parser = Parser::new(&self.session, lexer, &self.ast);
 
         let program = parser.parse_program();
         self.check_errors()?;
@@ -118,27 +122,27 @@ impl BBuild {
         Ok(())
     }
 
-    pub fn infer_types(&self, program: &Program) -> anyhow::Result<()> {
+    pub fn infer_types<'ast>(&self, program: &Program<'ast>) -> anyhow::Result<()> {
         let mut ty_infer = TypeInferer::new(&self.session);
         ty_infer.infer(program);
         self.check_errors()?;
         Ok(())
     }
 
-    pub fn dump_ast(&self, program: &Program) -> anyhow::Result<()> {
+    pub fn dump_ast<'ast>(&self, program: &Program<'ast>) -> anyhow::Result<()> {
         let mut dumper = ASTDumper::new(&self.session);
         dumper.visit_program(program);
         Ok(())
     }
 
-    pub fn dump_bir(&self, program: &Program) -> String {
+    pub fn dump_bir<'ast>(&self, program: &Program<'ast>) -> String {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
         birgen.optimize();
         birgen.dump_to_string()
     }
 
-    pub fn dump_llvm(&self, program: &Program) -> String {
+    pub fn dump_llvm<'ast>(&self, program: &Program<'ast>) -> String {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
         birgen.optimize();
@@ -146,7 +150,7 @@ impl BBuild {
         llvmgen.dump_to_string()
     }
 
-    pub fn compile_object_file(&self, program: &Program) -> anyhow::Result<String> {
+    pub fn compile_object_file<'ast>(&self, program: &Program<'ast>) -> anyhow::Result<String> {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
         birgen.optimize();

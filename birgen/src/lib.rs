@@ -7,10 +7,7 @@ use ast::{
     Statement,
     Type,
 };
-use lexer::{
-    AssignmentKind,
-    InfixKind,
-};
+use lexer::InfixKind;
 use session::{
     Session,
     interner::{
@@ -72,14 +69,14 @@ impl<'sess> BIRGen<'sess> {
         }
     }
 
-    pub fn generate_program(&mut self, program: &Program) {
-        for stmt in &program.statements {
+    pub fn generate_program<'ast>(&mut self, program: &Program<'ast>) {
+        for stmt in program.statements {
             self.generate_statement(stmt);
         }
         self.inner.pin_mut().build_main_return();
     }
 
-    pub fn generate_statement(&mut self, stmt: &Statement) {
+    pub fn generate_statement<'ast>(&mut self, stmt: &Statement<'ast>) {
         match stmt {
             Statement::Expression(expr_stmt) => {
                 self.generate_expression(&expr_stmt.expression);
@@ -93,7 +90,7 @@ impl<'sess> BIRGen<'sess> {
         }
     }
 
-    pub fn generate_expression(&mut self, expr: &Expression) -> cxx::UniquePtr<ffi::BIRValue> {
+    pub fn generate_expression<'ast>(&mut self, expr: &Expression<'ast>) -> cxx::UniquePtr<ffi::BIRValue> {
         match expr {
             Expression::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
             Expression::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
@@ -177,9 +174,9 @@ impl<'sess> BIRGen<'sess> {
         }
     }
 
-    fn generate_infix(&mut self, infix: &InfixExpression) -> cxx::UniquePtr<ffi::BIRValue> {
-        let lhs = self.generate_expression(&infix.left);
-        let rhs = self.generate_expression(&infix.right);
+    fn generate_infix<'ast>(&mut self, infix: &InfixExpression<'ast>) -> cxx::UniquePtr<ffi::BIRValue> {
+        let lhs = self.generate_expression(infix.left);
+        let rhs = self.generate_expression(infix.right);
 
         match infix.operator {
             InfixKind::Add => self.inner.pin_mut().build_add(&lhs, &rhs),

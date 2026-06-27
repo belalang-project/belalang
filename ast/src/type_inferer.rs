@@ -29,7 +29,7 @@ impl<'sess> TypeInferer<'sess> {
         }
     }
 
-    pub fn infer(&mut self, program: &crate::Program) {
+    pub fn infer<'ast>(&mut self, program: &crate::Program<'ast>) {
         self.inner.visit_program(program);
     }
 }
@@ -48,7 +48,7 @@ impl TypeInfererInner {
     }
 }
 
-impl Visitor for TypeInfererInner {
+impl<'ast> Visitor<'ast> for TypeInfererInner {
     fn visit_integer(&mut self, _node: &crate::IntegerLiteral) {
         self.current_type = Type::Integer;
     }
@@ -69,9 +69,9 @@ impl Visitor for TypeInfererInner {
         }
     }
 
-    fn visit_var_decl(&mut self, node: &crate::VarDeclExpression) {
+    fn visit_var_decl(&mut self, node: &crate::VarDeclExpression<'ast>) {
         let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
-            if let Some(value) = &node.value {
+            if let Some(value) = node.value {
                 self.visit_expression(value);
             }
             self.current_type
@@ -99,10 +99,11 @@ mod tests {
 
     #[test]
     fn test_implicit_string() {
+        let str_expr = Expression::String(StringLiteral { value: Symbol(1) });
         let expr = VarDeclExpression {
             name: Identifier { value: Symbol(0) },
             explicit_ty: None,
-            value: Some(Box::new(Expression::String(StringLiteral { value: Symbol(1) }))),
+            value: Some(&str_expr),
         };
 
         let mut ty_infer = TypeInfererInner::new();
@@ -114,10 +115,11 @@ mod tests {
 
     #[test]
     fn test_explicit_int() {
+        let int_expr = Expression::Integer(IntegerLiteral { value: 12 });
         let expr = VarDeclExpression {
             name: Identifier { value: Symbol(0) },
             explicit_ty: Some(Type::Integer),
-            value: Some(Box::new(Expression::Integer(IntegerLiteral { value: 12 }))),
+            value: Some(&int_expr),
         };
 
         let mut ty_infer = TypeInfererInner::new();

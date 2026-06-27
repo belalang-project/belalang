@@ -3,25 +3,25 @@ use super::{
     Expression,
 };
 
-#[derive(Debug, Clone)]
-pub struct ExpressionStatement {
-    pub expression: Expression,
+#[derive(Debug, Clone, Copy)]
+pub struct ExpressionStatement<'ast> {
+    pub expression: Expression<'ast>,
 }
 
-#[derive(Debug, Clone)]
-pub struct ReturnStatement {
-    pub return_value: Expression,
+#[derive(Debug, Clone, Copy)]
+pub struct ReturnStatement<'ast> {
+    pub return_value: Expression<'ast>,
 }
 
-#[derive(Debug, Clone)]
-pub struct WhileStatement {
-    pub condition: Box<Expression>,
-    pub block: BlockExpression,
+#[derive(Debug, Clone, Copy)]
+pub struct WhileStatement<'ast> {
+    pub condition: Expression<'ast>,
+    pub block: BlockExpression<'ast>,
 }
 
-#[derive(Debug, Clone)]
-pub enum Statement {
-    Expression(ExpressionStatement),
-    Return(ReturnStatement),
-    While(WhileStatement),
+#[derive(Debug, Clone, Copy)]
+pub enum Statement<'ast> {
+    Expression(ExpressionStatement<'ast>),
+    Return(ReturnStatement<'ast>),
+    While(WhileStatement<'ast>),
 }
