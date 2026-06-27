@@ -18,7 +18,7 @@ use super::{
     ReturnStatement,
     Statement,
     StringLiteral,
-    VarDeclExpression,
+    VarDeclStatement,
     VarExpression,
     WhileStatement,
 };
@@ -54,10 +54,6 @@ pub trait Visitor<'ast> {
 
     fn visit_var(&mut self, node: &VarExpression<'ast>) {
         self.walk_var(node);
-    }
-
-    fn visit_var_decl(&mut self, node: &VarDeclExpression<'ast>) {
-        self.walk_var_decl(node);
     }
 
     fn visit_call(&mut self, node: &CallExpression<'ast>) {
@@ -100,6 +96,10 @@ pub trait Visitor<'ast> {
         self.walk_while_statement(node);
     }
 
+    fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
+        self.walk_var_decl_statement(node);
+    }
+
     fn walk_program(&mut self, program: &Program<'ast>) {
         for stmt in program.statements {
             self.visit_statement(stmt);
@@ -111,6 +111,7 @@ pub trait Visitor<'ast> {
             Statement::Expression(v) => self.visit_expression_statement(v),
             Statement::Return(v) => self.visit_return_statement(v),
             Statement::While(v) => self.visit_while_statement(v),
+            Statement::VarDecl(v) => self.visit_var_decl_statement(v),
         }
     }
 
@@ -123,7 +124,6 @@ pub trait Visitor<'ast> {
             Expression::Null(v) => self.visit_null(v),
             Expression::Array(v) => self.visit_array(v),
             Expression::Var(v) => self.visit_var(v),
-            Expression::VarDecl(v) => self.visit_var_decl(v),
             Expression::Call(v) => self.visit_call(v),
             Expression::Index(v) => self.visit_index(v),
             Expression::Function(v) => self.visit_function(v),
@@ -144,13 +144,6 @@ pub trait Visitor<'ast> {
     fn walk_var(&mut self, node: &VarExpression<'ast>) {
         self.visit_identifier(&node.name);
         self.visit_expression(node.value);
-    }
-
-    fn walk_var_decl(&mut self, node: &VarDeclExpression<'ast>) {
-        self.visit_identifier(&node.name);
-        if let Some(value) = node.value {
-            self.visit_expression(value);
-        }
     }
 
     fn walk_call(&mut self, node: &CallExpression<'ast>) {
@@ -206,5 +199,12 @@ pub trait Visitor<'ast> {
     fn walk_while_statement(&mut self, node: &WhileStatement<'ast>) {
         self.visit_expression(&node.condition);
         self.visit_block(&node.block);
+    }
+
+    fn walk_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
+        self.visit_identifier(&node.name);
+        if let Some(value) = node.value {
+            self.visit_expression(value);
+        }
     }
 }

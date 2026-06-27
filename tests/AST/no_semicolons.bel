@@ -10,17 +10,14 @@ return 5
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     Identifier(name)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(int_var)
-# CHECK-NEXT:       Integer(123)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(flo_var)
-# CHECK-NEXT:       Float(44.2)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(str_var)
-# CHECK-NEXT:       String("Hello, World!")
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(int_var)
+# CHECK-NEXT:     Integer(123)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(flo_var)
+# CHECK-NEXT:     Float(44.2)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(str_var)
+# CHECK-NEXT:     String("Hello, World!")
 # CHECK-NEXT:   ReturnStatement
 # CHECK-NEXT:     Integer(5)

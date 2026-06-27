@@ -82,21 +82,6 @@ pub struct ArrayLiteral<'ast> {
     pub elements: &'ast [Expression<'ast>],
 }
 
-/// Represents a variable declaration expression.
-///
-/// # Examples
-///
-/// ```belalang
-/// x := 12
-/// y: Int = 12
-/// ```
-#[derive(Debug, Clone, Copy)]
-pub struct VarDeclExpression<'ast> {
-    pub name: Identifier,
-    pub value: Option<&'ast Expression<'ast>>,
-    pub explicit_ty: Option<Type>,
-}
-
 /// Represents an variable assignment literal expression.
 ///
 /// # Examples
@@ -228,7 +213,6 @@ pub enum Expression<'ast> {
     Null(NullLiteral),
     Array(ArrayLiteral<'ast>),
     Var(VarExpression<'ast>),
-    VarDecl(VarDeclExpression<'ast>),
     Call(CallExpression<'ast>),
     Index(IndexExpression<'ast>),
     Function(FunctionLiteral<'ast>),

@@ -1,6 +1,8 @@
 use super::{
     BlockExpression,
     Expression,
+    Identifier,
+    Type,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -20,8 +22,16 @@ pub struct WhileStatement<'ast> {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub struct VarDeclStatement<'ast> {
+    pub name: Identifier,
+    pub value: Option<&'ast Expression<'ast>>,
+    pub explicit_ty: Option<Type>,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum Statement<'ast> {
     Expression(ExpressionStatement<'ast>),
     Return(ReturnStatement<'ast>),
     While(WhileStatement<'ast>),
+    VarDecl(VarDeclStatement<'ast>),
 }

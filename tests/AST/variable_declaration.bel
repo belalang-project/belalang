@@ -4,9 +4,7 @@ x: Int
 x: String
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(Some(Integer))
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(Some(String))
-# CHECK-NEXT:       Identifier(x)
+# CHECK-NEXT:   VarDeclStatement(Some(Integer))
+# CHECK-NEXT:     Identifier(x)
+# CHECK-NEXT:   VarDeclStatement(Some(String))
+# CHECK-NEXT:     Identifier(x)

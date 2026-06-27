@@ -11,18 +11,15 @@ explicit_ty: Int = 12
 implicit_ty := 12
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(int_var)
-# CHECK-NEXT:       Integer(123)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(flo_var)
-# CHECK-NEXT:       Float(44.2)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(str_var)
-# CHECK-NEXT:       String("Hello, World!")
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(int_var)
+# CHECK-NEXT:     Integer(123)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(flo_var)
+# CHECK-NEXT:     Float(44.2)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(str_var)
+# CHECK-NEXT:     String("Hello, World!")
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     VarExpression(Assign)
 # CHECK-NEXT:       Identifier(int_var)
@@ -35,11 +32,9 @@ implicit_ty := 12
 # CHECK-NEXT:     VarExpression(Assign)
 # CHECK-NEXT:       Identifier(str_var)
 # CHECK-NEXT:       String("Hello, Mom!")
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(Some(Integer))
-# CHECK-NEXT:       Identifier(explicit_ty)
-# CHECK-NEXT:       Integer(12)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(implicit_ty)
-# CHECK-NEXT:       Integer(12)
+# CHECK-NEXT:   VarDeclStatement(Some(Integer))
+# CHECK-NEXT:     Identifier(explicit_ty)
+# CHECK-NEXT:     Integer(12)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(implicit_ty)
+# CHECK-NEXT:     Integer(12)

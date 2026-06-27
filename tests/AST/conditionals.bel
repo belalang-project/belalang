@@ -25,30 +25,28 @@ if x < y {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(price)
-# CHECK-NEXT:       Integer(50)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(status)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(price)
+# CHECK-NEXT:     Integer(50)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(status)
+# CHECK-NEXT:     IfExpression
+# CHECK-NEXT:       InfixExpression(Lt)
+# CHECK-NEXT:         Identifier(price)
+# CHECK-NEXT:         Integer(30)
+# CHECK-NEXT:       BlockExpression
+# CHECK-NEXT:         ExpressionStatement
+# CHECK-NEXT:           String("very cheap")
 # CHECK-NEXT:       IfExpression
 # CHECK-NEXT:         InfixExpression(Lt)
 # CHECK-NEXT:           Identifier(price)
-# CHECK-NEXT:           Integer(30)
+# CHECK-NEXT:           Integer(40)
 # CHECK-NEXT:         BlockExpression
 # CHECK-NEXT:           ExpressionStatement
-# CHECK-NEXT:             String("very cheap")
-# CHECK-NEXT:         IfExpression
-# CHECK-NEXT:           InfixExpression(Lt)
-# CHECK-NEXT:             Identifier(price)
-# CHECK-NEXT:             Integer(40)
-# CHECK-NEXT:           BlockExpression
-# CHECK-NEXT:             ExpressionStatement
-# CHECK-NEXT:               String("not so cheap")
-# CHECK-NEXT:           BlockExpression
-# CHECK-NEXT:             ExpressionStatement
-# CHECK-NEXT:               String("very not cheap")
+# CHECK-NEXT:             String("not so cheap")
+# CHECK-NEXT:         BlockExpression
+# CHECK-NEXT:           ExpressionStatement
+# CHECK-NEXT:             String("very not cheap")
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     IfExpression
 # CHECK-NEXT:       InfixExpression(Lt)
@@ -74,9 +72,8 @@ if x < y {
 # CHECK-NEXT:         Identifier(x)
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           VarDeclExpression(None)
-# CHECK-NEXT:             Identifier(a)
-# CHECK-NEXT:             Integer(10)
+# CHECK-NEXT:         VarDeclStatement(None)
+# CHECK-NEXT:           Identifier(a)
+# CHECK-NEXT:           Integer(10)
 # CHECK-NEXT:         ExpressionStatement
 # CHECK-NEXT:           Identifier(x)
