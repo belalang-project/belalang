@@ -300,4 +300,27 @@ def BIR_VarLoadOp : BIR_Op<"var.load"> {
   let assemblyFormat = "$ref attr-dict `:` functional-type(operands, results)";
 }
 
+def BIR_ScopeOp : BIR_Op<"scope", [
+  NoRegionArguments,
+]> {
+  let regions = (region AnyRegion:$scopeRegion);
+  let results = (outs Optional<BIR_AnyType>:$results);
+
+  let assemblyFormat = "$scopeRegion (`:` type($results)^)? attr-dict";
+}
+
+def BIR_YieldOp : BIR_Op<"yield", [
+  ParentOneOf<["ScopeOp"]>,
+  Terminator,
+]> {
+  let summary = "yield";
+
+  let arguments = (ins Variadic<BIR_AnyType>:$args);
+  let assemblyFormat = "($args^ `:` type($args))? attr-dict";
+
+  let builders = [
+    OpBuilder<(ins), [{  }]>,
+  ];
+}
+
 #endif // BELALANG_IR_OPS_TD_
