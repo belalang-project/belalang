@@ -276,8 +276,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 while !matches!(self.curr_token.kind, TokenKind::RightBrace | TokenKind::EOF) {
                     let stmt = self.parse_statement()?;
                     let Statement::VarDecl(var_decl) = stmt else {
-                        // TODO: change this with the correct error
-                        return Err(self.error_unexpected_token());
+                        return Err(self.error_parsing_struct());
                     };
                     fields.push(var_decl);
                     self.next_token()?; // curr_token now at next statement
@@ -646,5 +645,13 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         self.session
             .emit(Diagnostic::error("error parsing float").with_label(label));
         ParserError::ParsingFloat(v.to_string())
+    }
+
+    fn error_parsing_struct(&self) -> ParserError {
+        let label = Label::primary(self.curr_token.span, "invalid statement");
+        // TODO: fix diagnostic span regarding statement
+        self.session
+            .emit(Diagnostic::error("error parsing struct").with_label(label));
+        ParserError::ParsingStruct
     }
 }

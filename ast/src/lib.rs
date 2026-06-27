@@ -46,6 +46,9 @@ pub enum ParserError {
     #[error("error parsing float: could not parse {0} as float")]
     ParsingFloat(String),
 
+    #[error("error parsing struct")]
+    ParsingStruct,
+
     #[error("unknown prefix operator: {0}")]
     UnknownPrefixOperator(TokenKind),
 }

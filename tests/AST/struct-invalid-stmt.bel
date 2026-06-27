@@ -1,0 +1,11 @@
+# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+
+struct A {
+  return 1
+}
+
+# CHECK:      error: error parsing struct
+# CHECK-NEXT:  --> {{.*}}/tests/AST/struct-invalid-stmt.bel:4:10
+# CHECK-NEXT:   |
+# CHECK-NEXT: 4 |   return 1
+# CHECK-NEXT:   |          ^ invalid statement
