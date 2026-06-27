@@ -46,6 +46,7 @@ public:
   std::unique_ptr<BIRValue> get_value() const {
     return std::make_unique<BIRValue>(fnValue);
   }
+  std::unique_ptr<BIRValue> get_arg(size_t index) const;
 
 private:
   mlir::OpBuilder &builder;
@@ -70,12 +71,16 @@ public:
   std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_declare_ty(uint8_t v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
-  std::unique_ptr<BIRGuard> build_fn_expr(uint8_t resultTy);
+  std::unique_ptr<BIRGuard> build_fn_expr(uint8_t resultTy, rust::Slice<const uint8_t> paramTys);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
   void build_empty_return();
   void build_main_return();
+
+  void start_call(const BIRValue &callee);
+  void add_call_arg(const BIRValue &arg);
+  std::unique_ptr<BIRValue> finish_call();
 
   void dump() const;
   rust::String dump_to_string() const;
@@ -89,6 +94,8 @@ private:
   mlir::ModuleOp module;
   mlir::OpBuilder builder;
   mlir::Location loc;
+  mlir::Value current_callee;
+  std::vector<mlir::Value> current_args;
 
   mlir::Type mapType(uint8_t);
 };

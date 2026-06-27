@@ -169,17 +169,54 @@ mlir::Type BIRGen::mapType(uint8_t ty) {
   }
 }
 
-std::unique_ptr<BIRGuard> BIRGen::build_fn_expr(uint8_t resultTy) {
-  auto fnTy = mlir::FunctionType::get(&context, {}, {mapType(resultTy)});
+std::unique_ptr<BIRValue> BIRGuard::get_arg(size_t index) const {
+  auto op = fnValue.getDefiningOp();
+  auto &region = op->getRegion(0);
+  auto &block = region.front();
+  auto arg = block.getArgument(index);
+  return std::make_unique<BIRValue>(arg);
+}
+
+std::unique_ptr<BIRGuard> BIRGen::build_fn_expr(uint8_t resultTy, rust::Slice<const uint8_t> paramTys) {
+  std::vector<mlir::Type> inputs;
+  for (auto ty : paramTys) {
+    inputs.push_back(mapType(ty));
+  }
+  auto fnTy = mlir::FunctionType::get(&context, inputs, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
 
   auto guard = std::make_unique<BIRGuard>(builder, op.getResult());
-  builder.createBlock(&op.getBody());
+
+  std::vector<mlir::Location> locs(inputs.size(), loc);
+  builder.createBlock(&op.getBody(), {}, inputs, locs);
   return guard;
 }
 
 void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
+}
+
+void BIRGen::start_call(const BIRValue &callee) {
+  current_callee = callee.getValue();
+  current_args.clear();
+}
+
+void BIRGen::add_call_arg(const BIRValue &arg) {
+  current_args.push_back(arg.getValue());
+}
+
+std::unique_ptr<BIRValue> BIRGen::finish_call() {
+  auto fnType = mlir::cast<mlir::FunctionType>(current_callee.getType());
+  auto resultTypes = fnType.getResults();
+
+  std::vector<mlir::Value> operands;
+  operands.push_back(current_callee);
+  operands.insert(operands.end(), current_args.begin(), current_args.end());
+
+  auto op = bir::CallIndirectOp::create(builder, loc, resultTypes, operands);
+  if (resultTypes.empty())
+    return nullptr;
+  return std::make_unique<BIRValue>(op.getResult(0));
 }
 
 void BIRGen::build_return(const BIRValue &val) {
