@@ -35,7 +35,7 @@ pub enum ParserError {
     #[error("unexpected token: {0}")]
     UnexpectedToken(TokenKind),
 
-    #[error("invalid lhs: {0}")]
+    #[error("invalid lhs: {0:?}")]
     InvalidLHS(Expression),
 
     #[error("error parsing integer: could not parse {0} as integer")]
