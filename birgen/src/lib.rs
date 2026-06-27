@@ -41,6 +41,7 @@ mod ffi {
         fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: u8, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
+        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: u8) -> UniquePtr<BIRValue>;
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
@@ -119,7 +120,10 @@ impl<'sess> BIRGen<'sess> {
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
-                    Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
+                    Expression::Identifier(_)
+                    | Expression::Infix(_)
+                    | Expression::String(_)
+                    | Expression::Function(_) => {
                         let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
@@ -169,6 +173,15 @@ impl<'sess> BIRGen<'sess> {
             Expression::String(s) => {
                 let v = self.session.lookup_string(s.value);
                 self.inner.pin_mut().build_constant_string(v)
+            },
+            Expression::Function(func) => {
+                let result = match func.explicit_ty.unwrap() {
+                    Type::String => 0,
+                    Type::Integer => 1,
+                    Type::Float => 2,
+                    Type::None => unreachable!(),
+                };
+                self.inner.pin_mut().build_fn_expr(result)
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }

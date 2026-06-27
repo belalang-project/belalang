@@ -54,6 +54,7 @@ public:
   std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_declare_ty(uint8_t v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
+  std::unique_ptr<BIRValue> build_fn_expr(uint8_t resultTy);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
@@ -72,6 +73,8 @@ private:
   mlir::ModuleOp module;
   mlir::OpBuilder builder;
   mlir::Location loc;
+
+  mlir::Type mapType(uint8_t);
 };
 
 std::unique_ptr<BIRGen> create_birgen();

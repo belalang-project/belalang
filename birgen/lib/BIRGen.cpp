@@ -157,6 +157,24 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
+mlir::Type BIRGen::mapType(uint8_t ty) {
+  if (ty == 0) {
+    return bir::StringType::get(&context);
+  } else if (ty == 1) {
+    return bir::IntType::get(&context);
+  } else if (ty == 2) {
+    return bir::FloatType::get(&context);
+  } else {
+    return {};
+  }
+}
+
+std::unique_ptr<BIRValue> BIRGen::build_fn_expr(uint8_t resultTy) {
+  auto fnTy = mlir::FunctionType::get(&context, {}, {mapType(resultTy)});
+  auto op = bir::FuncExprOp::create(builder, loc, fnTy);
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
 void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
 }
