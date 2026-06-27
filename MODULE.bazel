@@ -136,6 +136,10 @@ crate.spec(
     package = "lexopt",
     version = "0.3.2",
 )
+crate.spec(
+    package = "bumpalo",
+    version = "3.20.3",
+)
 crate.from_specs()
 use_repo(crate, "crates")
 
