@@ -87,6 +87,9 @@ impl<'sess> BIRGen<'sess> {
             Statement::While(_while_stmt) => {
                 // TODO: Implement while
             },
+            Statement::VarDecl(_stmt) => {
+                // TODO: Implement var decl
+            },
         }
     }
 
