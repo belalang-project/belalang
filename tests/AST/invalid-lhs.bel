@@ -1,8 +1,8 @@
 # RUN: %not %belalang build --emit ast %s | %FileCheck %s
 1 := x
 
-# CHECK:      error: invalid lhs
-# CHECK-NEXT:  --> {{.*}}/tests/AST/invalid-lhs.bel:2:1
+# CHECK:      error: unknown prefix
+# CHECK-NEXT:  --> {{.*}}/tests/AST/invalid-lhs.bel:2:3
 # CHECK-NEXT:   |
 # CHECK-NEXT: 2 | 1 := x
-# CHECK-NEXT:   | ^ invalid lhs
+# CHECK-NEXT:   |   ^ unknown prefix

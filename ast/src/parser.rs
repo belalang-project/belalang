@@ -39,7 +39,6 @@ use crate::{
     Program,
     ReturnStatement,
     StringLiteral,
-    VarDeclExpression,
     VarDeclStatement,
     VarExpression,
     WhileStatement,
@@ -446,63 +445,6 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     name,
                     value,
                 }))))
-            },
-
-            TokenKind::Colon => {
-                if !matches!(left, Expression::Identifier(_)) {
-                    return Err(self.error_invalid_lhs(left));
-                }
-                let name = match left {
-                    Expression::Identifier(ident) => *ident,
-                    _ => unreachable!(),
-                };
-
-                self.next_token()?; // consume name; curr_token is colon
-                self.next_token()?; // consume colon; curr_token is type name or assign
-
-                let explicit_ty = if let TokenKind::Assign {
-                    kind: AssignmentKind::Assign,
-                } = self.curr_token.kind
-                {
-                    None
-                } else {
-                    let TokenKind::Ident { sym } = self.curr_token.kind else {
-                        return Err(self.error_unexpected_token());
-                    };
-                    let ty = match sym {
-                        syms::INT => Type::Integer,
-                        syms::FLOAT => Type::Float,
-                        syms::STRING => Type::String,
-                        _ => Type::None, // TODO: fill this in
-                    };
-
-                    optional_peek!(
-                        self,
-                        TokenKind::Assign {
-                            kind: AssignmentKind::Assign
-                        }
-                    ); // consumes equal sign; curr_token is Assign
-                    Some(ty)
-                };
-
-                if let TokenKind::Assign {
-                    kind: AssignmentKind::Assign,
-                } = self.curr_token.kind
-                {
-                    self.next_token()?; // consume equal sign; curr_token is start of RHS value
-                    let value = self.parse_expression(Precedence::Lowest)?;
-                    Ok(Some(self.ast.alloc(Expression::VarDecl(VarDeclExpression {
-                        name,
-                        value: Some(value),
-                        explicit_ty,
-                    }))))
-                } else {
-                    Ok(Some(self.ast.alloc(Expression::VarDecl(VarDeclExpression {
-                        name,
-                        value: None,
-                        explicit_ty,
-                    }))))
-                }
             },
 
             _ => Ok(None),

@@ -69,18 +69,6 @@ impl<'ast> Visitor<'ast> for TypeInfererInner {
         }
     }
 
-    fn visit_var_decl(&mut self, node: &crate::VarDeclExpression<'ast>) {
-        let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
-            if let Some(value) = node.value {
-                self.visit_expression(value);
-            }
-            self.current_type
-        });
-
-        self.env.insert(node.name.value, rhs_ty);
-        self.current_type = rhs_ty;
-    }
-
     fn visit_var_decl_statement(&mut self, node: &crate::VarDeclStatement<'ast>) {
         let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
             if let Some(value) = node.value {
