@@ -21,10 +21,10 @@ pub use type_inferer::{
 };
 pub use visitor::*;
 
-pub enum Node {
-    Expression(Expression),
-    Statement(Statement),
-    Program(Program),
+pub enum Node<'ast> {
+    Expression(Expression<'ast>),
+    Statement(Statement<'ast>),
+    Program(Program<'ast>),
 }
 
 #[derive(thiserror::Error, Debug)]

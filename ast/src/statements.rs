@@ -4,24 +4,24 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ExpressionStatement {
-    pub expression: Expression,
+pub struct ExpressionStatement<'ast> {
+    pub expression: Expression<'ast>,
 }
 
 #[derive(Debug, Clone)]
-pub struct ReturnStatement {
-    pub return_value: Expression,
+pub struct ReturnStatement<'ast> {
+    pub return_value: Expression<'ast>,
 }
 
 #[derive(Debug, Clone)]
-pub struct WhileStatement {
-    pub condition: Box<Expression>,
-    pub block: BlockExpression,
+pub struct WhileStatement<'ast> {
+    pub condition: &'ast Expression<'ast>,
+    pub block: BlockExpression<'ast>,
 }
 
 #[derive(Debug, Clone)]
-pub enum Statement {
-    Expression(ExpressionStatement),
-    Return(ReturnStatement),
-    While(WhileStatement),
+pub enum Statement<'ast> {
+    Expression(ExpressionStatement<'ast>),
+    Return(ReturnStatement<'ast>),
+    While(WhileStatement<'ast>),
 }

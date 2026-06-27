@@ -78,8 +78,8 @@ pub struct NullLiteral {}
 /// [1, 2, 3, "Hello"]
 /// ```
 #[derive(Debug, Clone)]
-pub struct ArrayLiteral {
-    pub elements: Vec<Expression>,
+pub struct ArrayLiteral<'ast> {
+    pub elements: &'ast [Expression<'ast>],
 }
 
 /// Represents a variable declaration expression.
@@ -91,9 +91,9 @@ pub struct ArrayLiteral {
 /// y: Int = 12
 /// ```
 #[derive(Debug, Clone)]
-pub struct VarDeclExpression {
+pub struct VarDeclExpression<'ast> {
     pub name: Identifier,
-    pub value: Option<Box<Expression>>,
+    pub value: Option<&'ast Expression<'ast>>,
     pub explicit_ty: Option<Type>,
 }
 
@@ -105,10 +105,10 @@ pub struct VarDeclExpression {
 /// x = 12
 /// ```
 #[derive(Debug, Clone)]
-pub struct VarExpression {
+pub struct VarExpression<'ast> {
     pub kind: AssignmentKind,
     pub name: Identifier,
-    pub value: Box<Expression>,
+    pub value: &'ast Expression<'ast>,
 }
 
 /// Represents a function call expression.
@@ -119,9 +119,9 @@ pub struct VarExpression {
 /// foo()
 /// ```
 #[derive(Debug, Clone)]
-pub struct CallExpression {
-    pub function: Box<Expression>,
-    pub args: Vec<Expression>,
+pub struct CallExpression<'ast> {
+    pub function: &'ast Expression<'ast>,
+    pub args: &'ast [Expression<'ast>],
 }
 
 /// Represents an indexing expression.
@@ -132,9 +132,9 @@ pub struct CallExpression {
 /// foo[1]
 /// ```
 #[derive(Debug, Clone)]
-pub struct IndexExpression {
-    pub left: Box<Expression>,
-    pub index: Box<Expression>,
+pub struct IndexExpression<'ast> {
+    pub left: &'ast Expression<'ast>,
+    pub index: &'ast Expression<'ast>,
 }
 
 /// Represents a function expression.
@@ -145,9 +145,9 @@ pub struct IndexExpression {
 /// fn() {}
 /// ```
 #[derive(Debug, Clone)]
-pub struct FunctionLiteral {
-    pub params: Vec<Identifier>,
-    pub body: BlockExpression,
+pub struct FunctionLiteral<'ast> {
+    pub params: &'ast [Identifier],
+    pub body: BlockExpression<'ast>,
 }
 
 /// Represents an identifier expression.
@@ -170,10 +170,10 @@ pub struct Identifier {
 /// if () {} else {}
 /// ```
 #[derive(Debug, Clone)]
-pub struct IfExpression {
-    pub condition: Box<Expression>,
-    pub consequence: BlockExpression,
-    pub alternative: Option<Box<Expression>>,
+pub struct IfExpression<'ast> {
+    pub condition: &'ast Expression<'ast>,
+    pub consequence: BlockExpression<'ast>,
+    pub alternative: Option<&'ast Expression<'ast>>,
 }
 
 /// Represents an infix expression.
@@ -184,10 +184,10 @@ pub struct IfExpression {
 /// 1 + 1
 /// ```
 #[derive(Debug, Clone)]
-pub struct InfixExpression {
-    pub left: Box<Expression>,
+pub struct InfixExpression<'ast> {
+    pub left: &'ast Expression<'ast>,
     pub operator: InfixKind,
-    pub right: Box<Expression>,
+    pub right: &'ast Expression<'ast>,
 }
 
 /// Represents an prefix expression.
@@ -198,9 +198,9 @@ pub struct InfixExpression {
 /// -1
 /// ```
 #[derive(Debug, Clone)]
-pub struct PrefixExpression {
+pub struct PrefixExpression<'ast> {
     pub operator: PrefixKind,
-    pub right: Box<Expression>,
+    pub right: &'ast Expression<'ast>,
 }
 
 /// Represents an code block expression.
@@ -214,27 +214,27 @@ pub struct PrefixExpression {
 /// {}
 /// ```
 #[derive(Debug, Clone)]
-pub struct BlockExpression {
-    pub statements: Vec<Statement>,
+pub struct BlockExpression<'ast> {
+    pub statements: &'ast [Statement<'ast>],
 }
 
 /// Represents all expressions supported by The Belalang Compiler.
 #[derive(Debug, Clone)]
-pub enum Expression {
+pub enum Expression<'ast> {
     Boolean(BooleanExpression),
     Integer(IntegerLiteral),
     Float(FloatLiteral),
     String(StringLiteral),
     Null(NullLiteral),
-    Array(ArrayLiteral),
-    Var(VarExpression),
-    VarDecl(VarDeclExpression),
-    Call(CallExpression),
-    Index(IndexExpression),
-    Function(FunctionLiteral),
+    Array(ArrayLiteral<'ast>),
+    Var(VarExpression<'ast>),
+    VarDecl(VarDeclExpression<'ast>),
+    Call(CallExpression<'ast>),
+    Index(IndexExpression<'ast>),
+    Function(FunctionLiteral<'ast>),
     Identifier(Identifier),
-    If(IfExpression),
-    Infix(InfixExpression),
-    Prefix(PrefixExpression),
-    Block(BlockExpression),
+    If(IfExpression<'ast>),
+    Infix(InfixExpression<'ast>),
+    Prefix(PrefixExpression<'ast>),
+    Block(BlockExpression<'ast>),
 }
