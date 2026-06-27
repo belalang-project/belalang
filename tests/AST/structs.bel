@@ -1,0 +1,25 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+struct A {
+  x: Int
+  y: Int
+}
+
+struct B {}
+
+struct C {
+  x: String
+}
+
+# CHECK:      Program
+# CHECK-NEXT:   StructDeclStatement
+# CHECK-NEXT:     Identifier(A)
+# CHECK-NEXT:     VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       Identifier(x)
+# CHECK-NEXT:     VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:   StructDeclStatement
+# CHECK-NEXT:     Identifier(B)
+# CHECK-NEXT:   StructDeclStatement
+# CHECK-NEXT:     Identifier(C)
+# CHECK-NEXT:     VarDeclStatement(Some(String))
+# CHECK-NEXT:       Identifier(x)

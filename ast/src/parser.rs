@@ -39,6 +39,7 @@ use crate::{
     Program,
     ReturnStatement,
     StringLiteral,
+    StructDeclStatement,
     VarDeclStatement,
     VarExpression,
     WhileStatement,
@@ -254,6 +255,38 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     name,
                     value,
                     explicit_ty,
+                })))
+            },
+
+            // matches `struct`
+            TokenKind::Struct => {
+                self.next_token(); // curr_token should now be ident
+                let TokenKind::Ident { sym } = self.curr_token.kind else {
+                    return Err(self.error_unexpected_token());
+                };
+                let struct_name = Identifier { value: sym };
+
+                expect_peek!(self, TokenKind::LeftBrace); // curr_token should now be `{`
+
+                let mut fields = Vec::new();
+
+                self.next_token()?; // curr_token now at first statement
+
+                self.depth += 1;
+                while !matches!(self.curr_token.kind, TokenKind::RightBrace | TokenKind::EOF) {
+                    let stmt = self.parse_statement()?;
+                    let Statement::VarDecl(var_decl) = stmt else {
+                        // TODO: change this with the correct error
+                        return Err(self.error_unexpected_token());
+                    };
+                    fields.push(var_decl);
+                    self.next_token()?; // curr_token now at next statement
+                } // curr_token now at end of block
+                self.depth -= 1;
+
+                Ok(*self.ast.alloc(Statement::StructDecl(StructDeclStatement {
+                    name: struct_name,
+                    fields: self.ast.alloc_slice_clone(&fields),
                 })))
             },
 

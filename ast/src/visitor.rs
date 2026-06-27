@@ -18,6 +18,7 @@ use super::{
     ReturnStatement,
     Statement,
     StringLiteral,
+    StructDeclStatement,
     VarDeclStatement,
     VarExpression,
     WhileStatement,
@@ -100,6 +101,10 @@ pub trait Visitor<'ast> {
         self.walk_var_decl_statement(node);
     }
 
+    fn visit_struct_decl_statement(&mut self, node: &StructDeclStatement<'ast>) {
+        self.walk_struct_decl_statement(node);
+    }
+
     fn walk_program(&mut self, program: &Program<'ast>) {
         for stmt in program.statements {
             self.visit_statement(stmt);
@@ -112,6 +117,7 @@ pub trait Visitor<'ast> {
             Statement::Return(v) => self.visit_return_statement(v),
             Statement::While(v) => self.visit_while_statement(v),
             Statement::VarDecl(v) => self.visit_var_decl_statement(v),
+            Statement::StructDecl(v) => self.visit_struct_decl_statement(v),
         }
     }
 
@@ -205,6 +211,13 @@ pub trait Visitor<'ast> {
         self.visit_identifier(&node.name);
         if let Some(value) = node.value {
             self.visit_expression(value);
+        }
+    }
+
+    fn walk_struct_decl_statement(&mut self, node: &StructDeclStatement<'ast>) {
+        self.visit_identifier(&node.name);
+        for v in node.fields {
+            self.visit_var_decl_statement(v);
         }
     }
 }

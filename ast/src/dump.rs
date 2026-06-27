@@ -18,6 +18,7 @@ use super::{
     Program,
     ReturnStatement,
     StringLiteral,
+    StructDeclStatement,
     VarDeclStatement,
     VarExpression,
     Visitor,
@@ -73,6 +74,13 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
         );
         self.indent += 2;
         self.walk_var_decl_statement(node);
+        self.indent -= 2;
+    }
+
+    fn visit_struct_decl_statement(&mut self, node: &StructDeclStatement<'ast>) {
+        println!("{:indent$}StructDeclStatement", "", indent = self.indent);
+        self.indent += 2;
+        self.walk_struct_decl_statement(node);
         self.indent -= 2;
     }
 

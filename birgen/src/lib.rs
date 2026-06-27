@@ -129,6 +129,9 @@ impl<'sess> BIRGen<'sess> {
                     _ => todo!("Generation for expression {:?} not implemented", **value),
                 }
             },
+            Statement::StructDecl(s) => {
+                // TODO: Implement struct declaration
+            },
         }
     }
 
