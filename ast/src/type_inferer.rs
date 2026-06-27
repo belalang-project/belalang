@@ -80,6 +80,18 @@ impl<'ast> Visitor<'ast> for TypeInfererInner {
         self.env.insert(node.name.value, rhs_ty);
         self.current_type = rhs_ty;
     }
+
+    fn visit_var_decl_statement(&mut self, node: &crate::VarDeclStatement<'ast>) {
+        let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
+            if let Some(value) = node.value {
+                self.visit_expression(value);
+            }
+            self.current_type
+        });
+
+        self.env.insert(node.name.value, rhs_ty);
+        self.current_type = rhs_ty;
+    }
 }
 
 #[cfg(test)]
@@ -92,7 +104,7 @@ mod tests {
         Identifier,
         IntegerLiteral,
         StringLiteral,
-        VarDeclExpression,
+        VarDeclStatement,
         Visitor,
         type_inferer::Type,
     };
@@ -100,14 +112,14 @@ mod tests {
     #[test]
     fn test_implicit_string() {
         let str_expr = Expression::String(StringLiteral { value: Symbol(1) });
-        let expr = VarDeclExpression {
+        let expr = VarDeclStatement {
             name: Identifier { value: Symbol(0) },
             explicit_ty: None,
             value: Some(&str_expr),
         };
 
         let mut ty_infer = TypeInfererInner::new();
-        ty_infer.visit_var_decl(&expr);
+        ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::String);
         assert_eq!(ty_infer.env.len(), 1);
@@ -116,14 +128,14 @@ mod tests {
     #[test]
     fn test_explicit_int() {
         let int_expr = Expression::Integer(IntegerLiteral { value: 12 });
-        let expr = VarDeclExpression {
+        let expr = VarDeclStatement {
             name: Identifier { value: Symbol(0) },
             explicit_ty: Some(Type::Integer),
             value: Some(&int_expr),
         };
 
         let mut ty_infer = TypeInfererInner::new();
-        ty_infer.visit_var_decl(&expr);
+        ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::Integer);
         assert_eq!(ty_infer.env.len(), 1);

@@ -40,6 +40,7 @@ use crate::{
     ReturnStatement,
     StringLiteral,
     VarDeclExpression,
+    VarDeclStatement,
     VarExpression,
     WhileStatement,
     type_inferer::Type,
@@ -198,6 +199,63 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 
                 Ok(Statement::Expression(ExpressionStatement { expression }))
+            },
+
+            // matches `<ident> :`
+            TokenKind::Ident { sym } if let TokenKind::Colon = self.peek_token.kind => {
+                let name = Identifier { value: sym };
+                self.next_token()?; // curr_token is now `:`
+
+                let explicit_ty = match self.peek_token.kind {
+                    // matches `=`; meaning there is no explicit type
+                    TokenKind::Assign {
+                        kind: AssignmentKind::Assign,
+                    } => {
+                        self.next_token()?; // curr_token is now `=`
+                        None
+                    },
+                    // matches `<typename>`
+                    TokenKind::Ident { sym } => {
+                        let ty = match sym {
+                            syms::INT => Type::Integer,
+                            syms::FLOAT => Type::Float,
+                            syms::STRING => Type::String,
+                            _ => Type::None,
+                        };
+                        self.next_token()?; // curr_token is now `<typename>`
+                        if let TokenKind::Assign {
+                            kind: AssignmentKind::Assign,
+                        } = self.peek_token.kind
+                        {
+                            self.next_token()?; // curr_token is now `=`
+                        };
+                        Some(ty)
+                    },
+                    // matches an unexpected token
+                    _ => {
+                        self.next_token()?; // curr_token is now the unexpected token
+                        return Err(self.error_unexpected_token());
+                    },
+                };
+
+                let value = if let TokenKind::Assign {
+                    kind: AssignmentKind::Assign,
+                } = self.curr_token.kind
+                {
+                    self.next_token()?; // curr_token is start of RHS value
+                    let value = self.parse_expression(Precedence::Lowest)?;
+                    Some(value)
+                } else {
+                    None
+                };
+
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+
+                Ok(*self.ast.alloc(Statement::VarDecl(VarDeclStatement {
+                    name,
+                    value,
+                    explicit_ty,
+                })))
             },
 
             _ => {

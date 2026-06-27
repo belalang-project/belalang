@@ -5,10 +5,9 @@ while i < 10 {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarDeclExpression(None)
-# CHECK-NEXT:       Identifier(i)
-# CHECK-NEXT:       Integer(0)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(i)
+# CHECK-NEXT:     Integer(0)
 # CHECK-NEXT:   WhileStatement
 # CHECK-NEXT:     InfixExpression(Lt)
 # CHECK-NEXT:       Identifier(i)

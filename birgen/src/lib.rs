@@ -87,8 +87,47 @@ impl<'sess> BIRGen<'sess> {
             Statement::While(_while_stmt) => {
                 // TODO: Implement while
             },
-            Statement::VarDecl(_stmt) => {
-                // TODO: Implement var decl
+            Statement::VarDecl(var) => {
+                let value = &var.value;
+
+                let Some(value) = value else {
+                    let id = match var.explicit_ty.unwrap() {
+                        Type::String => 0,
+                        Type::Integer => 1,
+                        Type::Float => 2,
+                        Type::None => unreachable!(),
+                    };
+
+                    let name = self.session.lookup_string(var.name.value);
+                    let declare = self.inner.pin_mut().build_var_declare_ty(id, name);
+                    self.symbol_table.insert(var.name.value, declare);
+                    return;
+                };
+
+                match **value {
+                    Expression::Integer(ref i) => {
+                        let v = self.inner.pin_mut().build_constant_int(i.value);
+                        let name = self.session.lookup_string(var.name.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        self.symbol_table.insert(var.name.value, declare);
+                    },
+                    Expression::Float(ref f) => {
+                        let v = self.inner.pin_mut().build_constant_float(f.value);
+                        let name = self.session.lookup_string(var.name.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        self.symbol_table.insert(var.name.value, declare);
+                    },
+                    Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
+                        let v = self.generate_expression(&value);
+                        let name = self.session.lookup_string(var.name.value);
+                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
+                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        self.symbol_table.insert(var.name.value, declare);
+                    },
+                    _ => todo!("Generation for expression {:?} not implemented", **value),
+                }
             },
         }
     }
