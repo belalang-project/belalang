@@ -108,6 +108,8 @@ pub enum TokenKind {
     Else,
     /// Return keyword `return`
     Return,
+    /// Struct keyword `struct`
+    Struct,
 
     /// Comma separator `,`
     Comma,
