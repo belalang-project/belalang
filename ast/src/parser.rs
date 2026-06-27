@@ -579,21 +579,40 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.next_token()?; // curr_token is now first argument
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
-                    let TokenKind::Ident { sym } = self.curr_token.kind else {
-                        todo!()
-                    };
-
-                    params.push(Identifier { value: sym });
-
-                    while matches!(self.peek_token.kind, TokenKind::Comma) {
-                        self.next_token()?;
-                        self.next_token()?;
-
-                        let TokenKind::Ident { sym } = self.curr_token.kind else {
-                            todo!()
+                    loop {
+                        let TokenKind::Ident { sym: name } = self.curr_token.kind else {
+                            return Err(self.error_unexpected_token());
                         };
 
-                        params.push(Identifier { value: sym });
+                        expect_peek!(self, TokenKind::Colon); // curr_token is now `:`
+
+                        expect_peek!(self, TokenKind::Ident { .. }); // curr_token is now `<typename>`
+                        let TokenKind::Ident { sym: ty } = self.curr_token.kind else {
+                            unreachable!()
+                        };
+
+                        let name = Identifier { value: name };
+                        let explicit_ty = Some(match ty {
+                            syms::INT => Type::Integer,
+                            syms::FLOAT => Type::Float,
+                            syms::STRING => Type::String,
+                            _ => Type::None,
+                        });
+
+                        params.push(VarDeclStatement {
+                            name,
+                            value: None,
+                            explicit_ty,
+                        });
+
+                        match self.peek_token.kind {
+                            TokenKind::RightParen => break,
+                            TokenKind::Comma => {
+                                self.next_token(); // curr_token is now comma
+                                self.next_token(); // curr_token is now next argument
+                            },
+                            _ => return Err(self.error_unexpected_token()),
+                        }
                     }
 
                     expect_peek!(self, TokenKind::RightParen);

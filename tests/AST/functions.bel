@@ -1,11 +1,11 @@
 # RUN: %belalang build --emit ast %s | %FileCheck %s
-add := fn(x, y) {
+add := fn(x: Int, y: Int) {
     return x + y;
 };
 
-mul := fn(x, y) { x * y };
+mul := fn(x: Int, y: Int) { x * y };
 
-sub := fn(x, y): Int {
+sub := fn(x: Int, y: Int): Int {
     return x - y
 }
 
@@ -13,8 +13,10 @@ sub := fn(x, y): Int {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(add)
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ReturnStatement
 # CHECK-NEXT:           InfixExpression(Add)
@@ -23,8 +25,10 @@ sub := fn(x, y): Int {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(mul)
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement
 # CHECK-NEXT:           InfixExpression(Mul)
@@ -33,8 +37,10 @@ sub := fn(x, y): Int {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(sub)
 # CHECK-NEXT:     FunctionLiteral(Some(Integer))
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ReturnStatement
 # CHECK-NEXT:           InfixExpression(Sub)

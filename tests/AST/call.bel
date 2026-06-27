@@ -1,6 +1,6 @@
 # RUN: %belalang build --emit ast %s | %FileCheck %s
 add(1, 2 * 3, 4 + 5);
-fn(x, y) { x + y }(2, 3);
+fn(x: Int, y: Int) { x + y }(2, 3);
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
@@ -16,8 +16,10 @@ fn(x, y) { x + y }(2, 3);
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     CallExpression
 # CHECK-NEXT:       FunctionLiteral(None)
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:         Identifier(y)
+# CHECK-NEXT:         VarDeclStatement(Some(Integer))
+# CHECK-NEXT:           Identifier(x)
+# CHECK-NEXT:         VarDeclStatement(Some(Integer))
+# CHECK-NEXT:           Identifier(y)
 # CHECK-NEXT:         BlockExpression
 # CHECK-NEXT:           ExpressionStatement
 # CHECK-NEXT:             InfixExpression(Add)

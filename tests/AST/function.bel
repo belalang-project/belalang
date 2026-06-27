@@ -1,16 +1,18 @@
 # RUN: %belalang build --emit ast %s | %FileCheck %s
-fn(x, y) { x + y; };
+fn(x: Int, y: Int) { x + y; };
 
 fn() {};
-fn(x) {};
-fn(x, y) {};
-fn(x, y, z) {};
+fn(x: Int) {};
+fn(x: Int, y: Int) {};
+fn(x: Int, y: Int, z: Int) {};
 
 # CHECK:      Program
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement
 # CHECK-NEXT:           InfixExpression(Add)
@@ -21,16 +23,22 @@ fn(x, y, z) {};
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:   ExpressionStatement
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:       Identifier(y)
-# CHECK-NEXT:       Identifier(z)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(y)
+# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:         Identifier(z)
 # CHECK-NEXT:       BlockExpression
