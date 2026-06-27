@@ -169,10 +169,13 @@ mlir::Type BIRGen::mapType(uint8_t ty) {
   }
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_fn_expr(uint8_t resultTy) {
+std::unique_ptr<BIRGuard> BIRGen::build_fn_expr(uint8_t resultTy) {
   auto fnTy = mlir::FunctionType::get(&context, {}, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
-  return std::make_unique<BIRValue>(op.getResult());
+
+  auto guard = std::make_unique<BIRGuard>(builder, op.getResult());
+  builder.createBlock(&op.getBody());
+  return guard;
 }
 
 void BIRGen::build_print(const BIRValue &val) {

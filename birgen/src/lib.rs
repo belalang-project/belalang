@@ -21,6 +21,7 @@ mod ffi {
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
+        type BIRGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -41,7 +42,8 @@ mod ffi {
         fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: u8, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
-        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: u8) -> UniquePtr<BIRValue>;
+        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: u8) -> UniquePtr<BIRGuard>;
+        fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
@@ -51,6 +53,8 @@ mod ffi {
 
         fn dump_to_string(self: &LLVMGen) -> String;
         fn compile_object_file(self: &LLVMGen, out: String) -> String;
+
+        fn get_value(self: &BIRGuard) -> UniquePtr<BIRValue>;
     }
 }
 
@@ -82,8 +86,9 @@ impl<'sess> BIRGen<'sess> {
             Statement::Expression(expr_stmt) => {
                 self.generate_expression(&expr_stmt.expression);
             },
-            Statement::Return(_ret_stmt) => {
-                // TODO: Implement return
+            Statement::Return(s) => {
+                let expr = self.generate_expression(&s.return_value);
+                self.inner.pin_mut().build_return(&expr);
             },
             Statement::While(_while_stmt) => {
                 // TODO: Implement while
@@ -181,7 +186,12 @@ impl<'sess> BIRGen<'sess> {
                     Type::Float => 2,
                     Type::None => unreachable!(),
                 };
-                self.inner.pin_mut().build_fn_expr(result)
+
+                let guard = self.inner.pin_mut().build_fn_expr(result);
+                for stmt in func.body.statements {
+                    self.generate_statement(stmt);
+                }
+                guard.get_value()
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }

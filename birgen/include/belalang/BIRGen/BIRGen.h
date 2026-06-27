@@ -37,6 +37,22 @@ private:
   mlir::Value value;
 };
 
+class BIRGuard {
+public:
+  BIRGuard(mlir::OpBuilder &builder, mlir::Value fnValue)
+      : builder(builder), guard(builder), fnValue(fnValue) {}
+  ~BIRGuard() = default;
+
+  std::unique_ptr<BIRValue> get_value() const {
+    return std::make_unique<BIRValue>(fnValue);
+  }
+
+private:
+  mlir::OpBuilder &builder;
+  mlir::OpBuilder::InsertionGuard guard;
+  mlir::Value fnValue;
+};
+
 class BIRGen {
 public:
   BIRGen();
@@ -54,7 +70,7 @@ public:
   std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_declare_ty(uint8_t v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
-  std::unique_ptr<BIRValue> build_fn_expr(uint8_t resultTy);
+  std::unique_ptr<BIRGuard> build_fn_expr(uint8_t resultTy);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
