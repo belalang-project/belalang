@@ -204,7 +204,7 @@ pub trait Visitor<'ast> {
     }
 
     fn walk_while_statement(&mut self, node: &WhileStatement<'ast>) {
-        self.visit_expression(node.condition);
+        self.visit_expression(&node.condition);
         self.visit_block(&node.block);
     }
 }

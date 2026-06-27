@@ -15,7 +15,7 @@ pub struct ReturnStatement<'ast> {
 
 #[derive(Debug, Clone, Copy)]
 pub struct WhileStatement<'ast> {
-    pub condition: &'ast Expression<'ast>,
+    pub condition: Expression<'ast>,
     pub block: BlockExpression<'ast>,
 }
 

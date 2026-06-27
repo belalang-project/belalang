@@ -180,7 +180,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_while
             TokenKind::While => {
                 self.next_token()?;
-                let condition = self.parse_expression(Precedence::Lowest)?;
+                let condition = *self.parse_expression(Precedence::Lowest)?;
 
                 expect_peek!(self, TokenKind::LeftBrace);
 
