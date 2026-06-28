@@ -8,6 +8,12 @@ def BelalangLowerPrintToRuntimePass : Pass<"bir-lower-print-to-runtime"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
+def BelalangFlattenCFGPass : Pass<"bir-flatten-cfg"> {
+  let summary = "flatten bir CFGs";
+  let dependentDialects = ["::belalang::bir::BIRDialect",
+                           "::mlir::cf::ControlFlowDialect"];
+}
+
 def BelalangLowerFuncExprPass : Pass<"bir-lower-func-expr"> {
   let summary = "replace func_expr with constant";
   let dependentDialects = ["::belalang::bir::BIRDialect"];

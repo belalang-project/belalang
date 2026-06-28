@@ -2,6 +2,7 @@
 #define BELALANG_PASSES_H_
 
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlow.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -15,6 +16,7 @@ namespace bir {
 #define GEN_PASS_REGISTRATION
 #include "belalang/BIR/Passes.h.inc"
 
+void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerPrintToRuntimePatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
