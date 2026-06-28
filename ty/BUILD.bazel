@@ -1,0 +1,16 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+	name = "ty",
+	srcs = glob(["src/*.rs"]),
+	deps = [
+        "//ast",
+        "//session",
+	],
+	visibility = ["//visibility:public"],
+)
+
+rust_test(
+	name = "ty-test",
+	crate = ":ty",
+)

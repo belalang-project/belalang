@@ -12,6 +12,7 @@ rust_library(
         "//ast",
         "//lexer",
         "//session",
+        "//ty",
         "@crates//:anyhow",
     ],
 )

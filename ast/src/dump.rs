@@ -66,12 +66,8 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
     }
 
     fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
-        println!(
-            "{:indent$}VarDeclStatement({:?})",
-            "",
-            node.explicit_ty,
-            indent = self.indent
-        );
+        let ty = node.explicit_ty.map(|ty| self.session.lookup_string(ty));
+        println!("{:indent$}VarDeclStatement({:?})", "", ty, indent = self.indent);
         self.indent += 2;
         self.walk_var_decl_statement(node);
         self.indent -= 2;
@@ -163,12 +159,8 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
     }
 
     fn visit_function(&mut self, node: &FunctionLiteral<'ast>) {
-        println!(
-            "{:indent$}FunctionLiteral({:?})",
-            "",
-            node.explicit_ty,
-            indent = self.indent
-        );
+        let ty = node.explicit_ty.map(|ty| self.session.lookup_string(ty));
+        println!("{:indent$}FunctionLiteral({:?})", "", ty, indent = self.indent);
         self.indent += 2;
         self.walk_function(node);
         self.indent -= 2;

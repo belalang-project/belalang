@@ -13,9 +13,9 @@ sub := fn(x: Int, y: Int): Int {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(add)
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ReturnStatement
@@ -25,9 +25,9 @@ sub := fn(x: Int, y: Int): Int {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(mul)
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement
@@ -36,10 +36,10 @@ sub := fn(x: Int, y: Int): Int {
 # CHECK-NEXT:             Identifier(y)
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(sub)
-# CHECK-NEXT:     FunctionLiteral(Some(Integer))
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:     FunctionLiteral(Some("Int"))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(y)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ReturnStatement

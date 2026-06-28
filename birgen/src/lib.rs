@@ -5,7 +5,6 @@ use ast::{
     InfixExpression,
     Program,
     Statement,
-    Type,
 };
 use lexer::InfixKind;
 use session::{
@@ -103,10 +102,10 @@ impl<'sess> BIRGen<'sess> {
 
                 let Some(value) = value else {
                     let id = match var.explicit_ty.unwrap() {
-                        Type::String => 0,
-                        Type::Integer => 1,
-                        Type::Float => 2,
-                        Type::None => unreachable!(),
+                        syms::STRING => 0,
+                        syms::INT => 1,
+                        syms::FLOAT => 2,
+                        _ => todo!(),
                     };
 
                     let name = self.session.lookup_string(var.name.value);
@@ -193,19 +192,19 @@ impl<'sess> BIRGen<'sess> {
             },
             Expression::Function(func) => {
                 let result = match func.explicit_ty.unwrap() {
-                    Type::String => 0,
-                    Type::Integer => 1,
-                    Type::Float => 2,
-                    Type::None => unreachable!(),
+                    syms::STRING => 0,
+                    syms::INT => 1,
+                    syms::FLOAT => 2,
+                    _ => todo!(),
                 };
 
                 let mut param_tys = Vec::new();
                 for param in func.params {
                     let ty = match param.explicit_ty.unwrap() {
-                        Type::String => 0,
-                        Type::Integer => 1,
-                        Type::Float => 2,
-                        Type::None => unreachable!(),
+                        syms::STRING => 0,
+                        syms::INT => 1,
+                        syms::FLOAT => 2,
+                        _ => todo!(),
                     };
                     param_tys.push(ty);
                 }

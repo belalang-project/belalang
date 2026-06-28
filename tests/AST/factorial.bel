@@ -11,7 +11,7 @@ fact := fn(n: Int) {
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(fact)
 # CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some(Integer))
+# CHECK-NEXT:       VarDeclStatement(Some("Int"))
 # CHECK-NEXT:         Identifier(n)
 # CHECK-NEXT:       BlockExpression
 # CHECK-NEXT:         ExpressionStatement
