@@ -11,10 +11,7 @@ use lexer::{
     Token,
     TokenKind,
 };
-use session::{
-    Session,
-    interner::syms,
-};
+use session::Session;
 
 use super::{
     Expression,
@@ -43,7 +40,6 @@ use crate::{
     VarDeclStatement,
     VarExpression,
     WhileStatement,
-    type_inferer::Type,
 };
 
 #[derive(Debug, PartialEq, PartialOrd)]
@@ -216,12 +212,6 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     },
                     // matches `<typename>`
                     TokenKind::Ident { sym } => {
-                        let ty = match sym {
-                            syms::INT => Type::Integer,
-                            syms::FLOAT => Type::Float,
-                            syms::STRING => Type::String,
-                            _ => Type::None,
-                        };
                         self.next_token()?; // curr_token is now `<typename>`
                         if let TokenKind::Assign {
                             kind: AssignmentKind::Assign,
@@ -229,7 +219,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                         {
                             self.next_token()?; // curr_token is now `=`
                         };
-                        Some(ty)
+                        Some(sym)
                     },
                     // matches an unexpected token
                     _ => {
@@ -592,12 +582,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                         };
 
                         let name = Identifier { value: name };
-                        let explicit_ty = Some(match ty {
-                            syms::INT => Type::Integer,
-                            syms::FLOAT => Type::Float,
-                            syms::STRING => Type::String,
-                            _ => Type::None,
-                        });
+                        let explicit_ty = Some(ty);
 
                         params.push(VarDeclStatement {
                             name,
@@ -625,12 +610,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                     let TokenKind::Ident { sym } = self.curr_token.kind else {
                         unreachable!()
                     };
-                    Some(match sym {
-                        syms::INT => Type::Integer,
-                        syms::FLOAT => Type::Float,
-                        syms::STRING => Type::String,
-                        _ => Type::None,
-                    })
+                    Some(sym)
                 } else {
                     None
                 };

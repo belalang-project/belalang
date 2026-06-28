@@ -9,7 +9,6 @@ use super::{
     Statement,
     VarDeclStatement,
 };
-use crate::type_inferer::Type;
 
 /// Represents a boolean literal expression.
 ///
@@ -136,7 +135,7 @@ pub struct IndexExpression<'ast> {
 pub struct FunctionLiteral<'ast> {
     pub params: &'ast [VarDeclStatement<'ast>],
     pub body: BlockExpression<'ast>,
-    pub explicit_ty: Option<Type>,
+    pub explicit_ty: Option<Symbol>,
 }
 
 /// Represents an identifier expression.

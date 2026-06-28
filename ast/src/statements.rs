@@ -1,8 +1,9 @@
+use session::interner::Symbol;
+
 use super::{
     BlockExpression,
     Expression,
     Identifier,
-    Type,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -25,7 +26,7 @@ pub struct WhileStatement<'ast> {
 pub struct VarDeclStatement<'ast> {
     pub name: Identifier,
     pub value: Option<&'ast Expression<'ast>>,
-    pub explicit_ty: Option<Type>,
+    pub explicit_ty: Option<Symbol>,
 }
 
 #[derive(Debug, Clone, Copy)]

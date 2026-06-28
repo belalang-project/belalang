@@ -32,7 +32,7 @@ implicit_ty := 12
 # CHECK-NEXT:     VarExpression(Assign)
 # CHECK-NEXT:       Identifier(str_var)
 # CHECK-NEXT:       String("Hello, Mom!")
-# CHECK-NEXT:   VarDeclStatement(Some(Integer))
+# CHECK-NEXT:   VarDeclStatement(Some("Int"))
 # CHECK-NEXT:     Identifier(explicit_ty)
 # CHECK-NEXT:     Integer(12)
 # CHECK-NEXT:   VarDeclStatement(None)

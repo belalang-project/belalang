@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
+use ast::Visitor;
 use session::{
     Session,
-    interner::Symbol,
+    interner::{
+        Symbol,
+        syms,
+    },
 };
-
-use super::Visitor;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Type {
@@ -29,7 +31,7 @@ impl<'sess> TypeInferer<'sess> {
         }
     }
 
-    pub fn infer<'ast>(&mut self, program: &crate::Program<'ast>) {
+    pub fn infer<'ast>(&mut self, program: &ast::Program<'ast>) {
         self.inner.visit_program(program);
     }
 }
@@ -49,19 +51,19 @@ impl TypeInfererInner {
 }
 
 impl<'ast> Visitor<'ast> for TypeInfererInner {
-    fn visit_integer(&mut self, _node: &crate::IntegerLiteral) {
+    fn visit_integer(&mut self, _node: &ast::IntegerLiteral) {
         self.current_type = Type::Integer;
     }
 
-    fn visit_string(&mut self, _node: &crate::StringLiteral) {
+    fn visit_string(&mut self, _node: &ast::StringLiteral) {
         self.current_type = Type::String;
     }
 
-    fn visit_float(&mut self, _node: &crate::FloatLiteral) {
+    fn visit_float(&mut self, _node: &ast::FloatLiteral) {
         self.current_type = Type::Float;
     }
 
-    fn visit_identifier(&mut self, node: &crate::Identifier) {
+    fn visit_identifier(&mut self, node: &ast::Identifier) {
         if let Some(ty) = self.env.get(&node.value) {
             self.current_type = *ty;
         } else {
@@ -69,8 +71,8 @@ impl<'ast> Visitor<'ast> for TypeInfererInner {
         }
     }
 
-    fn visit_var_decl_statement(&mut self, node: &crate::VarDeclStatement<'ast>) {
-        let rhs_ty = node.explicit_ty.unwrap_or_else(|| {
+    fn visit_var_decl_statement(&mut self, node: &ast::VarDeclStatement<'ast>) {
+        let rhs_ty = node.explicit_ty.map(sym_to_ty).unwrap_or_else(|| {
             if let Some(value) = node.value {
                 self.visit_expression(value);
             }
@@ -82,19 +84,33 @@ impl<'ast> Visitor<'ast> for TypeInfererInner {
     }
 }
 
+fn sym_to_ty(symbol: Symbol) -> Type {
+    match symbol {
+        syms::STRING => Type::String,
+        syms::INT => Type::Integer,
+        syms::FLOAT => Type::Float,
+        _ => Type::None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use session::interner::Symbol;
-
-    use super::TypeInfererInner;
-    use crate::{
+    use ast::{
         Expression,
         Identifier,
         IntegerLiteral,
         StringLiteral,
         VarDeclStatement,
         Visitor,
-        type_inferer::Type,
+    };
+    use session::interner::{
+        Symbol,
+        syms,
+    };
+
+    use super::{
+        Type,
+        TypeInfererInner,
     };
 
     #[test]
@@ -118,7 +134,7 @@ mod tests {
         let int_expr = Expression::Integer(IntegerLiteral { value: 12 });
         let expr = VarDeclStatement {
             name: Identifier { value: Symbol(0) },
-            explicit_ty: Some(Type::Integer),
+            explicit_ty: Some(syms::INT),
             value: Some(&int_expr),
         };
 

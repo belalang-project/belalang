@@ -18,12 +18,12 @@ use ast::{
     Ast,
     Parser,
     Program,
-    TypeInferer,
     Visitor,
 };
 use birgen::BIRGen;
 use lexer::Lexer;
 use session::Session;
+use ty::TypeInferer;
 
 pub struct BuildContext {
     pub use_color: bool,
