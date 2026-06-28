@@ -38,7 +38,7 @@ rust_library(
         "//ast",
         "//lexer",
         "//session",
-        "@crates//:cxx",
+        "@cxx.rs//:cxx",
     ],
 )
 
