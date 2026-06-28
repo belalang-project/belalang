@@ -320,6 +320,10 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
       elSize = 8;
     else if (mlir::isa<bir::StringType>(elType))
       elSize = 16;
+    else if (mlir::isa<bir::BoolType>(elType))
+      elSize = 8;
+    else if (mlir::isa<mlir::FunctionType>(elType))
+      elSize = 8;
     else
       return failure();
 

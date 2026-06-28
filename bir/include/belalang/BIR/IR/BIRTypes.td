@@ -21,16 +21,16 @@ def BIR_StringType : BIR_Type<"String", "string"> {
   let summary = "String type";
 }
 
+def BIR_BoolType : BIR_Type<"Bool", "bool"> {
+  let summary = "Boolean type";
+}
+
 def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let summary = "Reference type";
 
-  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType]>:$el);
+  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType, FunctionType, BIR_BoolType]>:$el);
 
   let assemblyFormat = "`<` $el `>`";
-}
-
-def BIR_BoolType : BIR_Type<"Bool", "bool"> {
-  let summary = "Boolean type";
 }
 
 #endif // BELALANG_IR_TYPES_TD_

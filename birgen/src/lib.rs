@@ -21,6 +21,7 @@ mod ffi {
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
+        type BIRGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -41,6 +42,8 @@ mod ffi {
         fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: u8, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
+        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: u8, paramTys: &[u8]) -> UniquePtr<BIRGuard>;
+        fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
@@ -50,6 +53,13 @@ mod ffi {
 
         fn dump_to_string(self: &LLVMGen) -> String;
         fn compile_object_file(self: &LLVMGen, out: String) -> String;
+
+        fn start_call(self: Pin<&mut BIRGen>, callee: &BIRValue);
+        fn add_call_arg(self: Pin<&mut BIRGen>, arg: &BIRValue);
+        fn finish_call(self: Pin<&mut BIRGen>) -> UniquePtr<BIRValue>;
+
+        fn get_value(self: &BIRGuard) -> UniquePtr<BIRValue>;
+        fn get_arg(self: &BIRGuard, index: usize) -> UniquePtr<BIRValue>;
     }
 }
 
@@ -81,8 +91,9 @@ impl<'sess> BIRGen<'sess> {
             Statement::Expression(expr_stmt) => {
                 self.generate_expression(&expr_stmt.expression);
             },
-            Statement::Return(_ret_stmt) => {
-                // TODO: Implement return
+            Statement::Return(s) => {
+                let expr = self.generate_expression(&s.return_value);
+                self.inner.pin_mut().build_return(&expr);
             },
             Statement::While(_while_stmt) => {
                 // TODO: Implement while
@@ -119,7 +130,11 @@ impl<'sess> BIRGen<'sess> {
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
-                    Expression::Identifier(_) | Expression::Infix(_) | Expression::String(_) => {
+                    Expression::Identifier(_)
+                    | Expression::Infix(_)
+                    | Expression::String(_)
+                    | Expression::Function(_)
+                    | Expression::Call(_) => {
                         let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
@@ -154,7 +169,13 @@ impl<'sess> BIRGen<'sess> {
                     return cxx::UniquePtr::null();
                 }
 
-                todo!("Generation for call expression not implemented");
+                let callee = self.generate_expression(call.function);
+                self.inner.pin_mut().start_call(&callee);
+                for arg in call.args {
+                    let arg_val = self.generate_expression(arg);
+                    self.inner.pin_mut().add_call_arg(&arg_val);
+                }
+                self.inner.pin_mut().finish_call()
             },
             Expression::Var(var) => match var.kind {
                 _ => todo!("Generation for expression {:?} not implemented", expr),
@@ -169,6 +190,51 @@ impl<'sess> BIRGen<'sess> {
             Expression::String(s) => {
                 let v = self.session.lookup_string(s.value);
                 self.inner.pin_mut().build_constant_string(v)
+            },
+            Expression::Function(func) => {
+                let result = match func.explicit_ty.unwrap() {
+                    Type::String => 0,
+                    Type::Integer => 1,
+                    Type::Float => 2,
+                    Type::None => unreachable!(),
+                };
+
+                let mut param_tys = Vec::new();
+                for param in func.params {
+                    let ty = match param.explicit_ty.unwrap() {
+                        Type::String => 0,
+                        Type::Integer => 1,
+                        Type::Float => 2,
+                        Type::None => unreachable!(),
+                    };
+                    param_tys.push(ty);
+                }
+
+                let guard = self.inner.pin_mut().build_fn_expr(result, &param_tys);
+
+                let mut saved_symbols = Vec::new();
+                for (i, param) in func.params.iter().enumerate() {
+                    let arg_val = guard.get_arg(i);
+                    let name = self.session.lookup_string(param.name.value);
+                    let declare = self.inner.pin_mut().build_var_declare(&arg_val, name);
+                    self.inner.pin_mut().build_var_store(&arg_val, &declare);
+                    let prev = self.symbol_table.insert(param.name.value, declare);
+                    saved_symbols.push((param.name.value, prev));
+                }
+
+                for stmt in func.body.statements {
+                    self.generate_statement(stmt);
+                }
+
+                for (sym, prev) in saved_symbols {
+                    if let Some(prev_val) = prev {
+                        self.symbol_table.insert(sym, prev_val);
+                    } else {
+                        self.symbol_table.remove(&sym);
+                    }
+                }
+
+                guard.get_value()
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
