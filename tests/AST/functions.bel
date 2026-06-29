@@ -9,6 +9,10 @@ sub := fn(x: Int, y: Int): Int {
     return x - y
 }
 
+v := fn() {
+  return
+}
+
 # CHECK:      Program
 # CHECK-NEXT:   VarDeclStatement(None)
 # CHECK-NEXT:     Identifier(add)
@@ -46,3 +50,8 @@ sub := fn(x: Int, y: Int): Int {
 # CHECK-NEXT:           InfixExpression(Sub)
 # CHECK-NEXT:             Identifier(x)
 # CHECK-NEXT:             Identifier(y)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(v)
+# CHECK-NEXT:     FunctionLiteral(None)
+# CHECK-NEXT:       BlockExpression
+# CHECK-NEXT:         ReturnStatement

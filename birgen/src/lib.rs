@@ -91,8 +91,12 @@ impl<'sess> BIRGen<'sess> {
                 self.generate_expression(&expr_stmt.expression);
             },
             Statement::Return(s) => {
-                let expr = self.generate_expression(&s.return_value);
-                self.inner.pin_mut().build_return(&expr);
+                if let Some(ref return_value) = s.return_value {
+                    let expr = self.generate_expression(&return_value);
+                    self.inner.pin_mut().build_return(&expr);
+                } else {
+                    self.inner.pin_mut().build_empty_return();
+                }
             },
             Statement::While(_while_stmt) => {
                 // TODO: Implement while

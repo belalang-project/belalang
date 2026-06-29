@@ -13,7 +13,7 @@ pub struct ExpressionStatement<'ast> {
 
 #[derive(Debug, Clone, Copy)]
 pub struct ReturnStatement<'ast> {
-    pub return_value: Expression<'ast>,
+    pub return_value: Option<Expression<'ast>>,
 }
 
 #[derive(Debug, Clone, Copy)]
