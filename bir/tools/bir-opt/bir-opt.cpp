@@ -5,7 +5,7 @@
 int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
 
-  registry.insert<belalang::bir::BIRDialect>();
+  registry.insert<belalang::bir::BIRDialect, mlir::cf::ControlFlowDialect>();
 
   belalang::bir::registerPasses();
   belalang::bir::registerBIRPipelines();

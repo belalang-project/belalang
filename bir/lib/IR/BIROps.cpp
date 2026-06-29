@@ -205,5 +205,58 @@ void CallOp::setCalleeFromCallable(mlir::CallInterfaceCallable callee) {
   (*this)->setAttr("callee", mlir::cast<mlir::SymbolRefAttr>(callee));
 }
 
+// -----------------------------------------------------------------------------
+// IfOp
+// -----------------------------------------------------------------------------
+
+mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result) {
+  result.regions.reserve(2);
+  mlir::Region *thenRegion = result.addRegion();
+  mlir::Region *elseRegion = result.addRegion();
+
+  OpAsmParser::UnresolvedOperand cond;
+  mlir::Type ty = bir::BoolType::get(p.getContext());
+
+  if (failed(p.parseOperand(cond)) || failed(p.resolveOperand(cond, ty, result.operands)))
+    return failure();
+
+  if (failed(p.parseRegion(*thenRegion)))
+    return failure();
+
+  if (succeeded(p.parseOptionalKeyword("else"))) {
+    if (failed(p.parseRegion(*elseRegion)))
+      return failure();
+  }
+
+  if (p.parseOptionalColon().succeeded()) {
+    // The if op can only have a return type if it also has an else region.
+    if (elseRegion->empty())
+      return p.emitError(p.getCurrentLocation()) << "with result types should also have an else region";
+
+    mlir::Type resultTy;
+    if (p.parseType(resultTy).failed())
+      return failure();
+    result.addTypes(resultTy);
+  }
+
+  if (failed(p.parseOptionalAttrDict(result.attributes)))
+    return failure();
+
+  return success();
+}
+
+void IfOp::print(mlir::OpAsmPrinter &p) {
+  p << ' ' << getCond() << ' ';
+  p.printRegion(getThenRegion());
+  
+  mlir::Region &elseRegion = getElseRegion();
+  if (!elseRegion.empty()) {
+    p << " else ";
+    p.printRegion(elseRegion);
+  }
+
+  p.printOptionalAttrDict(getOperation()->getAttrs());
+}
+
 } // namespace bir
 } // namespace belalang
