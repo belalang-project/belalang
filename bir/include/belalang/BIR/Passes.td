@@ -22,6 +22,7 @@ def BelalangLowerFuncExprPass : Pass<"bir-lower-func-expr"> {
 def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {
   let summary = "lower bir instructions to LLVM";
   let dependentDialects = ["::belalang::bir::BIRDialect",
+                           "::mlir::cf::ControlFlowDialect",
                            "::mlir::LLVM::LLVMDialect"];
 }
 

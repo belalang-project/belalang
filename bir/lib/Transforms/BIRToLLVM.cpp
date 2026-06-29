@@ -5,6 +5,8 @@
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
+#include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGBIRTOLLVMPASS
@@ -42,7 +44,7 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       {
         OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(module.getBody());
-        auto arrTy = LLVM::LLVMArrayType::get(IntegerType::get(ctx, 8), str.size());
+        auto arrTy = LLVM::LLVMArrayType::get(mlir::IntegerType::get(ctx, 8), str.size());
 
         global = module.lookupSymbol<LLVM::GlobalOp>(globalName);
         if (!global) {
@@ -53,7 +55,7 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
 
       auto addrOfOp = LLVM::AddressOfOp::create(rewriter, op.getLoc(), global);
 
-      auto lenTy = IntegerType::get(ctx, 64);
+      auto lenTy = mlir::IntegerType::get(ctx, 64);
       auto len = LLVM::ConstantOp::create(rewriter, op.getLoc(), lenTy, str.size());
 
       auto container = LLVM::UndefOp::create(rewriter, op.getLoc(), type);
@@ -149,7 +151,7 @@ struct CallIndirectOpLowering final
   LogicalResult
   matchAndRewrite(bir::CallIndirectOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
-    auto funcType = mlir::cast<FunctionType>(op.getCallee().getType());
+    auto funcType = mlir::cast<mlir::FunctionType>(op.getCallee().getType());
 
     SmallVector<mlir::Type> paramTypes;
     for (auto t : funcType.getInputs())
@@ -191,7 +193,7 @@ struct AddOpLowering final : public OpConversionPattern<bir::AddOp> {
     if (!type)
       return failure();
 
-    if (mlir::isa<IntegerType>(type)) {
+    if (mlir::isa<mlir::IntegerType>(type)) {
       rewriter.replaceOpWithNewOp<LLVM::AddOp>(op, type, adaptor.getLhs(),
                                                adaptor.getRhs());
     } else if (mlir::isa<FloatType>(type)) {
@@ -215,7 +217,7 @@ struct SubOpLowering final : public OpConversionPattern<bir::SubOp> {
     if (!type)
       return failure();
 
-    if (mlir::isa<IntegerType>(type)) {
+    if (mlir::isa<mlir::IntegerType>(type)) {
       rewriter.replaceOpWithNewOp<LLVM::SubOp>(op, type, adaptor.getLhs(),
                                                adaptor.getRhs());
     } else if (mlir::isa<FloatType>(type)) {
@@ -239,7 +241,7 @@ struct MulOpLowering final : public OpConversionPattern<bir::MulOp> {
     if (!type)
       return failure();
 
-    if (mlir::isa<IntegerType>(type)) {
+    if (mlir::isa<mlir::IntegerType>(type)) {
       rewriter.replaceOpWithNewOp<LLVM::MulOp>(op, type, adaptor.getLhs(),
                                                adaptor.getRhs());
     } else if (mlir::isa<FloatType>(type)) {
@@ -263,7 +265,7 @@ struct DivOpLowering final : public OpConversionPattern<bir::DivOp> {
     if (!type)
       return failure();
 
-    if (mlir::isa<IntegerType>(type)) {
+    if (mlir::isa<mlir::IntegerType>(type)) {
       rewriter.replaceOpWithNewOp<LLVM::SDivOp>(op, type, adaptor.getLhs(),
                                                 adaptor.getRhs());
     } else if (mlir::isa<FloatType>(type)) {
@@ -288,7 +290,7 @@ struct ModOpLowering final : public OpConversionPattern<bir::ModOp> {
     if (!type)
       return failure();
 
-    if (mlir::isa<IntegerType>(type)) {
+    if (mlir::isa<mlir::IntegerType>(type)) {
       rewriter.replaceOpWithNewOp<LLVM::SRemOp>(op, type, adaptor.getLhs(),
                                                 adaptor.getRhs());
     } else if (mlir::isa<FloatType>(type)) {
@@ -332,7 +334,7 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       auto funcType = LLVM::LLVMFunctionType::get(
-          LLVM::LLVMPointerType::get(ctx), IntegerType::get(ctx, 64));
+          LLVM::LLVMPointerType::get(ctx), mlir::IntegerType::get(ctx, 64));
       OperationState funcState(UnknownLoc::get(ctx),
                                LLVM::LLVMFuncOp::getOperationName());
       LLVM::LLVMFuncOp::build(rewriter, funcState, brt::BRT_MMTK_ALLOC,
@@ -340,7 +342,7 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
       rewriter.create(funcState);
     }
 
-    auto i64Type = IntegerType::get(ctx, 64);
+    auto i64Type = mlir::IntegerType::get(ctx, 64);
     auto sizeVal =
         LLVM::ConstantOp::create(rewriter, loc, i64Type, rewriter.getI64IntegerAttr(elSize));
 
@@ -389,8 +391,9 @@ struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoadOp> {
   };
 };
 
-struct BIRToLLVMTypeConverter : public mlir::TypeConverter {
-  BIRToLLVMTypeConverter() {
+struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
+  BIRToLLVMTypeConverter(mlir::MLIRContext *ctx)
+      : mlir::LLVMTypeConverter(ctx) {
     addConversion([](bir::IntType ty) {
       return mlir::IntegerType::get(ty.getContext(), 64);
     });
@@ -436,7 +439,7 @@ struct BelalangBIRToLLVMPass
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {
-    BIRToLLVMTypeConverter typeConverter;
+    BIRToLLVMTypeConverter typeConverter(&getContext());
 
     mlir::ConversionTarget target(getContext());
     target.addLegalDialect<mlir::LLVM::LLVMDialect, mlir::BuiltinDialect>();
@@ -444,6 +447,8 @@ struct BelalangBIRToLLVMPass
 
     mlir::RewritePatternSet patterns(&getContext());
     belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
+    mlir::cf::populateControlFlowToLLVMConversionPatterns(typeConverter,
+                                                          patterns);
 
     if (mlir::failed(mlir::applyFullConversion(getOperation(), target,
                                                   std::move(patterns)))) {
