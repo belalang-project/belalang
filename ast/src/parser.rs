@@ -164,10 +164,18 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
     fn parse_statement(&mut self) -> Result<Statement<'ast>, ParserError> {
         match self.curr_token.kind {
-            // parse_return
+            // matches `return`
             TokenKind::Return => {
-                self.next_token()?;
-                let return_value = *self.parse_expression(Precedence::Lowest)?;
+                // TODO: more concrete statement terminator. see #208
+                let return_value = if matches!(
+                    self.peek_token.kind,
+                    TokenKind::Semicolon | TokenKind::RightBrace | TokenKind::EOF
+                ) {
+                    None
+                } else {
+                    self.next_token()?; // curr_token is now the return value
+                    Some(*self.parse_expression(Precedence::Lowest)?)
+                };
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
 

@@ -199,7 +199,9 @@ pub trait Visitor<'ast> {
     }
 
     fn walk_return_statement(&mut self, node: &ReturnStatement<'ast>) {
-        self.visit_expression(&node.return_value);
+        if let Some(ref return_value) = node.return_value {
+            self.visit_expression(return_value);
+        }
     }
 
     fn walk_while_statement(&mut self, node: &WhileStatement<'ast>) {
