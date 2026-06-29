@@ -333,7 +333,7 @@ def BIR_IfOp : BIR_Op<"if", [
   let results = (outs Optional<BIR_AnyType>:$result);
 
   let extraClassDeclaration = [{
-    bool hasElse() { return getElseRegion().empty(); }
+    bool hasElse() { return !getElseRegion().empty(); }
   }];
 
   let hasCustomAssemblyFormat = 1;

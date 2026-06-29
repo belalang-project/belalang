@@ -47,6 +47,59 @@ public:
   }
 };
 
+class BIRIfOpFlattening : public mlir::OpRewritePattern<bir::IfOp> {
+public:
+  using OpRewritePattern<bir::IfOp>::OpRewritePattern;
+
+  mlir::LogicalResult
+  matchAndRewrite(bir::IfOp op,
+                  mlir::PatternRewriter &rewriter) const override {
+    OpBuilder::InsertionGuard guard(rewriter);
+
+    mlir::Block *currentBlock = rewriter.getInsertionBlock();
+    mlir::Block *continueBlock =
+        rewriter.splitBlock(currentBlock, rewriter.getInsertionPoint());
+
+    // Inline then
+    mlir::Block *thenBeforeBody = &op.getThenRegion().front();
+    mlir::Block *thenAfterBody = &op.getThenRegion().back();
+    rewriter.inlineRegionBefore(op.getThenRegion(), continueBlock);
+
+    if (auto thenYieldOp =
+            dyn_cast<bir::YieldOp>(thenAfterBody->getTerminator())) {
+      rewriter.setInsertionPointToEnd(thenAfterBody);
+      rewriter.replaceOpWithNewOp<cf::BranchOp>(
+          thenYieldOp, thenYieldOp.getArgs(), continueBlock);
+    }
+
+    // Inline else, if exists
+    mlir::Block *elseBeforeBody = nullptr;
+    mlir::Block *elseAfterBody = nullptr;
+    if (op.hasElse()) {
+      elseBeforeBody = &op.getElseRegion().front();
+      elseAfterBody = &op.getElseRegion().back();
+      rewriter.inlineRegionBefore(op.getElseRegion(), continueBlock);
+    } else {
+      elseBeforeBody = elseAfterBody = continueBlock;
+    }
+
+    if (auto elseYieldOp =
+            dyn_cast<bir::YieldOp>(elseAfterBody->getTerminator())) {
+      rewriter.setInsertionPointToEnd(elseAfterBody);
+      rewriter.replaceOpWithNewOp<cf::BranchOp>(
+          elseYieldOp, elseYieldOp.getArgs(), continueBlock);
+    }
+
+    // TODO: conditional branch
+    // cf::CondBranchOp does not accept !bir.bool
+    rewriter.setInsertionPointToEnd(currentBlock);
+    cf::BranchOp::create(rewriter, op.getLoc(), continueBlock);
+
+    rewriter.replaceOp(op, continueBlock->getArguments());
+    return success();
+  }
+};
+
 } // namespace
 
 // -----------------------------------------------------------------------------
@@ -55,7 +108,7 @@ public:
 
 void belalang::bir::populateBelalangFlattenCFGPatterns(
     mlir::RewritePatternSet &patterns) {
-  patterns.add<BIRScopeOpFlattening>(patterns.getContext());
+  patterns.add<BIRScopeOpFlattening, BIRIfOpFlattening>(patterns.getContext());
 }
 
 struct BelalangFlattenCFGPass
@@ -69,7 +122,7 @@ struct BelalangFlattenCFGPass
 
     llvm::SmallVector<Operation *, 16> ops;
     getOperation()->walk<mlir::WalkOrder::PostOrder>([&](Operation *op) {
-      if (isa<ScopeOp>(op))
+      if (isa<ScopeOp, IfOp>(op))
         ops.push_back(op);
     });
 
