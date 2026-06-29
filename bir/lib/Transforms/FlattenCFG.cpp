@@ -60,6 +60,10 @@ public:
     mlir::Block *continueBlock =
         rewriter.splitBlock(currentBlock, rewriter.getInsertionPoint());
 
+    if (!op.getResults().empty())
+      // Add arguments for the if expression output
+      continueBlock->addArguments(op->getResultTypes(), {op.getLoc()});
+
     // Inline then
     mlir::Block *thenBeforeBody = &op.getThenRegion().front();
     mlir::Block *thenAfterBody = &op.getThenRegion().back();
