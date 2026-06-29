@@ -16,6 +16,7 @@ td_library(
         "@llvm-project//mlir:OpBaseTdFiles",
         "@llvm-project//mlir:BuiltinDialectTdFiles",
         "@llvm-project//mlir:FunctionInterfacesTdFiles",
+        "@llvm-project//mlir:SideEffectInterfacesTdFiles",
     ],
 )
 
@@ -92,6 +93,7 @@ cc_library(
         "lib/IR/BIROps.cpp",
         "lib/Pipelines.cpp",
         "lib/Transforms/LowerPrintToRuntime.cpp",
+        "lib/Transforms/FlattenCFG.cpp",
         "lib/Transforms/LowerFuncExpr.cpp",
         "lib/Transforms/BIRToLLVM.cpp",
     ],
@@ -106,7 +108,9 @@ cc_library(
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:FunctionInterfaces",
+        "@llvm-project//mlir:ControlFlowDialect",
         "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:ControlFlowToLLVM",
         "@llvm-project//mlir:TransformUtils",
     ],
 )
