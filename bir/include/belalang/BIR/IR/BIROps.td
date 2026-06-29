@@ -338,4 +338,44 @@ def BIR_IfOp : BIR_Op<"if", [
 
   let hasCustomAssemblyFormat = 1;
 }
+
+def BIR_CondBrOp : BIR_Op<"cond_br", [
+  Terminator,
+  AttrSizedOperandSegments,
+]> {
+  let summary = "cond_br";
+
+  let builders = [
+    OpBuilder<(
+      ins "mlir::Value":$cond,
+      "mlir::Block *":$destTrue,
+      "mlir::Block *":$destFalse,
+      CArg<"mlir::ValueRange", "{}">:$destOperandsTrue,
+      CArg<"mlir::ValueRange", "{}">:$destOperandsFalse
+    ), [{
+      build($_builder, $_state, cond, destOperandsTrue,
+            destOperandsFalse, destTrue, destFalse);
+    }]>
+  ];
+
+  let arguments = (ins
+    BIR_BoolType:$cond,
+    Variadic<BIR_AnyType>:$destOperandsTrue,
+    Variadic<BIR_AnyType>:$destOperandsFalse
+  );
+
+  let successors = (successor
+    AnySuccessor:$destTrue,
+    AnySuccessor:$destFalse
+  );
+
+  let assemblyFormat = [{
+    $cond
+    $destTrue (`(` $destOperandsTrue^ `:` type($destOperandsTrue) `)`)?
+    `,`
+    $destFalse (`(` $destOperandsFalse^ `:` type($destOperandsFalse) `)`)?
+    attr-dict
+  }];
+}
+
 #endif // BELALANG_IR_OPS_TD_

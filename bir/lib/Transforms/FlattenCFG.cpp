@@ -90,10 +90,10 @@ public:
           elseYieldOp, elseYieldOp.getArgs(), continueBlock);
     }
 
-    // TODO: conditional branch
-    // cf::CondBranchOp does not accept !bir.bool
+    // Decide where to go, either the then block or else block.
     rewriter.setInsertionPointToEnd(currentBlock);
-    cf::BranchOp::create(rewriter, op.getLoc(), continueBlock);
+    bir::CondBrOp::create(rewriter, op.getLoc(), op.getCond(), thenBeforeBody,
+                          elseBeforeBody);
 
     rewriter.replaceOp(op, continueBlock->getArguments());
     return success();
