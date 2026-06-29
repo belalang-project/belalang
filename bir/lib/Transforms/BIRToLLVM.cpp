@@ -5,6 +5,7 @@
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 
@@ -391,6 +392,19 @@ struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoadOp> {
   };
 };
 
+struct CondBrLowering final : public OpConversionPattern<bir::CondBrOp> {
+  using OpConversionPattern<bir::CondBrOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::CondBrOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    rewriter.replaceOpWithNewOp<cf::CondBranchOp>(
+        op, adaptor.getCond(), op.getDestTrue(), op.getDestOperandsTrue(),
+        op.getDestFalse(), op.getDestOperandsFalse());
+    return success();
+  }
+};
+
 struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
   BIRToLLVMTypeConverter(mlir::MLIRContext *ctx)
       : mlir::LLVMTypeConverter(ctx) {
@@ -425,8 +439,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
   patterns.add<ConstantOpLowering, FuncOpLowering, CallOpLowering,
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
-               VarDeclareOpLowering, VarStoreOpLowering, VarLoadOpLowering>(
-      typeConverter, patterns.getContext());
+               VarDeclareOpLowering, VarStoreOpLowering, VarLoadOpLowering,
+               CondBrLowering>(typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
