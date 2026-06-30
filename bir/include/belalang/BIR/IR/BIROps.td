@@ -3,12 +3,15 @@
 
 include "belalang/BIR/IR/BIRDialect.td"
 include "belalang/BIR/IR/BIRTypes.td"
+include "belalang/BIR/IR/BIREnumAttrs.td"
 
 include "belalang/BIR/Interfaces/LoopOpInterface.td"
 
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/IR/BuiltinAttributeInterfaces.td"
+include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/FunctionInterfaces.td"
+include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 
 class BIR_Op<string mnemonic, list<Trait> traits = []>
@@ -412,6 +415,34 @@ def BIR_ContinueOp : BIR_Op<"continue", [
   // TODO: specify ancestor of continueable scopes
 ]> {
   let assemblyFormat = "attr-dict";
+}
+
+def BIR_CmpOpKind : BIR_I32EnumAttr<"CmpOpKind", "compare operation kind", [
+  I32EnumAttrCase<"lt", 0>,
+  I32EnumAttrCase<"le", 1>,
+  I32EnumAttrCase<"gt", 2>,
+  I32EnumAttrCase<"ge", 3>,
+  I32EnumAttrCase<"eq", 4>,
+  I32EnumAttrCase<"ne", 5>
+]>;
+
+def BIR_ComparableType : AnyTypeOf<[
+  BIR_IntType,
+  BIR_FloatType
+]> {}
+
+def BIR_CmpOp : BIR_Op<"cmp", [
+  Pure, SameTypeOperands
+]> {
+  let arguments = (ins
+    BIR_CmpOpKind:$kind,
+    BIR_ComparableType:$lhs,
+    BIR_ComparableType:$rhs
+  );
+  let results = (outs BIR_BoolType:$result);
+  let assemblyFormat = [{
+    $kind $lhs `,` $rhs `:` type($lhs) attr-dict
+  }];
 }
 
 #endif // BELALANG_IR_OPS_TD_

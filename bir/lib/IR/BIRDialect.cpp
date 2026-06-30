@@ -9,6 +9,7 @@
 #include "belalang/BIR/IR/BIRAttrs.cpp.inc"
 
 #include "belalang/BIR/IR/BIRDialect.cpp.inc"
+#include "belalang/BIR/IR/BIREnumAttrs.cpp.inc"
 
 namespace belalang {
 namespace bir {
