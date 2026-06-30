@@ -17,38 +17,54 @@ use session::{
 
 #[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
+    #[repr(u8)]
+    enum BinOpKind {
+        Add,
+        Sub,
+        Mul,
+        Div,
+        Mod,
+    }
+
+    #[repr(u8)]
+    enum TypeKind {
+        String,
+        Int,
+        Float,
+    }
+
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
-        type BIRGuard;
+        type BIRFunctionGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
 
         fn create_birgen() -> UniquePtr<BIRGen>;
+        fn create_llvmgen(birgen: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
         fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
         fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
         fn build_constant_string(self: Pin<&mut BIRGen>, val: &str) -> UniquePtr<BIRValue>;
         fn build_constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
-        fn build_add(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_sub(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_mul(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_div(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_mod(self: Pin<&mut BIRGen>, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_binop(self: Pin<&mut BIRGen>, kind: BinOpKind, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
-        fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: u8, name: &str) -> UniquePtr<BIRValue>;
+        fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
-        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: u8, paramTys: &[u8]) -> UniquePtr<BIRGuard>;
+        fn build_fn_expr(
+            self: Pin<&mut BIRGen>,
+            resultTy: TypeKind,
+            paramTys: &[TypeKind],
+        ) -> UniquePtr<BIRFunctionGuard>;
         fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
-        fn llvmgen(self: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
         fn dump_to_string(self: &LLVMGen) -> String;
         fn compile_object_file(self: &LLVMGen, out: String) -> String;
@@ -57,8 +73,8 @@ mod ffi {
         fn add_call_arg(self: Pin<&mut BIRGen>, arg: &BIRValue);
         fn finish_call(self: Pin<&mut BIRGen>) -> UniquePtr<BIRValue>;
 
-        fn get_value(self: &BIRGuard) -> UniquePtr<BIRValue>;
-        fn get_arg(self: &BIRGuard, index: usize) -> UniquePtr<BIRValue>;
+        fn get_value(self: &BIRFunctionGuard) -> UniquePtr<BIRValue>;
+        fn get_arg(self: &BIRFunctionGuard, index: usize) -> UniquePtr<BIRValue>;
     }
 }
 
@@ -106,9 +122,9 @@ impl<'sess> BIRGen<'sess> {
 
                 let Some(value) = value else {
                     let id = match var.explicit_ty.unwrap() {
-                        syms::STRING => 0,
-                        syms::INT => 1,
-                        syms::FLOAT => 2,
+                        syms::STRING => ffi::TypeKind::String,
+                        syms::INT => ffi::TypeKind::Int,
+                        syms::FLOAT => ffi::TypeKind::Float,
                         _ => todo!(),
                     };
 
@@ -196,18 +212,18 @@ impl<'sess> BIRGen<'sess> {
             },
             Expression::Function(func) => {
                 let result = match func.explicit_ty.unwrap() {
-                    syms::STRING => 0,
-                    syms::INT => 1,
-                    syms::FLOAT => 2,
+                    syms::STRING => ffi::TypeKind::String,
+                    syms::INT => ffi::TypeKind::Int,
+                    syms::FLOAT => ffi::TypeKind::Float,
                     _ => todo!(),
                 };
 
                 let mut param_tys = Vec::new();
                 for param in func.params {
                     let ty = match param.explicit_ty.unwrap() {
-                        syms::STRING => 0,
-                        syms::INT => 1,
-                        syms::FLOAT => 2,
+                        syms::STRING => ffi::TypeKind::String,
+                        syms::INT => ffi::TypeKind::Int,
+                        syms::FLOAT => ffi::TypeKind::Float,
                         _ => todo!(),
                     };
                     param_tys.push(ty);
@@ -247,14 +263,15 @@ impl<'sess> BIRGen<'sess> {
         let lhs = self.generate_expression(infix.left);
         let rhs = self.generate_expression(infix.right);
 
-        match infix.operator {
-            InfixKind::Add => self.inner.pin_mut().build_add(&lhs, &rhs),
-            InfixKind::Sub => self.inner.pin_mut().build_sub(&lhs, &rhs),
-            InfixKind::Mul => self.inner.pin_mut().build_mul(&lhs, &rhs),
-            InfixKind::Div => self.inner.pin_mut().build_div(&lhs, &rhs),
-            InfixKind::Mod => self.inner.pin_mut().build_mod(&lhs, &rhs),
+        let kind = match infix.operator {
+            InfixKind::Add => ffi::BinOpKind::Add,
+            InfixKind::Sub => ffi::BinOpKind::Sub,
+            InfixKind::Mul => ffi::BinOpKind::Mul,
+            InfixKind::Div => ffi::BinOpKind::Div,
+            InfixKind::Mod => ffi::BinOpKind::Mod,
             _ => todo!("Infix operator {:?} not implemented", infix.operator),
-        }
+        };
+        self.inner.pin_mut().build_binop(kind, &lhs, &rhs)
     }
 
     pub fn dump(&self) {
@@ -272,7 +289,7 @@ impl<'sess> BIRGen<'sess> {
     pub fn llvmgen(&mut self) -> LLVMGen<'sess> {
         LLVMGen {
             session: self.session,
-            inner: self.inner.pin_mut().llvmgen(),
+            inner: ffi::create_llvmgen(self.inner.pin_mut()),
         }
     }
 }

@@ -13,11 +13,11 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/MC/TargetRegistry.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/TargetSelect.h"
-#include "llvm/TargetParser/Host.h"
-#include "llvm/Target/TargetOptions.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/TargetParser/Host.h"
 #include <optional>
 
 namespace belalang {
@@ -35,10 +35,22 @@ BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   builder.setInsertionPointToStart(module.getBody());
 
   auto retTy = bir::IntType::get(&context);
-  auto main = bir::FuncOp::create(builder, loc, "main",
-                                  mlir::FunctionType::get(&context, {}, {retTy}));
+  auto main = bir::FuncOp::create(
+      builder, loc, "main", mlir::FunctionType::get(&context, {}, {retTy}));
   mlir::Block *entry = main.addEntryBlock();
   builder.setInsertionPointToStart(entry);
+}
+
+mlir::Type BIRGen::mapType(TypeKind ty) {
+  if (ty == TypeKind::String) {
+    return bir::StringType::get(&context);
+  } else if (ty == TypeKind::Int) {
+    return bir::IntType::get(&context);
+  } else if (ty == TypeKind::Float) {
+    return bir::FloatType::get(&context);
+  } else {
+    return {};
+  }
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
@@ -72,69 +84,49 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_bool(bool val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_add(const BIRValue &lhs,
-                                            const BIRValue &rhs) {
+template <typename Op>
+std::unique_ptr<BIRValue>
+build_binop_impl(mlir::OpBuilder &builder, mlir::Location loc,
+                 const BIRValue &lhs, const BIRValue &rhs) {
   auto type = lhs.getValue().getType();
-  auto op =
-      bir::AddOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
+  auto op = Op::create(builder, loc, type, lhs.getValue(), rhs.getValue());
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_sub(const BIRValue &lhs,
-                                            const BIRValue &rhs) {
-  auto type = lhs.getValue().getType();
-  auto op =
-      bir::SubOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
-  return std::make_unique<BIRValue>(op.getResult());
-}
-
-std::unique_ptr<BIRValue> BIRGen::build_mul(const BIRValue &lhs,
-                                            const BIRValue &rhs) {
-  auto type = lhs.getValue().getType();
-  auto op =
-      bir::MulOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
-  return std::make_unique<BIRValue>(op.getResult());
-}
-
-std::unique_ptr<BIRValue> BIRGen::build_div(const BIRValue &lhs,
-                                            const BIRValue &rhs) {
-  auto type = lhs.getValue().getType();
-  auto op =
-      bir::DivOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
-  return std::make_unique<BIRValue>(op.getResult());
-}
-
-std::unique_ptr<BIRValue> BIRGen::build_mod(const BIRValue &lhs,
-                                            const BIRValue &rhs) {
-  auto type = lhs.getValue().getType();
-  auto op =
-      bir::ModOp::create(builder, loc, type, lhs.getValue(), rhs.getValue());
-  return std::make_unique<BIRValue>(op.getResult());
-}
-
-std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v, rust::Str name) {
-  auto nakedType = v.getValue().getType();
-  auto refType = bir::RefType::get(&context, nakedType);
-  auto op = bir::VarDeclareOp::create(builder, loc, refType, llvm::StringRef(name.data(), name.size()));
-  return std::make_unique<BIRValue>(op.getResult());
-}
-
-std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(uint8_t v, rust::Str name) {
-  mlir::Type ty;
-
-  // TODO: this is not elegant, but works
-  if (v == 0) {
-    ty = bir::StringType::get(&context);
-  } else if (v == 1) {
-    ty = bir::IntType::get(&context);
-  } else if (v == 2) {
-    ty = bir::FloatType::get(&context);
-  } else {
+std::unique_ptr<BIRValue>
+BIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
+  switch (kind) {
+  case BinOpKind::Add:
+    return build_binop_impl<bir::AddOp>(builder, loc, lhs, rhs);
+  case BinOpKind::Sub:
+    return build_binop_impl<bir::SubOp>(builder, loc, lhs, rhs);
+  case BinOpKind::Mul:
+    return build_binop_impl<bir::MulOp>(builder, loc, lhs, rhs);
+  case BinOpKind::Div:
+    return build_binop_impl<bir::DivOp>(builder, loc, lhs, rhs);
+  case BinOpKind::Mod:
+    return build_binop_impl<bir::ModOp>(builder, loc, lhs, rhs);
+  default:
     return nullptr;
   }
+}
+
+std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v,
+                                                    rust::Str name) {
+  auto nakedType = v.getValue().getType();
+  auto refType = bir::RefType::get(&context, nakedType);
+  auto op = bir::VarDeclareOp::create(
+      builder, loc, refType, llvm::StringRef(name.data(), name.size()));
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
+std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(TypeKind v,
+                                                       rust::Str name) {
+  mlir::Type ty = mapType(v);
 
   auto refType = bir::RefType::get(&context, ty);
-  auto op = bir::VarDeclareOp::create(builder, loc, refType, llvm::StringRef(name.data(), name.size()));
+  auto op = bir::VarDeclareOp::create(
+      builder, loc, refType, llvm::StringRef(name.data(), name.size()));
   return std::make_unique<BIRValue>(op.getResult());
 }
 
@@ -153,23 +145,12 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
 
   auto resultType = refType.getEl();
 
-  auto op = bir::VarLoadOp::create(builder, loc, resultType, refValue.getValue());
+  auto op =
+      bir::VarLoadOp::create(builder, loc, resultType, refValue.getValue());
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-mlir::Type BIRGen::mapType(uint8_t ty) {
-  if (ty == 0) {
-    return bir::StringType::get(&context);
-  } else if (ty == 1) {
-    return bir::IntType::get(&context);
-  } else if (ty == 2) {
-    return bir::FloatType::get(&context);
-  } else {
-    return {};
-  }
-}
-
-std::unique_ptr<BIRValue> BIRGuard::get_arg(size_t index) const {
+std::unique_ptr<BIRValue> BIRFunctionGuard::get_arg(size_t index) const {
   auto op = fnValue.getDefiningOp();
   auto &region = op->getRegion(0);
   auto &block = region.front();
@@ -177,7 +158,8 @@ std::unique_ptr<BIRValue> BIRGuard::get_arg(size_t index) const {
   return std::make_unique<BIRValue>(arg);
 }
 
-std::unique_ptr<BIRGuard> BIRGen::build_fn_expr(uint8_t resultTy, rust::Slice<const uint8_t> paramTys) {
+std::unique_ptr<BIRFunctionGuard>
+BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   std::vector<mlir::Type> inputs;
   for (auto ty : paramTys) {
     inputs.push_back(mapType(ty));
@@ -185,7 +167,7 @@ std::unique_ptr<BIRGuard> BIRGen::build_fn_expr(uint8_t resultTy, rust::Slice<co
   auto fnTy = mlir::FunctionType::get(&context, inputs, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
 
-  auto guard = std::make_unique<BIRGuard>(builder, op.getResult());
+  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult());
 
   std::vector<mlir::Location> locs(inputs.size(), loc);
   builder.createBlock(&op.getBody(), {}, inputs, locs);
@@ -223,9 +205,7 @@ void BIRGen::build_return(const BIRValue &val) {
   bir::ReturnOp::create(builder, loc, val.getValue());
 }
 
-void BIRGen::build_empty_return() {
-  bir::ReturnOp::create(builder, loc, {});
-}
+void BIRGen::build_empty_return() { bir::ReturnOp::create(builder, loc, {}); }
 
 void BIRGen::build_main_return() {
   auto typ = bir::IntType::get(&context);
@@ -250,15 +230,15 @@ bool BIRGen::optimize() {
   return mlir::succeeded(pm.run(module));
 }
 
-std::unique_ptr<LLVMGen> BIRGen::llvmgen() {
-  return std::make_unique<LLVMGen>(&module);
-}
-
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
 
 // -----------------------------------------------------------------------------
 // LLVMGen
 // -----------------------------------------------------------------------------
+
+std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen) {
+  return std::make_unique<LLVMGen>(&gen.module);
+}
 
 LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   mlir::PassManager pm(op->getContext());

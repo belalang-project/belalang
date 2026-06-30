@@ -12,8 +12,27 @@
 #include <memory>
 #include <stdint.h>
 
+// Forward declarations for lib.rs.h
 namespace belalang {
 namespace birgen {
+class LLVMGen;
+class BIRValue;
+class BIRGuard;
+class BIRFunctionGuard;
+class BIRGen;
+} // namespace birgen
+} // namespace belalang
+
+#include "birgen/src/lib.rs.h"
+
+namespace belalang {
+namespace birgen {
+
+// -----------------------------------------------------------------------------
+// LLVMGen
+// -----------------------------------------------------------------------------
+
+std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
 
 class LLVMGen {
 public:
@@ -28,6 +47,10 @@ private:
   std::unique_ptr<llvm::Module> module;
 };
 
+// -----------------------------------------------------------------------------
+// BIRValue
+// -----------------------------------------------------------------------------
+
 class BIRValue {
 public:
   BIRValue(mlir::Value value) : value(value) {}
@@ -37,11 +60,24 @@ private:
   mlir::Value value;
 };
 
+// -----------------------------------------------------------------------------
+// BIRGuards
+// -----------------------------------------------------------------------------
+
 class BIRGuard {
 public:
-  BIRGuard(mlir::OpBuilder &builder, mlir::Value fnValue)
-      : builder(builder), guard(builder), fnValue(fnValue) {}
-  ~BIRGuard() = default;
+  BIRGuard(mlir::OpBuilder &builder) : guard(builder) {}
+  virtual ~BIRGuard() = default;
+
+protected:
+  mlir::OpBuilder::InsertionGuard guard;
+};
+
+class BIRFunctionGuard : public BIRGuard {
+public:
+  BIRFunctionGuard(mlir::OpBuilder &builder, mlir::Value fnValue)
+      : BIRGuard(builder), fnValue(fnValue) {}
+  ~BIRFunctionGuard() = default;
 
   std::unique_ptr<BIRValue> get_value() const {
     return std::make_unique<BIRValue>(fnValue);
@@ -49,10 +85,14 @@ public:
   std::unique_ptr<BIRValue> get_arg(size_t index) const;
 
 private:
-  mlir::OpBuilder &builder;
-  mlir::OpBuilder::InsertionGuard guard;
   mlir::Value fnValue;
 };
+
+// -----------------------------------------------------------------------------
+// BIRGen
+// -----------------------------------------------------------------------------
+
+std::unique_ptr<BIRGen> create_birgen();
 
 class BIRGen {
 public:
@@ -63,15 +103,15 @@ public:
   std::unique_ptr<BIRValue> build_constant_float(double val);
   std::unique_ptr<BIRValue> build_constant_string(rust::Str val);
   std::unique_ptr<BIRValue> build_constant_bool(bool val);
-  std::unique_ptr<BIRValue> build_add(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_sub(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_mul(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_div(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_mod(const BIRValue &lhs, const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
-  std::unique_ptr<BIRValue> build_var_declare_ty(uint8_t v, rust::Str name);
+
+  std::unique_ptr<BIRValue> build_binop(BinOpKind kind, const BIRValue &lhs,
+                                        const BIRValue &rhs);
+  std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v,
+                                              rust::Str name);
+  std::unique_ptr<BIRValue> build_var_declare_ty(TypeKind v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
-  std::unique_ptr<BIRGuard> build_fn_expr(uint8_t resultTy, rust::Slice<const uint8_t> paramTys);
+  std::unique_ptr<BIRFunctionGuard>
+  build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
@@ -87,7 +127,7 @@ public:
 
   bool optimize();
 
-  std::unique_ptr<LLVMGen> llvmgen();
+  friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
 
 private:
   mlir::MLIRContext context;
@@ -97,10 +137,8 @@ private:
   mlir::Value current_callee;
   std::vector<mlir::Value> current_args;
 
-  mlir::Type mapType(uint8_t);
+  mlir::Type mapType(TypeKind);
 };
-
-std::unique_ptr<BIRGen> create_birgen();
 
 } // namespace birgen
 } // namespace belalang
