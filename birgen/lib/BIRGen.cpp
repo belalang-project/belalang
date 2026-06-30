@@ -18,6 +18,7 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/TargetParser/Host.h"
+#include <memory>
 #include <optional>
 
 namespace belalang {
@@ -93,6 +94,16 @@ build_binop_impl(mlir::OpBuilder &builder, mlir::Location loc,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
+std::unique_ptr<BIRValue> build_binop_cmp_impl(mlir::OpBuilder &builder,
+                                               mlir::Location loc,
+                                               bir::CmpOpKind kind,
+                                               const BIRValue &lhs,
+                                               const BIRValue &rhs) {
+  auto op =
+      bir::CmpOp::create(builder, loc, kind, lhs.getValue(), rhs.getValue());
+  return std::make_unique<BIRValue>(op.getResult());
+}
+
 std::unique_ptr<BIRValue>
 BIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
   switch (kind) {
@@ -106,6 +117,18 @@ BIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
     return build_binop_impl<bir::DivOp>(builder, loc, lhs, rhs);
   case BinOpKind::Mod:
     return build_binop_impl<bir::ModOp>(builder, loc, lhs, rhs);
+  case BinOpKind::Lt:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::lt, lhs, rhs);
+  case BinOpKind::Le:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::le, lhs, rhs);
+  case BinOpKind::Gt:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::gt, lhs, rhs);
+  case BinOpKind::Ge:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::ge, lhs, rhs);
+  case BinOpKind::Eq:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::eq, lhs, rhs);
+  case BinOpKind::Ne:
+    return build_binop_cmp_impl(builder, loc, bir::CmpOpKind::ne, lhs, rhs);
   default:
     return nullptr;
   }
@@ -204,9 +227,7 @@ void BIRGen::build_yield(const BIRValue &val) {
   bir::YieldOp::create(builder, loc, val.getValue());
 }
 
-void BIRGen::build_empty_yield() {
-  bir::YieldOp::create(builder, loc);
-}
+void BIRGen::build_empty_yield() { bir::YieldOp::create(builder, loc); }
 
 void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());

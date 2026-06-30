@@ -7,6 +7,7 @@
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Interfaces/FunctionInterfaces.h"
+#include "mlir/Interfaces/SideEffectInterfaces.h"
 #include "mlir/Support/LLVM.h"
 
 #include "llvm/ADT/TypeSwitch.h"
@@ -17,6 +18,7 @@ using namespace mlir;
 using namespace llvm;
 
 #include "belalang/BIR/IR/BIRDialect.h.inc"
+#include "belalang/BIR/IR/BIREnumAttrs.h.inc"
 
 #define GET_ATTRDEF_CLASSES
 #include "belalang/BIR/IR/BIRAttrs.h.inc"

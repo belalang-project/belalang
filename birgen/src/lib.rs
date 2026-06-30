@@ -24,6 +24,12 @@ mod ffi {
         Mul,
         Div,
         Mod,
+        Lt,
+        Le,
+        Gt,
+        Ge,
+        Eq,
+        Ne,
     }
 
     #[repr(u8)]
@@ -311,6 +317,12 @@ impl<'sess> BIRGen<'sess> {
             InfixKind::Mul => ffi::BinOpKind::Mul,
             InfixKind::Div => ffi::BinOpKind::Div,
             InfixKind::Mod => ffi::BinOpKind::Mod,
+            InfixKind::Lt => ffi::BinOpKind::Lt,
+            InfixKind::Le => ffi::BinOpKind::Le,
+            InfixKind::Gt => ffi::BinOpKind::Gt,
+            InfixKind::Ge => ffi::BinOpKind::Ge,
+            InfixKind::Eq => ffi::BinOpKind::Eq,
+            InfixKind::Ne => ffi::BinOpKind::Ne,
             _ => todo!("Infix operator {:?} not implemented", infix.operator),
         };
         self.inner.pin_mut().build_binop(kind, &lhs, &rhs)

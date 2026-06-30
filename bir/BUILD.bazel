@@ -10,6 +10,7 @@ td_library(
         "include/belalang/BIR/IR/BIRDialect.td",
         "include/belalang/BIR/IR/BIROps.td",
         "include/belalang/BIR/IR/BIRTypes.td",
+        "include/belalang/BIR/IR/BIREnumAttrs.td",
 
         "include/belalang/BIR/Interfaces/LoopOpInterface.td",
     ],
@@ -79,6 +80,17 @@ gentbl_cc_library(
 )
 
 gentbl_cc_library(
+    name = "BelalangBIREnumAttrGen",
+    tbl_outs = [
+        (["-gen-enum-decls"], "include/belalang/BIR/IR/BIREnumAttrs.h.inc"),
+        (["-gen-enum-defs"], "include/belalang/BIR/IR/BIREnumAttrs.cpp.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang/BIR/IR/BIROps.td",
+    deps = [":BelalangBIRTdFiles"],
+)
+
+gentbl_cc_library(
     name = "BelalangBIRLoopOpInterfaceIncGen",
     tbl_outs = [
         (["-gen-op-interface-decls"], "include/belalang/BIR/Interfaces/LoopOpInterface.h.inc"),
@@ -117,6 +129,7 @@ cc_library(
         ":BelalangBIRDialectGen",
         ":BelalangBIRTypeGen",
         ":BelalangBIRAttrDefsGen",
+        ":BelalangBIREnumAttrGen",
         ":BelalangBIROpGen",
         ":BelalangPassIncGen",
         "//brt:brt-include",
