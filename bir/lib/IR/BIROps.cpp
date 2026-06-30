@@ -1,5 +1,6 @@
 #include "belalang/BIR/IR/BIR.h"
 
+#include "belalang/BIR/Interfaces/LoopOpInterface.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/OpImplementation.h"
@@ -256,6 +257,16 @@ void IfOp::print(mlir::OpAsmPrinter &p) {
   }
 
   p.printOptionalAttrDict(getOperation()->getAttrs());
+}
+
+// -----------------------------------------------------------------------------
+// ConditionOp
+// -----------------------------------------------------------------------------
+
+LogicalResult bir::ConditionOp::verify() {
+  if (!isa<LoopOpInterface>(getOperation()->getParentOp()))
+    return emitOpError("must be within a conditional region");
+  return success();
 }
 
 } // namespace bir

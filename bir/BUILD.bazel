@@ -10,6 +10,8 @@ td_library(
         "include/belalang/BIR/IR/BIRDialect.td",
         "include/belalang/BIR/IR/BIROps.td",
         "include/belalang/BIR/IR/BIRTypes.td",
+
+        "include/belalang/BIR/Interfaces/LoopOpInterface.td",
     ],
     includes = ["include"],
     deps = [
@@ -17,6 +19,7 @@ td_library(
         "@llvm-project//mlir:BuiltinDialectTdFiles",
         "@llvm-project//mlir:FunctionInterfacesTdFiles",
         "@llvm-project//mlir:SideEffectInterfacesTdFiles",
+        "@llvm-project//mlir:LoopLikeInterfaceTdFiles"
     ],
 )
 
@@ -76,6 +79,17 @@ gentbl_cc_library(
 )
 
 gentbl_cc_library(
+    name = "BelalangBIRLoopOpInterfaceIncGen",
+    tbl_outs = [
+        (["-gen-op-interface-decls"], "include/belalang/BIR/Interfaces/LoopOpInterface.h.inc"),
+        (["-gen-op-interface-defs"], "include/belalang/BIR/Interfaces/LoopOpInterface.cpp.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "include/belalang/BIR/Interfaces/LoopOpInterface.td",
+    deps = [":BelalangBIRTdFiles"],
+)
+
+gentbl_cc_library(
     name = "BelalangPassIncGen",
     tbl_outs = [
         (["-gen-pass-decls"], "include/belalang/BIR/Passes.h.inc"),
@@ -92,6 +106,7 @@ cc_library(
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
         "lib/Pipelines.cpp",
+        "lib/Interfaces/LoopOpInterface.cpp",
         "lib/Transforms/LowerPrintToRuntime.cpp",
         "lib/Transforms/FlattenCFG.cpp",
         "lib/Transforms/LowerFuncExpr.cpp",
@@ -120,12 +135,14 @@ cc_library(
     hdrs = [
         "include/belalang/BIR/IR/BIR.h",
         "include/belalang/BIR/Passes.h",
+        "include/belalang/BIR/Interfaces/LoopOpInterface.h",
     ],
     includes = ["include"],
     deps = [
         ":BelalangBIRDialectGen",
         ":BelalangBIRTypeGen",
         ":BelalangBIROpGen",
+        ":BelalangBIRLoopOpInterfaceIncGen",
         ":BelalangPassIncGen",
         "@llvm-project//mlir:IR",
     ],

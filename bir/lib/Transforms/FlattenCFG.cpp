@@ -1,4 +1,5 @@
 #include "belalang/BIR/IR/BIR.h"
+#include "belalang/BIR/Interfaces/LoopOpInterface.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -104,7 +105,72 @@ public:
   }
 };
 
-} // namespace
+class BIRLoopOpInterfaceFlattening
+    : public mlir::OpInterfaceRewritePattern<bir::LoopOpInterface> {
+public:
+  using OpInterfaceRewritePattern<
+      bir::LoopOpInterface>::OpInterfaceRewritePattern;
+
+  mlir::LogicalResult
+  matchAndRewrite(bir::LoopOpInterface op,
+                  mlir::PatternRewriter &rewriter) const override {
+    // CFG blocks.
+    mlir::Block *currentBlock = rewriter.getInsertionBlock();
+    mlir::Block *exit =
+        rewriter.splitBlock(currentBlock, rewriter.getInsertionPoint());
+    mlir::Block *entry = &op.getEntry().front();
+    mlir::Block *cond = &op.getCond().front();
+    mlir::Block *body = &op.getBody().front();
+    // step
+
+    // Loop entry branch.
+    rewriter.setInsertionPointToEnd(currentBlock);
+    cf::BranchOp::create(rewriter, op.getLoc(), entry);
+
+    // Lower condition.
+    auto conditionOp =
+        cast<bir::ConditionOp>(op.getCond().back().getTerminator());
+    {
+      OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPoint(conditionOp);
+      rewriter.replaceOpWithNewOp<bir::CondBrOp>(
+          conditionOp, conditionOp.getCond(), body, exit);
+    }
+
+    // Replace continues and breaks with branch op.
+    op.walk([&](mlir::Operation *op) {
+      if (isa<bir::BreakOp>(op)) {
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointAfter(op);
+        rewriter.replaceOpWithNewOp<cf::BranchOp>(op, exit);
+      }
+      if (isa<bir::ContinueOp>(op)) {
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointAfter(op);
+        rewriter.replaceOpWithNewOp<cf::BranchOp>(op, cond);
+      }
+    });
+
+    // End body with jump to condition.
+    {
+      OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPointToEnd(&op.getBody().back());
+      if (auto continueOp =
+              dyn_cast<bir::ContinueOp>(op.getBody().back().getTerminator()))
+        rewriter.replaceOpWithNewOp<cf::BranchOp>(continueOp, cond);
+    }
+
+    // Inline contents.
+    rewriter.inlineRegionBefore(op.getCond(), exit);
+    rewriter.inlineRegionBefore(op.getBody(), exit);
+
+    // Yay!
+    rewriter.eraseOp(op);
+    return success();
+  }
+};
+
+}; // namespace
 
 // -----------------------------------------------------------------------------
 // The Pass
@@ -112,7 +178,8 @@ public:
 
 void belalang::bir::populateBelalangFlattenCFGPatterns(
     mlir::RewritePatternSet &patterns) {
-  patterns.add<BIRScopeOpFlattening, BIRIfOpFlattening>(patterns.getContext());
+  patterns.add<BIRScopeOpFlattening, BIRIfOpFlattening,
+               BIRLoopOpInterfaceFlattening>(patterns.getContext());
 }
 
 struct BelalangFlattenCFGPass
@@ -126,7 +193,7 @@ struct BelalangFlattenCFGPass
 
     llvm::SmallVector<Operation *, 16> ops;
     getOperation()->walk<mlir::WalkOrder::PostOrder>([&](Operation *op) {
-      if (isa<ScopeOp, IfOp>(op))
+      if (isa<ScopeOp, IfOp, WhileOp>(op))
         ops.push_back(op);
     });
 
