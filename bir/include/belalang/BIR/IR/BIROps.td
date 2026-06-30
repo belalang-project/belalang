@@ -378,4 +378,26 @@ def BIR_CondBrOp : BIR_Op<"cond_br", [
   }];
 }
 
+def BIR_ConditionOp : BIR_Op<"condition", [
+  Terminator,
+]> {
+  let arguments = (ins BIR_BoolType:$cond);
+  let assemblyFormat = "$cond attr-dict";
+  let hasVerifier = 1;
+}
+
+def BIR_BreakOp : BIR_Op<"break", [
+  Terminator,
+  // TODO: breakable scopes
+]> {
+  let assemblyFormat = "attr-dict";
+}
+
+def BIR_ContinueOp : BIR_Op<"continue", [
+  Terminator,
+  // TODO: continueable scopes
+]> {
+  let assemblyFormat = "attr-dict";
+}
+
 #endif // BELALANG_IR_OPS_TD_

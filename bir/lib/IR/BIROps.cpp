@@ -258,5 +258,14 @@ void IfOp::print(mlir::OpAsmPrinter &p) {
   p.printOptionalAttrDict(getOperation()->getAttrs());
 }
 
+// -----------------------------------------------------------------------------
+// ConditionOp
+// -----------------------------------------------------------------------------
+
+LogicalResult bir::ConditionOp::verify() {
+  // TODO: check if the parent is a loop op
+  return success();
+}
+
 } // namespace bir
 } // namespace belalang
