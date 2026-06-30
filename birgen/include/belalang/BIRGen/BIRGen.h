@@ -99,24 +99,22 @@ public:
   BIRGen();
   ~BIRGen() = default;
 
-  std::unique_ptr<BIRValue> build_constant_int(int64_t val);
-  std::unique_ptr<BIRValue> build_constant_float(double val);
-  std::unique_ptr<BIRValue> build_constant_string(rust::Str val);
-  std::unique_ptr<BIRValue> build_constant_bool(bool val);
+  std::unique_ptr<BIRValue> constant_int(int64_t val);
+  std::unique_ptr<BIRValue> constant_float(double val);
+  std::unique_ptr<BIRValue> constant_string(rust::Str val);
+  std::unique_ptr<BIRValue> constant_bool(bool val);
 
-  std::unique_ptr<BIRValue> build_binop(BinOpKind kind, const BIRValue &lhs,
-                                        const BIRValue &rhs);
-  std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v,
-                                              rust::Str name);
-  std::unique_ptr<BIRValue> build_var_declare_ty(TypeKind v, rust::Str name);
-  std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
+  std::unique_ptr<BIRValue> binop(BinOpKind kind, const BIRValue &lhs,
+                                  const BIRValue &rhs);
+  std::unique_ptr<BIRValue> var_declare(const BIRValue &v, rust::Str name);
+  std::unique_ptr<BIRValue> var_declare_ty(TypeKind v, rust::Str name);
+  std::unique_ptr<BIRValue> var_load(const BIRValue &refValue);
   std::unique_ptr<BIRFunctionGuard>
-  build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
-  void build_var_store(const BIRValue &v, const BIRValue &ref);
-  void build_print(const BIRValue &val);
-  void build_return(const BIRValue &val);
-  void build_empty_return();
-  void build_main_return();
+  fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
+  void var_store(const BIRValue &v, const BIRValue &ref);
+  void print(const BIRValue &val);
+  void ret(const BIRValue &val);
+  void empty_return();
 
   void start_call(const BIRValue &callee);
   void add_call_arg(const BIRValue &arg);
@@ -138,6 +136,7 @@ private:
   std::vector<mlir::Value> current_args;
 
   mlir::Type mapType(TypeKind);
+  void ensure_main_terminated();
 };
 
 } // namespace birgen

@@ -44,24 +44,19 @@ mod ffi {
         fn create_birgen() -> UniquePtr<BIRGen>;
         fn create_llvmgen(birgen: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
-        fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
-        fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
-        fn build_constant_string(self: Pin<&mut BIRGen>, val: &str) -> UniquePtr<BIRValue>;
-        fn build_constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
-        fn build_binop(self: Pin<&mut BIRGen>, kind: BinOpKind, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
-        fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
-        fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
-        fn build_fn_expr(
-            self: Pin<&mut BIRGen>,
-            resultTy: TypeKind,
-            paramTys: &[TypeKind],
-        ) -> UniquePtr<BIRFunctionGuard>;
-        fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_empty_return(self: Pin<&mut BIRGen>);
-        fn build_main_return(self: Pin<&mut BIRGen>);
+        fn constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
+        fn constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
+        fn constant_string(self: Pin<&mut BIRGen>, val: &str) -> UniquePtr<BIRValue>;
+        fn constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
+        fn binop(self: Pin<&mut BIRGen>, kind: BinOpKind, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
+        fn print(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
+        fn var_declare_ty(self: Pin<&mut BIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
+        fn var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
+        fn var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
+        fn fn_expr(self: Pin<&mut BIRGen>, resultTy: TypeKind, paramTys: &[TypeKind]) -> UniquePtr<BIRFunctionGuard>;
+        fn ret(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn empty_return(self: Pin<&mut BIRGen>);
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
@@ -98,7 +93,6 @@ impl<'sess> BIRGen<'sess> {
         for stmt in program.statements {
             self.generate_statement(stmt);
         }
-        self.inner.pin_mut().build_main_return();
     }
 
     pub fn generate_statement<'ast>(&mut self, stmt: &Statement<'ast>) {
@@ -109,9 +103,9 @@ impl<'sess> BIRGen<'sess> {
             Statement::Return(s) => {
                 if let Some(ref return_value) = s.return_value {
                     let expr = self.generate_expression(&return_value);
-                    self.inner.pin_mut().build_return(&expr);
+                    self.inner.pin_mut().ret(&expr);
                 } else {
-                    self.inner.pin_mut().build_empty_return();
+                    self.inner.pin_mut().empty_return();
                 }
             },
             Statement::While(_while_stmt) => {
@@ -129,24 +123,24 @@ impl<'sess> BIRGen<'sess> {
                     };
 
                     let name = self.session.lookup_string(var.name.value);
-                    let declare = self.inner.pin_mut().build_var_declare_ty(id, name);
+                    let declare = self.inner.pin_mut().var_declare_ty(id, name);
                     self.symbol_table.insert(var.name.value, declare);
                     return;
                 };
 
                 match **value {
                     Expression::Integer(ref i) => {
-                        let v = self.inner.pin_mut().build_constant_int(i.value);
+                        let v = self.inner.pin_mut().constant_int(i.value);
                         let name = self.session.lookup_string(var.name.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
-                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        let declare = self.inner.pin_mut().var_declare(&v, name);
+                        self.inner.pin_mut().var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
                     Expression::Float(ref f) => {
-                        let v = self.inner.pin_mut().build_constant_float(f.value);
+                        let v = self.inner.pin_mut().constant_float(f.value);
                         let name = self.session.lookup_string(var.name.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
-                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        let declare = self.inner.pin_mut().var_declare(&v, name);
+                        self.inner.pin_mut().var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
                     Expression::Identifier(_)
@@ -156,8 +150,8 @@ impl<'sess> BIRGen<'sess> {
                     | Expression::Call(_) => {
                         let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
-                        let declare = self.inner.pin_mut().build_var_declare(&v, name);
-                        self.inner.pin_mut().build_var_store(&v, &declare);
+                        let declare = self.inner.pin_mut().var_declare(&v, name);
+                        self.inner.pin_mut().var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
                     _ => todo!("Generation for expression {:?} not implemented", **value),
@@ -171,9 +165,9 @@ impl<'sess> BIRGen<'sess> {
 
     pub fn generate_expression<'ast>(&mut self, expr: &Expression<'ast>) -> cxx::UniquePtr<ffi::BIRValue> {
         match expr {
-            Expression::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
-            Expression::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
-            Expression::Boolean(lit) => self.inner.pin_mut().build_constant_bool(lit.value),
+            Expression::Integer(lit) => self.inner.pin_mut().constant_int(lit.value),
+            Expression::Float(lit) => self.inner.pin_mut().constant_float(lit.value),
+            Expression::Boolean(lit) => self.inner.pin_mut().constant_bool(lit.value),
             Expression::Infix(infix) => self.generate_infix(infix),
             Expression::Call(call) => {
                 // HACK: this checks for the print function hardcoded-ly
@@ -182,7 +176,7 @@ impl<'sess> BIRGen<'sess> {
                 {
                     // TODO: handle more than one arguments
                     let arg = self.generate_expression(&call.args[0]);
-                    self.inner.pin_mut().build_print(&arg);
+                    self.inner.pin_mut().print(&arg);
 
                     // TODO: maybe not return nullptr here
                     return cxx::UniquePtr::null();
@@ -201,14 +195,14 @@ impl<'sess> BIRGen<'sess> {
             },
             Expression::Identifier(ident) => {
                 if let Some(ssa) = self.symbol_table.get(&ident.value) {
-                    self.inner.pin_mut().build_var_load(ssa)
+                    self.inner.pin_mut().var_load(ssa)
                 } else {
                     cxx::UniquePtr::null() // FIXME: don't return nullptr
                 }
             },
             Expression::String(s) => {
                 let v = self.session.lookup_string(s.value);
-                self.inner.pin_mut().build_constant_string(v)
+                self.inner.pin_mut().constant_string(v)
             },
             Expression::Function(func) => {
                 let result = match func.explicit_ty.unwrap() {
@@ -229,14 +223,14 @@ impl<'sess> BIRGen<'sess> {
                     param_tys.push(ty);
                 }
 
-                let guard = self.inner.pin_mut().build_fn_expr(result, &param_tys);
+                let guard = self.inner.pin_mut().fn_expr(result, &param_tys);
 
                 let mut saved_symbols = Vec::new();
                 for (i, param) in func.params.iter().enumerate() {
                     let arg_val = guard.get_arg(i);
                     let name = self.session.lookup_string(param.name.value);
-                    let declare = self.inner.pin_mut().build_var_declare(&arg_val, name);
-                    self.inner.pin_mut().build_var_store(&arg_val, &declare);
+                    let declare = self.inner.pin_mut().var_declare(&arg_val, name);
+                    self.inner.pin_mut().var_store(&arg_val, &declare);
                     let prev = self.symbol_table.insert(param.name.value, declare);
                     saved_symbols.push((param.name.value, prev));
                 }
@@ -271,7 +265,7 @@ impl<'sess> BIRGen<'sess> {
             InfixKind::Mod => ffi::BinOpKind::Mod,
             _ => todo!("Infix operator {:?} not implemented", infix.operator),
         };
-        self.inner.pin_mut().build_binop(kind, &lhs, &rhs)
+        self.inner.pin_mut().binop(kind, &lhs, &rhs)
     }
 
     pub fn dump(&self) {
