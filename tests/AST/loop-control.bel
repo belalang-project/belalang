@@ -1,0 +1,13 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+
+while true {
+  break
+  continue
+}
+
+# CHECK:      Program
+# CHECK-NEXT:   WhileStatement
+# CHECK-NEXT:     Boolean(true)
+# CHECK-NEXT:     BlockExpression
+# CHECK-NEXT:       BreakStatement
+# CHECK-NEXT:       ContinueStatement

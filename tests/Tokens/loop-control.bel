@@ -1,0 +1,12 @@
+while true {
+  break
+  continue
+}
+
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+# CHECK: While <0..5>
+# CHECK: KwTrue <6..10>
+# CHECK: LeftBrace <11..12>
+# CHECK: KwBreak <15..20>
+# CHECK: KwContinue <23..31>
+# CHECK: RightBrace <32..33>
