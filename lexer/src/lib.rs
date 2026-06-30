@@ -102,6 +102,10 @@ pub enum TokenKind {
     Function,
     /// While loop keyword `while`
     While,
+    /// Break loop keyword `break`
+    KwBreak,
+    /// Continue loop keyword `continue`
+    KwContinue,
     /// If conditional keyword `if`
     If,
     /// Else conditional keyword `else`

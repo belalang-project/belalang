@@ -552,6 +552,8 @@ impl<'sess> Lexer<'sess> {
                 let kind = match sym {
                     syms::FN => TokenKind::Function,
                     syms::WHILE => TokenKind::While,
+                    syms::BREAK => TokenKind::KwBreak,
+                    syms::CONTINUE => TokenKind::KwContinue,
                     syms::TRUE => TokenKind::KwTrue,
                     syms::FALSE => TokenKind::KwFalse,
                     syms::IF => TokenKind::If,

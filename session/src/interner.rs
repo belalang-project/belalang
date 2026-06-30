@@ -36,9 +36,11 @@ pub mod syms {
     pub const ELSE: Symbol = Symbol(8);
     pub const RETURN: Symbol = Symbol(9);
     pub const STRUCT: Symbol = Symbol(10);
+    pub const BREAK: Symbol = Symbol(11);
+    pub const CONTINUE: Symbol = Symbol(12);
 
     // Built-ins
-    pub const PRINT: Symbol = Symbol(11);
+    pub const PRINT: Symbol = Symbol(13);
 }
 
 impl Interner {
@@ -59,6 +61,8 @@ impl Interner {
         s.intern("else");
         s.intern("return");
         s.intern("struct");
+        s.intern("break");
+        s.intern("continue");
 
         // Built-ins
         s.intern("print");
