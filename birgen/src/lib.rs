@@ -48,6 +48,7 @@ mod ffi {
         type BIRGuard;
         type BIRFunctionGuard;
         type BIRIfGuard;
+        type BIRWhileGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -74,6 +75,12 @@ mod ffi {
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
+        fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
+        fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
+        fn build_continue(self: Pin<&mut BIRGen>);
+        fn build_break(self: Pin<&mut BIRGen>);
+        fn start_cond(self: Pin<&mut BIRWhileGuard>);
+        fn start_body(self: Pin<&mut BIRWhileGuard>);
         fn build_yield(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_yield(self: Pin<&mut BIRGen>);
         fn start_then(self: Pin<&mut BIRIfGuard>);
@@ -131,8 +138,18 @@ impl<'sess> BIRGen<'sess> {
                     self.inner.pin_mut().build_empty_return();
                 }
             },
-            Statement::While(_while_stmt) => {
-                // TODO: Implement while
+            Statement::While(while_stmt) => {
+                let mut guard = self.inner.pin_mut().build_while_stmt();
+
+                guard.pin_mut().start_cond();
+                let cond_val = self.generate_expression(&while_stmt.condition);
+                self.inner.pin_mut().build_condition(&cond_val);
+
+                guard.pin_mut().start_body();
+                for stmt in while_stmt.block.statements {
+                    self.generate_statement(stmt);
+                }
+                self.inner.pin_mut().build_continue();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -183,11 +200,11 @@ impl<'sess> BIRGen<'sess> {
             Statement::StructDecl(s) => {
                 // TODO: Implement struct declaration
             },
-            Statement::Break(s) => {
-                // TODO: Implement break
+            Statement::Break(_s) => {
+                self.inner.pin_mut().build_break();
             },
-            Statement::Continue(s) => {
-                // TODO: Implement continue
+            Statement::Continue(_s) => {
+                self.inner.pin_mut().build_continue();
             },
         }
     }

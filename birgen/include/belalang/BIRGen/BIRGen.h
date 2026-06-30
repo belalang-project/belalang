@@ -20,6 +20,7 @@ class BIRValue;
 class BIRGuard;
 class BIRFunctionGuard;
 class BIRIfGuard;
+class BIRWhileGuard;
 class BIRGen;
 } // namespace birgen
 } // namespace belalang
@@ -104,6 +105,20 @@ private:
   mlir::Operation *ifOp;
 };
 
+class BIRWhileGuard : public BIRGuard {
+public:
+  BIRWhileGuard(mlir::OpBuilder &builder, mlir::Operation *whileOp)
+      : BIRGuard(builder), builder(builder), whileOp(whileOp) {}
+  ~BIRWhileGuard() = default;
+
+  void start_cond();
+  void start_body();
+
+private:
+  mlir::OpBuilder &builder;
+  mlir::Operation *whileOp;
+};
+
 // -----------------------------------------------------------------------------
 // BIRGen
 // -----------------------------------------------------------------------------
@@ -129,6 +144,10 @@ public:
   std::unique_ptr<BIRFunctionGuard>
   build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
   std::unique_ptr<BIRIfGuard> build_if_expr(const BIRValue &cond);
+  std::unique_ptr<BIRWhileGuard> build_while_stmt();
+  void build_condition(const BIRValue &cond);
+  void build_continue();
+  void build_break();
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
