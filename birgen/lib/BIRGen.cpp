@@ -223,6 +223,37 @@ std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
   return std::make_unique<BIRIfGuard>(builder, op.getOperation());
 }
 
+void BIRWhileGuard::start_cond() {
+  auto op = mlir::cast<bir::WhileOp>(whileOp);
+  auto &region = op.getCond();
+  region.push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&region.front());
+}
+
+void BIRWhileGuard::start_body() {
+  auto op = mlir::cast<bir::WhileOp>(whileOp);
+  auto &region = op.getBody();
+  region.push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&region.front());
+}
+
+std::unique_ptr<BIRWhileGuard> BIRGen::build_while_stmt() {
+  auto op = bir::WhileOp::create(builder, loc);
+  return std::make_unique<BIRWhileGuard>(builder, op.getOperation());
+}
+
+void BIRGen::build_condition(const BIRValue &cond) {
+  bir::ConditionOp::create(builder, loc, cond.getValue());
+}
+
+void BIRGen::build_continue() {
+  bir::ContinueOp::create(builder, loc);
+}
+
+void BIRGen::build_break() {
+  bir::BreakOp::create(builder, loc);
+}
+
 void BIRGen::build_yield(const BIRValue &val) {
   bir::YieldOp::create(builder, loc, val.getValue());
 }

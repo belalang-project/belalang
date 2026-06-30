@@ -6,7 +6,10 @@ use ast::{
     Program,
     Statement,
 };
-use lexer::InfixKind;
+use lexer::{
+    AssignmentKind,
+    InfixKind,
+};
 use session::{
     Session,
     interner::{
@@ -45,6 +48,7 @@ mod ffi {
         type BIRGuard;
         type BIRFunctionGuard;
         type BIRIfGuard;
+        type BIRWhileGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -71,6 +75,12 @@ mod ffi {
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
+        fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
+        fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
+        fn build_continue(self: Pin<&mut BIRGen>);
+        fn build_break(self: Pin<&mut BIRGen>);
+        fn start_cond(self: Pin<&mut BIRWhileGuard>);
+        fn start_body(self: Pin<&mut BIRWhileGuard>);
         fn build_yield(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_yield(self: Pin<&mut BIRGen>);
         fn start_then(self: Pin<&mut BIRIfGuard>);
@@ -128,8 +138,18 @@ impl<'sess> BIRGen<'sess> {
                     self.inner.pin_mut().build_empty_return();
                 }
             },
-            Statement::While(_while_stmt) => {
-                // TODO: Implement while
+            Statement::While(while_stmt) => {
+                let mut guard = self.inner.pin_mut().build_while_stmt();
+
+                guard.pin_mut().start_cond();
+                let cond_val = self.generate_expression(&while_stmt.condition);
+                self.inner.pin_mut().build_condition(&cond_val);
+
+                guard.pin_mut().start_body();
+                for stmt in while_stmt.block.statements {
+                    self.generate_statement(stmt);
+                }
+                self.inner.pin_mut().build_continue();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -180,11 +200,11 @@ impl<'sess> BIRGen<'sess> {
             Statement::StructDecl(s) => {
                 // TODO: Implement struct declaration
             },
-            Statement::Break(s) => {
-                // TODO: Implement break
+            Statement::Break(_s) => {
+                self.inner.pin_mut().build_break();
             },
-            Statement::Continue(s) => {
-                // TODO: Implement continue
+            Statement::Continue(_s) => {
+                self.inner.pin_mut().build_continue();
             },
         }
     }
@@ -216,8 +236,35 @@ impl<'sess> BIRGen<'sess> {
                 }
                 self.inner.pin_mut().finish_call()
             },
-            Expression::Var(var) => match var.kind {
-                _ => todo!("Generation for expression {:?} not implemented", expr),
+            Expression::Var(var) => {
+                let name_sym = var.name.value;
+                let val = self.generate_expression(var.value);
+                let ssa = self.symbol_table.get(&name_sym).expect("Variable not declared");
+                match var.kind {
+                    AssignmentKind::Assign => {
+                        self.inner.pin_mut().build_var_store(&val, ssa);
+                        val
+                    },
+                    AssignmentKind::AddAssign
+                    | AssignmentKind::SubAssign
+                    | AssignmentKind::MulAssign
+                    | AssignmentKind::DivAssign
+                    | AssignmentKind::ModAssign => {
+                        let op = match var.kind {
+                            AssignmentKind::AddAssign => ffi::BinOpKind::Add,
+                            AssignmentKind::SubAssign => ffi::BinOpKind::Sub,
+                            AssignmentKind::MulAssign => ffi::BinOpKind::Mul,
+                            AssignmentKind::DivAssign => ffi::BinOpKind::Div,
+                            AssignmentKind::ModAssign => ffi::BinOpKind::Mod,
+                            _ => unreachable!(),
+                        };
+                        let current_val = self.inner.pin_mut().build_var_load(ssa);
+                        let new_val = self.inner.pin_mut().build_binop(op, &current_val, &val);
+                        self.inner.pin_mut().build_var_store(&new_val, ssa);
+                        new_val
+                    },
+                    _ => todo!("Assignment kind {:?} not supported", var.kind),
+                }
             },
             Expression::Identifier(ident) => {
                 if let Some(ssa) = self.symbol_table.get(&ident.value) {
