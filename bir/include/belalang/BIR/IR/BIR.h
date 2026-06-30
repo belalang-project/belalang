@@ -11,6 +11,8 @@
 
 #include "llvm/ADT/TypeSwitch.h"
 
+#include "belalang/BIR/Interfaces/LoopOpInterface.h"
+
 using namespace mlir;
 using namespace llvm;
 
