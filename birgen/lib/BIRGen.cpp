@@ -230,15 +230,15 @@ bool BIRGen::optimize() {
   return mlir::succeeded(pm.run(module));
 }
 
-std::unique_ptr<LLVMGen> BIRGen::llvmgen() {
-  return std::make_unique<LLVMGen>(&module);
-}
-
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
 
 // -----------------------------------------------------------------------------
 // LLVMGen
 // -----------------------------------------------------------------------------
+
+std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen) {
+  return std::make_unique<LLVMGen>(&gen.module);
+}
 
 LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   mlir::PassManager pm(op->getContext());

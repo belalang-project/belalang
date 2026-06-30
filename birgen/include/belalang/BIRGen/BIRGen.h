@@ -32,6 +32,8 @@ namespace birgen {
 // LLVMGen
 // -----------------------------------------------------------------------------
 
+std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
+
 class LLVMGen {
 public:
   LLVMGen(mlir::ModuleOp *module);
@@ -125,7 +127,7 @@ public:
 
   bool optimize();
 
-  std::unique_ptr<LLVMGen> llvmgen();
+  friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
 
 private:
   mlir::MLIRContext context;

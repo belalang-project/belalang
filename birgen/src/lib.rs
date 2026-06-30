@@ -42,6 +42,7 @@ mod ffi {
         type LLVMGen;
 
         fn create_birgen() -> UniquePtr<BIRGen>;
+        fn create_llvmgen(birgen: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
         fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
         fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
@@ -64,7 +65,6 @@ mod ffi {
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
-        fn llvmgen(self: Pin<&mut BIRGen>) -> UniquePtr<LLVMGen>;
 
         fn dump_to_string(self: &LLVMGen) -> String;
         fn compile_object_file(self: &LLVMGen, out: String) -> String;
@@ -289,7 +289,7 @@ impl<'sess> BIRGen<'sess> {
     pub fn llvmgen(&mut self) -> LLVMGen<'sess> {
         LLVMGen {
             session: self.session,
-            inner: self.inner.pin_mut().llvmgen(),
+            inner: ffi::create_llvmgen(self.inner.pin_mut()),
         }
     }
 }
