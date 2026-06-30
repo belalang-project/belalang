@@ -174,6 +174,40 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   return guard;
 }
 
+void BIRIfGuard::start_then() {
+  auto op = mlir::cast<bir::IfOp>(ifOp);
+  auto &region = op.getThenRegion();
+  region.push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&region.front());
+}
+
+void BIRIfGuard::start_else() {
+  auto op = mlir::cast<bir::IfOp>(ifOp);
+  auto &region = op.getElseRegion();
+  region.push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&region.front());
+}
+
+std::unique_ptr<BIRValue> BIRIfGuard::get_value() const {
+  auto op = mlir::cast<bir::IfOp>(ifOp);
+  if (op.getNumResults() > 0)
+    return std::make_unique<BIRValue>(op.getResult());
+  return nullptr;
+}
+
+std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
+  auto op = bir::IfOp::create(builder, loc, mlir::TypeRange{}, cond.getValue());
+  return std::make_unique<BIRIfGuard>(builder, op.getOperation());
+}
+
+void BIRGen::build_yield(const BIRValue &val) {
+  bir::YieldOp::create(builder, loc, val.getValue());
+}
+
+void BIRGen::build_empty_yield() {
+  bir::YieldOp::create(builder, loc);
+}
+
 void BIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
 }
