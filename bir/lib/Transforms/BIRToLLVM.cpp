@@ -405,6 +405,82 @@ struct CondBrLowering final : public OpConversionPattern<bir::CondBrOp> {
   }
 };
 
+struct CmpOpLowering final : public OpConversionPattern<bir::CmpOp> {
+  using OpConversionPattern<bir::CmpOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::CmpOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    mlir::Type ty = op.getLhs().getType();
+    mlir::Type llvmTy = getTypeConverter()->convertType(ty);
+    if (!llvmTy)
+      return failure();
+
+    mlir::Type resultTy =
+        getTypeConverter()->convertType(op.getResult().getType());
+
+    if (mlir::isa<bir::IntType>(ty)) {
+      LLVM::ICmpPredicate pred;
+      switch (op.getKind()) {
+      case bir::CmpOpKind::eq:
+        pred = LLVM::ICmpPredicate::eq;
+        break;
+      case bir::CmpOpKind::ne:
+        pred = LLVM::ICmpPredicate::ne;
+        break;
+      case bir::CmpOpKind::lt:
+        pred = LLVM::ICmpPredicate::slt;
+        break;
+      case bir::CmpOpKind::le:
+        pred = LLVM::ICmpPredicate::sle;
+        break;
+      case bir::CmpOpKind::gt:
+        pred = LLVM::ICmpPredicate::sgt;
+        break;
+      case bir::CmpOpKind::ge:
+        pred = LLVM::ICmpPredicate::sge;
+        break;
+      default:
+        return failure();
+      }
+      rewriter.replaceOpWithNewOp<LLVM::ICmpOp>(
+          op, resultTy, pred, adaptor.getLhs(), adaptor.getRhs());
+      return success();
+    }
+
+    if (mlir::isa<bir::FloatType>(ty)) {
+      LLVM::FCmpPredicate pred;
+      switch (op.getKind()) {
+      case bir::CmpOpKind::eq:
+        pred = LLVM::FCmpPredicate::oeq;
+        break;
+      case bir::CmpOpKind::ne:
+        pred = LLVM::FCmpPredicate::one;
+        break;
+      case bir::CmpOpKind::lt:
+        pred = LLVM::FCmpPredicate::olt;
+        break;
+      case bir::CmpOpKind::le:
+        pred = LLVM::FCmpPredicate::ole;
+        break;
+      case bir::CmpOpKind::gt:
+        pred = LLVM::FCmpPredicate::ogt;
+        break;
+      case bir::CmpOpKind::ge:
+        pred = LLVM::FCmpPredicate::oge;
+        break;
+      default:
+        return failure();
+      }
+      rewriter.replaceOpWithNewOp<LLVM::FCmpOp>(
+          op, resultTy, pred, adaptor.getLhs(), adaptor.getRhs());
+      return success();
+    }
+
+    return op.emitOpError("unsupported type");
+  }
+};
+
 struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
   BIRToLLVMTypeConverter(mlir::MLIRContext *ctx)
       : mlir::LLVMTypeConverter(ctx) {
@@ -440,7 +516,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                VarDeclareOpLowering, VarStoreOpLowering, VarLoadOpLowering,
-               CondBrLowering>(typeConverter, patterns.getContext());
+               CondBrLowering, CmpOpLowering>(typeConverter,
+                                              patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
