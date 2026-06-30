@@ -1,0 +1,19 @@
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
+
+# CHECK: bir.cmp lt
+print(1 <  1);
+
+# CHECK: bir.cmp le
+print(1 <= 1);
+
+# CHECK: bir.cmp gt
+print(1 >  1);
+
+# CHECK: bir.cmp ge
+print(1 >= 1);
+
+# CHECK: bir.cmp eq
+print(1 == 1);
+
+# CHECK: bir.cmp ne
+print(1 != 1);

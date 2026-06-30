@@ -443,6 +443,15 @@ def BIR_CmpOp : BIR_Op<"cmp", [
   let assemblyFormat = [{
     $kind $lhs `,` $rhs `:` type($lhs) attr-dict
   }];
+
+  let builders = [
+    OpBuilder<(ins "bir::CmpOpKind":$kind, "::mlir::Value":$lhs, "::mlir::Value":$rhs), [{
+      $_state.addTypes(bir::BoolType::get($_builder.getContext()));
+      $_state.addAttribute("kind", bir::CmpOpKindAttr::get($_builder.getContext(), kind));
+      $_state.addOperands(lhs);
+      $_state.addOperands(rhs);
+    }]>
+  ];
 }
 
 #endif // BELALANG_IR_OPS_TD_
