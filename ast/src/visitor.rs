@@ -2,7 +2,9 @@ use super::{
     ArrayLiteral,
     BlockExpression,
     BooleanExpression,
+    BreakStatement,
     CallExpression,
+    ContinueStatement,
     Expression,
     ExpressionStatement,
     FloatLiteral,
@@ -97,6 +99,10 @@ pub trait Visitor<'ast> {
         self.walk_while_statement(node);
     }
 
+    fn visit_break_statement(&mut self, node: &BreakStatement) {}
+
+    fn visit_continue_statement(&mut self, node: &ContinueStatement) {}
+
     fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
         self.walk_var_decl_statement(node);
     }
@@ -118,6 +124,8 @@ pub trait Visitor<'ast> {
             Statement::While(v) => self.visit_while_statement(v),
             Statement::VarDecl(v) => self.visit_var_decl_statement(v),
             Statement::StructDecl(v) => self.visit_struct_decl_statement(v),
+            Statement::Break(v) => self.visit_break_statement(v),
+            Statement::Continue(v) => self.visit_continue_statement(v),
         }
     }
 

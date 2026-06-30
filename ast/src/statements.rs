@@ -23,6 +23,12 @@ pub struct WhileStatement<'ast> {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub struct BreakStatement;
+
+#[derive(Debug, Clone, Copy)]
+pub struct ContinueStatement;
+
+#[derive(Debug, Clone, Copy)]
 pub struct VarDeclStatement<'ast> {
     pub name: Identifier,
     pub value: Option<&'ast Expression<'ast>>,
@@ -42,4 +48,6 @@ pub enum Statement<'ast> {
     While(WhileStatement<'ast>),
     VarDecl(VarDeclStatement<'ast>),
     StructDecl(StructDeclStatement<'ast>),
+    Break(BreakStatement),
+    Continue(ContinueStatement),
 }

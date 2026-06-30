@@ -23,7 +23,9 @@ use crate::{
     Ast,
     BlockExpression,
     BooleanExpression,
+    BreakStatement,
     CallExpression,
+    ContinueStatement,
     ExpressionStatement,
     FloatLiteral,
     FunctionLiteral,
@@ -195,6 +197,12 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 Ok(Statement::While(WhileStatement { condition, block }))
             },
+
+            // match `break`
+            TokenKind::KwBreak => Ok(Statement::Break(BreakStatement)),
+
+            // match `continue`
+            TokenKind::KwContinue => Ok(Statement::Continue(ContinueStatement)),
 
             // parse_if: parse if expression as statement
             TokenKind::If => {

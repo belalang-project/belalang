@@ -65,6 +65,14 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
         self.indent -= 2;
     }
 
+    fn visit_break_statement(&mut self, node: &crate::BreakStatement) {
+        println!("{:indent$}BreakStatement", "", indent = self.indent);
+    }
+
+    fn visit_continue_statement(&mut self, node: &crate::ContinueStatement) {
+        println!("{:indent$}ContinueStatement", "", indent = self.indent);
+    }
+
     fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
         let ty = node.explicit_ty.map(|ty| self.session.lookup_string(ty));
         println!("{:indent$}VarDeclStatement({:?})", "", ty, indent = self.indent);

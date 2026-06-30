@@ -150,6 +150,12 @@ impl<'sess> BIRGen<'sess> {
             Statement::StructDecl(s) => {
                 // TODO: Implement struct declaration
             },
+            Statement::Break(s) => {
+                // TODO: Implement break
+            },
+            Statement::Continue(s) => {
+                // TODO: Implement continue
+            },
         }
     }
 
