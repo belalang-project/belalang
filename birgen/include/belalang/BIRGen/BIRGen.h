@@ -18,6 +18,7 @@ namespace birgen {
 class LLVMGen;
 class BIRValue;
 class BIRGuard;
+class BIRFunctionGuard;
 class BIRGen;
 }
 }
@@ -51,9 +52,18 @@ private:
 
 class BIRGuard {
 public:
-  BIRGuard(mlir::OpBuilder &builder, mlir::Value fnValue)
-      : builder(builder), guard(builder), fnValue(fnValue) {}
-  ~BIRGuard() = default;
+  BIRGuard(mlir::OpBuilder &builder) : guard(builder) {}
+  virtual ~BIRGuard() = default;
+
+protected:
+  mlir::OpBuilder::InsertionGuard guard;
+};
+
+class BIRFunctionGuard : public BIRGuard {
+public:
+  BIRFunctionGuard(mlir::OpBuilder &builder, mlir::Value fnValue)
+      : BIRGuard(builder), fnValue(fnValue) {}
+  ~BIRFunctionGuard() = default;
 
   std::unique_ptr<BIRValue> get_value() const {
     return std::make_unique<BIRValue>(fnValue);
@@ -61,8 +71,6 @@ public:
   std::unique_ptr<BIRValue> get_arg(size_t index) const;
 
 private:
-  mlir::OpBuilder &builder;
-  mlir::OpBuilder::InsertionGuard guard;
   mlir::Value fnValue;
 };
 
@@ -80,7 +88,7 @@ public:
   std::unique_ptr<BIRValue> build_var_declare(const BIRValue &v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_declare_ty(TypeKind v, rust::Str name);
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
-  std::unique_ptr<BIRGuard> build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
+  std::unique_ptr<BIRFunctionGuard> build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);

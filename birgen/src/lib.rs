@@ -36,7 +36,7 @@ mod ffi {
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
-        type BIRGuard;
+        type BIRFunctionGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -53,7 +53,11 @@ mod ffi {
         fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
         fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
         fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
-        fn build_fn_expr(self: Pin<&mut BIRGen>, resultTy: TypeKind, paramTys: &[TypeKind]) -> UniquePtr<BIRGuard>;
+        fn build_fn_expr(
+            self: Pin<&mut BIRGen>,
+            resultTy: TypeKind,
+            paramTys: &[TypeKind],
+        ) -> UniquePtr<BIRFunctionGuard>;
         fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
@@ -69,8 +73,8 @@ mod ffi {
         fn add_call_arg(self: Pin<&mut BIRGen>, arg: &BIRValue);
         fn finish_call(self: Pin<&mut BIRGen>) -> UniquePtr<BIRValue>;
 
-        fn get_value(self: &BIRGuard) -> UniquePtr<BIRValue>;
-        fn get_arg(self: &BIRGuard, index: usize) -> UniquePtr<BIRValue>;
+        fn get_value(self: &BIRFunctionGuard) -> UniquePtr<BIRValue>;
+        fn get_arg(self: &BIRFunctionGuard, index: usize) -> UniquePtr<BIRValue>;
     }
 }
 

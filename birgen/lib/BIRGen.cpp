@@ -150,7 +150,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGuard::get_arg(size_t index) const {
+std::unique_ptr<BIRValue> BIRFunctionGuard::get_arg(size_t index) const {
   auto op = fnValue.getDefiningOp();
   auto &region = op->getRegion(0);
   auto &block = region.front();
@@ -158,7 +158,7 @@ std::unique_ptr<BIRValue> BIRGuard::get_arg(size_t index) const {
   return std::make_unique<BIRValue>(arg);
 }
 
-std::unique_ptr<BIRGuard>
+std::unique_ptr<BIRFunctionGuard>
 BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   std::vector<mlir::Type> inputs;
   for (auto ty : paramTys) {
@@ -167,7 +167,7 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   auto fnTy = mlir::FunctionType::get(&context, inputs, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
 
-  auto guard = std::make_unique<BIRGuard>(builder, op.getResult());
+  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult());
 
   std::vector<mlir::Location> locs(inputs.size(), loc);
   builder.createBlock(&op.getBody(), {}, inputs, locs);
