@@ -6,7 +6,10 @@ use ast::{
     Program,
     Statement,
 };
-use lexer::InfixKind;
+use lexer::{
+    AssignmentKind,
+    InfixKind,
+};
 use session::{
     Session,
     interner::{
@@ -216,8 +219,35 @@ impl<'sess> BIRGen<'sess> {
                 }
                 self.inner.pin_mut().finish_call()
             },
-            Expression::Var(var) => match var.kind {
-                _ => todo!("Generation for expression {:?} not implemented", expr),
+            Expression::Var(var) => {
+                let name_sym = var.name.value;
+                let val = self.generate_expression(var.value);
+                let ssa = self.symbol_table.get(&name_sym).expect("Variable not declared");
+                match var.kind {
+                    AssignmentKind::Assign => {
+                        self.inner.pin_mut().build_var_store(&val, ssa);
+                        val
+                    },
+                    AssignmentKind::AddAssign
+                    | AssignmentKind::SubAssign
+                    | AssignmentKind::MulAssign
+                    | AssignmentKind::DivAssign
+                    | AssignmentKind::ModAssign => {
+                        let op = match var.kind {
+                            AssignmentKind::AddAssign => ffi::BinOpKind::Add,
+                            AssignmentKind::SubAssign => ffi::BinOpKind::Sub,
+                            AssignmentKind::MulAssign => ffi::BinOpKind::Mul,
+                            AssignmentKind::DivAssign => ffi::BinOpKind::Div,
+                            AssignmentKind::ModAssign => ffi::BinOpKind::Mod,
+                            _ => unreachable!(),
+                        };
+                        let current_val = self.inner.pin_mut().build_var_load(ssa);
+                        let new_val = self.inner.pin_mut().build_binop(op, &current_val, &val);
+                        self.inner.pin_mut().build_var_store(&new_val, ssa);
+                        new_val
+                    },
+                    _ => todo!("Assignment kind {:?} not supported", var.kind),
+                }
             },
             Expression::Identifier(ident) => {
                 if let Some(ssa) = self.symbol_table.get(&ident.value) {

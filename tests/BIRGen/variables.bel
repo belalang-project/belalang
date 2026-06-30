@@ -26,7 +26,17 @@ z := x + 1;
 # CHECK-NEXT: bir.call @brt_print_int(%[[C8]]) : (!bir.int) -> ()
 print(z);
 
-# CHECK-NEXT: %[[C9:.*]] = bir.constant #bir.int<0> : !bir.int
-# CHECK-NEXT: bir.return %[[C9]] : !bir.int
+# CHECK-NEXT: %[[C10:.*]] = bir.constant #bir.int<10> : !bir.int
+# CHECK-NEXT: bir.var.store %[[C10]] to %[[C1]] : !bir.int to <!bir.int>
+x = 10;
+
+# CHECK-NEXT: %[[C11:.*]] = bir.constant #bir.int<5> : !bir.int
+# CHECK-NEXT: %[[C12:.*]] = bir.var.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
+# CHECK-NEXT: %[[C13:.*]] = bir.add %[[C12]], %[[C11]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: bir.var.store %[[C13]] to %[[C1]] : !bir.int to <!bir.int>
+x += 5;
+
+# CHECK-NEXT: %[[C14:.*]] = bir.constant #bir.int<0> : !bir.int
+# CHECK-NEXT: bir.return %[[C14]] : !bir.int
 # CHECK-NEXT: }
 # CHECK-NEXT: }
