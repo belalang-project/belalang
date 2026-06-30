@@ -19,6 +19,7 @@ class LLVMGen;
 class BIRValue;
 class BIRGuard;
 class BIRFunctionGuard;
+class BIRIfGuard;
 class BIRGen;
 } // namespace birgen
 } // namespace belalang
@@ -88,6 +89,21 @@ private:
   mlir::Value fnValue;
 };
 
+class BIRIfGuard : public BIRGuard {
+public:
+  BIRIfGuard(mlir::OpBuilder &builder, mlir::Operation *ifOp)
+      : BIRGuard(builder), builder(builder), ifOp(ifOp) {}
+  ~BIRIfGuard() = default;
+
+  void start_then();
+  void start_else();
+  std::unique_ptr<BIRValue> get_value() const;
+
+private:
+  mlir::OpBuilder &builder;
+  mlir::Operation *ifOp;
+};
+
 // -----------------------------------------------------------------------------
 // BIRGen
 // -----------------------------------------------------------------------------
@@ -112,11 +128,14 @@ public:
   std::unique_ptr<BIRValue> build_var_load(const BIRValue &refValue);
   std::unique_ptr<BIRFunctionGuard>
   build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
+  std::unique_ptr<BIRIfGuard> build_if_expr(const BIRValue &cond);
   void build_var_store(const BIRValue &v, const BIRValue &ref);
   void build_print(const BIRValue &val);
   void build_return(const BIRValue &val);
   void build_empty_return();
   void build_main_return();
+  void build_yield(const BIRValue &val);
+  void build_empty_yield();
 
   void start_call(const BIRValue &callee);
   void add_call_arg(const BIRValue &arg);

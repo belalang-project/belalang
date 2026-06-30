@@ -36,7 +36,9 @@ mod ffi {
     unsafe extern "C++" {
         include!("belalang/BIRGen/BIRGen.h");
 
+        type BIRGuard;
         type BIRFunctionGuard;
+        type BIRIfGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -62,6 +64,12 @@ mod ffi {
         fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
+        fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
+        fn build_yield(self: Pin<&mut BIRGen>, val: &BIRValue);
+        fn build_empty_yield(self: Pin<&mut BIRGen>);
+        fn start_then(self: Pin<&mut BIRIfGuard>);
+        fn start_else(self: Pin<&mut BIRIfGuard>);
+        fn get_value(self: &BIRIfGuard) -> UniquePtr<BIRValue>;
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
@@ -257,6 +265,34 @@ impl<'sess> BIRGen<'sess> {
                     } else {
                         self.symbol_table.remove(&sym);
                     }
+                }
+
+                guard.get_value()
+            },
+            Expression::If(if_expr) => {
+                let cond = self.generate_expression(if_expr.condition);
+                let mut guard = self.inner.pin_mut().build_if_expr(&cond);
+
+                // TODO: handle yielding if expressions
+                guard.pin_mut().start_then();
+                for stmt in if_expr.consequence.statements {
+                    self.generate_statement(stmt);
+                }
+                self.inner.pin_mut().build_empty_yield();
+
+                if let Some(alt) = if_expr.alternative {
+                    guard.pin_mut().start_else();
+                    match alt {
+                        Expression::Block(block) => {
+                            for stmt in block.statements {
+                                self.generate_statement(stmt);
+                            }
+                        },
+                        _ => {
+                            self.generate_expression(alt);
+                        },
+                    }
+                    self.inner.pin_mut().build_empty_yield();
                 }
 
                 guard.get_value()
