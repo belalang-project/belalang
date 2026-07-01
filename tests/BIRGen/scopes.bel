@@ -1,0 +1,15 @@
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
+
+# CHECK:        cf.br ^bb1
+# CHECK-NEXT: ^bb1:  // pred: ^bb0
+# CHECK-NEXT:   %0 = bir.constant #bir.int<1> : !bir.int
+# CHECK-NEXT:   %1 = bir.constant #bir.int<2> : !bir.int
+# CHECK-NEXT:   cf.br ^bb2
+# CHECK-NEXT: ^bb2:  // pred: ^bb1
+# CHECK-NEXT:   %2 = bir.constant #bir.int<0> : !bir.int
+# CHECK-NEXT:   bir.return %2 : !bir.int
+
+{
+  1
+  2
+}
