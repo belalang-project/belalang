@@ -7,7 +7,6 @@ rust_library(
 		"//diag",
 		"//session",
 		"//span",
-		"@crates//:thiserror",
 		"@crates//:unicode-ident",
 	],
 	visibility = ["//visibility:public"],

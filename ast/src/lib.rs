@@ -24,29 +24,31 @@ pub enum Node<'ast> {
     Program(Program<'ast>),
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(Debug)]
 pub enum ParserError {
-    #[error(transparent)]
-    LexerError(#[from] LexerError),
-
-    #[error("unexpected token: {0}")]
+    LexerError(LexerError),
     UnexpectedToken(TokenKind),
-
-    #[error("invalid lhs")]
     InvalidLHS,
-
-    #[error("error parsing integer: could not parse {0} as integer")]
     ParsingInteger(String),
-
-    #[error("error parsing float: could not parse {0} as float")]
     ParsingFloat(String),
-
-    #[error("error parsing struct")]
     ParsingStruct,
-
-    #[error("unknown prefix operator: {0}")]
     UnknownPrefixOperator(TokenKind),
 }
+
+impl From<LexerError> for ParserError {
+    fn from(err: LexerError) -> Self {
+        ParserError::LexerError(err)
+    }
+}
+
+// NOTE: the parser error display isn't used by anything.
+impl std::fmt::Display for ParserError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+impl std::error::Error for ParserError {}
 
 pub struct Ast {
     bump: bumpalo::Bump,

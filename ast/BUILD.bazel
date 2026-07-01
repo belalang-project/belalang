@@ -9,7 +9,6 @@ rust_library(
 		"//session",
 		"//span",
 		"@crates//:bumpalo",
-		"@crates//:thiserror",
 	],
 	visibility = ["//visibility:public"],
 )

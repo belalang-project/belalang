@@ -26,17 +26,21 @@ use crate::{
     TokenKind,
 };
 
-#[derive(thiserror::Error, Debug)]
+#[derive(Debug)]
 pub enum LexerError {
-    #[error("unknown token: {0}")]
     UnknownToken(String),
-
-    #[error("unknown escape string")]
     UnknownEscapeString,
-
-    #[error("unclosed string")]
     UnclosedString,
 }
+
+// NOTE: the lexer error display isn't used by anything.
+impl std::fmt::Display for LexerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+impl std::error::Error for LexerError {}
 
 pub struct Lexer<'sess> {
     session: &'sess Session,
