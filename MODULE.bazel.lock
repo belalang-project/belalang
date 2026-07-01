@@ -227,6 +227,27 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//third_party:defs.bzl%third_party_deps": {
+      "general": {
+        "bzlTransitiveDigest": "CDPVEKo0pXudZZw6ia3/hdkvBRjkxs9URbMiB+JQVTw=",
+        "usagesDigest": "IhAWKcX6mchlBXfCkPHTt6i1VEX5C02mmAOg5u+pJw8=",
+        "recordedInputs": [
+          "REPO_MAPPING:,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "bdwgc": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "build_file": "@@//third_party:bdwgc.BUILD",
+              "strip_prefix": "gc-8.2.12",
+              "urls": [
+                "https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"
+              ]
+            }
+          }
+        }
+      }
+    },
     "@@rules_kotlin+//src/main/starlark/core/repositories:bzlmod_setup.bzl%rules_kotlin_extensions": {
       "general": {
         "bzlTransitiveDigest": "ABI1D/sbS1ovwaW/kHDoj8nnXjQ0oKU9fzmzEG4iT8o=",

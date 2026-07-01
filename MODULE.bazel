@@ -47,17 +47,11 @@ pip.parse(
 use_repo(pip, "pypi")
 
 # ------------------------------------------------------------------------------
-# bdwgc
+# Third Parties
 # ------------------------------------------------------------------------------
 
-http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "bdwgc",
-    build_file = "//third_party:bdwgc.BUILD",
-    strip_prefix = "gc-8.2.12",
-    urls = ["https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"],
-)
+third_party = use_extension("//third_party:defs.bzl", "third_party_deps")
+use_repo(third_party, "bdwgc")
 
 # ------------------------------------------------------------------------------
 # LLVM
