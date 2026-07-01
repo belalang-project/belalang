@@ -7,6 +7,7 @@ use std::{
     str::FromStr,
 };
 
+use anyhow::Context;
 use bbuild::{
     BuildContext,
     EmitTarget,
@@ -157,7 +158,11 @@ fn main() -> anyhow::Result<()> {
         emit = EmitTarget::Exe;
     }
 
-    let bctx = BuildContext { use_color, emit };
+    let bctx = BuildContext {
+        use_color,
+        emit,
+        out_dir: std::env::current_dir().context("failed to get current directory")?,
+    };
     let bb = if let Source::File(path) = src {
         bbuild::BBuild::new(&path, bctx)
     } else {
