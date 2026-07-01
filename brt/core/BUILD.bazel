@@ -6,14 +6,4 @@ package(default_visibility = ["//brt:__pkg__"])
 rust_library(
     name = "brt-core",
     srcs = glob(["src/**/*.rs"]),
-    deps = [
-        "@crates//:log",
-        "@crates//:mmtk",
-    ],
-)
-
-rust_test(
-    name = "tests",
-    srcs = glob(["tests/**/*.rs"]),
-    deps = [":brt-core"],
 )
