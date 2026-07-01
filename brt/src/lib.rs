@@ -1,3 +1,13 @@
+use libc::{
+    c_void,
+    size_t,
+};
+
+unsafe extern "C" {
+    fn GC_init();
+    fn GC_malloc(size: size_t) -> *mut c_void;
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn brt_print_int(v: i64) {
     println!("{}", v)
@@ -20,10 +30,12 @@ pub extern "C" fn brt_print_bool(v: bool) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn brt_mmtk_init() {
-    brt_core::mmtk::init();
+    unsafe {
+        GC_init();
+    }
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn brt_mmtk_alloc(size: usize) -> *mut u8 {
-    brt_core::mmtk::alloc(size)
+    unsafe { GC_malloc(size) }.cast()
 }

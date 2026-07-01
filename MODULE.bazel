@@ -47,6 +47,19 @@ pip.parse(
 use_repo(pip, "pypi")
 
 # ------------------------------------------------------------------------------
+# bdwgc
+# ------------------------------------------------------------------------------
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "bdwgc",
+    build_file = "//third_party:bdwgc.BUILD",
+    strip_prefix = "gc-8.2.12",
+    urls = ["https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"],
+)
+
+# ------------------------------------------------------------------------------
 # LLVM
 # ------------------------------------------------------------------------------
 
@@ -89,20 +102,6 @@ crate.spec(
 crate.spec(
     package = "libc",
     version = "0.2.177",
-)
-crate.spec(
-    package = "mmtk",
-    version = "0.32.0",
-)
-crate.annotation(
-    build_script_env = {
-        "CARGO_PKG_AUTHORS": "MMTk Developers",
-        "CARGO_PKG_DESCRIPTION": "MMTk is a framework for the design and implementation of high-performance and portable memory managers.",
-        "CARGO_PKG_HOMEPAGE": "https://www.mmtk.io",
-        "CARGO_PKG_LICENSE": "MIT OR Apache-2.0",
-        "CARGO_PKG_REPOSITORY": "https://github.com/mmtk/mmtk-core",
-    },
-    crate = "mmtk",
 )
 crate.spec(
     package = "log",
