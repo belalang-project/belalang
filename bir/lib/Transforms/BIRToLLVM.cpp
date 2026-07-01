@@ -331,14 +331,14 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
       return failure();
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
-    if (!module.lookupSymbol(brt::BRT_MMTK_ALLOC)) {
+    if (!module.lookupSymbol(brt::BRT_GC_ALLOC)) {
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       auto funcType = LLVM::LLVMFunctionType::get(
           LLVM::LLVMPointerType::get(ctx), mlir::IntegerType::get(ctx, 64));
       OperationState funcState(UnknownLoc::get(ctx),
                                LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(rewriter, funcState, brt::BRT_MMTK_ALLOC,
+      LLVM::LLVMFuncOp::build(rewriter, funcState, brt::BRT_GC_ALLOC,
                               funcType);
       rewriter.create(funcState);
     }
@@ -348,7 +348,7 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
         LLVM::ConstantOp::create(rewriter, loc, i64Type, rewriter.getI64IntegerAttr(elSize));
 
     auto ptrType = LLVM::LLVMPointerType::get(ctx);
-    auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_MMTK_ALLOC);
+    auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_GC_ALLOC);
     auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr, sizeVal.getResult());
 
     rewriter.replaceOp(op, allocCall.getResult());
@@ -556,14 +556,14 @@ struct BelalangBIRToLLVMPass
     if (!mainFunc || mainFunc.isExternal())
       return;
 
-    if (!module.lookupSymbol(brt::BRT_MMTK_INIT)) {
+    if (!module.lookupSymbol(brt::BRT_GC_INIT)) {
       OpBuilder builder(&module.getBodyRegion().front(),
                         module.getBodyRegion().front().begin());
       auto voidType = LLVM::LLVMVoidType::get(ctx);
       auto funcType = LLVM::LLVMFunctionType::get(voidType, {});
       OperationState funcState(UnknownLoc::get(ctx),
                                LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_MMTK_INIT,
+      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_GC_INIT,
                               funcType);
       builder.create(funcState);
     }
@@ -571,7 +571,7 @@ struct BelalangBIRToLLVMPass
     {
       Block &entryBlock = mainFunc.getBody().front();
       OpBuilder builder(&entryBlock, entryBlock.begin());
-      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_MMTK_INIT);
+      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_GC_INIT);
       OperationState callState(UnknownLoc::get(ctx),
                                LLVM::CallOp::getOperationName());
       LLVM::CallOp::build(builder, callState, TypeRange{}, calleeAttr,

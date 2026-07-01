@@ -1,9 +1,9 @@
 // RUN: %bir-opt --split-input-file --convert-bir-to-llvm %s | %FileCheck %s
 
 // CHECK:      module {
-// CHECK-NEXT:   llvm.func @brt_mmtk_init()
+// CHECK-NEXT:   llvm.func @brg_gc_init()
 // CHECK-NEXT:   llvm.func @main() {
-// CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
+// CHECK-NEXT:     llvm.call @brg_gc_init() : () -> ()
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0 : i64) : i64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
@@ -17,9 +17,9 @@ bir.func @main() {
 // -----
 
 // CHECK:      module {
-// CHECK-NEXT:   llvm.func @brt_mmtk_init()
+// CHECK-NEXT:   llvm.func @brg_gc_init()
 // CHECK-NEXT:   llvm.func @main() {
-// CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
+// CHECK-NEXT:     llvm.call @brg_gc_init() : () -> ()
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
@@ -33,9 +33,9 @@ bir.func @main() {
 // -----
 
 // CHECK:      module {
-// CHECK-NEXT:   llvm.func @brt_mmtk_init()
+// CHECK-NEXT:   llvm.func @brg_gc_init()
 // CHECK-NEXT:   llvm.func @main() {
-// CHECK-NEXT:     llvm.call @brt_mmtk_init() : () -> ()
+// CHECK-NEXT:     llvm.call @brg_gc_init() : () -> ()
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(1.230000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
@@ -48,12 +48,12 @@ bir.func @main() {
 
 // -----
 
-// CHECK: llvm.func @brt_mmtk_init()
+// CHECK: llvm.func @brg_gc_init()
 // CHECK: llvm.func @f(i64) -> i64
 // CHECK: llvm.func @g(i64)
 
 // CHECK-LABEL: llvm.func @main() -> i64
-// CHECK: llvm.call @brt_mmtk_init() : () -> ()
+// CHECK: llvm.call @brg_gc_init() : () -> ()
 // CHECK: %[[C1:.*]] = llvm.mlir.constant(1 : i64) : i64
 // CHECK: %[[CALL:.*]] = llvm.call @f(%[[C1]]) : (i64) -> i64
 // CHECK: llvm.call @f(%[[C1]]) : (i64) -> i64
@@ -71,13 +71,13 @@ bir.func @main() -> !bir.int {
 
 // -----
 
-// CHECK: llvm.func @brt_mmtk_init()
-// CHECK: llvm.func @brt_mmtk_alloc(i64) -> !llvm.ptr
+// CHECK: llvm.func @brg_gc_init()
+// CHECK: llvm.func @brg_gc_alloc(i64) -> !llvm.ptr
 
 // CHECK-LABEL: llvm.func @main() -> i64
-// CHECK: llvm.call @brt_mmtk_init() : () -> ()
+// CHECK: llvm.call @brg_gc_init() : () -> ()
 // CHECK: %[[SIZE:.*]] = llvm.mlir.constant(8 : i64) : i64
-// CHECK: %[[PTR:.*]] = llvm.call @brt_mmtk_alloc(%[[SIZE]]) : (i64) -> !llvm.ptr
+// CHECK: %[[PTR:.*]] = llvm.call @brg_gc_alloc(%[[SIZE]]) : (i64) -> !llvm.ptr
 // CHECK: %[[VAL:.*]] = llvm.mlir.constant(12 : i64) : i64
 // CHECK: llvm.store %[[VAL]], %[[PTR]] : i64, !llvm.ptr
 // CHECK: %[[LOAD:.*]] = llvm.load %[[PTR]] : !llvm.ptr -> i64
@@ -93,10 +93,10 @@ bir.func @main() -> !bir.int {
 
 // -----
 
-// CHECK:      llvm.func @brt_mmtk_init()
+// CHECK:      llvm.func @brg_gc_init()
 // CHECK-NEXT: llvm.func @f()
 // CHECK-LABEL: llvm.func @main()
-// CHECK:        llvm.call @brt_mmtk_init() : () -> ()
+// CHECK:        llvm.call @brg_gc_init() : () -> ()
 // CHECK-NEXT:   %[[ADDR:.*]] = llvm.mlir.addressof @f : !llvm.ptr
 // CHECK-NEXT:   llvm.return
 bir.func @f()

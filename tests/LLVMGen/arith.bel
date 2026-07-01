@@ -1,10 +1,10 @@
 # RUN: %belalang build --emit=llvm %s | %FileCheck %s
 
-# CHECK: declare void @brt_mmtk_init()
+# CHECK: declare void @brg_gc_init()
 # CHECK: declare void @brt_print_int(i64)
 
 #      CHECK: define i64 @main() {
-# CHECK-NEXT:  call void @brt_mmtk_init()
+# CHECK-NEXT:  call void @brg_gc_init()
 # CHECK-NEXT:  call void @brt_print_int(i64 4)
 # CHECK-NEXT:  ret i64 0
 # CHECK-NEXT: }
