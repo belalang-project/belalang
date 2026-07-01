@@ -1,0 +1,15 @@
+x := 0
+
+while (x += 1) <= 100 {
+  if x % 3 == 0 {
+    if x % 5 == 0 {
+      print("fizzbuzz")
+    } else {
+      print("fizz")
+    }
+  } else if x % 5 == 0 {
+    print("buzz")
+  } else {
+    print(x)
+  }
+}
