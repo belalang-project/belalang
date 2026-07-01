@@ -242,6 +242,19 @@ std::unique_ptr<BIRWhileGuard> BIRGen::build_while_stmt() {
   return std::make_unique<BIRWhileGuard>(builder, op.getOperation());
 }
 
+void BIRScopeGuard::start_body() {
+  auto op  = mlir::cast<bir::ScopeOp>(scopeOp);
+  auto &region = op.getScopeRegion();
+  region.push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&region.front());
+}
+
+std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr() {
+  // TODO: handle yielding block
+  auto op = bir::ScopeOp::create(builder, loc, mlir::Type{});
+  return std::make_unique<BIRScopeGuard>(builder, op.getOperation());
+}
+
 void BIRGen::build_condition(const BIRValue &cond) {
   bir::ConditionOp::create(builder, loc, cond.getValue());
 }

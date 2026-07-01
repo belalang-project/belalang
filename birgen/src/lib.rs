@@ -49,6 +49,7 @@ mod ffi {
         type BIRFunctionGuard;
         type BIRIfGuard;
         type BIRWhileGuard;
+        type BIRScopeGuard;
         type BIRValue;
         type BIRGen;
         type LLVMGen;
@@ -76,6 +77,7 @@ mod ffi {
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
         fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
+        fn build_block_expr(self: Pin<&mut BIRGen>) -> UniquePtr<BIRScopeGuard>;
         fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
         fn build_continue(self: Pin<&mut BIRGen>);
         fn build_break(self: Pin<&mut BIRGen>);
@@ -85,6 +87,7 @@ mod ffi {
         fn build_empty_yield(self: Pin<&mut BIRGen>);
         fn start_then(self: Pin<&mut BIRIfGuard>);
         fn start_else(self: Pin<&mut BIRIfGuard>);
+        fn start_body(self: Pin<&mut BIRScopeGuard>);
         fn get_value(self: &BIRIfGuard) -> UniquePtr<BIRValue>;
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
@@ -349,6 +352,18 @@ impl<'sess> BIRGen<'sess> {
                 }
 
                 guard.get_value()
+            },
+            Expression::Block(blk) => {
+                let mut guard = self.inner.pin_mut().build_block_expr();
+                guard.pin_mut().start_body();
+
+                for stmt in blk.statements {
+                    self.generate_statement(stmt);
+                }
+
+                // TODO: handle yielding blocks
+                self.inner.pin_mut().build_empty_yield();
+                cxx::UniquePtr::null()
             },
             _ => todo!("Generation for expression {:?} not implemented", expr),
         }
