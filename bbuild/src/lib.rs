@@ -28,6 +28,7 @@ use ty::TypeInferer;
 pub struct BuildContext {
     pub use_color: bool,
     pub emit: EmitTarget,
+    pub out_dir: PathBuf,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -63,8 +64,8 @@ impl BBuild {
         let cc = env::var("CC").unwrap_or("cc".to_string());
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
 
-        let out_obj = PathBuf::from("belalang_out.o");
-        let out_exe = PathBuf::from("belalang_out");
+        let out_obj = bctx.out_dir.join("belalang_out.o");
+        let out_exe = bctx.out_dir.join("belalang_out");
 
         let mut source_text = String::new();
         io::stdin()
@@ -88,8 +89,15 @@ impl BBuild {
         let cc = env::var("CC").unwrap_or("cc".to_string());
         let brt_dir = env::var("BRT_DIR").unwrap_or_else(|_| "/usr/local/lib".to_string());
 
-        let out_obj = source_path.with_added_extension("o");
-        let out_exe = source_path.with_extension("");
+        let mut out_obj = source_path.with_added_extension("o");
+        let mut out_exe = source_path.with_extension("");
+
+        if let Some(file_name) = out_obj.file_name() {
+            out_obj = bctx.out_dir.join(file_name);
+        }
+        if let Some(file_name) = out_exe.file_name() {
+            out_exe = bctx.out_dir.join(file_name);
+        }
 
         let session = Session::for_file(source_path.to_path_buf())?;
 

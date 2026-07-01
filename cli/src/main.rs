@@ -1,12 +1,20 @@
 use std::{
+    env,
+    fs,
     io::{
         self,
         IsTerminal,
     },
-    path::PathBuf,
+    path::{
+        Path,
+        PathBuf,
+    },
+    process,
     str::FromStr,
+    time,
 };
 
+use anyhow::Context;
 use bbuild::{
     BuildContext,
     EmitTarget,
@@ -157,7 +165,21 @@ fn main() -> anyhow::Result<()> {
         emit = EmitTarget::Exe;
     }
 
-    let bctx = BuildContext { use_color, emit };
+    let mut _temp_dir_guard = None;
+    let out_dir = if let Subcommands::Run = subcommand {
+        let guard = TempDirGuard::new()?;
+        let path = guard.path.to_path_buf();
+        _temp_dir_guard = Some(guard);
+        path
+    } else {
+        env::current_dir().context("failed to get current directory")?
+    };
+
+    let bctx = BuildContext {
+        use_color,
+        emit,
+        out_dir,
+    };
     let bb = if let Source::File(path) = src {
         bbuild::BBuild::new(&path, bctx)
     } else {
@@ -222,4 +244,39 @@ fn run(bb: bbuild::BBuild) -> anyhow::Result<()> {
     bb.execute_artifact();
 
     Ok(())
+}
+
+struct TempDirGuard {
+    path: PathBuf,
+}
+
+impl TempDirGuard {
+    pub fn new() -> anyhow::Result<Self> {
+        let mut path = env::temp_dir();
+
+        let pid = process::id();
+        let nanos = time::SystemTime::now()
+            .duration_since(time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+
+        path.push(format!("belalang_out_{}_{}", pid, nanos));
+        fs::create_dir_all(&path)?;
+
+        Ok(Self { path })
+    }
+}
+
+impl std::ops::Deref for TempDirGuard {
+    type Target = Path;
+
+    fn deref(&self) -> &Self::Target {
+        &self.path
+    }
+}
+
+impl Drop for TempDirGuard {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.path);
+    }
 }
