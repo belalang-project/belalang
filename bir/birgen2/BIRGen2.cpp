@@ -5,5 +5,5 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIRGen/BIRGen.h"
 
-#include "birgen2.h"
-#include "bindings.cpp.inc"
+#include "BIRGen2.h"
+#include "Bindings.cpp.inc"

@@ -144,8 +144,8 @@ gentbl_rule(
 gentbl_cc_library(
     name = "BelalangCXXBindingsGen",
     tbl_outs = [
-        (["-gen-cxx-bindings-decl"], "birgen2/bindings.h.inc"),
-        (["-gen-cxx-bindings-defs"], "birgen2/bindings.cpp.inc"),
+        (["-gen-cxx-bindings-decl"], "birgen2/Bindings.h.inc"),
+        (["-gen-cxx-bindings-defs"], "birgen2/Bindings.cpp.inc"),
     ],
     tblgen = ":bir-tblgen",
     td_file = "include/belalang/BIR/IR/BIROps.td",
@@ -155,10 +155,10 @@ gentbl_cc_library(
 cc_library(
     name = "birgen2-cc",
     srcs = [
-        "birgen2/birgen2.cpp",
+        "birgen2/BIRGen2.cpp",
     ],
     hdrs = [
-        "birgen2/birgen2.h",
+        "birgen2/BIRGen2.h",
     ],
     deps = [
         ":birgen2-include",

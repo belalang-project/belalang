@@ -8,6 +8,6 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Location.h"
 
-#include "bindings.h.inc"
+#include "Bindings.h.inc"
 
 #endif // BELALANG_BIRGEN2_BIRGEN2_H_
