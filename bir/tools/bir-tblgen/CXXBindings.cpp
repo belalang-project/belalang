@@ -108,7 +108,7 @@ void emitCXXBindingsDecl(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
 void emitCXXBindingsDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
   os << "#include <memory>\n";
   os << "#include <cstdint>\n";
-  os << "#include \"bindings.h\"\n";
+  os << "#include \"bindings.h.inc\"\n";
   os << "#include \"belalang/BIR/IR/BIR.h\"\n";
   os << "#include \"belalang/BIRGen/BIRGen.h\"\n\n";
   os << "namespace belalang::birgen2 {\n";

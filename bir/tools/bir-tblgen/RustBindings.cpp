@@ -13,7 +13,7 @@ void emitRustBindings(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
 
   os.indent(4) << "unsafe extern \"C++\" {\n";
 
-  os.indent(8) << "include!(\"bindings.h\");\n";
+  os.indent(8) << "include!(\"bindings.h.inc\");\n";
   os.indent(8) << "type BIRGen2;\n";
 
   os.indent(8) << "fn create_birgen2(gen_ptr: usize) -> UniquePtr<BIRGen2>;\n";
