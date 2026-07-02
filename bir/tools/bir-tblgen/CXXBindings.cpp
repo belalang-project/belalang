@@ -23,6 +23,8 @@ private:
   mlir::OpBuilder builder;
   mlir::Location loc;
 };
+
+std::unique_ptr<BIRGen2> create_birgen2();
 )";
 
 std::string getArgs(mlir::tblgen::Operator op) {
@@ -39,7 +41,8 @@ void genBuilderFunctionDecl(const llvm::Record *opRec, llvm::raw_ostream &os) {
   mlir::tblgen::Operator op(opRec);
 
   // TODO: support more
-  if (!(op.getNumResults() == 0 && op.getNumOperands() == 0))
+  if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
+        op.getNumAttributes() == 0 && op.getNumRegions() == 0))
     return;
 
   llvm::StringRef name = op.getCppClassName();
@@ -56,7 +59,8 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
   mlir::tblgen::Operator op(opRec);
 
   // TODO: support more
-  if (!(op.getNumResults() == 0 && op.getNumOperands() == 0))
+  if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
+        op.getNumAttributes() == 0 && op.getNumRegions() == 0))
     return;
 
   llvm::StringRef name = op.getCppClassName();
@@ -82,6 +86,7 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
 namespace belalang::bir {
 
 void emitCXXBindingsDecl(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
+  os << "#pragma once\n\n";
   os << "#include \"mlir/IR/MLIRContext.h\"\n";
   os << "#include \"mlir/IR/BuiltinOps.h\"\n";
   os << "#include \"mlir/IR/Builders.h\"\n";
@@ -94,7 +99,14 @@ void emitCXXBindingsDecl(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
 }
 
 void emitCXXBindingsDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
+  os << "#include <memory>\n";
+  os << "#include \"bindings.h\"\n";
+  os << "#include \"belalang/BIR/IR/BIR.h\"\n\n";
   os << "namespace belalang::birgen2 {\n";
+  os << "std::unique_ptr<BIRGen2> create_birgen2() { return std::make_unique<BIRGen2>(); }\n";
+  os << "BIRGen2::BIRGen2() : builder(&context), loc(builder.getUnknownLoc()) {\n";
+  os.indent(2) << "context.loadDialect<belalang::bir::BIRDialect>();\n";
+  os << "}\n";
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
     genBuilderFunctionDefs(op, os);
   os << "} // namespace belalang::birgen2\n";

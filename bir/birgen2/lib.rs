@@ -1,3 +1,3 @@
 mod bindings;
 
-pub use bindings::*;
+pub use bindings::ffi::*;

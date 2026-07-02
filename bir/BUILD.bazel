@@ -154,7 +154,9 @@ gentbl_cc_library(
 
 cc_library(
     name = "birgen2-cc",
-    srcs = ["birgen2/birgen2.cpp"],
+    srcs = [
+        "birgen2/birgen2.cpp",
+    ],
     deps = [
         ":birgen2-include",
         ":birgen2-bridge/include",
@@ -166,6 +168,7 @@ cc_library(
     includes = ["birgen2"],
     deps = [
         ":BelalangCXXBindingsGen",
+        ":bir",
         "@llvm-project//mlir:IR",
     ],
 )

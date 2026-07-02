@@ -16,11 +16,14 @@ void emitRustBindings(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
   os.indent(8) << "include!(\"bindings.h\");\n";
   os.indent(8) << "type BIRGen2;\n";
 
+  os.indent(8) << "fn create_birgen2() -> UniquePtr<BIRGen2>;";
+
   for (const auto *opRec : rk.getAllDerivedDefinitions("BIR_Op")) {
     mlir::tblgen::Operator op(opRec);
 
     // TODO: support more
-    if (!(op.getNumResults() == 0 && op.getNumOperands() == 0))
+    if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
+          op.getNumAttributes() == 0 && op.getNumRegions() == 0))
       continue;
 
     llvm::StringRef name = op.getCppClassName();

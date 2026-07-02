@@ -107,6 +107,7 @@ pub struct BIRGen<'sess> {
     session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
     symbol_table: HashMap<Symbol, cxx::UniquePtr<ffi::BIRValue>>,
+    birgen2: cxx::UniquePtr<birgen2::BIRGen2>,
 }
 
 impl<'sess> BIRGen<'sess> {
@@ -115,6 +116,7 @@ impl<'sess> BIRGen<'sess> {
             session,
             inner: ffi::create_birgen(),
             symbol_table: HashMap::new(),
+            birgen2: birgen2::create_birgen2(),
         }
     }
 

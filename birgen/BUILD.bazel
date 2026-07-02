@@ -35,6 +35,7 @@ rust_library(
         ":birgen-bridge",
         ":birgen-cc",
         "//bir",
+        "//bir:birgen2",
         "//ast",
         "//lexer",
         "//session",
