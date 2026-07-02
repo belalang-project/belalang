@@ -1,5 +1,7 @@
-load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library")
+load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library", "gentbl_rule")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -111,6 +113,63 @@ gentbl_cc_library(
     deps = [":BelalangPassesTdFiles"],
 )
 
+rust_cxx_bridge(
+    name = "birgen2-bridge",
+    src = ":BelalangRustBindingsGen",
+    deps = [":birgen2-cc"],
+)
+
+rust_library(
+    name = "birgen2",
+    srcs = glob(["birgen2/*.rs"]) + [
+        ":BelalangRustBindingsGen",
+    ],
+    deps = [
+        ":birgen2-include",
+        ":birgen2-bridge",
+        ":birgen2-cc",
+        "@cxx.rs//:cxx",
+    ],
+)
+
+gentbl_rule(
+    name = "BelalangRustBindingsGen",
+    opts = ["-gen-rust-bindings"],
+    out = "birgen2/bindings.rs",
+    tblgen = ":bir-tblgen",
+    td_file = "include/belalang/BIR/IR/BIROps.td",
+    deps = [":BelalangBIRTdFiles"],
+)
+
+gentbl_cc_library(
+    name = "BelalangCXXBindingsGen",
+    tbl_outs = [
+        (["-gen-cxx-bindings-decl"], "birgen2/bindings.h"),
+        (["-gen-cxx-bindings-defs"], "birgen2/bindings.cpp"),
+    ],
+    tblgen = ":bir-tblgen",
+    td_file = "include/belalang/BIR/IR/BIROps.td",
+    deps = [":BelalangBIRTdFiles"],
+)
+
+cc_library(
+    name = "birgen2-cc",
+    srcs = ["birgen2/birgen2.cpp"],
+    deps = [
+        ":birgen2-include",
+        ":birgen2-bridge/include",
+    ]
+)
+
+cc_library(
+    name = "birgen2-include",
+    includes = ["birgen2"],
+    deps = [
+        ":BelalangCXXBindingsGen",
+        "@llvm-project//mlir:IR",
+    ],
+)
+
 cc_library(
     name = "bir",
     srcs = [
@@ -172,9 +231,11 @@ cc_binary(
 
 cc_binary(
     name = "bir-tblgen",
-    srcs = ["tools/bir-tblgen/bir-tblgen.cpp"],
+    srcs = glob(["tools/bir-tblgen/*.cpp", "tools/bir-tblgen/*.h"]),
     deps = [
+        ":bir",
         "@llvm-project//llvm:TableGen",
+        "@llvm-project//mlir:TableGen",
     ],
 )
 
