@@ -174,9 +174,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
 }
 
 std::unique_ptr<BIRValue> BIRFunctionGuard::get_arg(size_t index) const {
-  auto op = fnValue.getDefiningOp();
-  auto &region = op->getRegion(0);
-  auto &block = region.front();
+  auto &block = bodyRegion->front();
   auto arg = block.getArgument(index);
   return std::make_unique<BIRValue>(arg);
 }
@@ -190,7 +188,7 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   auto fnTy = mlir::FunctionType::get(&context, inputs, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
 
-  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult());
+  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult(), &op.getBody());
 
   std::vector<mlir::Location> locs(inputs.size(), loc);
   builder.createBlock(&op.getBody(), {}, inputs, locs);
@@ -198,61 +196,51 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
 }
 
 void BIRIfGuard::start_then() {
-  auto op = mlir::cast<bir::IfOp>(ifOp);
-  auto &region = op.getThenRegion();
-  region.push_back(new mlir::Block());
-  builder.setInsertionPointToEnd(&region.front());
+  thenRegion->push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&thenRegion->front());
 }
 
 void BIRIfGuard::start_else() {
-  auto op = mlir::cast<bir::IfOp>(ifOp);
-  auto &region = op.getElseRegion();
-  region.push_back(new mlir::Block());
-  builder.setInsertionPointToEnd(&region.front());
+  elseRegion->push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&elseRegion->front());
 }
 
 std::unique_ptr<BIRValue> BIRIfGuard::get_value() const {
-  auto op = mlir::cast<bir::IfOp>(ifOp);
-  if (op.getNumResults() > 0)
-    return std::make_unique<BIRValue>(op.getResult());
+  if (resultValue)
+    return std::make_unique<BIRValue>(resultValue);
   return nullptr;
 }
 
 std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
   auto op = bir::IfOp::create(builder, loc, mlir::TypeRange{}, cond.getValue());
-  return std::make_unique<BIRIfGuard>(builder, op.getOperation());
+  mlir::Value result = op.getNumResults() > 0 ? op.getResult() : mlir::Value();
+  return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(), &op.getElseRegion(), result);
 }
 
 void BIRWhileGuard::start_cond() {
-  auto op = mlir::cast<bir::WhileOp>(whileOp);
-  auto &region = op.getCond();
-  region.push_back(new mlir::Block());
-  builder.setInsertionPointToEnd(&region.front());
+  condRegion->push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&condRegion->front());
 }
 
 void BIRWhileGuard::start_body() {
-  auto op = mlir::cast<bir::WhileOp>(whileOp);
-  auto &region = op.getBody();
-  region.push_back(new mlir::Block());
-  builder.setInsertionPointToEnd(&region.front());
+  bodyRegion->push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&bodyRegion->front());
 }
 
 std::unique_ptr<BIRWhileGuard> BIRGen::build_while_stmt() {
   auto op = bir::WhileOp::create(builder, loc);
-  return std::make_unique<BIRWhileGuard>(builder, op.getOperation());
+  return std::make_unique<BIRWhileGuard>(builder, &op.getCond(), &op.getBody());
 }
 
 void BIRScopeGuard::start_body() {
-  auto op  = mlir::cast<bir::ScopeOp>(scopeOp);
-  auto &region = op.getScopeRegion();
-  region.push_back(new mlir::Block());
-  builder.setInsertionPointToEnd(&region.front());
+  scopeRegion->push_back(new mlir::Block());
+  builder.setInsertionPointToEnd(&scopeRegion->front());
 }
 
 std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr() {
   // TODO: handle yielding block
   auto op = bir::ScopeOp::create(builder, loc, mlir::Type{});
-  return std::make_unique<BIRScopeGuard>(builder, op.getOperation());
+  return std::make_unique<BIRScopeGuard>(builder, &op.getScopeRegion());
 }
 
 void BIRGen::build_condition(const BIRValue &cond) {
