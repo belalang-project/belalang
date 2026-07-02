@@ -15,7 +15,7 @@ std::string getArgs(mlir::tblgen::Operator op) {
   return llvm::join(args, ", ");
 }
 
-void genGuardMemberFunctions(OpMetadata M, llvm::raw_ostream &os) {
+void emitGuardMemberFunctionDefs(OpMetadata M, llvm::raw_ostream &os) {
   for (auto r : M.getRegionNames()) {
     os << "void " + M.getGuardName() + "::enter_" + r + "() {\n";
     os.indent(2) << r + "->push_back(new mlir::Block());\n";
@@ -24,15 +24,11 @@ void genGuardMemberFunctions(OpMetadata M, llvm::raw_ostream &os) {
   }
 }
 
-void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
-  mlir::tblgen::Operator op(opRec);
-  OpMetadata M(op);
-
-  if (!opRec->getValueAsBit("hasBIRGenBindings"))
-    return;
-
+void emitBuilderFunctionDef(OpMetadata M, llvm::raw_ostream &os) {
   std::string retTy =
       M.requiresGuard() ? "std::unique_ptr<" + M.getGuardName() + ">" : "void";
+
+  auto op = M.getOp();
   auto args = getArgs(op);
 
   os << retTy + " BIRGen2::" + M.getBuilderName() + "(" + args + ") {\n";
@@ -40,13 +36,13 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
   if (op.getNumResults() > 0)
     os.indent(2) << "return nullptr;\n";
   else if (M.requiresGuard()) {
-    auto regionGetters = llvm::join(
-        llvm::map_range(M.getRegionNames(),
-                        [&](const std::string &s) {
-                          auto fnName = sc2cc("get_" + s);
-                          return "&op." + fnName + "()";
-                        }),
-        ", ");
+    auto regionGetters =
+        llvm::join(llvm::map_range(M.getRegionNames(),
+                                   [&](const std::string &s) {
+                                     auto fnName = sc2cc("get_" + s);
+                                     return "&op." + fnName + "()";
+                                   }),
+                   ", ");
     os.indent(2) << "auto op = " + M.getFullOpIdent() +
                         "::create(gen.builder, gen.loc);\n";
     os.indent(2) << "return std::make_unique<" + M.getGuardName() +
@@ -55,25 +51,43 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
     os.indent(2) << M.getFullOpIdent() + "::create(gen.builder, gen.loc);\n";
 
   os << "}\n\n";
+}
 
+void emit(const llvm::Record *opRec, llvm::raw_ostream &os) {
+  if (!opRec->getValueAsBit("hasBIRGenBindings"))
+    return;
+
+  mlir::tblgen::Operator op(opRec);
+  OpMetadata M(op);
+
+  emitCommentBanner(os, M.getOpIdent());
+  emitBuilderFunctionDef(M, os);
   if (M.requiresGuard())
-    genGuardMemberFunctions(M, os);
+    emitGuardMemberFunctionDefs(M, os);
 }
 
 } // namespace
 
+static const char *const CreateBIRGen2 = R"(
+std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {
+  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen *>(gen_ptr);
+  return std::make_unique<BIRGen2>(*gen);
+}
+)";
+
+static const char *const BIRGen2Ctor = R"(
+BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}
+)";
+
 namespace belalang::bir {
 
 void emitCXXBindingDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
-  os << "namespace belalang::birgen2 {\n";
-  os << "std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {\n";
-  os << "  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen "
-        "*>(gen_ptr);\n";
-  os << "  return std::make_unique<BIRGen2>(*gen);\n";
-  os << "}\n";
-  os << "BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}\n";
+  os << "namespace belalang::birgen2 {\n"
+     << CreateBIRGen2 << BIRGen2Ctor << "\n";
+
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
-    genBuilderFunctionDefs(op, os);
+    emit(op, os);
+
   os << "} // namespace belalang::birgen2\n";
 }
 
