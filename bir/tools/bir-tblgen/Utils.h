@@ -15,6 +15,7 @@ public:
 
   std::vector<std::string> getRegionNames() { return regionNames; };
 
+  std::string getOpIdent() { return op.getCppClassName().str(); };
   std::string getFullOpIdent() {
     return op.getCppNamespace().str() + "::" + op.getCppClassName().str();
   }

@@ -5,6 +5,21 @@
 #include "mlir/TableGen/Operator.h"
 #include "llvm/TableGen/TableGenBackend.h"
 
+void emitGuardClassesDecls(OpMetadata M, llvm::raw_ostream &os) {
+  os.indent(8) << "type " + M.getGuardName() + ";\n";
+  for (auto r : M.getRegionNames()) {
+    os.indent(8) << "fn enter_" << r
+                 << "(self: Pin<&mut " + M.getGuardName() + ">);\n";
+  }
+}
+
+void emitBuilderFunction(OpMetadata M, llvm::raw_ostream &os) {
+  os.indent(8) << "fn build" + M.getOpIdent() << "(self: Pin<&mut BIRGen2>)";
+  if (M.requiresGuard())
+    os << " -> UniquePtr<" + M.getGuardName() + ">";
+  os << ";\n";
+}
+
 namespace belalang::bir {
 
 void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
@@ -28,20 +43,9 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
           op.getNumAttributes() == 0))
       continue;
 
-    if (M.requiresGuard()) {
-      os.indent(8) << "type " + M.getGuardName() + ";\n";
-      for (auto r : M.getRegionNames()) {
-        os.indent(8) << "fn enter_" << r
-                     << "(self: Pin<&mut " + M.getGuardName() + ">);\n";
-      }
-    }
-
-    llvm::StringRef name = op.getCppClassName();
-
-    os.indent(8) << "fn build" + name << "(self: Pin<&mut BIRGen2>)";
     if (M.requiresGuard())
-      os << " -> UniquePtr<" + M.getGuardName() + ">";
-    os << ";\n";
+      emitGuardClassesDecls(M, os);
+    emitBuilderFunction(M, os);
   }
 
   os.indent(4) << "}\n";
