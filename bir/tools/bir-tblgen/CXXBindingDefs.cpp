@@ -40,14 +40,15 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
   os << "}\n\n";
 }
 
-}
+} // namespace
 
 namespace belalang::bir {
 
-void emitCXXBindingsDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
+void emitCXXBindingDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
   os << "namespace belalang::birgen2 {\n";
   os << "std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {\n";
-  os << "  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen *>(gen_ptr);\n";
+  os << "  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen "
+        "*>(gen_ptr);\n";
   os << "  return std::make_unique<BIRGen2>(*gen);\n";
   os << "}\n";
   os << "BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}\n";

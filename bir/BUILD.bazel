@@ -134,7 +134,7 @@ rust_library(
 
 gentbl_rule(
     name = "BelalangRustBindingsGen",
-    opts = ["-gen-rust-bindings"],
+    opts = ["-gen-rust-binding-decls"],
     out = "birgen2/bindings.rs",
     tblgen = ":bir-tblgen",
     td_file = "include/belalang/BIR/IR/BIROps.td",
@@ -142,10 +142,10 @@ gentbl_rule(
 )
 
 gentbl_cc_library(
-    name = "BelalangCXXBindingsGen",
+    name = "BelalangCXXBindingsIncGen",
     tbl_outs = [
-        (["-gen-cxx-bindings-decl"], "birgen2/Bindings.h.inc"),
-        (["-gen-cxx-bindings-defs"], "birgen2/Bindings.cpp.inc"),
+        (["-gen-cxx-binding-decls"], "birgen2/Bindings.h.inc"),
+        (["-gen-cxx-binding-defs"], "birgen2/Bindings.cpp.inc"),
     ],
     tblgen = ":bir-tblgen",
     td_file = "include/belalang/BIR/IR/BIROps.td",
@@ -170,7 +170,7 @@ cc_library(
     name = "birgen2-include",
     includes = ["birgen2"],
     deps = [
-        ":BelalangCXXBindingsGen",
+        ":BelalangCXXBindingsIncGen",
         ":bir",
         "//birgen:birgen-cc",
         "@llvm-project//mlir:IR",

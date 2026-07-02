@@ -66,7 +66,7 @@ void genBuilderFunctionDecl(const llvm::Record *opRec, llvm::raw_ostream &os) {
 
 namespace belalang::bir {
 
-void emitCXXBindingsDecl(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
+void emitCXXBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
     genBuilderFunctionDecl(op, os);
   os << llvm::formatv(BIRGenClass, llvm::join(builderFunctions, "\n"));
