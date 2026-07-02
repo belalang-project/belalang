@@ -38,9 +38,7 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
     mlir::tblgen::Operator op(opRec);
     OpMetadata M(op);
 
-    // TODO: support more
-    if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
-          op.getNumAttributes() == 0))
+    if (!opRec->getValueAsBit("hasBIRGenBindings"))
       continue;
 
     if (M.requiresGuard())
