@@ -93,24 +93,12 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
 namespace belalang::bir {
 
 void emitCXXBindingsDecl(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
-  os << "#pragma once\n\n";
-  os << "#include <cstdint>\n";
-  os << "#include <memory>\n";
-  os << "#include \"mlir/IR/MLIRContext.h\"\n";
-  os << "#include \"mlir/IR/BuiltinOps.h\"\n";
-  os << "#include \"mlir/IR/Builders.h\"\n";
-  os << "#include \"mlir/IR/Location.h\"\n\n";
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
     genBuilderFunctionDecl(op, os);
   os << llvm::formatv(BIRGenClass, llvm::join(builderFunctions, "\n"));
 }
 
 void emitCXXBindingsDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
-  os << "#include <memory>\n";
-  os << "#include <cstdint>\n";
-  os << "#include \"bindings.h.inc\"\n";
-  os << "#include \"belalang/BIR/IR/BIR.h\"\n";
-  os << "#include \"belalang/BIRGen/BIRGen.h\"\n\n";
   os << "namespace belalang::birgen2 {\n";
   os << "std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {\n";
   os << "  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen *>(gen_ptr);\n";

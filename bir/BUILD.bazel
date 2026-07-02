@@ -157,6 +157,9 @@ cc_library(
     srcs = [
         "birgen2/birgen2.cpp",
     ],
+    hdrs = [
+        "birgen2/birgen2.h",
+    ],
     deps = [
         ":birgen2-include",
         ":birgen2-bridge/include",

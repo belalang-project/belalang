@@ -2,5 +2,8 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 
-#include "bindings.h.inc"
+#include "belalang/BIR/IR/BIR.h"
+#include "belalang/BIRGen/BIRGen.h"
+
+#include "birgen2.h"
 #include "bindings.cpp.inc"
