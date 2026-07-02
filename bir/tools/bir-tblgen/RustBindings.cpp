@@ -41,6 +41,8 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
     if (!opRec->getValueAsBit("hasBIRGenBindings"))
       continue;
 
+    os << "\n";
+    os.indent(8) << "// " + M.getOpIdent() + "\n";
     if (M.requiresGuard())
       emitGuardClassesDecls(M, os);
     emitBuilderFunction(M, os);
