@@ -1,5 +1,13 @@
 #include "mlir/TableGen/Operator.h"
 
+inline std::string sc2cc(llvm::StringRef s) {
+  return llvm::convertToCamelFromSnakeCase(s);
+}
+
+inline std::string cc2sc(llvm::StringRef s) {
+  return llvm::convertToSnakeFromCamelCase(s);
+}
+
 class OpMetadata {
 public:
   OpMetadata(mlir::tblgen::Operator &op) : op(op) {
@@ -22,6 +30,10 @@ public:
 
   std::string getGuardName() {
     return "BIR" + op.getCppClassName().str() + "Guard";
+  }
+
+  std::string getBuilderName() {
+    return cc2sc("build" + op.getCppClassName().str());
   }
 
 private:

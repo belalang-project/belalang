@@ -148,7 +148,7 @@ impl<'sess> BIRGen<'sess> {
                 }
             },
             Statement::While(while_stmt) => {
-                let mut guard = self.birgen2.pin_mut().buildWhileOp();
+                let mut guard = self.birgen2.pin_mut().build_while_op();
 
                 guard.pin_mut().enter_cond();
                 let cond_val = self.generate_expression(&while_stmt.condition);
@@ -158,7 +158,7 @@ impl<'sess> BIRGen<'sess> {
                 for stmt in while_stmt.block.statements {
                     self.generate_statement(stmt);
                 }
-                self.birgen2.pin_mut().buildContinueOp();
+                self.birgen2.pin_mut().build_continue_op();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -210,7 +210,7 @@ impl<'sess> BIRGen<'sess> {
                 // TODO: Implement struct declaration
             },
             Statement::Break(_s) => {
-                self.birgen2.pin_mut().buildBreakOp();
+                self.birgen2.pin_mut().build_break_op();
             },
             Statement::Continue(_s) => {
                 self.inner.pin_mut().build_continue();

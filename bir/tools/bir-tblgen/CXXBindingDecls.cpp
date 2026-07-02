@@ -109,13 +109,11 @@ void genBuilderFunctionDecl(const llvm::Record *opRec, llvm::raw_ostream &os) {
   if (!opRec->getValueAsBit("hasBIRGenBindings"))
     return;
 
-  llvm::StringRef name = op.getCppClassName();
-
   std::string retTy =
       M.requiresGuard() ? "std::unique_ptr<" + M.getGuardName() + ">" : "void";
   auto args = getArgs(op);
 
-  std::string fn = "  " + retTy + " build" + name.str() + "(" + args + ");";
+  std::string fn = "  " + retTy + " " + M.getBuilderName() + "(" + args + ");";
   builderFunctions.push_back(fn);
 
   if (M.requiresGuard())

@@ -14,7 +14,7 @@ void emitGuardClassesDecls(OpMetadata M, llvm::raw_ostream &os) {
 }
 
 void emitBuilderFunction(OpMetadata M, llvm::raw_ostream &os) {
-  os.indent(8) << "fn build" + M.getOpIdent() << "(self: Pin<&mut BIRGen2>)";
+  os.indent(8) << "fn " + M.getBuilderName() << "(self: Pin<&mut BIRGen2>)";
   if (M.requiresGuard())
     os << " -> UniquePtr<" + M.getGuardName() + ">";
   os << ";\n";

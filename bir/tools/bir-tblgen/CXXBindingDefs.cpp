@@ -31,13 +31,11 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
   if (!opRec->getValueAsBit("hasBIRGenBindings"))
     return;
 
-  llvm::StringRef name = op.getCppClassName();
-
   std::string retTy =
       M.requiresGuard() ? "std::unique_ptr<" + M.getGuardName() + ">" : "void";
   auto args = getArgs(op);
 
-  os << retTy + " BIRGen2::build" + name.str() + "(" + args + ") {\n";
+  os << retTy + " BIRGen2::" + M.getBuilderName() + "(" + args + ") {\n";
 
   if (op.getNumResults() > 0)
     os.indent(2) << "return nullptr;\n";
@@ -45,8 +43,7 @@ void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
     auto regionGetters = llvm::join(
         llvm::map_range(M.getRegionNames(),
                         [&](const std::string &s) {
-                          auto fnName =
-                              llvm::convertToCamelFromSnakeCase("get_" + s);
+                          auto fnName = sc2cc("get_" + s);
                           return "&op." + fnName + "()";
                         }),
         ", ");
