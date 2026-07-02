@@ -169,6 +169,7 @@ cc_library(
     deps = [
         ":BelalangCXXBindingsGen",
         ":bir",
+        "//birgen:birgen-cc",
         "@llvm-project//mlir:IR",
     ],
 )

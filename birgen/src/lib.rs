@@ -112,11 +112,15 @@ pub struct BIRGen<'sess> {
 
 impl<'sess> BIRGen<'sess> {
     pub fn new(session: &'sess Session) -> Self {
+        let inner = ffi::create_birgen();
+        let ptr = inner.into_raw();
+        let birgen2 = birgen2::create_birgen2(ptr as usize);
+        let inner = unsafe { cxx::UniquePtr::from_raw(ptr) };
         Self {
             session,
-            inner: ffi::create_birgen(),
+            inner,
             symbol_table: HashMap::new(),
-            birgen2: birgen2::create_birgen2(),
+            birgen2,
         }
     }
 
@@ -151,7 +155,7 @@ impl<'sess> BIRGen<'sess> {
                 for stmt in while_stmt.block.statements {
                     self.generate_statement(stmt);
                 }
-                self.inner.pin_mut().build_continue();
+                self.birgen2.pin_mut().buildContinueOp();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -203,7 +207,7 @@ impl<'sess> BIRGen<'sess> {
                 // TODO: Implement struct declaration
             },
             Statement::Break(_s) => {
-                self.inner.pin_mut().build_break();
+                self.birgen2.pin_mut().buildBreakOp();
             },
             Statement::Continue(_s) => {
                 self.inner.pin_mut().build_continue();
