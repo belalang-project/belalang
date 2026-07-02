@@ -171,6 +171,14 @@ cc_binary(
 )
 
 cc_binary(
+    name = "bir-tblgen",
+    srcs = ["tools/bir-tblgen/bir-tblgen.cpp"],
+    deps = [
+        "@llvm-project//llvm:TableGen",
+    ],
+)
+
+cc_binary(
     name = "bir-translate",
     srcs = ["tools/bir-translate/bir-translate.cpp"],
     deps = [
