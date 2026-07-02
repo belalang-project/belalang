@@ -1,4 +1,5 @@
 #include "TableGenBackends.h"
+#include "Utils.h"
 #include "mlir/TableGen/Operator.h"
 #include "llvm/TableGen/TableGenBackend.h"
 
@@ -14,30 +15,54 @@ std::string getArgs(mlir::tblgen::Operator op) {
   return llvm::join(args, ", ");
 }
 
+void genGuardMemberFunctions(OpMetadata M, llvm::raw_ostream &os) {
+  for (auto r : M.getRegionNames()) {
+    os << "void " + M.getGuardName() + "::enter_" + r + "() {\n";
+    os.indent(2) << r + "->push_back(new mlir::Block());\n";
+    os.indent(2) << "builder.setInsertionPointToEnd(&" + r + "->front());\n";
+    os << "}\n\n";
+  }
+}
+
 void genBuilderFunctionDefs(const llvm::Record *opRec, llvm::raw_ostream &os) {
   mlir::tblgen::Operator op(opRec);
+  OpMetadata M(op);
 
   // TODO: support more
   if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
-        op.getNumAttributes() == 0 && op.getNumRegions() == 0))
+        op.getNumAttributes() == 0))
     return;
 
   llvm::StringRef name = op.getCppClassName();
 
   std::string retTy =
-      op.getNumResults() > 0 ? "std::unique_ptr<BIRValue>" : "void";
+      M.requiresGuard() ? "std::unique_ptr<" + M.getGuardName() + ">" : "void";
   auto args = getArgs(op);
 
   os << retTy + " BIRGen2::build" + name.str() + "(" + args + ") {\n";
 
   if (op.getNumResults() > 0)
     os.indent(2) << "return nullptr;\n";
-  else if (op.getNumResults() == 0 && op.getNumOperands() == 0) {
-    os.indent(2) << op.getCppNamespace() + "::" + op.getCppClassName() +
+  else if (M.requiresGuard()) {
+    auto regionGetters = llvm::join(
+        llvm::map_range(M.getRegionNames(),
+                        [&](const std::string &s) {
+                          auto fnName =
+                              llvm::convertToCamelFromSnakeCase("get_" + s);
+                          return "&op." + fnName + "()";
+                        }),
+        ", ");
+    os.indent(2) << "auto op = " + M.getFullOpIdent() +
                         "::create(gen.builder, gen.loc);\n";
-  }
+    os.indent(2) << "return std::make_unique<" + M.getGuardName() +
+                        ">(gen.builder, " + regionGetters + ");\n";
+  } else if (op.getNumResults() == 0 && op.getNumOperands() == 0)
+    os.indent(2) << M.getFullOpIdent() + "::create(gen.builder, gen.loc);\n";
 
   os << "}\n\n";
+
+  if (M.requiresGuard())
+    genGuardMemberFunctions(M, os);
 }
 
 } // namespace
