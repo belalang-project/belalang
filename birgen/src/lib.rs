@@ -148,13 +148,13 @@ impl<'sess> BIRGen<'sess> {
                 }
             },
             Statement::While(while_stmt) => {
-                let mut guard = self.inner.pin_mut().build_while_stmt();
+                let mut guard = self.birgen2.pin_mut().buildWhileOp();
 
-                guard.pin_mut().start_cond();
+                guard.pin_mut().enter_cond();
                 let cond_val = self.generate_expression(&while_stmt.condition);
                 self.inner.pin_mut().build_condition(&cond_val);
 
-                guard.pin_mut().start_body();
+                guard.pin_mut().enter_body();
                 for stmt in while_stmt.block.statements {
                     self.generate_statement(stmt);
                 }

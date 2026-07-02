@@ -1,8 +1,24 @@
 #include "belalang/BIR/IR/BIR.h"
 
 #include "TableGenBackends.h"
+#include "Utils.h"
 #include "mlir/TableGen/Operator.h"
 #include "llvm/TableGen/TableGenBackend.h"
+
+void emitGuardClassesDecls(OpMetadata M, llvm::raw_ostream &os) {
+  os.indent(8) << "type " + M.getGuardName() + ";\n";
+  for (auto r : M.getRegionNames()) {
+    os.indent(8) << "fn enter_" << r
+                 << "(self: Pin<&mut " + M.getGuardName() + ">);\n";
+  }
+}
+
+void emitBuilderFunction(OpMetadata M, llvm::raw_ostream &os) {
+  os.indent(8) << "fn build" + M.getOpIdent() << "(self: Pin<&mut BIRGen2>)";
+  if (M.requiresGuard())
+    os << " -> UniquePtr<" + M.getGuardName() + ">";
+  os << ";\n";
+}
 
 namespace belalang::bir {
 
@@ -20,15 +36,16 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
 
   for (const auto *opRec : rk.getAllDerivedDefinitions("BIR_Op")) {
     mlir::tblgen::Operator op(opRec);
+    OpMetadata M(op);
 
     // TODO: support more
     if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
-          op.getNumAttributes() == 0 && op.getNumRegions() == 0))
+          op.getNumAttributes() == 0))
       continue;
 
-    llvm::StringRef name = op.getCppClassName();
-
-    os.indent(8) << "fn build" + name << "(self: Pin<&mut BIRGen2>);\n";
+    if (M.requiresGuard())
+      emitGuardClassesDecls(M, os);
+    emitBuilderFunction(M, os);
   }
 
   os.indent(4) << "}\n";
