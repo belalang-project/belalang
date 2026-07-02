@@ -8,30 +8,30 @@
 using namespace belalang;
 
 enum ActionType {
-  GenCXXBindings,
-  GenCXXBindingsDecl,
-  GenCXXBindingsDefs,
+  GenRustBindingDecls,
+  GenCXXBindingDecls,
+  GenCXXBindingDefs,
 };
 
 llvm::cl::opt<ActionType> action(
     llvm::cl::desc("Action to perform:"),
-    llvm::cl::values(clEnumValN(GenCXXBindings, "gen-rust-bindings",
-                                "Generate cxx.rs Rust Bindings")),
-    llvm::cl::values(clEnumValN(GenCXXBindingsDecl, "gen-cxx-bindings-decl",
+    llvm::cl::values(clEnumValN(GenRustBindingDecls, "gen-rust-binding-decls",
+                                "Generate Rust binding declarations")),
+    llvm::cl::values(clEnumValN(GenCXXBindingDecls, "gen-cxx-binding-decls",
                                 "Generate C++ BIR binding declarations")),
-    llvm::cl::values(clEnumValN(GenCXXBindingsDefs, "gen-cxx-bindings-defs",
+    llvm::cl::values(clEnumValN(GenCXXBindingDefs, "gen-cxx-binding-defs",
                                 "Generate C++ BIR binding definitions")));
 
 bool BIRTableGenMain(llvm::raw_ostream &OS, const llvm::RecordKeeper &Records) {
   switch (action) {
-  case GenCXXBindings:
-    bir::emitRustBindings(Records, OS);
+  case GenRustBindingDecls:
+    bir::emitRustBindingDecls(Records, OS);
     break;
-  case GenCXXBindingsDecl:
-    bir::emitCXXBindingsDecl(Records, OS);
+  case GenCXXBindingDecls:
+    bir::emitCXXBindingDecls(Records, OS);
     break;
-  case GenCXXBindingsDefs:
-    bir::emitCXXBindingsDefs(Records, OS);
+  case GenCXXBindingDefs:
+    bir::emitCXXBindingDefs(Records, OS);
     break;
   }
 

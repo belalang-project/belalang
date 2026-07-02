@@ -8,9 +8,9 @@ class RecordKeeper;
 
 namespace belalang::bir {
 
-void emitRustBindings(const llvm::RecordKeeper &, llvm::raw_ostream &);
-void emitCXXBindingsDecl(const llvm::RecordKeeper &, llvm::raw_ostream &);
-void emitCXXBindingsDefs(const llvm::RecordKeeper &, llvm::raw_ostream &);
+void emitRustBindingDecls(const llvm::RecordKeeper &, llvm::raw_ostream &);
+void emitCXXBindingDecls(const llvm::RecordKeeper &, llvm::raw_ostream &);
+void emitCXXBindingDefs(const llvm::RecordKeeper &, llvm::raw_ostream &);
 
 } // namespace belalang::bir
 
