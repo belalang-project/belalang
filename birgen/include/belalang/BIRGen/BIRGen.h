@@ -72,16 +72,18 @@ private:
 
 class BIRGuard {
 public:
-  BIRGuard(mlir::OpBuilder &builder) : guard(builder) {}
+  BIRGuard(mlir::OpBuilder &builder) : guard(builder), builder(builder) {}
   virtual ~BIRGuard() = default;
 
 protected:
   mlir::OpBuilder::InsertionGuard guard;
+  mlir::OpBuilder &builder;
 };
 
 class BIRFunctionGuard : public BIRGuard {
 public:
-  BIRFunctionGuard(mlir::OpBuilder &builder, mlir::Value fnValue, mlir::Region *bodyRegion)
+  BIRFunctionGuard(mlir::OpBuilder &builder, mlir::Value fnValue,
+                   mlir::Region *bodyRegion)
       : BIRGuard(builder), fnValue(fnValue), bodyRegion(bodyRegion) {}
   ~BIRFunctionGuard() = default;
 
@@ -97,8 +99,10 @@ private:
 
 class BIRIfGuard : public BIRGuard {
 public:
-  BIRIfGuard(mlir::OpBuilder &builder, mlir::Region *thenRegion, mlir::Region *elseRegion, mlir::Value resultValue)
-      : BIRGuard(builder), builder(builder), thenRegion(thenRegion), elseRegion(elseRegion), resultValue(resultValue) {}
+  BIRIfGuard(mlir::OpBuilder &builder, mlir::Region *thenRegion,
+             mlir::Region *elseRegion, mlir::Value resultValue)
+      : BIRGuard(builder), thenRegion(thenRegion), elseRegion(elseRegion),
+        resultValue(resultValue) {}
   ~BIRIfGuard() = default;
 
   void start_then();
@@ -106,7 +110,6 @@ public:
   std::unique_ptr<BIRValue> get_value() const;
 
 private:
-  mlir::OpBuilder &builder;
   mlir::Region *thenRegion;
   mlir::Region *elseRegion;
   mlir::Value resultValue;
@@ -114,15 +117,15 @@ private:
 
 class BIRWhileGuard : public BIRGuard {
 public:
-  BIRWhileGuard(mlir::OpBuilder &builder, mlir::Region *condRegion, mlir::Region *bodyRegion)
-      : BIRGuard(builder), builder(builder), condRegion(condRegion), bodyRegion(bodyRegion) {}
+  BIRWhileGuard(mlir::OpBuilder &builder, mlir::Region *condRegion,
+                mlir::Region *bodyRegion)
+      : BIRGuard(builder), condRegion(condRegion), bodyRegion(bodyRegion) {}
   ~BIRWhileGuard() = default;
 
   void start_cond();
   void start_body();
 
 private:
-  mlir::OpBuilder &builder;
   mlir::Region *condRegion;
   mlir::Region *bodyRegion;
 };
@@ -130,13 +133,12 @@ private:
 class BIRScopeGuard : public BIRGuard {
 public:
   BIRScopeGuard(mlir::OpBuilder &builder, mlir::Region *scopeRegion)
-      : BIRGuard(builder), builder(builder), scopeRegion(scopeRegion) {}
+      : BIRGuard(builder), scopeRegion(scopeRegion) {}
   ~BIRScopeGuard() = default;
 
   void start_body();
 
 private:
-  mlir::OpBuilder &builder;
   mlir::Region *scopeRegion;
 };
 
