@@ -14,7 +14,7 @@ void emitGuardClassesDecls(OpMetadata M, llvm::raw_ostream &os) {
 }
 
 void emitBuilderFunction(OpMetadata M, llvm::raw_ostream &os) {
-  os.indent(8) << "fn build" + M.getOpIdent() << "(self: Pin<&mut BIRGen2>)";
+  os.indent(8) << "fn " + M.getBuilderName() << "(self: Pin<&mut BIRGen2>)";
   if (M.requiresGuard())
     os << " -> UniquePtr<" + M.getGuardName() + ">";
   os << ";\n";
@@ -38,11 +38,11 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
     mlir::tblgen::Operator op(opRec);
     OpMetadata M(op);
 
-    // TODO: support more
-    if (!(op.getNumResults() == 0 && op.getNumOperands() == 0 &&
-          op.getNumAttributes() == 0))
+    if (!opRec->getValueAsBit("hasBIRGenBindings"))
       continue;
 
+    os << "\n";
+    os.indent(8) << "// " + M.getOpIdent() + "\n";
     if (M.requiresGuard())
       emitGuardClassesDecls(M, os);
     emitBuilderFunction(M, os);

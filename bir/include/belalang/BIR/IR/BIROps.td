@@ -15,7 +15,9 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 
 class BIR_Op<string mnemonic, list<Trait> traits = []>
-    : Op<BIR_Dialect, mnemonic, traits>;
+    : Op<BIR_Dialect, mnemonic, traits> {
+  bit hasBIRGenBindings = true;
+}
 
 def BIR_AnyType : AnyTypeOf<[
   BIR_IntType,
@@ -42,6 +44,7 @@ def BIR_ConstantOp : BIR_Op<"constant", [
   let assemblyFormat = "$value attr-dict";
 
   let hasVerifier = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_AddOp : BIR_Op<"add"> {
@@ -60,6 +63,7 @@ def BIR_AddOp : BIR_Op<"add"> {
 
   let assemblyFormat =
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_SubOp : BIR_Op<"sub"> {
@@ -78,6 +82,7 @@ def BIR_SubOp : BIR_Op<"sub"> {
 
   let assemblyFormat =
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_MulOp : BIR_Op<"mul"> {
@@ -96,6 +101,7 @@ def BIR_MulOp : BIR_Op<"mul"> {
 
   let assemblyFormat =
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_DivOp : BIR_Op<"div"> {
@@ -114,6 +120,7 @@ def BIR_DivOp : BIR_Op<"div"> {
 
   let assemblyFormat =
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_ModOp : BIR_Op<"mod"> {
@@ -132,6 +139,7 @@ def BIR_ModOp : BIR_Op<"mod"> {
 
   let assemblyFormat =
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_PrintOp : BIR_Op<"print"> {
@@ -147,6 +155,7 @@ def BIR_PrintOp : BIR_Op<"print"> {
   let arguments = (ins BIR_AnyType:$value);
 
   let assemblyFormat = "attr-dict $value `:` type($value)";
+  let hasBIRGenBindings = false;
 }
 
 def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
@@ -178,6 +187,7 @@ def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
   }];
 
   let hasCustomAssemblyFormat = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_FuncExprOp : BIR_Op<"func_expr", [
@@ -196,6 +206,7 @@ def BIR_FuncExprOp : BIR_Op<"func_expr", [
 
   let assemblyFormat = "attr-dict `:` type($result) $body";
   let hasVerifier = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_CallOp
@@ -217,6 +228,7 @@ def BIR_CallOp
 
   let skipDefaultBuilders = 1;
   let hasCustomAssemblyFormat = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
@@ -262,6 +274,8 @@ def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
       setOperand(0, cast<mlir::Value>(callee));
     }
   }];
+
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_ReturnOp : BIR_Op<"return", [
@@ -277,6 +291,7 @@ def BIR_ReturnOp : BIR_Op<"return", [
   ];
 
   let assemblyFormat = "($input^ `:` type($input))? attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
@@ -286,6 +301,7 @@ def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
   let results = (outs BIR_RefType:$result);
 
   let assemblyFormat = "$name attr-dict `:` type($result)";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_VarStoreOp : BIR_Op<"var.store"> {
@@ -294,6 +310,7 @@ def BIR_VarStoreOp : BIR_Op<"var.store"> {
   let arguments = (ins BIR_AnyType:$src, BIR_RefType:$dest);
 
   let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` type($dest)";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_VarLoadOp : BIR_Op<"var.load"> {
@@ -303,6 +320,7 @@ def BIR_VarLoadOp : BIR_Op<"var.load"> {
   let results = (outs BIR_AnyType:$result);
 
   let assemblyFormat = "$ref attr-dict `:` functional-type(operands, results)";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_ScopeOp : BIR_Op<"scope", [
@@ -312,6 +330,7 @@ def BIR_ScopeOp : BIR_Op<"scope", [
   let results = (outs Optional<BIR_AnyType>:$results);
 
   let assemblyFormat = "$scopeRegion (`:` type($results)^)? attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_YieldOp : BIR_Op<"yield", [
@@ -326,6 +345,7 @@ def BIR_YieldOp : BIR_Op<"yield", [
   let builders = [
     OpBuilder<(ins), [{  }]>,
   ];
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_IfOp : BIR_Op<"if", [
@@ -342,6 +362,7 @@ def BIR_IfOp : BIR_Op<"if", [
   }];
 
   let hasCustomAssemblyFormat = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_CondBrOp : BIR_Op<"cond_br", [
@@ -381,6 +402,7 @@ def BIR_CondBrOp : BIR_Op<"cond_br", [
     $destFalse (`(` $destOperandsFalse^ `:` type($destOperandsFalse) `)`)?
     attr-dict
   }];
+  let hasBIRGenBindings = false;
 }
 
 def BIR_WhileOp : BIR_Op<"while", [
@@ -393,6 +415,7 @@ def BIR_WhileOp : BIR_Op<"while", [
   );
   
   let assemblyFormat = "$cond `do` $body attr-dict";
+  let hasBIRGenBindings = true;
 }
 
 def BIR_ConditionOp : BIR_Op<"condition", [
@@ -401,6 +424,7 @@ def BIR_ConditionOp : BIR_Op<"condition", [
   let arguments = (ins BIR_BoolType:$cond);
   let assemblyFormat = "$cond attr-dict";
   let hasVerifier = 1;
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 def BIR_BreakOp : BIR_Op<"break", [
@@ -408,6 +432,7 @@ def BIR_BreakOp : BIR_Op<"break", [
   // TODO: specify ancestor of breakable scopes
 ]> {
   let assemblyFormat = "attr-dict";
+  let hasBIRGenBindings = true;
 }
 
 def BIR_ContinueOp : BIR_Op<"continue", [
@@ -415,6 +440,7 @@ def BIR_ContinueOp : BIR_Op<"continue", [
   // TODO: specify ancestor of continueable scopes
 ]> {
   let assemblyFormat = "attr-dict";
+  let hasBIRGenBindings = true;
 }
 
 def BIR_CmpOpKind : BIR_I32EnumAttr<"CmpOpKind", "compare operation kind", [
@@ -452,6 +478,8 @@ def BIR_CmpOp : BIR_Op<"cmp", [
       $_state.addOperands(rhs);
     }]>
   ];
+
+  let hasBIRGenBindings = false; // TODO: make bindings
 }
 
 #endif // BELALANG_IR_OPS_TD_
