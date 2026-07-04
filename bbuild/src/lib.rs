@@ -175,6 +175,7 @@ impl BBuild {
             .arg(&self.out_obj)
             .arg(format!("-L{}", self.brt_dir))
             .arg("-lbrt")
+            .arg("-lbdwgc")
             .arg("-o")
             .arg(&self.out_exe)
             .status()?;

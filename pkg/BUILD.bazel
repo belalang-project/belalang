@@ -16,7 +16,11 @@ pkg_files(
 
 pkg_files(
     name = "brt_library",
-    srcs = ["//brt:brt"],
+    srcs = [
+        "//brt:brt",
+        "//brt:brt_rs",
+        "//brt:bdwgc",
+    ],
     prefix = "lib",
     tags = ["manual"],
 )

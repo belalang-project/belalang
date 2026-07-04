@@ -9,11 +9,27 @@ cc_library(
     includes = ["include"],
 )
 
-rust_static_library(
+cc_library(
     name = "brt",
+    srcs = ["src/brt.c"],
+    linkstatic = True,
+    deps = [
+        "@bdwgc//:bdwgc",
+    ],
+)
+
+genrule(
+    name = "bdwgc",
+    srcs = ["@bdwgc//:bdwgc"],
+    outs = ["libbdwgc.a"],
+    cmd = "cp $(location @bdwgc//:bdwgc) $(RULEDIR)/libbdwgc.a",
+    visibility = ["//visibility:public"],
+)
+
+rust_static_library(
+    name = "brt_rs",
     srcs = ["src/lib.rs"],
     deps = [
-        "//brt/core:brt-core",
         "@crates//:libc",
         "@bdwgc//:bdwgc",
     ],
