@@ -20,5 +20,5 @@ void brt_print_string(struct BrString v) {
   }
 }
 
-void brg_gc_init() { GC_init(); }
-void *brg_gc_alloc(size_t size) { return GC_malloc(size); }
+void brt_init() { GC_init(); }
+void *brt_gc_alloc(size_t size) { return GC_malloc(size); }

@@ -48,13 +48,13 @@ pub extern "C" fn brt_print_bool(v: bool) {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn brg_gc_init() {
+pub extern "C" fn brt_init() {
     unsafe {
         GC_init();
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn brg_gc_alloc(size: usize) -> *mut u8 {
+pub extern "C" fn brt_gc_alloc(size: usize) -> *mut u8 {
     unsafe { GC_malloc(size) }.cast()
 }
