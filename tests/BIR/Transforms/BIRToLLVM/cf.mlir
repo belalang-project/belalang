@@ -1,9 +1,9 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
 
 // CHECK:      module {
-// CHECK-NEXT:   llvm.func @brg_gc_init()
+// CHECK-NEXT:   llvm.func @brt_gc_init()
 // CHECK-NEXT:   llvm.func @main() -> i64 {
-// CHECK-NEXT:     llvm.call @brg_gc_init() : () -> ()
+// CHECK-NEXT:     llvm.call @brt_gc_init() : () -> ()
 // CHECK-NEXT:     llvm.br ^bb1
 // CHECK-NEXT:   ^bb1:  // pred: ^bb0
 // CHECK-NEXT:     %[[VAL:.*]] = llvm.mlir.constant(42 : i64) : i64
@@ -24,9 +24,9 @@ bir.func @main() -> !bir.int {
 // -----
 
 // CHECK:      module {
-// CHECK-NEXT:   llvm.func @brg_gc_init()
+// CHECK-NEXT:   llvm.func @brt_gc_init()
 // CHECK-NEXT:   llvm.func @main() {
-// CHECK-NEXT:     llvm.call @brg_gc_init() : () -> ()
+// CHECK-NEXT:     llvm.call @brt_gc_init() : () -> ()
 // CHECK-NEXT:     llvm.br ^bb1
 // CHECK-NEXT:   ^bb1:  // pred: ^bb0
 // CHECK-NEXT:     %[[VAL:.*]] = llvm.mlir.constant(42 : i64) : i64

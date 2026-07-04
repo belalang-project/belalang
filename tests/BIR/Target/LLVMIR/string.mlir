@@ -4,13 +4,13 @@
 
 // CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 
-// CHECK: declare void @brg_gc_init()
+// CHECK: declare void @brt_gc_init()
 
-// CHECK: declare ptr @brg_gc_alloc(i64)
+// CHECK: declare ptr @brt_gc_alloc(i64)
 
 // CHECK:      define { ptr, i64 } @main() {
-// CHECK-NEXT:   call void @brg_gc_init()
-// CHECK-NEXT:   %[[C1:.*]] = call ptr @brg_gc_alloc(i64 16)
+// CHECK-NEXT:   call void @brt_gc_init()
+// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
 // CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   ret { ptr, i64 } %[[C2]]
@@ -31,15 +31,15 @@ bir.func @main() -> !bir.string {
 
 // CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 
-// CHECK: declare void @brg_gc_init()
+// CHECK: declare void @brt_gc_init()
 
-// CHECK: declare ptr @brg_gc_alloc(i64)
+// CHECK: declare ptr @brt_gc_alloc(i64)
 
 // CHECK: declare void @brt_print_string({ ptr, i64 })
 
 // CHECK:      define void @main() {
-// CHECK-NEXT:   call void @brg_gc_init()
-// CHECK-NEXT:   %[[C1:.*]] = call ptr @brg_gc_alloc(i64 16)
+// CHECK-NEXT:   call void @brt_gc_init()
+// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
 // CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   call void @brt_print_string({ ptr, i64 } %[[C2]])

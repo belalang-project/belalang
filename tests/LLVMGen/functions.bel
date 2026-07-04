@@ -1,13 +1,13 @@
 # RUN: %belalang build --emit=llvm %s | %FileCheck %s
 
-# CHECK: declare void @brg_gc_init()
-# CHECK: declare ptr @brg_gc_alloc(i64)
+# CHECK: declare void @brt_gc_init()
+# CHECK: declare ptr @brt_gc_alloc(i64)
 # CHECK: declare void @brt_print_int(i64)
 
 # CHECK:      define i64 @fn.main.anon(i64 %[[ARG0:.*]], i64 %[[ARG1:.*]]) {
-# CHECK-NEXT:   %[[V0:.*]] = call ptr @brg_gc_alloc(i64 8)
+# CHECK-NEXT:   %[[V0:.*]] = call ptr @brt_gc_alloc(i64 8)
 # CHECK-NEXT:   store i64 %[[ARG0]], ptr %[[V0]], align 4
-# CHECK-NEXT:   %[[V1:.*]] = call ptr @brg_gc_alloc(i64 8)
+# CHECK-NEXT:   %[[V1:.*]] = call ptr @brt_gc_alloc(i64 8)
 # CHECK-NEXT:   store i64 %[[ARG1]], ptr %[[V1]], align 4
 # CHECK-NEXT:   %[[V2:.*]] = load i64, ptr %[[V0]], align 4
 # CHECK-NEXT:   %[[V3:.*]] = load i64, ptr %[[V1]], align 4
@@ -16,12 +16,12 @@
 # CHECK-NEXT: }
 
 # CHECK:      define i64 @main() {
-# CHECK-NEXT:   call void @brg_gc_init()
-# CHECK-NEXT:   %[[V5:.*]] = call ptr @brg_gc_alloc(i64 8)
+# CHECK-NEXT:   call void @brt_gc_init()
+# CHECK-NEXT:   %[[V5:.*]] = call ptr @brt_gc_alloc(i64 8)
 # CHECK-NEXT:   store ptr @fn.main.anon, ptr %[[V5]], align 8
 # CHECK-NEXT:   %[[V6:.*]] = load ptr, ptr %[[V5]], align 8
 # CHECK-NEXT:   %[[V7:.*]] = call i64 %[[V6]](i64 2, i64 3)
-# CHECK-NEXT:   %[[V8:.*]] = call ptr @brg_gc_alloc(i64 8)
+# CHECK-NEXT:   %[[V8:.*]] = call ptr @brt_gc_alloc(i64 8)
 # CHECK-NEXT:   store i64 %[[V7]], ptr %[[V8]], align 4
 # CHECK-NEXT:   %[[V9:.*]] = load i64, ptr %[[V8]], align 4
 # CHECK-NEXT:   call void @brt_print_int(i64 %[[V9]])
