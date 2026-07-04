@@ -1,7 +1,9 @@
 # RUN: %belalang build --emit=bir %s | %FileCheck %s
 
 # CHECK: module {
+# CHECK-NEXT: bir.func @brt_init()
 # CHECK-NEXT: bir.func @main() -> !bir.int {
+# CHECK-NEXT:   bir.call @brt_init() : () -> ()
 
 # CHECK-NEXT: %[[C0:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C1:.*]] = bir.constant #bir.int<2> : !bir.int

@@ -101,6 +101,45 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     return mlir::failure();
   }
 };
+
+static bool hasBRTInitCall(bir::FuncOp mainFunc) {
+  bool found = false;
+  mainFunc.walk([&found](bir::CallOp callOp) {
+    if (callOp.getCallee() == llvm::StringRef(brt::BRT_INIT)) {
+      found = true;
+      return mlir::WalkResult::interrupt();
+    }
+    return mlir::WalkResult::advance();
+  });
+  return found;
+}
+
+static void insertBRTInitCall(mlir::Operation *op) {
+  mlir::ModuleOp module = dyn_cast_or_null<mlir::ModuleOp>(op);
+  assert(module);
+
+  mlir::OpBuilder builder(module.getContext());
+
+  auto mainFunc = module.lookupSymbol<bir::FuncOp>("main");
+  if (!mainFunc || mainFunc.isExternal())
+    return;
+
+  if (!module.lookupSymbol(brt::BRT_INIT)) {
+    mlir::OpBuilder::InsertionGuard g(builder);
+    builder.setInsertionPointToStart(module.getBody());
+    auto funcType = mlir::FunctionType::get(builder.getContext(), {}, {});
+    bir::FuncOp::create(builder, builder.getUnknownLoc(), brt::BRT_INIT,
+                        funcType);
+  }
+
+  if (!hasBRTInitCall(mainFunc)) {
+    mlir::OpBuilder::InsertionGuard g(builder);
+    builder.setInsertionPointToStart(&mainFunc.getBody().front());
+    auto callee = FlatSymbolRefAttr::get(builder.getContext(), brt::BRT_INIT);
+    bir::CallOp::create(builder, builder.getUnknownLoc(), callee, {}, {});
+  }
+}
+
 } // namespace
 
 void belalang::bir::populateBelalangLowerPrintToRuntimePatterns(
@@ -118,6 +157,8 @@ struct BelalangLowerPrintToRuntimePass
       BelalangLowerPrintToRuntimePass>::BelalangLowerPrintToRuntimePassBase;
 
   void runOnOperation() override {
+    insertBRTInitCall(getOperation());
+
     mlir::RewritePatternSet patterns(&getContext());
     populateBelalangLowerPrintToRuntimePatterns(patterns);
 

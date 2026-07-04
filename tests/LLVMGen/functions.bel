@@ -1,8 +1,8 @@
 # RUN: %belalang build --emit=llvm %s | %FileCheck %s
 
-# CHECK: declare void @brt_init()
 # CHECK: declare ptr @brt_gc_alloc(i64)
 # CHECK: declare void @brt_print_int(i64)
+# CHECK: declare void @brt_init()
 
 # CHECK:      define i64 @fn.main.anon(i64 %[[ARG0:.*]], i64 %[[ARG1:.*]]) {
 # CHECK-NEXT:   %[[V0:.*]] = call ptr @brt_gc_alloc(i64 8)

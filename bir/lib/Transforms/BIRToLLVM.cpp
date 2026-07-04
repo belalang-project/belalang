@@ -546,38 +546,6 @@ struct BelalangBIRToLLVMPass
       signalPassFailure();
       return;
     }
-
-    auto module = mlir::dyn_cast<mlir::ModuleOp>(getOperation());
-    if (!module)
-      return;
-
-    MLIRContext *ctx = &getContext();
-    auto mainFunc = module.lookupSymbol<LLVM::LLVMFuncOp>("main");
-    if (!mainFunc || mainFunc.isExternal())
-      return;
-
-    if (!module.lookupSymbol(brt::BRT_INIT)) {
-      OpBuilder builder(&module.getBodyRegion().front(),
-                        module.getBodyRegion().front().begin());
-      auto voidType = LLVM::LLVMVoidType::get(ctx);
-      auto funcType = LLVM::LLVMFunctionType::get(voidType, {});
-      OperationState funcState(UnknownLoc::get(ctx),
-                               LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_INIT,
-                              funcType);
-      builder.create(funcState);
-    }
-
-    {
-      Block &entryBlock = mainFunc.getBody().front();
-      OpBuilder builder(&entryBlock, entryBlock.begin());
-      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_INIT);
-      OperationState callState(UnknownLoc::get(ctx),
-                               LLVM::CallOp::getOperationName());
-      LLVM::CallOp::build(builder, callState, TypeRange{}, calleeAttr,
-                          ValueRange{});
-      builder.create(callState);
-    }
   }
 };
 
