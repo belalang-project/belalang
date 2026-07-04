@@ -1,9 +1,0 @@
-load("@rules_rust//rust:defs.bzl", "rust_static_library", "rust_library", "rust_test", "rust_binary")
-load("@rules_cc//cc:defs.bzl", "cc_library")
-
-package(default_visibility = ["//brt:__pkg__"])
-
-rust_library(
-    name = "brt-core",
-    srcs = glob(["src/**/*.rs"]),
-)
