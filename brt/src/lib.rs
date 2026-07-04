@@ -48,7 +48,7 @@ pub extern "C" fn brt_print_bool(v: bool) {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn brt_gc_init() {
+pub extern "C" fn brt_init() {
     unsafe {
         GC_init();
     }

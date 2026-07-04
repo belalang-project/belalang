@@ -556,14 +556,14 @@ struct BelalangBIRToLLVMPass
     if (!mainFunc || mainFunc.isExternal())
       return;
 
-    if (!module.lookupSymbol(brt::BRT_GC_INIT)) {
+    if (!module.lookupSymbol(brt::BRT_INIT)) {
       OpBuilder builder(&module.getBodyRegion().front(),
                         module.getBodyRegion().front().begin());
       auto voidType = LLVM::LLVMVoidType::get(ctx);
       auto funcType = LLVM::LLVMFunctionType::get(voidType, {});
       OperationState funcState(UnknownLoc::get(ctx),
                                LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_GC_INIT,
+      LLVM::LLVMFuncOp::build(builder, funcState, brt::BRT_INIT,
                               funcType);
       builder.create(funcState);
     }
@@ -571,7 +571,7 @@ struct BelalangBIRToLLVMPass
     {
       Block &entryBlock = mainFunc.getBody().front();
       OpBuilder builder(&entryBlock, entryBlock.begin());
-      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_GC_INIT);
+      auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_INIT);
       OperationState callState(UnknownLoc::get(ctx),
                                LLVM::CallOp::getOperationName());
       LLVM::CallOp::build(builder, callState, TypeRange{}, calleeAttr,
