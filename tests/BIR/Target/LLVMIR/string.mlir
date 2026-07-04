@@ -4,9 +4,9 @@
 
 // CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 
-// CHECK: declare void @brt_init()
-
 // CHECK: declare ptr @brt_gc_alloc(i64)
+
+// CHECK: declare void @brt_init()
 
 // CHECK:      define { ptr, i64 } @main() {
 // CHECK-NEXT:   call void @brt_init()
@@ -31,11 +31,11 @@ bir.func @main() -> !bir.string {
 
 // CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 
-// CHECK: declare void @brt_init()
-
 // CHECK: declare ptr @brt_gc_alloc(i64)
 
 // CHECK: declare void @brt_print_string({ ptr, i64 })
+
+// CHECK: declare void @brt_init()
 
 // CHECK:      define void @main() {
 // CHECK-NEXT:   call void @brt_init()

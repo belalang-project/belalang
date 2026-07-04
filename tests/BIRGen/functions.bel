@@ -2,6 +2,7 @@
 
 # CHECK:      module {
 # CHECK-NEXT:   bir.func private @brt_print_int(!bir.int)
+# CHECK-NEXT:   bir.func @brt_init()
 # CHECK-NEXT:   bir.func @fn.main.anon(%[[ARG0:.*]]: !bir.int, %[[ARG1:.*]]: !bir.int) -> !bir.int {
 # CHECK-NEXT:     %[[V0:.*]] = bir.var.declare "x" : <!bir.int>
 # CHECK-NEXT:     bir.var.store %[[ARG0]] to %[[V0]] : !bir.int to <!bir.int>
@@ -13,6 +14,7 @@
 # CHECK-NEXT:     bir.return %[[V4]] : !bir.int
 # CHECK-NEXT:   }
 # CHECK-NEXT:   bir.func @main() -> !bir.int {
+# CHECK-NEXT:     bir.call @brt_init() : () -> ()
 # CHECK-NEXT:     %[[C0:.*]] = bir.constant #bir.fn<@fn.main.anon> : (!bir.int, !bir.int) -> !bir.int
 # CHECK-NEXT:     %[[V5:.*]] = bir.var.declare "add" : <(!bir.int, !bir.int) -> !bir.int>
 # CHECK-NEXT:     bir.var.store %[[C0]] to %[[V5]] : (!bir.int, !bir.int) -> !bir.int to <(!bir.int, !bir.int) -> !bir.int>
