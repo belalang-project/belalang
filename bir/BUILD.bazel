@@ -199,7 +199,6 @@ cc_library(
         ":BelalangBIREnumAttrGen",
         ":BelalangBIROpGen",
         ":BelalangPassIncGen",
-        "//brt:brt-include",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:FunctionInterfaces",
@@ -215,6 +214,7 @@ cc_library(
     hdrs = [
         "include/belalang/BIR/IR/BIR.h",
         "include/belalang/BIR/Passes.h",
+        "include/belalang/BIR/BRTUtils.h",
         "include/belalang/BIR/Interfaces/LoopOpInterface.h",
     ],
     includes = ["include"],

@@ -1,6 +1,6 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
-#include "belalang/BRT/BRT.h"
+#include "belalang/BIR/BRTUtils.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Transforms/DialectConversion.h"
@@ -331,14 +331,14 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
       return failure();
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
-    if (!module.lookupSymbol(brt::BRT_GC_ALLOC)) {
+    if (!module.lookupSymbol(kGCAlloc)) {
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       auto funcType = LLVM::LLVMFunctionType::get(
           LLVM::LLVMPointerType::get(ctx), mlir::IntegerType::get(ctx, 64));
       OperationState funcState(UnknownLoc::get(ctx),
                                LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(rewriter, funcState, brt::BRT_GC_ALLOC,
+      LLVM::LLVMFuncOp::build(rewriter, funcState, kGCAlloc,
                               funcType);
       rewriter.create(funcState);
     }
@@ -348,7 +348,7 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
         LLVM::ConstantOp::create(rewriter, loc, i64Type, rewriter.getI64IntegerAttr(elSize));
 
     auto ptrType = LLVM::LLVMPointerType::get(ctx);
-    auto calleeAttr = FlatSymbolRefAttr::get(ctx, brt::BRT_GC_ALLOC);
+    auto calleeAttr = FlatSymbolRefAttr::get(ctx, kGCAlloc);
     auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr, sizeVal.getResult());
 
     rewriter.replaceOp(op, allocCall.getResult());

@@ -1,6 +1,6 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
-#include "belalang/BRT/BRT.h"
+#include "belalang/BIR/BRTUtils.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGPREPARERUNTIMEPASS
@@ -13,7 +13,7 @@ using namespace belalang;
 static bool hasBRTInitCall(bir::FuncOp mainFunc) {
   bool found = false;
   mainFunc.walk([&found](bir::CallOp callOp) {
-    if (callOp.getCallee() == llvm::StringRef(brt::BRT_INIT)) {
+    if (callOp.getCallee() == llvm::StringRef(kInit)) {
       found = true;
       return mlir::WalkResult::interrupt();
     }
@@ -32,18 +32,18 @@ static void insertBRTInitCall(mlir::Operation *op) {
   if (!mainFunc || mainFunc.isExternal())
     return;
 
-  if (!module.lookupSymbol(brt::BRT_INIT)) {
+  if (!module.lookupSymbol(kInit)) {
     mlir::OpBuilder::InsertionGuard g(builder);
     builder.setInsertionPointToStart(module.getBody());
     auto funcType = mlir::FunctionType::get(builder.getContext(), {}, {});
-    bir::FuncOp::create(builder, builder.getUnknownLoc(), brt::BRT_INIT,
+    bir::FuncOp::create(builder, builder.getUnknownLoc(), kInit,
                         funcType);
   }
 
   if (!hasBRTInitCall(mainFunc)) {
     mlir::OpBuilder::InsertionGuard g(builder);
     builder.setInsertionPointToStart(&mainFunc.getBody().front());
-    auto callee = FlatSymbolRefAttr::get(builder.getContext(), brt::BRT_INIT);
+    auto callee = FlatSymbolRefAttr::get(builder.getContext(), kInit);
     bir::CallOp::create(builder, builder.getUnknownLoc(), callee, {}, {});
   }
 }
