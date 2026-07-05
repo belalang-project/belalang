@@ -142,6 +142,61 @@ def BIR_ModOp : BIR_Op<"mod"> {
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
+def BIR_AndOp : BIR_Op<"and"> {
+  let summary = "and";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
+def BIR_OrOp : BIR_Op<"or"> {
+  let summary = "or";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
+def BIR_XorOp : BIR_Op<"xor"> {
+  let summary = "xor";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
+def BIR_ShlOp : BIR_Op<"shl"> {
+  let summary = "shl";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
+def BIR_ShrOp : BIR_Op<"shr"> {
+  let summary = "shr";
+
+  let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
+  let results = (outs BIR_AnyType:$result);
+
+  let assemblyFormat =
+      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
 def BIR_PrintOp : BIR_Op<"print"> {
   let summary = "print";
 
