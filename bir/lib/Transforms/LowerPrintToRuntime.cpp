@@ -1,6 +1,6 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
-#include "belalang/BRT/BRT.h"
+#include "belalang/BIR/BRTUtils.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -23,7 +23,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     mlir::ModuleOp mod = op->getParentOfType<mlir::ModuleOp>();
 
     if (auto v = mlir::dyn_cast<IntType>(value.getType())) {
-      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_INT);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(kPrintInt);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::IntType>();
@@ -32,7 +32,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_INT,
+        f = bir::FuncOp::create(rewriter, op.getLoc(), kPrintInt,
                                 funcType);
         f.setPrivate();
       }
@@ -42,7 +42,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     }
 
     if (auto v = mlir::dyn_cast<bir::FloatType>(value.getType())) {
-      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_FLOAT);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(kPrintFloat);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::FloatType>();
@@ -51,7 +51,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_FLOAT,
+        f = bir::FuncOp::create(rewriter, op.getLoc(), kPrintFloat,
                                 funcType);
         f.setPrivate();
       }
@@ -61,7 +61,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     }
 
     if (auto v = mlir::dyn_cast<bir::StringType>(value.getType())) {
-      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_STRING);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(kPrintString);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::StringType>();
@@ -70,7 +70,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_STRING,
+        f = bir::FuncOp::create(rewriter, op.getLoc(), kPrintString,
                                 funcType);
         f.setPrivate();
       }
@@ -80,7 +80,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
     }
 
     if (auto v = mlir::dyn_cast<bir::BoolType>(value.getType())) {
-      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(brt::BRT_PRINT_BOOL);
+      bir::FuncOp f = mod.lookupSymbol<bir::FuncOp>(kPrintBool);
 
       if (!f) {
         mlir::Type ty = rewriter.getType<bir::BoolType>();
@@ -89,7 +89,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
         mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(mod.getBody());
 
-        f = bir::FuncOp::create(rewriter, op.getLoc(), brt::BRT_PRINT_BOOL,
+        f = bir::FuncOp::create(rewriter, op.getLoc(), kPrintBool,
                                 funcType);
         f.setPrivate();
       }
@@ -105,7 +105,7 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
 static bool hasBRTInitCall(bir::FuncOp mainFunc) {
   bool found = false;
   mainFunc.walk([&found](bir::CallOp callOp) {
-    if (callOp.getCallee() == llvm::StringRef(brt::BRT_INIT)) {
+    if (callOp.getCallee() == llvm::StringRef(kInit)) {
       found = true;
       return mlir::WalkResult::interrupt();
     }
@@ -124,18 +124,18 @@ static void insertBRTInitCall(mlir::Operation *op) {
   if (!mainFunc || mainFunc.isExternal())
     return;
 
-  if (!module.lookupSymbol(brt::BRT_INIT)) {
+  if (!module.lookupSymbol(kInit)) {
     mlir::OpBuilder::InsertionGuard g(builder);
     builder.setInsertionPointToStart(module.getBody());
     auto funcType = mlir::FunctionType::get(builder.getContext(), {}, {});
-    bir::FuncOp::create(builder, builder.getUnknownLoc(), brt::BRT_INIT,
+    bir::FuncOp::create(builder, builder.getUnknownLoc(), kInit,
                         funcType);
   }
 
   if (!hasBRTInitCall(mainFunc)) {
     mlir::OpBuilder::InsertionGuard g(builder);
     builder.setInsertionPointToStart(&mainFunc.getBody().front());
-    auto callee = FlatSymbolRefAttr::get(builder.getContext(), brt::BRT_INIT);
+    auto callee = FlatSymbolRefAttr::get(builder.getContext(), kInit);
     bir::CallOp::create(builder, builder.getUnknownLoc(), callee, {}, {});
   }
 }
