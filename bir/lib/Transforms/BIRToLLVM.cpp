@@ -305,6 +305,69 @@ struct ModOpLowering final : public OpConversionPattern<bir::ModOp> {
   }
 };
 
+struct AndOpLowering final : public OpConversionPattern<bir::AndOp> {
+  using OpConversionPattern<bir::AndOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::AndOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<mlir::IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::AndOp>(op, type, adaptor.getLhs(),
+                                               adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct OrOpLowering final : public OpConversionPattern<bir::OrOp> {
+  using OpConversionPattern<bir::OrOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::OrOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<mlir::IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::OrOp>(op, type, adaptor.getLhs(),
+                                              adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
+struct XorOpLowering final : public OpConversionPattern<bir::XorOp> {
+  using OpConversionPattern<bir::XorOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::XorOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto type = getTypeConverter()->convertType(op.getType());
+    if (!type)
+      return failure();
+
+    if (mlir::isa<mlir::IntegerType>(type)) {
+      rewriter.replaceOpWithNewOp<LLVM::XOrOp>(op, type, adaptor.getLhs(),
+                                               adaptor.getRhs());
+    } else {
+      return failure();
+    }
+
+    return success();
+  }
+};
+
 struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp> {
   using OpConversionPattern<bir::VarDeclareOp>::OpConversionPattern;
 
@@ -515,6 +578,7 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
   patterns.add<ConstantOpLowering, FuncOpLowering, CallOpLowering,
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
+               AndOpLowering, OrOpLowering, XorOpLowering,
                VarDeclareOpLowering, VarStoreOpLowering, VarLoadOpLowering,
                CondBrLowering, CmpOpLowering>(typeConverter,
                                               patterns.getContext());
