@@ -1,6 +1,9 @@
 # Belalang 🦗
 
-Belalang is an experimental compiled language built using MLIR and LLVM.
+> [!NOTE]
+> Belalang is currently highly experimental and in very early development. The language design and syntax are subject to change.
+
+Belalang (Indonesian word for Grasshopper) is an experimental compiled language built using MLIR and LLVM.
 Inspired by ClangIR, it utilizes a custom MLIR dialect for its lowering system
 and uses the Boehm-Demers-Weiser GC algorithm under the hood for automatic
 memory management.
