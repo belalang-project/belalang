@@ -68,27 +68,11 @@ void emit(const llvm::Record *opRec, llvm::raw_ostream &os) {
 
 } // namespace
 
-static const char *const CreateBIRGen2 = R"(
-std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {
-  auto *gen = reinterpret_cast<::belalang::birgen::BIRGen *>(gen_ptr);
-  return std::make_unique<BIRGen2>(*gen);
-}
-)";
-
-static const char *const BIRGen2Ctor = R"(
-BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}
-)";
-
 namespace belalang::bir {
 
 void emitCXXBindingDefs(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
-  os << "namespace belalang::birgen2 {\n"
-     << CreateBIRGen2 << BIRGen2Ctor << "\n";
-
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
     emit(op, os);
-
-  os << "} // namespace belalang::birgen2\n";
 }
 
 } // namespace belalang::bir

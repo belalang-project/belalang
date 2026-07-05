@@ -77,54 +77,27 @@ void emitAndGather(const llvm::Record *opRec, llvm::raw_ostream &os) {
 }
 
 void emitBIRGenClass(llvm::raw_ostream &os) {
-  os << "class BIRGen2 {\n"
-     << "public:\n"
-     << "  BIRGen2(::belalang::birgen::BIRGen &gen);\n"
-     << "  ~BIRGen2() = default;\n";
+  os << "#ifdef GET_BUILDER_FUNCTION_DECLS\n"
+     << "#undef GET_BUILDER_FUNCTION_DECLS\n";
 
   for (auto decl : builderFunctionDecls)
     os << decl << "\n";
 
-  os << "private:\n"
-     << "  ::belalang::birgen::BIRGen &gen;\n"
-     << "};\n"
-     << "std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen);\n";
+  os << "#endif // GET_BUILDER_FUNCTION_DECLS\n";
 }
 
 } // namespace
 
-static const char *const BIRGenForwardDecl = R"(
-namespace belalang {
-namespace birgen {
-class BIRGen;
-} // namespace birgen
-} // namespace belalang
-)";
-
-static const char *const BIRGuardBaseClass = R"(
-class BIRGuard {
-public:
-  BIRGuard(mlir::OpBuilder &builder) : guard(builder), builder(builder) {}
-  virtual ~BIRGuard() = default;
-
-protected:
-  mlir::OpBuilder::InsertionGuard guard;
-  mlir::OpBuilder &builder;
-};
-)";
-
 namespace belalang::bir {
 
 void emitCXXBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
-  os << BIRGenForwardDecl;
-  os << "namespace belalang::birgen2 {\n";
-  os << BIRGuardBaseClass;
-
+  os << "#ifdef GET_BIRGUARD_CLASS_DECLS\n"
+     << "#undef GET_BIRGUARD_CLASS_DECLS\n";
   for (const auto *op : rk.getAllDerivedDefinitions("BIR_Op"))
     emitAndGather(op, os);
-  emitBIRGenClass(os);
+  os << "#endif // GET_BIRGUARD_CLASS_DECLS\n";
 
-  os << "} // namespace belalang::birgen2\n";
+  emitBIRGenClass(os);
 }
 
 } // namespace belalang::bir
