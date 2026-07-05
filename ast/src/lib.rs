@@ -1,5 +1,3 @@
-#![feature(if_let_guard)]
-
 mod dump;
 mod expressions;
 mod parser;
