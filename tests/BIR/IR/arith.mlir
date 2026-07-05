@@ -12,5 +12,7 @@ bir.func @basic() -> !bir.int {
     %7 = bir.and %0, %1 : (!bir.int, !bir.int) -> !bir.int
     %8 = bir.or %0, %1 : (!bir.int, !bir.int) -> !bir.int
     %9 = bir.xor %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    %10 = bir.shl %0, %1 : (!bir.int, !bir.int) -> !bir.int
+    %11 = bir.shr %0, %1 : (!bir.int, !bir.int) -> !bir.int
     bir.return %0 : !bir.int
 }

@@ -34,6 +34,12 @@ bir.func @basic() -> !bir.int {
   // CHECK-NEXT: %9 = llvm.xor %0, %1 : i64
   %9 = bir.xor %0, %1 : (!bir.int, !bir.int) -> !bir.int
 
+  // CHECK-NEXT: %10 = llvm.shl %0, %1 : i64
+  %10 = bir.shl %0, %1 : (!bir.int, !bir.int) -> !bir.int
+
+  // CHECK-NEXT: %11 = llvm.ashr %0, %1 : i64
+  %11 = bir.shr %0, %1 : (!bir.int, !bir.int) -> !bir.int
+
   // CHECK-NEXT: llvm.return %0 : i64
   bir.return %0 : !bir.int
 }
