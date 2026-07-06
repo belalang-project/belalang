@@ -195,6 +195,12 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   return guard;
 }
 
+BIRIfGuard::~BIRIfGuard() {
+  // TODO: handle errors, for now, it won't error
+  assert(bir::IfOp::ensureRegionTerm(builder, *thenRegion).succeeded());
+  assert(bir::IfOp::ensureRegionTerm(builder, *elseRegion).succeeded());
+}
+
 void BIRIfGuard::start_then() {
   thenRegion->push_back(new mlir::Block());
   builder.setInsertionPointToEnd(&thenRegion->front());
