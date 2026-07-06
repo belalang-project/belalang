@@ -114,20 +114,20 @@ gentbl_cc_library(
 )
 
 rust_cxx_bridge(
-    name = "birgen2-bridge",
+    name = "bir_codegen-bridge",
     src = ":BelalangRustBindingsGen",
-    deps = [":birgen2-cc"],
+    deps = [":bir_codegen-cc"],
 )
 
 rust_library(
-    name = "birgen2",
+    name = "bir_codegen",
     srcs = glob(["lib/CodeGen/*.rs"]) + [
         ":BelalangRustBindingsGen",
     ],
     deps = [
-        ":birgen2-include",
-        ":birgen2-bridge",
-        ":birgen2-cc",
+        ":bir_codegen-include",
+        ":bir_codegen-bridge",
+        ":bir_codegen-cc",
         "@cxx.rs//:cxx",
     ],
 )
@@ -153,7 +153,7 @@ gentbl_cc_library(
 )
 
 cc_library(
-    name = "birgen2-cc",
+    name = "bir_codegen-cc",
     srcs = [
         "lib/CodeGen/BIRGen.cpp",
     ],
@@ -161,14 +161,14 @@ cc_library(
         "include/belalang/BIR/CodeGen/BIRGen.h",
     ],
     deps = [
-        ":birgen2-include",
-        ":birgen2-bridge/include",
+        ":bir_codegen-include",
+        ":bir_codegen-bridge/include",
     ]
 )
 
 cc_library(
-    name = "birgen2-include",
-    includes = ["birgen2"],
+    name = "bir_codegen-include",
+    includes = ["bir_codegen"],
     deps = [
         ":BelalangCXXBindingsIncGen",
         ":bir",
