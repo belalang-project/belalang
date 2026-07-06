@@ -114,20 +114,20 @@ gentbl_cc_library(
 )
 
 rust_cxx_bridge(
-    name = "birgen2-bridge",
+    name = "bir_codegen-bridge",
     src = ":BelalangRustBindingsGen",
-    deps = [":birgen2-cc"],
+    deps = [":bir_codegen-cc"],
 )
 
 rust_library(
-    name = "birgen2",
-    srcs = glob(["birgen2/*.rs"]) + [
+    name = "bir_codegen",
+    srcs = glob(["lib/CodeGen/*.rs"]) + [
         ":BelalangRustBindingsGen",
     ],
     deps = [
-        ":birgen2-include",
-        ":birgen2-bridge",
-        ":birgen2-cc",
+        ":bir_codegen-include",
+        ":bir_codegen-bridge",
+        ":bir_codegen-cc",
         "@cxx.rs//:cxx",
     ],
 )
@@ -135,7 +135,7 @@ rust_library(
 gentbl_rule(
     name = "BelalangRustBindingsGen",
     opts = ["-gen-rust-binding-decls"],
-    out = "birgen2/bindings.rs",
+    out = "lib/CodeGen/bindings.rs",
     tblgen = ":bir-tblgen",
     td_file = "include/belalang/BIR/IR/BIROps.td",
     deps = [":BelalangBIRTdFiles"],
@@ -144,8 +144,8 @@ gentbl_rule(
 gentbl_cc_library(
     name = "BelalangCXXBindingsIncGen",
     tbl_outs = [
-        (["-gen-cxx-binding-decls"], "birgen2/Bindings.h.inc"),
-        (["-gen-cxx-binding-defs"], "birgen2/Bindings.cpp.inc"),
+        (["-gen-cxx-binding-decls"], "include/belalang/BIR/CodeGen/Bindings.h.inc"),
+        (["-gen-cxx-binding-defs"], "include/belalang/BIR/CodeGen/Bindings.cpp.inc"),
     ],
     tblgen = ":bir-tblgen",
     td_file = "include/belalang/BIR/IR/BIROps.td",
@@ -153,22 +153,22 @@ gentbl_cc_library(
 )
 
 cc_library(
-    name = "birgen2-cc",
+    name = "bir_codegen-cc",
     srcs = [
-        "birgen2/BIRGen2.cpp",
+        "lib/CodeGen/BIRGen.cpp",
     ],
     hdrs = [
-        "birgen2/BIRGen2.h",
+        "include/belalang/BIR/CodeGen/BIRGen.h",
     ],
     deps = [
-        ":birgen2-include",
-        ":birgen2-bridge/include",
+        ":bir_codegen-include",
+        ":bir_codegen-bridge/include",
     ]
 )
 
 cc_library(
-    name = "birgen2-include",
-    includes = ["birgen2"],
+    name = "bir_codegen-include",
+    includes = ["bir_codegen"],
     deps = [
         ":BelalangCXXBindingsIncGen",
         ":bir",

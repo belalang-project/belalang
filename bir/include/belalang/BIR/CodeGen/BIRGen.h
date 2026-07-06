@@ -1,5 +1,5 @@
-#ifndef BELALANG_BIRGEN2_BIRGEN2_H_
-#define BELALANG_BIRGEN2_BIRGEN2_H_
+#ifndef BELALANG_BIR_CODEGEN_BIRGEN_H_
+#define BELALANG_BIR_CODEGEN_BIRGEN_H_
 
 #include <cstdint>
 #include <memory>
@@ -15,7 +15,8 @@ namespace birgen {
 class BIRGen;
 } // namespace birgen
 
-namespace birgen2 {
+namespace bir {
+namespace codegen {
 
 // -----------------------------------------------------------------------------
 // BIRGuard
@@ -32,26 +33,27 @@ protected:
 };
 
 #define GET_BIRGUARD_CLASS_DECLS
-#include "Bindings.h.inc"
+#include "belalang/BIR/CodeGen/Bindings.h.inc"
 
 // -----------------------------------------------------------------------------
-// BIRGen2
+// BIRGen
 // -----------------------------------------------------------------------------
 
-class BIRGen2 {
+class BIRGen {
 public:
-  BIRGen2(birgen::BIRGen &gen);
+  BIRGen(birgen::BIRGen &gen);
 
 #define GET_BUILDER_FUNCTION_DECLS
-#include "Bindings.h.inc"
+#include "belalang/BIR/CodeGen/Bindings.h.inc"
 
 private:
   birgen::BIRGen &gen;
 };
 
-std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen);
+std::unique_ptr<BIRGen> create_birgen(uintptr_t gen);
 
-} // namespace birgen2
+} // namespace codegen
+} // namespace bir
 } // namespace belalang
 
-#endif // BELALANG_BIRGEN2_BIRGEN2_H_
+#endif // BELALANG_BIR_CODEGEN_BIRGEN_H_

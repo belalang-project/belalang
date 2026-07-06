@@ -31,7 +31,7 @@ void emitBuilderFunctionDef(OpMetadata M, llvm::raw_ostream &os) {
   auto op = M.getOp();
   auto args = getArgs(op);
 
-  os << retTy + " BIRGen2::" + M.getBuilderName() + "(" + args + ") {\n";
+  os << retTy + " BIRGen::" + M.getBuilderName() + "(" + args + ") {\n";
 
   if (op.getNumResults() > 0)
     os.indent(2) << "return nullptr;\n";

@@ -110,20 +110,20 @@ pub struct BIRGen<'sess> {
     session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
     symbol_table: HashMap<Symbol, cxx::UniquePtr<ffi::BIRValue>>,
-    birgen2: cxx::UniquePtr<birgen2::BIRGen2>,
+    bir_codegen: cxx::UniquePtr<bir_codegen::BIRGen>,
 }
 
 impl<'sess> BIRGen<'sess> {
     pub fn new(session: &'sess Session) -> Self {
         let inner = ffi::create_birgen();
         let ptr = inner.into_raw();
-        let birgen2 = birgen2::create_birgen2(ptr as usize);
+        let bir_codegen = bir_codegen::create_birgen(ptr as usize);
         let inner = unsafe { cxx::UniquePtr::from_raw(ptr) };
         Self {
             session,
             inner,
             symbol_table: HashMap::new(),
-            birgen2,
+            bir_codegen,
         }
     }
 
@@ -148,7 +148,7 @@ impl<'sess> BIRGen<'sess> {
                 }
             },
             Statement::While(while_stmt) => {
-                let mut guard = self.birgen2.pin_mut().build_while_op();
+                let mut guard = self.bir_codegen.pin_mut().build_while_op();
 
                 guard.pin_mut().enter_cond();
                 let cond_val = self.generate_expression(&while_stmt.condition);
@@ -158,7 +158,7 @@ impl<'sess> BIRGen<'sess> {
                 for stmt in while_stmt.block.statements {
                     self.generate_statement(stmt);
                 }
-                self.birgen2.pin_mut().build_continue_op();
+                self.bir_codegen.pin_mut().build_continue_op();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -210,7 +210,7 @@ impl<'sess> BIRGen<'sess> {
                 // TODO: Implement struct declaration
             },
             Statement::Break(_s) => {
-                self.birgen2.pin_mut().build_break_op();
+                self.bir_codegen.pin_mut().build_break_op();
             },
             Statement::Continue(_s) => {
                 self.inner.pin_mut().build_continue();
