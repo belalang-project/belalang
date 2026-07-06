@@ -25,6 +25,8 @@ rust_static_library(
     srcs = ["src/lib.rs"],
     deps = [
         "@crates//:libc",
+    ],
+    link_deps = [
         "@bdwgc//:bdwgc",
     ],
 )

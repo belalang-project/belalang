@@ -32,14 +32,16 @@ rust_library(
     name = "birgen",
     srcs = glob(["src/**/*.rs"]),
     deps = [
-        ":birgen-bridge",
-        ":birgen-cc",
-        "//bir",
         "//bir:bir_codegen",
         "//ast",
         "//lexer",
         "//session",
         "@cxx.rs//:cxx",
+    ],
+    link_deps = [
+        ":birgen-bridge",
+        ":birgen-cc",
+        "//bir",
     ],
 )
 

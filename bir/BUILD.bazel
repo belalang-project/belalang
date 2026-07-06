@@ -125,10 +125,12 @@ rust_library(
         ":BelalangRustBindingsGen",
     ],
     deps = [
+        "@cxx.rs//:cxx",
+    ],
+    link_deps = [
         ":bir_codegen-include",
         ":bir_codegen-bridge",
         ":bir_codegen-cc",
-        "@cxx.rs//:cxx",
     ],
 )
 
