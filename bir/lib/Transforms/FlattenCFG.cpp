@@ -151,13 +151,12 @@ public:
       }
     });
 
-    // End body with jump to condition.
-    {
-      OpBuilder::InsertionGuard guard(rewriter);
-      rewriter.setInsertionPointToEnd(&op.getBody().back());
-      if (auto continueOp =
-              dyn_cast<bir::ContinueOp>(op.getBody().back().getTerminator()))
-        rewriter.replaceOpWithNewOp<cf::BranchOp>(continueOp, cond);
+    // Lower yield terminator.
+    for (mlir::Block &blk : op.getBody().getBlocks()) {
+      if (auto yield = dyn_cast<bir::YieldOp>(blk.getTerminator())) {
+        rewriter.setInsertionPointToEnd(&op.getBody().back());
+        rewriter.replaceOpWithNewOp<cf::BranchOp>(yield, cond);
+      }
     }
 
     // Inline contents.

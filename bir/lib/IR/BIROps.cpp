@@ -210,6 +210,22 @@ void CallOp::setCalleeFromCallable(mlir::CallInterfaceCallable callee) {
 // IfOp
 // -----------------------------------------------------------------------------
 
+mlir::LogicalResult IfOp::ensureRegionTerm(mlir::Builder &b, mlir::Region &r) {
+  mlir::OpBuilder builder(b.getContext());
+
+  if (r.empty())
+    builder.createBlock(&r);
+
+  mlir::Block &blk = r.back();
+  if (!blk.empty() && blk.back().hasTrait<OpTrait::IsTerminator>())
+    return success();
+
+  // Create the yield op to terminate the block
+  builder.setInsertionPointToEnd(&blk);
+  bir::YieldOp::create(builder, builder.getUnknownLoc());
+  return success();
+}
+
 mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result) {
   result.regions.reserve(2);
   mlir::Region *thenRegion = result.addRegion();
@@ -223,9 +239,13 @@ mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result
 
   if (failed(p.parseRegion(*thenRegion)))
     return failure();
+  if (failed(ensureRegionTerm(p.getBuilder(), *thenRegion)))
+    return failure();
 
   if (succeeded(p.parseOptionalKeyword("else"))) {
     if (failed(p.parseRegion(*elseRegion)))
+      return failure();
+    if (failed(ensureRegionTerm(p.getBuilder(), *elseRegion)))
       return failure();
   }
 

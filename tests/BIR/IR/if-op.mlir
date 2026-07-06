@@ -3,6 +3,7 @@
 bir.func @main() {
   %0 = bir.constant #bir.bool<true> : !bir.bool
   // CHECK:      bir.if %{{.*}} {
+  // CHECK-NEXT:   bir.yield
   // CHECK-NEXT: }
   bir.if %0 {}
   bir.return

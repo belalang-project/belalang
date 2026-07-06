@@ -155,10 +155,14 @@ impl<'sess> BIRGen<'sess> {
                 self.inner.pin_mut().build_condition(&cond_val);
 
                 guard.pin_mut().enter_body();
+                let mut bg = self.inner.pin_mut().build_block_expr();
+                bg.pin_mut().start_body();
                 for stmt in while_stmt.block.statements {
                     self.generate_statement(stmt);
                 }
-                self.bir_codegen.pin_mut().build_continue_op();
+                self.inner.pin_mut().build_empty_yield();
+                drop(bg);
+                self.inner.pin_mut().build_empty_yield();
             },
             Statement::VarDecl(var) => {
                 let value = &var.value;
@@ -340,7 +344,6 @@ impl<'sess> BIRGen<'sess> {
                 for stmt in if_expr.consequence.statements {
                     self.generate_statement(stmt);
                 }
-                self.inner.pin_mut().build_empty_yield();
 
                 if let Some(alt) = if_expr.alternative {
                     guard.pin_mut().start_else();
@@ -354,7 +357,6 @@ impl<'sess> BIRGen<'sess> {
                             self.generate_expression(alt);
                         },
                     }
-                    self.inner.pin_mut().build_empty_yield();
                 }
 
                 guard.get_value()

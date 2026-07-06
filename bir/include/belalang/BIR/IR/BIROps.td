@@ -389,7 +389,7 @@ def BIR_ScopeOp : BIR_Op<"scope", [
 }
 
 def BIR_YieldOp : BIR_Op<"yield", [
-  ParentOneOf<["ScopeOp", "IfOp"]>,
+  ParentOneOf<["ScopeOp", "IfOp", "WhileOp"]>,
   Terminator,
 ]> {
   let summary = "yield";
@@ -414,6 +414,7 @@ def BIR_IfOp : BIR_Op<"if", [
 
   let extraClassDeclaration = [{
     bool hasElse() { return !getElseRegion().empty(); }
+    static LogicalResult ensureRegionTerm(::mlir::Builder &, ::mlir::Region &);
   }];
 
   let hasCustomAssemblyFormat = 1;

@@ -105,7 +105,7 @@ public:
              mlir::Region *elseRegion, mlir::Value resultValue)
       : BIRGuard(builder), thenRegion(thenRegion), elseRegion(elseRegion),
         resultValue(resultValue) {}
-  ~BIRIfGuard() = default;
+  ~BIRIfGuard();
 
   void start_then();
   void start_else();
