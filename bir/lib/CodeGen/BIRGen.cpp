@@ -8,7 +8,8 @@
 #include "belalang/BIR/CodeGen/BIRGen.h"
 
 namespace belalang {
-namespace birgen2 {
+namespace bir {
+namespace codegen {
 
 std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {
   auto *gen = reinterpret_cast<birgen::BIRGen *>(gen_ptr);
@@ -19,5 +20,6 @@ BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}
 
 #include "belalang/BIR/CodeGen/Bindings.cpp.inc"
 
-} // birgen2
+} // codegen
+} // bir
 } // belalang

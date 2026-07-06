@@ -24,9 +24,11 @@ class BIRWhileGuard;
 class BIRScopeGuard;
 class BIRGen;
 } // namespace birgen
-namespace birgen2 {
+namespace bir {
+namespace codegen {
 class BIRGen2;
-} // namespace birgen2
+} // namespace codegen
+} // namespace bir
 } // namespace belalang
 
 #include "birgen/src/lib.rs.h"
@@ -190,7 +192,7 @@ public:
   bool optimize();
 
   friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
-  friend class belalang::birgen2::BIRGen2;
+  friend class belalang::bir::codegen::BIRGen2;
 
 private:
   mlir::MLIRContext context;

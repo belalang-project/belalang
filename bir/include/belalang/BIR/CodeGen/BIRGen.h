@@ -15,7 +15,8 @@ namespace birgen {
 class BIRGen;
 } // namespace birgen
 
-namespace birgen2 {
+namespace bir {
+namespace codegen {
 
 // -----------------------------------------------------------------------------
 // BIRGuard
@@ -51,7 +52,8 @@ private:
 
 std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen);
 
-} // namespace birgen2
+} // namespace codegen
+} // namespace bir
 } // namespace belalang
 
 #endif // BELALANG_BIR_CODEGEN_BIRGEN_H_
