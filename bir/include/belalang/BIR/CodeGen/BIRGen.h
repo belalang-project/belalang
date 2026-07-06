@@ -36,12 +36,12 @@ protected:
 #include "belalang/BIR/CodeGen/Bindings.h.inc"
 
 // -----------------------------------------------------------------------------
-// BIRGen2
+// BIRGen
 // -----------------------------------------------------------------------------
 
-class BIRGen2 {
+class BIRGen {
 public:
-  BIRGen2(birgen::BIRGen &gen);
+  BIRGen(birgen::BIRGen &gen);
 
 #define GET_BUILDER_FUNCTION_DECLS
 #include "belalang/BIR/CodeGen/Bindings.h.inc"
@@ -50,7 +50,7 @@ private:
   birgen::BIRGen &gen;
 };
 
-std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen);
+std::unique_ptr<BIRGen> create_birgen(uintptr_t gen);
 
 } // namespace codegen
 } // namespace bir

@@ -14,7 +14,7 @@ void emitGuardClassesDecls(OpMetadata M, llvm::raw_ostream &os) {
 }
 
 void emitBuilderFunction(OpMetadata M, llvm::raw_ostream &os) {
-  os.indent(8) << "fn " + M.getBuilderName() << "(self: Pin<&mut BIRGen2>)";
+  os.indent(8) << "fn " + M.getBuilderName() << "(self: Pin<&mut BIRGen>)";
   if (M.requiresGuard())
     os << " -> UniquePtr<" + M.getGuardName() + ">";
   os << ";\n";
@@ -30,9 +30,9 @@ void emitRustBindingDecls(const llvm::RecordKeeper &rk, llvm::raw_ostream &os) {
   os.indent(4) << "unsafe extern \"C++\" {\n";
 
   os.indent(8) << "include!(\"belalang/BIR/CodeGen/BIRGen.h\");\n";
-  os.indent(8) << "type BIRGen2;\n";
+  os.indent(8) << "type BIRGen;\n";
 
-  os.indent(8) << "fn create_birgen2(gen_ptr: usize) -> UniquePtr<BIRGen2>;\n";
+  os.indent(8) << "fn create_birgen(gen_ptr: usize) -> UniquePtr<BIRGen>;\n";
 
   for (const auto *opRec : rk.getAllDerivedDefinitions("BIR_Op")) {
     mlir::tblgen::Operator op(opRec);

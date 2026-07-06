@@ -26,7 +26,7 @@ class BIRGen;
 } // namespace birgen
 namespace bir {
 namespace codegen {
-class BIRGen2;
+class BIRGen;
 } // namespace codegen
 } // namespace bir
 } // namespace belalang
@@ -192,7 +192,7 @@ public:
   bool optimize();
 
   friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
-  friend class belalang::bir::codegen::BIRGen2;
+  friend class belalang::bir::codegen::BIRGen;
 
 private:
   mlir::MLIRContext context;

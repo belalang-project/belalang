@@ -11,12 +11,12 @@ namespace belalang {
 namespace bir {
 namespace codegen {
 
-std::unique_ptr<BIRGen2> create_birgen2(uintptr_t gen_ptr) {
+std::unique_ptr<BIRGen> create_birgen(uintptr_t gen_ptr) {
   auto *gen = reinterpret_cast<birgen::BIRGen *>(gen_ptr);
-  return std::make_unique<BIRGen2>(*gen);
+  return std::make_unique<BIRGen>(*gen);
 }
 
-BIRGen2::BIRGen2(::belalang::birgen::BIRGen &gen) : gen(gen) {}
+BIRGen::BIRGen(::belalang::birgen::BIRGen &gen) : gen(gen) {}
 
 #include "belalang/BIR/CodeGen/Bindings.cpp.inc"
 
