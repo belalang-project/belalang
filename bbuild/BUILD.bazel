@@ -6,7 +6,6 @@ rust_library(
     name = "bbuild",
     srcs = glob(["src/**/*.rs"]),
     deps = [
-        "//bir",
         "//birgen",
         "//diag",
         "//ast",
@@ -14,5 +13,8 @@ rust_library(
         "//session",
         "//ty",
         "@crates//:anyhow",
+    ],
+    link_deps = [
+        "//bir",
     ],
 )

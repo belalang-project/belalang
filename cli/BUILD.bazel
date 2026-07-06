@@ -7,7 +7,6 @@ rust_binary(
     srcs = glob(["src/**/*.rs"]),
     deps = [
         "//bbuild",
-        "//bir",
         "//birgen",
         "//diag",
         "//ast",
@@ -15,5 +14,8 @@ rust_binary(
         "//session",
         "@crates//:lexopt",
         "@crates//:anyhow",
+    ],
+    link_deps = [
+        "//bir",
     ],
 )
