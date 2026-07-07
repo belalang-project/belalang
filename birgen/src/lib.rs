@@ -45,7 +45,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("belalang/BIRGen/BIRGen.h");
+        include!("belalang/BIR/CodeGen/BIRGen.h");
 
         type BIRGuard;
         type BIRFunctionGuard;

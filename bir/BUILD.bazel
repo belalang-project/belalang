@@ -165,7 +165,13 @@ cc_library(
     deps = [
         ":bir_codegen-include",
         ":bir_codegen-bridge/include",
-    ]
+        "//birgen:birgen-bridge/include",
+        "@cxx.rs//:core",
+        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
+        "@llvm-project//llvm:AllTargetsAsmParsers",
+    ],
 )
 
 cc_library(
@@ -174,7 +180,6 @@ cc_library(
     deps = [
         ":BelalangCXXBindingsIncGen",
         ":bir",
-        "//birgen:birgen-cc",
         "@llvm-project//mlir:IR",
     ],
 )
