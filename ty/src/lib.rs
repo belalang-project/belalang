@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
 use ast::Visitor;
+use diag::{
+    Diagnostic,
+    Label,
+};
 use session::{
     Session,
     interner::{
@@ -36,36 +40,57 @@ impl<'sess> TypeChecker<'sess> {
     pub fn infer<'ast>(&mut self, program: &ast::Program<'ast>) {
         self.visit_program(program);
     }
-}
 
-impl<'ast, 'sess> Visitor<'ast> for TypeChecker<'sess> {
-    fn visit_integer(&mut self, _node: &ast::IntegerLiteral) {
-        self.current_type = Type::Integer;
-    }
-
-    fn visit_string(&mut self, _node: &ast::StringLiteral) {
-        self.current_type = Type::String;
-    }
-
-    fn visit_float(&mut self, _node: &ast::FloatLiteral) {
-        self.current_type = Type::Float;
-    }
-
-    fn visit_identifier(&mut self, node: &ast::Identifier) {
-        if let Some(ty) = self.env.get(&node.value) {
-            self.current_type = *ty;
-        } else {
-            // TODO: handle unknown variables
+    pub fn infer_expr<'ast>(&mut self, expr: &ast::Expression<'ast>) -> Type {
+        match expr.kind {
+            ast::ExpressionKind::Integer(_) => Type::Integer,
+            ast::ExpressionKind::Float(_) => Type::Float,
+            ast::ExpressionKind::String(_) => Type::String,
+            ast::ExpressionKind::Identifier(i) => *self.env.get(&i.value).unwrap_or(&Type::None),
+            _ => {
+                self.walk_expression(expr);
+                self.current_type
+            },
         }
     }
 
+    pub fn check_expr<'ast>(&mut self, expr: &ast::Expression<'ast>, expected: Type) {
+        let inferred = self.infer_expr(expr);
+        if inferred != expected {
+            let label = Label::primary(
+                expr.span,
+                format!(
+                    "expected type `{}`, found type `{}`",
+                    ty_to_str(expected),
+                    ty_to_str(inferred),
+                ),
+            );
+            self.session
+                .emit(Diagnostic::error("mismatched type").with_label(label))
+        }
+    }
+}
+
+impl<'ast, 'sess> Visitor<'ast> for TypeChecker<'sess> {
+    fn visit_expression(&mut self, expr: &ast::Expression<'ast>) {
+        self.current_type = self.infer_expr(expr);
+    }
+
     fn visit_var_decl_statement(&mut self, node: &ast::VarDeclStatement<'ast>) {
-        let rhs_ty = node.explicit_ty.map(sym_to_ty).unwrap_or_else(|| {
+        let explicit_ty = node.explicit_ty.map(|sym| sym_to_ty(sym));
+
+        let rhs_ty = if let Some(resolved_ty) = explicit_ty {
             if let Some(value) = node.value {
-                self.visit_expression(value);
+                self.check_expr(value, resolved_ty);
             }
-            self.current_type
-        });
+            resolved_ty
+        } else {
+            if let Some(value) = node.value {
+                self.infer_expr(value)
+            } else {
+                Type::None
+            }
+        };
 
         self.env.insert(node.name.value, rhs_ty);
         self.current_type = rhs_ty;
@@ -79,6 +104,15 @@ fn sym_to_ty(symbol: Symbol) -> Type {
         syms::FLOAT => Type::Float,
         _ => Type::None,
     }
+}
+
+fn ty_to_str(ty: Type) -> String {
+    String::from(match ty {
+        Type::String => "String",
+        Type::Integer => "Integer",
+        Type::Float => "Float",
+        Type::None => "None",
+    })
 }
 
 #[cfg(test)]
