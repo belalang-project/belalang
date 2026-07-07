@@ -113,36 +113,6 @@ gentbl_cc_library(
     deps = [":BelalangPassesTdFiles"],
 )
 
-rust_cxx_bridge(
-    name = "bir_codegen-bridge",
-    src = ":BelalangRustBindingsGen",
-    deps = [":bir_codegen-cc"],
-)
-
-rust_library(
-    name = "bir_codegen",
-    srcs = glob(["lib/CodeGen/*.rs"]) + [
-        ":BelalangRustBindingsGen",
-    ],
-    deps = [
-        "@cxx.rs//:cxx",
-    ],
-    link_deps = [
-        ":bir_codegen-include",
-        ":bir_codegen-bridge",
-        ":bir_codegen-cc",
-    ],
-)
-
-gentbl_rule(
-    name = "BelalangRustBindingsGen",
-    opts = ["-gen-rust-binding-decls"],
-    out = "lib/CodeGen/bindings.rs",
-    tblgen = ":bir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIROps.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
 gentbl_cc_library(
     name = "BelalangCXXBindingsIncGen",
     tbl_outs = [
@@ -163,19 +133,15 @@ cc_library(
         "include/belalang/BIR/CodeGen/BIRGen.h",
     ],
     deps = [
-        ":bir_codegen-include",
-        ":bir_codegen-bridge/include",
-    ]
-)
-
-cc_library(
-    name = "bir_codegen-include",
-    includes = ["bir_codegen"],
-    deps = [
         ":BelalangCXXBindingsIncGen",
         ":bir",
-        "//birgen:birgen-cc",
+        "//birgen:birgen-bridge/include",
+        "@cxx.rs//:core",
         "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
+        "@llvm-project//llvm:AllTargetsAsmParsers",
     ],
 )
 
