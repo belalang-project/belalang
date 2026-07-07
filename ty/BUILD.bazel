@@ -1,16 +1,17 @@
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 rust_library(
-	name = "ty",
-	srcs = glob(["src/*.rs"]),
-	deps = [
+    name = "ty",
+    srcs = glob(["src/*.rs"]),
+    deps = [
         "//ast",
+        "//diag",
         "//session",
-	],
-	visibility = ["//visibility:public"],
+    ],
+    visibility = ["//visibility:public"],
 )
 
 rust_test(
-	name = "ty-test",
-	crate = ":ty",
+    name = "ty-test",
+    crate = ":ty",
 )
