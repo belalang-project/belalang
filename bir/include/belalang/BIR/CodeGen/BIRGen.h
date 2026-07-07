@@ -1,16 +1,16 @@
 #ifndef BELALANG_BIR_CODEGEN_BIRGEN_H_
 #define BELALANG_BIR_CODEGEN_BIRGEN_H_
 
-#include <cstdint>
-#include <memory>
-#include "llvm/IR/Module.h"
-#include "mlir/IR/MLIRContext.h"
-#include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Builders.h"
+#include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Location.h"
+#include "mlir/IR/MLIRContext.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Export.h"
 #include "rust/cxx.h"
+#include "llvm/IR/Module.h"
+#include <cstdint>
+#include <memory>
 
 namespace belalang {
 namespace bir {

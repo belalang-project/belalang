@@ -1,13 +1,11 @@
-#include "mlir/IR/MLIRContext.h"
-#include "mlir/IR/Builders.h"
-#include "mlir/IR/BuiltinOps.h"
-
-#include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/CodeGen/BIRGen.h"
-
+#include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
+#include "mlir/IR/Builders.h"
+#include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/DialectRegistry.h"
+#include "mlir/IR/MLIRContext.h"
 #include "mlir/IR/Verifier.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
@@ -193,7 +191,8 @@ BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   auto fnTy = mlir::FunctionType::get(&context, inputs, {mapType(resultTy)});
   auto op = bir::FuncExprOp::create(builder, loc, fnTy);
 
-  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult(), &op.getBody());
+  auto guard = std::make_unique<BIRFunctionGuard>(builder, op.getResult(),
+                                                  &op.getBody());
 
   std::vector<mlir::Location> locs(inputs.size(), loc);
   builder.createBlock(&op.getBody(), {}, inputs, locs);
@@ -225,7 +224,8 @@ std::unique_ptr<BIRValue> BIRIfGuard::get_value() const {
 std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
   auto op = bir::IfOp::create(builder, loc, mlir::TypeRange{}, cond.getValue());
   mlir::Value result = op.getNumResults() > 0 ? op.getResult() : mlir::Value();
-  return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(), &op.getElseRegion(), result);
+  return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(),
+                                      &op.getElseRegion(), result);
 }
 
 void BIRWhileGuard::start_cond() {
@@ -258,13 +258,9 @@ void BIRGen::build_condition(const BIRValue &cond) {
   bir::ConditionOp::create(builder, loc, cond.getValue());
 }
 
-void BIRGen::build_continue() {
-  bir::ContinueOp::create(builder, loc);
-}
+void BIRGen::build_continue() { bir::ContinueOp::create(builder, loc); }
 
-void BIRGen::build_break() {
-  bir::BreakOp::create(builder, loc);
-}
+void BIRGen::build_break() { bir::BreakOp::create(builder, loc); }
 
 void BIRGen::build_yield(const BIRValue &val) {
   bir::YieldOp::create(builder, loc, val.getValue());
