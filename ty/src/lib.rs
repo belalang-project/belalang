@@ -17,40 +17,28 @@ pub enum Type {
     None,
 }
 
-pub struct TypeInferer<'sess> {
+pub struct TypeChecker<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
-    inner: TypeInfererInner,
-}
-
-impl<'sess> TypeInferer<'sess> {
-    pub fn new(session: &'sess Session) -> TypeInferer<'sess> {
-        TypeInferer {
-            session,
-            inner: TypeInfererInner::new(),
-        }
-    }
-
-    pub fn infer<'ast>(&mut self, program: &ast::Program<'ast>) {
-        self.inner.visit_program(program);
-    }
-}
-
-pub(crate) struct TypeInfererInner {
     env: HashMap<Symbol, Type>,
     current_type: Type,
 }
 
-impl TypeInfererInner {
-    pub fn new() -> Self {
-        Self {
+impl<'sess> TypeChecker<'sess> {
+    pub fn new(session: &'sess Session) -> TypeChecker<'sess> {
+        TypeChecker {
+            session,
             env: HashMap::new(),
             current_type: Type::None,
         }
     }
+
+    pub fn infer<'ast>(&mut self, program: &ast::Program<'ast>) {
+        self.visit_program(program);
+    }
 }
 
-impl<'ast> Visitor<'ast> for TypeInfererInner {
+impl<'ast, 'sess> Visitor<'ast> for TypeChecker<'sess> {
     fn visit_integer(&mut self, _node: &ast::IntegerLiteral) {
         self.current_type = Type::Integer;
     }
@@ -104,14 +92,17 @@ mod tests {
         VarDeclStatement,
         Visitor,
     };
-    use session::interner::{
-        Symbol,
-        syms,
+    use session::{
+        Session,
+        interner::{
+            Symbol,
+            syms,
+        },
     };
 
     use super::{
         Type,
-        TypeInfererInner,
+        TypeChecker,
     };
 
     #[test]
@@ -126,7 +117,8 @@ mod tests {
             value: Some(&str_expr),
         };
 
-        let mut ty_infer = TypeInfererInner::new();
+        let session = Session::for_text("".to_string()).unwrap();
+        let mut ty_infer = TypeChecker::new(&session);
         ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::String);
@@ -145,7 +137,8 @@ mod tests {
             value: Some(&int_expr),
         };
 
-        let mut ty_infer = TypeInfererInner::new();
+        let session = Session::for_text("".to_string()).unwrap();
+        let mut ty_infer = TypeChecker::new(&session);
         ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::Integer);
