@@ -6,6 +6,7 @@ use super::{
     CallExpression,
     ContinueStatement,
     Expression,
+    ExpressionKind,
     ExpressionStatement,
     FloatLiteral,
     FunctionLiteral,
@@ -19,6 +20,7 @@ use super::{
     Program,
     ReturnStatement,
     Statement,
+    StatementKind,
     StringLiteral,
     StructDeclStatement,
     VarDeclStatement,
@@ -118,34 +120,34 @@ pub trait Visitor<'ast> {
     }
 
     fn walk_statement(&mut self, stmt: &Statement<'ast>) {
-        match stmt {
-            Statement::Expression(v) => self.visit_expression_statement(v),
-            Statement::Return(v) => self.visit_return_statement(v),
-            Statement::While(v) => self.visit_while_statement(v),
-            Statement::VarDecl(v) => self.visit_var_decl_statement(v),
-            Statement::StructDecl(v) => self.visit_struct_decl_statement(v),
-            Statement::Break(v) => self.visit_break_statement(v),
-            Statement::Continue(v) => self.visit_continue_statement(v),
+        match &stmt.kind {
+            StatementKind::Expression(v) => self.visit_expression_statement(v),
+            StatementKind::Return(v) => self.visit_return_statement(v),
+            StatementKind::While(v) => self.visit_while_statement(v),
+            StatementKind::VarDecl(v) => self.visit_var_decl_statement(v),
+            StatementKind::StructDecl(v) => self.visit_struct_decl_statement(v),
+            StatementKind::Break(v) => self.visit_break_statement(v),
+            StatementKind::Continue(v) => self.visit_continue_statement(v),
         }
     }
 
     fn walk_expression(&mut self, expr: &Expression<'ast>) {
-        match expr {
-            Expression::Boolean(v) => self.visit_boolean(v),
-            Expression::Integer(v) => self.visit_integer(v),
-            Expression::Float(v) => self.visit_float(v),
-            Expression::String(v) => self.visit_string(v),
-            Expression::Null(v) => self.visit_null(v),
-            Expression::Array(v) => self.visit_array(v),
-            Expression::Var(v) => self.visit_var(v),
-            Expression::Call(v) => self.visit_call(v),
-            Expression::Index(v) => self.visit_index(v),
-            Expression::Function(v) => self.visit_function(v),
-            Expression::Identifier(v) => self.visit_identifier(v),
-            Expression::If(v) => self.visit_if(v),
-            Expression::Infix(v) => self.visit_infix(v),
-            Expression::Prefix(v) => self.visit_prefix(v),
-            Expression::Block(v) => self.visit_block(v),
+        match &expr.kind {
+            ExpressionKind::Boolean(v) => self.visit_boolean(v),
+            ExpressionKind::Integer(v) => self.visit_integer(v),
+            ExpressionKind::Float(v) => self.visit_float(v),
+            ExpressionKind::String(v) => self.visit_string(v),
+            ExpressionKind::Null(v) => self.visit_null(v),
+            ExpressionKind::Array(v) => self.visit_array(v),
+            ExpressionKind::Var(v) => self.visit_var(v),
+            ExpressionKind::Call(v) => self.visit_call(v),
+            ExpressionKind::Index(v) => self.visit_index(v),
+            ExpressionKind::Function(v) => self.visit_function(v),
+            ExpressionKind::Identifier(v) => self.visit_identifier(v),
+            ExpressionKind::If(v) => self.visit_if(v),
+            ExpressionKind::Infix(v) => self.visit_infix(v),
+            ExpressionKind::Prefix(v) => self.visit_prefix(v),
+            ExpressionKind::Block(v) => self.visit_block(v),
         }
     }
 

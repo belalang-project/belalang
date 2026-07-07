@@ -1,4 +1,5 @@
 use session::interner::Symbol;
+use span::SourceSpan;
 
 use super::{
     BlockExpression,
@@ -42,7 +43,13 @@ pub struct StructDeclStatement<'ast> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum Statement<'ast> {
+pub struct Statement<'ast> {
+    pub kind: StatementKind<'ast>,
+    pub span: SourceSpan,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum StatementKind<'ast> {
     Expression(ExpressionStatement<'ast>),
     Return(ReturnStatement<'ast>),
     While(WhileStatement<'ast>),
