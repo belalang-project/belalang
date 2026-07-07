@@ -17,16 +17,16 @@ pub enum Type {
     None,
 }
 
-pub struct TypeInferer<'sess> {
+pub struct TypeChecker<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
     env: HashMap<Symbol, Type>,
     current_type: Type,
 }
 
-impl<'sess> TypeInferer<'sess> {
-    pub fn new(session: &'sess Session) -> TypeInferer<'sess> {
-        TypeInferer {
+impl<'sess> TypeChecker<'sess> {
+    pub fn new(session: &'sess Session) -> TypeChecker<'sess> {
+        TypeChecker {
             session,
             env: HashMap::new(),
             current_type: Type::None,
@@ -38,7 +38,7 @@ impl<'sess> TypeInferer<'sess> {
     }
 }
 
-impl<'ast, 'sess> Visitor<'ast> for TypeInferer<'sess> {
+impl<'ast, 'sess> Visitor<'ast> for TypeChecker<'sess> {
     fn visit_integer(&mut self, _node: &ast::IntegerLiteral) {
         self.current_type = Type::Integer;
     }
@@ -102,7 +102,7 @@ mod tests {
 
     use super::{
         Type,
-        TypeInferer,
+        TypeChecker,
     };
 
     #[test]
@@ -118,7 +118,7 @@ mod tests {
         };
 
         let session = Session::for_text("".to_string()).unwrap();
-        let mut ty_infer = TypeInferer::new(&session);
+        let mut ty_infer = TypeChecker::new(&session);
         ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::String);
@@ -138,7 +138,7 @@ mod tests {
         };
 
         let session = Session::for_text("".to_string()).unwrap();
-        let mut ty_infer = TypeInferer::new(&session);
+        let mut ty_infer = TypeChecker::new(&session);
         ty_infer.visit_var_decl_statement(&expr);
 
         assert_eq!(*ty_infer.env.get(&Symbol(0)).unwrap(), Type::Integer);

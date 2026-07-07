@@ -23,7 +23,7 @@ use ast::{
 use birgen::BIRGen;
 use lexer::Lexer;
 use session::Session;
-use ty::TypeInferer;
+use ty::TypeChecker;
 
 pub struct BuildContext {
     pub use_color: bool,
@@ -131,7 +131,7 @@ impl BBuild {
     }
 
     pub fn infer_types<'ast>(&self, program: &Program<'ast>) -> anyhow::Result<()> {
-        let mut ty_infer = TypeInferer::new(&self.session);
+        let mut ty_infer = TypeChecker::new(&self.session);
         ty_infer.infer(program);
         self.check_errors()?;
         Ok(())
