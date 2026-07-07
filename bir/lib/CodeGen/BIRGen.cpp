@@ -5,23 +5,6 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/CodeGen/BIRGen.h"
 
-namespace belalang {
-namespace bir {
-namespace codegen {
-
-std::unique_ptr<BIRGen> create_birgen(uintptr_t gen_ptr) {
-  auto *gen = reinterpret_cast<birgen::BIRGen *>(gen_ptr);
-  return std::make_unique<BIRGen>(*gen);
-}
-
-BIRGen::BIRGen(::belalang::birgen::BIRGen &gen) : gen(gen) {}
-
-#include "belalang/BIR/CodeGen/Bindings.cpp.inc"
-
-} // codegen
-} // bir
-} // belalang
-
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/DialectRegistry.h"
@@ -41,7 +24,10 @@ BIRGen::BIRGen(::belalang::birgen::BIRGen &gen) : gen(gen) {}
 #include <optional>
 
 namespace belalang {
-namespace birgen {
+namespace bir {
+namespace codegen {
+
+#include "belalang/BIR/CodeGen/Bindings.cpp.inc"
 
 BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   mlir::DialectRegistry registry;
@@ -411,5 +397,6 @@ rust::String LLVMGen::dump_to_string() const {
   return rust::String(os.str());
 }
 
-} // namespace birgen
+} // namespace codegen
+} // namespace bir
 } // namespace belalang

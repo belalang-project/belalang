@@ -13,9 +13,8 @@
 #include "rust/cxx.h"
 
 namespace belalang {
-
-// forward declaration
-namespace birgen {
+namespace bir {
+namespace codegen {
 class LLVMGen;
 class BIRValue;
 class BIRGuard;
@@ -24,11 +23,6 @@ class BIRIfGuard;
 class BIRWhileGuard;
 class BIRScopeGuard;
 class BIRGen;
-} // namespace birgen
-
-namespace bir {
-namespace codegen {
-class BIRGen;
 } // namespace codegen
 } // namespace bir
 } // namespace belalang
@@ -36,7 +30,8 @@ class BIRGen;
 #include "birgen/src/lib.rs.h"
 
 namespace belalang {
-namespace birgen {
+namespace bir {
+namespace codegen {
 
 // -----------------------------------------------------------------------------
 // LLVMGen
@@ -83,6 +78,9 @@ protected:
   mlir::OpBuilder::InsertionGuard guard;
   mlir::OpBuilder &builder;
 };
+
+#define GET_BIRGUARD_CLASS_DECLS
+#include "belalang/BIR/CodeGen/Bindings.h.inc"
 
 class BIRFunctionGuard : public BIRGuard {
 public:
@@ -194,7 +192,9 @@ public:
   bool optimize();
 
   friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
-  friend class belalang::bir::codegen::BIRGen;
+
+#define GET_BUILDER_FUNCTION_DECLS
+#include "belalang/BIR/CodeGen/Bindings.h.inc"
 
 private:
   mlir::MLIRContext context;
@@ -206,47 +206,6 @@ private:
 
   mlir::Type mapType(TypeKind);
 };
-
-} // namespace birgen
-} // namespace belalang
-
-namespace belalang {
-namespace bir {
-namespace codegen {
-
-// -----------------------------------------------------------------------------
-// BIRGuard
-// -----------------------------------------------------------------------------
-
-class BIRGuard {
-public:
-  BIRGuard(mlir::OpBuilder &builder) : guard(builder), builder(builder) {}
-  virtual ~BIRGuard() = default;
-
-protected:
-  mlir::OpBuilder::InsertionGuard guard;
-  mlir::OpBuilder &builder;
-};
-
-#define GET_BIRGUARD_CLASS_DECLS
-#include "belalang/BIR/CodeGen/Bindings.h.inc"
-
-// -----------------------------------------------------------------------------
-// BIRGen
-// -----------------------------------------------------------------------------
-
-class BIRGen {
-public:
-  BIRGen(birgen::BIRGen &gen);
-
-#define GET_BUILDER_FUNCTION_DECLS
-#include "belalang/BIR/CodeGen/Bindings.h.inc"
-
-private:
-  birgen::BIRGen &gen;
-};
-
-std::unique_ptr<BIRGen> create_birgen(uintptr_t gen);
 
 } // namespace codegen
 } // namespace bir

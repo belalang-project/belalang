@@ -44,11 +44,11 @@ void emitBuilderFunctionDef(OpMetadata M, llvm::raw_ostream &os) {
                                    }),
                    ", ");
     os.indent(2) << "auto op = " + M.getFullOpIdent() +
-                        "::create(gen.builder, gen.loc);\n";
+                        "::create(builder, loc);\n";
     os.indent(2) << "return std::make_unique<" + M.getGuardName() +
-                        ">(gen.builder, " + regionGetters + ");\n";
+                        ">(builder, " + regionGetters + ");\n";
   } else if (op.getNumResults() == 0 && op.getNumOperands() == 0)
-    os.indent(2) << M.getFullOpIdent() + "::create(gen.builder, gen.loc);\n";
+    os.indent(2) << M.getFullOpIdent() + "::create(builder, loc);\n";
 
   os << "}\n\n";
 }
