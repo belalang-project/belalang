@@ -23,6 +23,9 @@ class BIRIfGuard;
 class BIRWhileGuard;
 class BIRScopeGuard;
 class BIRGen;
+
+// NOTE: manual forward decl
+class BIRWhileOpGuard;
 } // namespace codegen
 } // namespace bir
 } // namespace belalang
