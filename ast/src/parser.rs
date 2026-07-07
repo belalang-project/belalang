@@ -12,11 +12,14 @@ use lexer::{
     TokenKind,
 };
 use session::Session;
+use span::SourceSpan;
 
 use super::{
     Expression,
+    ExpressionKind,
     ParserError,
     Statement,
+    StatementKind,
 };
 use crate::{
     ArrayLiteral,
@@ -165,6 +168,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
     }
 
     fn parse_statement(&mut self) -> Result<Statement<'ast>, ParserError> {
+        let start_span = self.curr_token.span;
         match self.curr_token.kind {
             // matches `return`
             TokenKind::Return => {
@@ -180,8 +184,12 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 };
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Statement::Return(ReturnStatement { return_value }))
+                Ok(Statement {
+                    kind: StatementKind::Return(ReturnStatement { return_value }),
+                    span,
+                })
             },
 
             // parse_while
@@ -194,23 +202,37 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 let block = self.parse_block()?;
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Statement::While(WhileStatement { condition, block }))
+                Ok(Statement {
+                    kind: StatementKind::While(WhileStatement { condition, block }),
+                    span,
+                })
             },
 
             // match `break`
-            TokenKind::KwBreak => Ok(Statement::Break(BreakStatement)),
+            TokenKind::KwBreak => Ok(Statement {
+                kind: StatementKind::Break(BreakStatement),
+                span: start_span,
+            }),
 
             // match `continue`
-            TokenKind::KwContinue => Ok(Statement::Continue(ContinueStatement)),
+            TokenKind::KwContinue => Ok(Statement {
+                kind: StatementKind::Continue(ContinueStatement),
+                span: start_span,
+            }),
 
             // parse_if: parse if expression as statement
             TokenKind::If => {
                 let expression = *self.parse_if()?;
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Statement::Expression(ExpressionStatement { expression }))
+                Ok(Statement {
+                    kind: StatementKind::Expression(ExpressionStatement { expression }),
+                    span,
+                })
             },
 
             // matches `<ident> :`
@@ -256,12 +278,16 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 };
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(*self.ast.alloc(Statement::VarDecl(VarDeclStatement {
-                    name,
-                    value,
-                    explicit_ty,
-                })))
+                Ok(*self.ast.alloc(Statement {
+                    kind: StatementKind::VarDecl(VarDeclStatement {
+                        name,
+                        value,
+                        explicit_ty,
+                    }),
+                    span,
+                }))
             },
 
             // matches `struct`
@@ -281,28 +307,35 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.depth += 1;
                 while !matches!(self.curr_token.kind, TokenKind::RightBrace | TokenKind::EOF) {
                     let stmt = self.parse_statement()?;
-                    let Statement::VarDecl(var_decl) = stmt else {
-                        return Err(self.error_parsing_struct());
+                    let StatementKind::VarDecl(var_decl) = stmt.kind else {
+                        return Err(self.error_parsing_struct(stmt));
                     };
                     fields.push(var_decl);
                     self.next_token()?; // curr_token now at next statement
                 } // curr_token now at end of block
                 self.depth -= 1;
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(*self.ast.alloc(Statement::StructDecl(StructDeclStatement {
-                    name: struct_name,
-                    fields: self.ast.alloc_slice_clone(&fields),
-                })))
+                Ok(*self.ast.alloc(Statement {
+                    kind: StatementKind::StructDecl(StructDeclStatement {
+                        name: struct_name,
+                        fields: self.ast.alloc_slice_clone(&fields),
+                    }),
+                    span,
+                }))
             },
 
             _ => {
-                let stmt = ExpressionStatement {
-                    expression: *self.parse_expression(Precedence::Lowest)?,
-                };
+                let expr = self.parse_expression(Precedence::Lowest)?;
+                let stmt = ExpressionStatement { expression: *expr };
 
                 self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Statement::Expression(stmt))
+                Ok(Statement {
+                    kind: StatementKind::Expression(stmt),
+                    span,
+                })
             },
         }
     }
@@ -338,34 +371,52 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
     }
 
     fn parse_if(&mut self) -> Result<&'ast Expression<'ast>, ParserError> {
+        let start_span = self.curr_token.span;
         self.next_token()?;
         let condition = self.parse_expression(Precedence::Lowest)?;
 
         expect_peek!(self, TokenKind::LeftBrace);
 
         let consequence = self.parse_block()?;
+        let mut end_span = self.curr_token.span;
 
         let alternative: Option<&'ast Expression<'ast>> = if matches!(self.peek_token.kind, TokenKind::Else) {
             self.next_token()?;
             self.next_token()?;
 
-            Some(match self.curr_token.kind {
+            let alt = match self.curr_token.kind {
                 TokenKind::If => self.parse_if()?,
-                TokenKind::LeftBrace => self.ast.alloc(Expression::Block(self.parse_block()?)),
+                TokenKind::LeftBrace => {
+                    let block_start = self.curr_token.span;
+                    let block = self.parse_block()?;
+                    let block_span = SourceSpan::new(block_start.start, self.curr_token.span.end);
+                    self.ast.alloc(Expression {
+                        kind: ExpressionKind::Block(block),
+                        span: block_span,
+                    })
+                },
                 _ => return Err(self.error_unexpected_token()),
-            })
+            };
+            end_span = alt.span;
+            Some(alt)
         } else {
             None
         };
 
-        Ok(self.ast.alloc(Expression::If(IfExpression {
-            condition,
-            consequence,
-            alternative,
-        })))
+        let span = SourceSpan::new(start_span.start, end_span.end);
+
+        Ok(self.ast.alloc(Expression {
+            kind: ExpressionKind::If(IfExpression {
+                condition,
+                consequence,
+                alternative,
+            }),
+            span,
+        }))
     }
 
     fn parse_infix(&mut self, left: &'ast Expression<'ast>) -> Result<Option<&'ast Expression<'ast>>, ParserError> {
+        let start_span = left.span;
         match self.peek_token.kind {
             // parse_infix: parse infix expression
             TokenKind::Add
@@ -394,32 +445,36 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.next_token()?;
 
                 let right = self.parse_expression(precedence)?;
+                let span = SourceSpan::new(start_span.start, right.span.end);
 
-                Ok(Some(self.ast.alloc(Expression::Infix(InfixExpression {
-                    left,
-                    operator: match operator.kind {
-                        TokenKind::Add => InfixKind::Add,
-                        TokenKind::Sub => InfixKind::Sub,
-                        TokenKind::Mul => InfixKind::Mul,
-                        TokenKind::Div => InfixKind::Div,
-                        TokenKind::Mod => InfixKind::Mod,
-                        TokenKind::Eq => InfixKind::Eq,
-                        TokenKind::Ne => InfixKind::Ne,
-                        TokenKind::Gt => InfixKind::Gt,
-                        TokenKind::Ge => InfixKind::Ge,
-                        TokenKind::Lt => InfixKind::Lt,
-                        TokenKind::Le => InfixKind::Le,
-                        TokenKind::BitAnd => InfixKind::BitAnd,
-                        TokenKind::BitOr => InfixKind::BitOr,
-                        TokenKind::BitXor => InfixKind::BitXor,
-                        TokenKind::ShiftLeft => InfixKind::ShiftLeft,
-                        TokenKind::ShiftRight => InfixKind::ShiftRight,
-                        TokenKind::Or => InfixKind::Or,
-                        TokenKind::And => InfixKind::And,
-                        _ => unreachable!(),
-                    },
-                    right,
-                }))))
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Infix(InfixExpression {
+                        left,
+                        operator: match operator.kind {
+                            TokenKind::Add => InfixKind::Add,
+                            TokenKind::Sub => InfixKind::Sub,
+                            TokenKind::Mul => InfixKind::Mul,
+                            TokenKind::Div => InfixKind::Div,
+                            TokenKind::Mod => InfixKind::Mod,
+                            TokenKind::Eq => InfixKind::Eq,
+                            TokenKind::Ne => InfixKind::Ne,
+                            TokenKind::Gt => InfixKind::Gt,
+                            TokenKind::Ge => InfixKind::Ge,
+                            TokenKind::Lt => InfixKind::Lt,
+                            TokenKind::Le => InfixKind::Le,
+                            TokenKind::BitAnd => InfixKind::BitAnd,
+                            TokenKind::BitOr => InfixKind::BitOr,
+                            TokenKind::BitXor => InfixKind::BitXor,
+                            TokenKind::ShiftLeft => InfixKind::ShiftLeft,
+                            TokenKind::ShiftRight => InfixKind::ShiftRight,
+                            TokenKind::Or => InfixKind::Or,
+                            TokenKind::And => InfixKind::And,
+                            _ => unreachable!(),
+                        },
+                        right,
+                    }),
+                    span,
+                })))
             },
 
             // parse_call: parse call expression
@@ -443,11 +498,15 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                     expect_peek!(self, TokenKind::RightParen);
                 }
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Some(self.ast.alloc(Expression::Call(CallExpression {
-                    function: left,
-                    args: self.ast.alloc_slice_clone(&args),
-                }))))
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Call(CallExpression {
+                        function: left,
+                        args: self.ast.alloc_slice_clone(&args),
+                    }),
+                    span,
+                })))
             },
 
             TokenKind::LeftBracket => {
@@ -457,13 +516,17 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 let index = self.parse_expression(Precedence::Lowest)?;
 
                 expect_peek!(self, TokenKind::RightBracket);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(Some(self.ast.alloc(Expression::Index(IndexExpression { left, index }))))
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Index(IndexExpression { left, index }),
+                    span,
+                })))
             },
 
             TokenKind::Assign { ref kind } => {
                 let kind = *kind;
-                if !matches!(left, Expression::Identifier(_)) {
+                if !matches!(left.kind, ExpressionKind::Identifier(_)) {
                     return Err(self.error_invalid_lhs(left));
                 }
 
@@ -477,12 +540,12 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 self.next_token()?;
                 let value = self.parse_expression(Precedence::Lowest)?;
+                let span = SourceSpan::new(start_span.start, value.span.end);
 
-                Ok(Some(self.ast.alloc(Expression::Var(VarExpression {
-                    kind,
-                    name,
-                    value,
-                }))))
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Var(VarExpression { kind, name, value }),
+                    span,
+                })))
             },
 
             _ => Ok(None),
@@ -490,28 +553,47 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
     }
 
     fn parse_prefix(&mut self) -> Result<&'ast Expression<'ast>, ParserError> {
+        let start_span = self.curr_token.span;
         match self.curr_token.kind {
             // parse_identifier: parse current token as identifier
-            TokenKind::Ident { sym } => Ok(self.ast.alloc(Expression::Identifier(Identifier { value: sym }))),
+            TokenKind::Ident { sym } => Ok(self.ast.alloc(Expression {
+                kind: ExpressionKind::Identifier(Identifier { value: sym }),
+                span: start_span,
+            })),
 
             TokenKind::Literal { ref kind, sym } => {
                 let str_value = self.session.lookup_string(sym);
                 match kind {
                     LiteralKind::Integer => match str_value.parse::<i64>() {
-                        Ok(lit) => Ok(self.ast.alloc(Expression::Integer(IntegerLiteral { value: lit }))),
+                        Ok(lit) => Ok(self.ast.alloc(Expression {
+                            kind: ExpressionKind::Integer(IntegerLiteral { value: lit }),
+                            span: start_span,
+                        })),
                         Err(_) => Err(self.error_parsing_integer(str_value)),
                     },
                     LiteralKind::Float => match str_value.parse::<f64>() {
-                        Ok(lit) => Ok(self.ast.alloc(Expression::Float(FloatLiteral { value: lit }))),
+                        Ok(lit) => Ok(self.ast.alloc(Expression {
+                            kind: ExpressionKind::Float(FloatLiteral { value: lit }),
+                            span: start_span,
+                        })),
                         Err(_) => Err(self.error_parsing_float(str_value)),
                     },
-                    LiteralKind::String => Ok(self.ast.alloc(Expression::String(StringLiteral { value: sym }))),
+                    LiteralKind::String => Ok(self.ast.alloc(Expression {
+                        kind: ExpressionKind::String(StringLiteral { value: sym }),
+                        span: start_span,
+                    })),
                 }
             },
 
-            TokenKind::KwTrue => Ok(self.ast.alloc(Expression::Boolean(BooleanExpression { value: true }))),
+            TokenKind::KwTrue => Ok(self.ast.alloc(Expression {
+                kind: ExpressionKind::Boolean(BooleanExpression { value: true }),
+                span: start_span,
+            })),
 
-            TokenKind::KwFalse => Ok(self.ast.alloc(Expression::Boolean(BooleanExpression { value: false }))),
+            TokenKind::KwFalse => Ok(self.ast.alloc(Expression {
+                kind: ExpressionKind::Boolean(BooleanExpression { value: false }),
+                span: start_span,
+            })),
 
             // parse_array
             TokenKind::LeftBracket => {
@@ -533,10 +615,14 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                     expect_peek!(self, TokenKind::RightBracket);
                 }
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(self.ast.alloc(Expression::Array(ArrayLiteral {
-                    elements: self.ast.alloc_slice_clone(&elements),
-                })))
+                Ok(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Array(ArrayLiteral {
+                        elements: self.ast.alloc_slice_clone(&elements),
+                    }),
+                    span,
+                }))
             },
 
             // parse_prefix: parse current expression with prefix
@@ -546,15 +632,19 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.next_token()?;
 
                 let right = self.parse_expression(Precedence::Prefix).unwrap();
+                let span = SourceSpan::new(start_span.start, right.span.end);
 
-                Ok(self.ast.alloc(Expression::Prefix(PrefixExpression {
-                    operator: match prev_token.kind {
-                        TokenKind::Not => PrefixKind::Not,
-                        TokenKind::Sub => PrefixKind::Sub,
-                        _ => unreachable!(),
-                    },
-                    right,
-                })))
+                Ok(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Prefix(PrefixExpression {
+                        operator: match prev_token.kind {
+                            TokenKind::Not => PrefixKind::Not,
+                            TokenKind::Sub => PrefixKind::Sub,
+                            _ => unreachable!(),
+                        },
+                        right,
+                    }),
+                    span,
+                }))
             },
 
             // parse_grouped: parse grouped expression
@@ -570,7 +660,11 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_block
             TokenKind::LeftBrace => {
                 let block = self.parse_block()?;
-                Ok(self.ast.alloc(Expression::Block(block)))
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
+                Ok(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Block(block),
+                    span,
+                }))
             },
 
             // parse_if: parse current if expression
@@ -634,12 +728,16 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 expect_peek!(self, TokenKind::LeftBrace); // curr_token is now `{`
 
                 let body = self.parse_block()?;
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
 
-                Ok(self.ast.alloc(Expression::Function(FunctionLiteral {
-                    params: self.ast.alloc_slice_clone(&params),
-                    body,
-                    explicit_ty,
-                })))
+                Ok(self.ast.alloc(Expression {
+                    kind: ExpressionKind::Function(FunctionLiteral {
+                        params: self.ast.alloc_slice_clone(&params),
+                        body,
+                        explicit_ty,
+                    }),
+                    span,
+                }))
             },
 
             _ => Err(self.error_unknown_prefix_op()),
@@ -659,9 +757,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         ParserError::UnknownPrefixOperator(self.curr_token.kind)
     }
 
-    fn error_invalid_lhs(&self, _left: &Expression) -> ParserError {
-        // TODO: change this with expression span
-        let label = Label::primary(self.curr_token.span, "invalid lhs");
+    fn error_invalid_lhs(&self, left: &Expression) -> ParserError {
+        let label = Label::primary(left.span, "invalid lhs");
         self.session.emit(Diagnostic::error("invalid lhs").with_label(label));
         ParserError::InvalidLHS
     }
@@ -680,9 +777,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         ParserError::ParsingFloat(v.to_string())
     }
 
-    fn error_parsing_struct(&self) -> ParserError {
-        let label = Label::primary(self.curr_token.span, "invalid statement");
-        // TODO: fix diagnostic span regarding statement
+    fn error_parsing_struct(&self, stmt: Statement) -> ParserError {
+        let label = Label::primary(stmt.span, "invalid statement");
         self.session
             .emit(Diagnostic::error("error parsing struct").with_label(label));
         ParserError::ParsingStruct

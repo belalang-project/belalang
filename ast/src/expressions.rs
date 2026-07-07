@@ -4,6 +4,7 @@ use lexer::{
     PrefixKind,
 };
 use session::interner::Symbol;
+use span::SourceSpan;
 
 use super::{
     Statement,
@@ -208,7 +209,13 @@ pub struct BlockExpression<'ast> {
 
 /// Represents all expressions supported by The Belalang Compiler.
 #[derive(Debug, Clone, Copy)]
-pub enum Expression<'ast> {
+pub struct Expression<'ast> {
+    pub kind: ExpressionKind<'ast>,
+    pub span: SourceSpan,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ExpressionKind<'ast> {
     Boolean(BooleanExpression),
     Integer(IntegerLiteral),
     Float(FloatLiteral),

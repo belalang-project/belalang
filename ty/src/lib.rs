@@ -97,6 +97,7 @@ fn sym_to_ty(symbol: Symbol) -> Type {
 mod tests {
     use ast::{
         Expression,
+        ExpressionKind,
         Identifier,
         IntegerLiteral,
         StringLiteral,
@@ -115,7 +116,10 @@ mod tests {
 
     #[test]
     fn test_implicit_string() {
-        let str_expr = Expression::String(StringLiteral { value: Symbol(1) });
+        let str_expr = Expression {
+            kind: ExpressionKind::String(StringLiteral { value: Symbol(1) }),
+            span: Default::default(),
+        };
         let expr = VarDeclStatement {
             name: Identifier { value: Symbol(0) },
             explicit_ty: None,
@@ -131,7 +135,10 @@ mod tests {
 
     #[test]
     fn test_explicit_int() {
-        let int_expr = Expression::Integer(IntegerLiteral { value: 12 });
+        let int_expr = Expression {
+            kind: ExpressionKind::Integer(IntegerLiteral { value: 12 }),
+            span: Default::default(),
+        };
         let expr = VarDeclStatement {
             name: Identifier { value: Symbol(0) },
             explicit_ty: Some(syms::INT),

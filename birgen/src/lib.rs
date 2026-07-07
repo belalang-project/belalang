@@ -2,9 +2,11 @@ use std::collections::HashMap;
 
 use ast::{
     Expression,
+    ExpressionKind,
     InfixExpression,
     Program,
     Statement,
+    StatementKind,
 };
 use lexer::{
     AssignmentKind,
@@ -135,11 +137,11 @@ impl<'sess> BIRGen<'sess> {
     }
 
     pub fn generate_statement<'ast>(&mut self, stmt: &Statement<'ast>) {
-        match stmt {
-            Statement::Expression(expr_stmt) => {
+        match &stmt.kind {
+            StatementKind::Expression(expr_stmt) => {
                 self.generate_expression(&expr_stmt.expression);
             },
-            Statement::Return(s) => {
+            StatementKind::Return(s) => {
                 if let Some(ref return_value) = s.return_value {
                     let expr = self.generate_expression(&return_value);
                     self.inner.pin_mut().build_return(&expr);
@@ -147,7 +149,7 @@ impl<'sess> BIRGen<'sess> {
                     self.inner.pin_mut().build_empty_return();
                 }
             },
-            Statement::While(while_stmt) => {
+            StatementKind::While(while_stmt) => {
                 let mut guard = self.bir_codegen.pin_mut().build_while_op();
 
                 guard.pin_mut().enter_cond();
@@ -164,7 +166,7 @@ impl<'sess> BIRGen<'sess> {
                 drop(bg);
                 self.inner.pin_mut().build_empty_yield();
             },
-            Statement::VarDecl(var) => {
+            StatementKind::VarDecl(var) => {
                 let value = &var.value;
 
                 let Some(value) = value else {
@@ -181,56 +183,56 @@ impl<'sess> BIRGen<'sess> {
                     return;
                 };
 
-                match **value {
-                    Expression::Integer(ref i) => {
+                match &value.kind {
+                    ExpressionKind::Integer(i) => {
                         let v = self.inner.pin_mut().build_constant_int(i.value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
-                    Expression::Float(ref f) => {
+                    ExpressionKind::Float(f) => {
                         let v = self.inner.pin_mut().build_constant_float(f.value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
-                    Expression::Identifier(_)
-                    | Expression::Infix(_)
-                    | Expression::String(_)
-                    | Expression::Function(_)
-                    | Expression::Call(_) => {
+                    ExpressionKind::Identifier(_)
+                    | ExpressionKind::Infix(_)
+                    | ExpressionKind::String(_)
+                    | ExpressionKind::Function(_)
+                    | ExpressionKind::Call(_) => {
                         let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
                         self.inner.pin_mut().build_var_store(&v, &declare);
                         self.symbol_table.insert(var.name.value, declare);
                     },
-                    _ => todo!("Generation for expression {:?} not implemented", **value),
+                    _ => todo!("Generation for expression {:?} not implemented", value.kind),
                 }
             },
-            Statement::StructDecl(s) => {
+            StatementKind::StructDecl(_s) => {
                 // TODO: Implement struct declaration
             },
-            Statement::Break(_s) => {
+            StatementKind::Break(_s) => {
                 self.bir_codegen.pin_mut().build_break_op();
             },
-            Statement::Continue(_s) => {
+            StatementKind::Continue(_s) => {
                 self.inner.pin_mut().build_continue();
             },
         }
     }
 
     pub fn generate_expression<'ast>(&mut self, expr: &Expression<'ast>) -> cxx::UniquePtr<ffi::BIRValue> {
-        match expr {
-            Expression::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
-            Expression::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
-            Expression::Boolean(lit) => self.inner.pin_mut().build_constant_bool(lit.value),
-            Expression::Infix(infix) => self.generate_infix(infix),
-            Expression::Call(call) => {
+        match &expr.kind {
+            ExpressionKind::Integer(lit) => self.inner.pin_mut().build_constant_int(lit.value),
+            ExpressionKind::Float(lit) => self.inner.pin_mut().build_constant_float(lit.value),
+            ExpressionKind::Boolean(lit) => self.inner.pin_mut().build_constant_bool(lit.value),
+            ExpressionKind::Infix(infix) => self.generate_infix(infix),
+            ExpressionKind::Call(call) => {
                 // HACK: this checks for the print function hardcoded-ly
-                if let Expression::Identifier(ref ident) = *call.function
+                if let ExpressionKind::Identifier(ref ident) = call.function.kind
                     && ident.value == syms::PRINT
                 {
                     // TODO: handle more than one arguments
@@ -249,7 +251,7 @@ impl<'sess> BIRGen<'sess> {
                 }
                 self.inner.pin_mut().finish_call()
             },
-            Expression::Var(var) => {
+            ExpressionKind::Var(var) => {
                 let name_sym = var.name.value;
                 let val = self.generate_expression(var.value);
                 let ssa = self.symbol_table.get(&name_sym).expect("Variable not declared");
@@ -279,18 +281,18 @@ impl<'sess> BIRGen<'sess> {
                     _ => todo!("Assignment kind {:?} not supported", var.kind),
                 }
             },
-            Expression::Identifier(ident) => {
+            ExpressionKind::Identifier(ident) => {
                 if let Some(ssa) = self.symbol_table.get(&ident.value) {
                     self.inner.pin_mut().build_var_load(ssa)
                 } else {
                     cxx::UniquePtr::null() // FIXME: don't return nullptr
                 }
             },
-            Expression::String(s) => {
+            ExpressionKind::String(s) => {
                 let v = self.session.lookup_string(s.value);
                 self.inner.pin_mut().build_constant_string(v)
             },
-            Expression::Function(func) => {
+            ExpressionKind::Function(func) => {
                 let result = match func.explicit_ty.unwrap() {
                     syms::STRING => ffi::TypeKind::String,
                     syms::INT => ffi::TypeKind::Int,
@@ -335,7 +337,7 @@ impl<'sess> BIRGen<'sess> {
 
                 guard.get_value()
             },
-            Expression::If(if_expr) => {
+            ExpressionKind::If(if_expr) => {
                 let cond = self.generate_expression(if_expr.condition);
                 let mut guard = self.inner.pin_mut().build_if_expr(&cond);
 
@@ -347,8 +349,8 @@ impl<'sess> BIRGen<'sess> {
 
                 if let Some(alt) = if_expr.alternative {
                     guard.pin_mut().start_else();
-                    match alt {
-                        Expression::Block(block) => {
+                    match &alt.kind {
+                        ExpressionKind::Block(block) => {
                             for stmt in block.statements {
                                 self.generate_statement(stmt);
                             }
@@ -361,7 +363,7 @@ impl<'sess> BIRGen<'sess> {
 
                 guard.get_value()
             },
-            Expression::Block(blk) => {
+            ExpressionKind::Block(blk) => {
                 let mut guard = self.inner.pin_mut().build_block_expr();
                 guard.pin_mut().start_body();
 
@@ -373,7 +375,7 @@ impl<'sess> BIRGen<'sess> {
                 self.inner.pin_mut().build_empty_yield();
                 cxx::UniquePtr::null()
             },
-            _ => todo!("Generation for expression {:?} not implemented", expr),
+            _ => todo!("Generation for expression {:?} not implemented", expr.kind),
         }
     }
 
