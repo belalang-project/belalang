@@ -137,14 +137,16 @@ private:
 
 class BIRScopeGuard : public BIRGuard {
 public:
-  BIRScopeGuard(mlir::OpBuilder &builder, mlir::Region *scopeRegion)
-      : BIRGuard(builder), scopeRegion(scopeRegion) {}
+  BIRScopeGuard(mlir::OpBuilder &builder, mlir::Region *scopeRegion, mlir::Value resultValue)
+      : BIRGuard(builder), scopeRegion(scopeRegion), resultValue(resultValue) {}
   ~BIRScopeGuard() = default;
 
   void start_body();
+  std::unique_ptr<BIRValue> get_value() const;
 
 private:
   mlir::Region *scopeRegion;
+  mlir::Value resultValue;
 };
 
 // -----------------------------------------------------------------------------
@@ -175,6 +177,7 @@ public:
   std::unique_ptr<BIRIfGuard> build_if_expr_ty(const BIRValue &cond, TypeKind resultTy);
   std::unique_ptr<BIRWhileGuard> build_while_stmt();
   std::unique_ptr<BIRScopeGuard> build_block_expr();
+  std::unique_ptr<BIRScopeGuard> build_block_expr_ty(TypeKind resultTy);
   void build_condition(const BIRValue &cond);
   void build_continue();
   void build_break();
