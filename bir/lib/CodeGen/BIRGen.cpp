@@ -52,6 +52,8 @@ mlir::Type BIRGen::mapType(TypeKind ty) {
     return bir::IntType::get(&context);
   } else if (ty == TypeKind::Float) {
     return bir::FloatType::get(&context);
+  } else if (ty == TypeKind::Bool) {
+    return bir::BoolType::get(&context);
   } else {
     return {};
   }
@@ -223,6 +225,16 @@ std::unique_ptr<BIRValue> BIRIfGuard::get_value() const {
 
 std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
   auto op = bir::IfOp::create(builder, loc, mlir::TypeRange{}, cond.getValue());
+  mlir::Value result = op.getNumResults() > 0 ? op.getResult() : mlir::Value();
+  return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(),
+                                      &op.getElseRegion(), result);
+}
+
+std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr_ty(const BIRValue &cond,
+                                                     TypeKind resultTy) {
+  mlir::Type ty = mapType(resultTy);
+  auto op =
+      bir::IfOp::create(builder, loc, mlir::TypeRange{ty}, cond.getValue());
   mlir::Value result = op.getNumResults() > 0 ? op.getResult() : mlir::Value();
   return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(),
                                       &op.getElseRegion(), result);

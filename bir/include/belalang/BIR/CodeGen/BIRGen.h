@@ -172,6 +172,7 @@ public:
   std::unique_ptr<BIRFunctionGuard>
   build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys);
   std::unique_ptr<BIRIfGuard> build_if_expr(const BIRValue &cond);
+  std::unique_ptr<BIRIfGuard> build_if_expr_ty(const BIRValue &cond, TypeKind resultTy);
   std::unique_ptr<BIRWhileGuard> build_while_stmt();
   std::unique_ptr<BIRScopeGuard> build_block_expr();
   void build_condition(const BIRValue &cond);

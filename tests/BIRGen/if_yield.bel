@@ -1,0 +1,19 @@
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
+
+x: Int = if true {
+    1
+} else {
+    0
+}
+
+# CHECK:      %[[C1:.*]] = bir.constant #bir.bool<true> : !bir.bool
+# CHECK-NEXT: bir.cond_br %[[C1]] ^bb1, ^bb2
+# CHECK-NEXT: ^bb1:  // pred: ^bb0
+# CHECK-NEXT:   %[[C2:.*]] = bir.constant #bir.int<1> : !bir.int
+# CHECK-NEXT:   cf.br ^bb3(%[[C2]] : !bir.int)
+# CHECK-NEXT: ^bb2:  // pred: ^bb0
+# CHECK-NEXT:   %[[C3:.*]] = bir.constant #bir.int<0> : !bir.int
+# CHECK-NEXT:   cf.br ^bb3(%[[C3]] : !bir.int)
+# CHECK-NEXT: ^bb3(%[[VAL:.*]]: !bir.int):  // 2 preds: ^bb1, ^bb2
+# CHECK-NEXT:   %[[VAR:.*]] = bir.var.declare "x" : <!bir.int>
+# CHECK-NEXT:   bir.var.store %[[VAL]] to %[[VAR]] : !bir.int to <!bir.int>

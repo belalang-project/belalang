@@ -16,11 +16,11 @@
 # CHECK-NEXT:     bir.cond_br %[[C3]] ^bb4, ^bb5
 # CHECK-NEXT:   ^bb4:  // pred: ^bb3
 # CHECK-NEXT:     %[[C4:.*]] = bir.constant #bir.int<1> : !bir.int
-# CHECK-NEXT:     cf.br ^bb6
+# CHECK-NEXT:     cf.br ^bb6(%[[C4]] : !bir.int)
 # CHECK-NEXT:   ^bb5:  // pred: ^bb3
 # CHECK-NEXT:     %[[C5:.*]] = bir.constant #bir.int<0> : !bir.int
-# CHECK-NEXT:     cf.br ^bb6
-# CHECK-NEXT:   ^bb6:  // 2 preds: ^bb4, ^bb5
+# CHECK-NEXT:     cf.br ^bb6(%[[C5]] : !bir.int)
+# CHECK-NEXT:   ^bb6(%[[VAL:.*]]: !bir.int):  // 2 preds: ^bb4, ^bb5
 # CHECK-NEXT:     %[[C6:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %[[C6]] : !bir.int
 # CHECK-NEXT:   }
