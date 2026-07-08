@@ -587,6 +587,27 @@ struct CmpOpLowering final : public OpConversionPattern<bir::CmpOp> {
   }
 };
 
+struct GetMemberOpLowering final : public OpConversionPattern<bir::GetMemberOp> {
+  using OpConversionPattern<bir::GetMemberOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::GetMemberOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    mlir::Type llvmResTy = getTypeConverter()->convertType(op.getType());
+    mlir::Type pointee = op.getAddr().getType().getEl();
+
+    auto structTy = mlir::cast<bir::StructType>(pointee);
+    llvm::SmallVector<mlir::LLVM::GEPArg, 2> offset{0, op.getIndexAttr().getZExtValue()};
+    const mlir::Type elementTy = getTypeConverter()->convertType(structTy);
+    mlir::LLVM::GEPNoWrapFlags flags = 
+        mlir::LLVM::GEPNoWrapFlags::inbounds | mlir::LLVM::GEPNoWrapFlags::nuw;
+    rewriter.replaceOpWithNewOp<mlir::LLVM::GEPOp>(
+        op, llvmResTy, elementTy, adaptor.getAddr(), offset, flags);
+
+    return success();
+  }
+};
+
 struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
   BIRToLLVMTypeConverter(mlir::MLIRContext *ctx)
       : mlir::LLVMTypeConverter(ctx) {
@@ -631,7 +652,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, VarDeclareOpLowering, VarStoreOpLowering,
-               VarLoadOpLowering, CondBrLowering, CmpOpLowering>(
+               VarLoadOpLowering, CondBrLowering, CmpOpLowering,
+               GetMemberOpLowering>(
       typeConverter, patterns.getContext());
 }
 
