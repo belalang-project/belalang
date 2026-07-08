@@ -115,6 +115,9 @@ pub enum TokenKind {
     /// Struct keyword `struct`
     Struct,
 
+    /// Dot operator `.`
+    Dot,
+
     /// Comma separator `,`
     Comma,
     /// Semicolon terminator `;`

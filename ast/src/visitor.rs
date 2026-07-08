@@ -15,6 +15,7 @@ use super::{
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
+    MemberAccessExpression,
     NullLiteral,
     PrefixExpression,
     Program,
@@ -67,6 +68,10 @@ pub trait Visitor<'ast> {
 
     fn visit_index(&mut self, node: &IndexExpression<'ast>) {
         self.walk_index(node);
+    }
+
+    fn visit_member_access(&mut self, node: &MemberAccessExpression<'ast>) {
+        self.walk_member_access(node);
     }
 
     fn visit_function(&mut self, node: &FunctionLiteral<'ast>) {
@@ -148,6 +153,7 @@ pub trait Visitor<'ast> {
             ExpressionKind::Infix(v) => self.visit_infix(v),
             ExpressionKind::Prefix(v) => self.visit_prefix(v),
             ExpressionKind::Block(v) => self.visit_block(v),
+            ExpressionKind::MemberAccess(v) => self.visit_member_access(v),
         }
     }
 
@@ -172,6 +178,11 @@ pub trait Visitor<'ast> {
     fn walk_index(&mut self, node: &IndexExpression<'ast>) {
         self.visit_expression(node.left);
         self.visit_expression(node.index);
+    }
+
+    fn walk_member_access(&mut self, node: &MemberAccessExpression<'ast>) {
+        self.visit_expression(node.source);
+        self.visit_identifier(&node.member);
     }
 
     fn walk_function(&mut self, node: &FunctionLiteral<'ast>) {

@@ -207,6 +207,13 @@ pub struct BlockExpression<'ast> {
     pub statements: &'ast [Statement<'ast>],
 }
 
+/// Represents an access to member
+#[derive(Debug, Clone, Copy)]
+pub struct MemberAccessExpression<'ast> {
+    pub source: &'ast Expression<'ast>,
+    pub member: Identifier,
+}
+
 /// Represents all expressions supported by The Belalang Compiler.
 #[derive(Debug, Clone, Copy)]
 pub struct Expression<'ast> {
@@ -231,4 +238,5 @@ pub enum ExpressionKind<'ast> {
     Infix(InfixExpression<'ast>),
     Prefix(PrefixExpression<'ast>),
     Block(BlockExpression<'ast>),
+    MemberAccess(MemberAccessExpression<'ast>),
 }
