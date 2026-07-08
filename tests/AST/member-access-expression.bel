@@ -1,0 +1,9 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+
+some_struct.member
+
+# CHECK:      Program
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     MemberAccessExpression
+# CHECK-NEXT:       Identifier(some_struct)
+# CHECK-NEXT:       Identifier(member)

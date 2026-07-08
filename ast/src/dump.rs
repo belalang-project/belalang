@@ -13,6 +13,7 @@ use super::{
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
+    MemberAccessExpression,
     NullLiteral,
     PrefixExpression,
     Program,
@@ -156,6 +157,13 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
         println!("{:indent$}IndexExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_index(node);
+        self.indent -= 2;
+    }
+
+    fn visit_member_access(&mut self, node: &MemberAccessExpression<'ast>) {
+        println!("{:indent$}MemberAccessExpression", "", indent = self.indent);
+        self.indent += 2;
+        self.walk_member_access(node);
         self.indent -= 2;
     }
 

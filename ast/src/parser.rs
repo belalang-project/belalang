@@ -37,6 +37,7 @@ use crate::{
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
+    MemberAccessExpression,
     PrefixExpression,
     Program,
     ReturnStatement,
@@ -81,7 +82,7 @@ impl From<&TokenKind> for Precedence {
             TokenKind::Add | TokenKind::Sub => Self::Additive,
             TokenKind::Div | TokenKind::Mul | TokenKind::Mod => Self::Multiplicative,
             TokenKind::LeftParen => Self::Call,
-            TokenKind::LeftBracket => Self::Index,
+            TokenKind::LeftBracket | TokenKind::Dot => Self::Index,
             _ => Self::Lowest,
         }
     }
@@ -520,6 +521,26 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 Ok(Some(self.ast.alloc(Expression {
                     kind: ExpressionKind::Index(IndexExpression { left, index }),
+                    span,
+                })))
+            },
+
+            // matches `.`
+            TokenKind::Dot => {
+                self.next_token()?; // curr_token is now `.`
+                self.next_token()?; // curr_token is not the property expr
+
+                // expect the property identifier
+                let TokenKind::Ident { sym } = self.curr_token.kind else {
+                    return Err(self.error_unexpected_token());
+                };
+
+                let member = Identifier { value: sym };
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
+
+                // make member access!
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::MemberAccess(MemberAccessExpression { source: left, member }),
                     span,
                 })))
             },
