@@ -50,6 +50,8 @@ impl<'sess> TypeChecker<'sess> {
             ast::ExpressionKind::Boolean(_) => Type::Boolean,
             ast::ExpressionKind::Identifier(i) => *self.env.get(&i.value).unwrap_or(&Type::None),
             ast::ExpressionKind::Infix(ref infix) => self.infer_infix(infix),
+            ast::ExpressionKind::Block(ref block) => self.infer_block(block),
+            ast::ExpressionKind::If(ref if_expr) => self.infer_if(if_expr),
             _ => {
                 self.walk_expression(expr);
                 self.current_type
@@ -111,6 +113,40 @@ impl<'sess> TypeChecker<'sess> {
             },
 
             _ => left_ty,
+        }
+    }
+
+    pub fn infer_block<'ast>(&mut self, block: &ast::BlockExpression<'ast>) -> Type {
+        let mut last_ty = Type::None;
+        for stmt in block.statements {
+            self.visit_statement(stmt);
+            last_ty = self.current_type;
+        }
+
+        last_ty
+    }
+
+    pub fn infer_if<'ast>(&mut self, if_expr: &ast::IfExpression<'ast>) -> Type {
+        self.check_expr(if_expr.condition, Type::Boolean);
+        let consequence_ty = self.infer_block(&if_expr.consequence);
+
+        if let Some(alt_expr) = if_expr.alternative {
+            let alternative_ty = self.infer_expr(alt_expr);
+            if consequence_ty != alternative_ty {
+                let label = Label::primary(
+                    alt_expr.span,
+                    format!(
+                        "expected type `{}`, found type `{}`",
+                        ty_to_str(consequence_ty),
+                        ty_to_str(alternative_ty),
+                    ),
+                );
+                self.session
+                    .emit(Diagnostic::error("mismatched type").with_label(label));
+            }
+            consequence_ty
+        } else {
+            Type::None
         }
     }
 }
