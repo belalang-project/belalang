@@ -43,6 +43,7 @@ use crate::{
     ReturnStatement,
     StringLiteral,
     StructDeclStatement,
+    StructLiteral,
     VarDeclStatement,
     VarExpression,
     WhileStatement,
@@ -81,7 +82,7 @@ impl From<&TokenKind> for Precedence {
             TokenKind::ShiftLeft | TokenKind::ShiftRight => Self::Shift,
             TokenKind::Add | TokenKind::Sub => Self::Additive,
             TokenKind::Div | TokenKind::Mul | TokenKind::Mod => Self::Multiplicative,
-            TokenKind::LeftParen => Self::Call,
+            TokenKind::LeftParen | TokenKind::LeftBrace => Self::Call,
             TokenKind::LeftBracket | TokenKind::Dot => Self::Index,
             _ => Self::Lowest,
         }
@@ -110,6 +111,18 @@ macro_rules! optional_peek {
     };
 }
 
+bitflags::bitflags! {
+    /// Context applied when parsing.
+    ///
+    /// This is inspired by rustc_parse's Restrictions. This essentially tracks
+    /// what is being parsed and allow the parser to change behaviour based on
+    /// it.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct Restrictions: u8 {
+        const NO_STRUCT_LITERAL = 1 << 0;
+    }
+}
+
 /// Belalang language parser.
 ///
 /// Responsible for parsing a token stream into an abstract syntax tree. Also
@@ -125,6 +138,8 @@ pub struct Parser<'sess, 'ast> {
 
     depth: i32,
     has_semicolon: bool,
+
+    restrictions: Restrictions,
 }
 
 impl<'sess, 'ast> Parser<'sess, 'ast> {
@@ -138,7 +153,26 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             ast,
             depth: 0,
             has_semicolon: false,
+            restrictions: Restrictions::empty(),
         }
+    }
+
+    fn with_restr<T, F>(&mut self, restrictions: Restrictions, f: F) -> Result<T, ParserError>
+    where
+        F: FnOnce(&mut Self) -> Result<T, ParserError>,
+    {
+        let old = self.restrictions;
+        self.restrictions = restrictions;
+        let res = f(self);
+        self.restrictions = old;
+        res
+    }
+
+    fn with_no_restr<T, F>(&mut self, f: F) -> Result<T, ParserError>
+    where
+        F: FnOnce(&mut Self) -> Result<T, ParserError>,
+    {
+        self.with_restr(Restrictions::empty(), f)
     }
 
     fn next_token(&mut self) -> Result<(), ParserError> {
@@ -196,7 +230,10 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_while
             TokenKind::While => {
                 self.next_token()?;
-                let condition = *self.parse_expression(Precedence::Lowest)?;
+                let condition = self.with_restr(Restrictions::NO_STRUCT_LITERAL, |p| {
+                    p.parse_expression(Precedence::Lowest)
+                })?;
+                let condition = *condition;
 
                 expect_peek!(self, TokenKind::LeftBrace);
 
@@ -345,6 +382,11 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
         let mut left_expr = self.parse_prefix()?;
 
         while precedence < Precedence::from(&self.peek_token.kind) {
+            if self.peek_token.kind == TokenKind::LeftBrace
+                && self.restrictions.contains(Restrictions::NO_STRUCT_LITERAL)
+            {
+                break;
+            }
             match self.parse_infix(left_expr)? {
                 Some(expr) => left_expr = expr,
                 None => return Ok(left_expr),
@@ -374,7 +416,10 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
     fn parse_if(&mut self) -> Result<&'ast Expression<'ast>, ParserError> {
         let start_span = self.curr_token.span;
         self.next_token()?;
-        let condition = self.parse_expression(Precedence::Lowest)?;
+
+        let condition = self.with_restr(Restrictions::NO_STRUCT_LITERAL, |p| {
+            p.parse_expression(Precedence::Lowest)
+        })?;
 
         expect_peek!(self, TokenKind::LeftBrace);
 
@@ -487,7 +532,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 if !matches!(self.curr_token.kind, TokenKind::RightParen) {
                     loop {
-                        args.push(*self.parse_expression(Precedence::Lowest)?);
+                        let expr = self.with_no_restr(|p| p.parse_expression(Precedence::Lowest))?;
+                        args.push(*expr);
 
                         if !matches!(self.peek_token.kind, TokenKind::Comma) {
                             break;
@@ -514,7 +560,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 self.next_token()?;
                 self.next_token()?;
 
-                let index = self.parse_expression(Precedence::Lowest)?;
+                let index = self.with_no_restr(|p| p.parse_expression(Precedence::Lowest))?;
 
                 expect_peek!(self, TokenKind::RightBracket);
                 let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
@@ -541,6 +587,49 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
                 // make member access!
                 Ok(Some(self.ast.alloc(Expression {
                     kind: ExpressionKind::MemberAccess(MemberAccessExpression { source: left, member }),
+                    span,
+                })))
+            },
+
+            // match `{`
+            TokenKind::LeftBrace => {
+                self.next_token()?; // curr_token is now `{`
+                self.next_token()?; // curr_token is now first field or `}`
+
+                let mut fields = Vec::new();
+                if !matches!(self.curr_token.kind, TokenKind::RightBrace) {
+                    loop {
+                        let expr = self.with_no_restr(|p| p.parse_expression(Precedence::Lowest))?;
+                        let ExpressionKind::Var(var_expr) = expr.kind else {
+                            return Err(self.error_invalid_struct_field(expr));
+                        };
+                        if !matches!(var_expr.kind, AssignmentKind::Assign) {
+                            return Err(self.error_invalid_struct_field(expr));
+                        }
+                        fields.push(var_expr);
+
+                        match self.peek_token.kind {
+                            TokenKind::RightBrace => break,
+                            TokenKind::Comma => {
+                                self.next_token()?; // curr_token is now `,`
+                                self.next_token()?; // curr_token is now next field
+                            },
+                            _ => return Err(self.error_unexpected_token()),
+                        }
+                    }
+                    expect_peek!(self, TokenKind::RightBrace);
+                }
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
+
+                let ExpressionKind::Identifier(struct_name) = left.kind else {
+                    return Err(self.error_invalid_struct_name(left));
+                };
+
+                Ok(Some(self.ast.alloc(Expression {
+                    kind: ExpressionKind::StructLiteral(StructLiteral {
+                        name: struct_name,
+                        fields: self.ast.alloc_slice_clone(&fields),
+                    }),
                     span,
                 })))
             },
@@ -624,7 +713,8 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 if !matches!(self.curr_token.kind, TokenKind::RightBracket) {
                     loop {
-                        elements.push(*self.parse_expression(Precedence::Lowest)?);
+                        let expr = self.with_no_restr(|p| p.parse_expression(Precedence::Lowest))?;
+                        elements.push(*expr);
 
                         if !matches!(self.peek_token.kind, TokenKind::Comma) {
                             break;
@@ -671,7 +761,7 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
             // parse_grouped: parse grouped expression
             TokenKind::LeftParen => {
                 self.next_token()?;
-                let expr = self.parse_expression(Precedence::Lowest)?;
+                let expr = self.with_no_restr(|p| p.parse_expression(Precedence::Lowest))?;
 
                 expect_peek!(self, TokenKind::RightParen);
 
@@ -800,6 +890,20 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
     fn error_parsing_struct(&self, stmt: Statement) -> ParserError {
         let label = Label::primary(stmt.span, "invalid statement");
+        self.session
+            .emit(Diagnostic::error("error parsing struct").with_label(label));
+        ParserError::ParsingStruct
+    }
+
+    fn error_invalid_struct_name(&self, left: &Expression) -> ParserError {
+        let label = Label::primary(left.span, "invalid struct name");
+        self.session
+            .emit(Diagnostic::error("error parsing struct").with_label(label));
+        ParserError::ParsingStruct
+    }
+
+    fn error_invalid_struct_field(&self, expr: &Expression) -> ParserError {
+        let label = Label::primary(expr.span, "expected field assignment");
         self.session
             .emit(Diagnostic::error("error parsing struct").with_label(label));
         ParserError::ParsingStruct

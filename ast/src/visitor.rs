@@ -24,6 +24,7 @@ use super::{
     StatementKind,
     StringLiteral,
     StructDeclStatement,
+    StructLiteral,
     VarDeclStatement,
     VarExpression,
     WhileStatement,
@@ -94,6 +95,10 @@ pub trait Visitor<'ast> {
         self.walk_block(node);
     }
 
+    fn visit_struct_literal(&mut self, node: &StructLiteral<'ast>) {
+        self.walk_struct_literal(node);
+    }
+
     fn visit_expression_statement(&mut self, node: &ExpressionStatement<'ast>) {
         self.walk_expression_statement(node);
     }
@@ -154,6 +159,7 @@ pub trait Visitor<'ast> {
             ExpressionKind::Prefix(v) => self.visit_prefix(v),
             ExpressionKind::Block(v) => self.visit_block(v),
             ExpressionKind::MemberAccess(v) => self.visit_member_access(v),
+            ExpressionKind::StructLiteral(v) => self.visit_struct_literal(v),
         }
     }
 
@@ -241,6 +247,13 @@ pub trait Visitor<'ast> {
         self.visit_identifier(&node.name);
         for v in node.fields {
             self.visit_var_decl_statement(v);
+        }
+    }
+
+    fn walk_struct_literal(&mut self, node: &StructLiteral<'ast>) {
+        self.visit_identifier(&node.name);
+        for field in node.fields {
+            self.visit_var(field);
         }
     }
 }

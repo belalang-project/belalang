@@ -20,6 +20,7 @@ use super::{
     ReturnStatement,
     StringLiteral,
     StructDeclStatement,
+    StructLiteral,
     VarDeclStatement,
     VarExpression,
     Visitor,
@@ -193,6 +194,14 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
         println!("{:indent$}BlockExpression", "", indent = self.indent);
         self.indent += 2;
         self.walk_block(node);
+        self.indent -= 2;
+    }
+
+    fn visit_struct_literal(&mut self, node: &StructLiteral<'ast>) {
+        let name = self.session.lookup_string(node.name.value);
+        println!("{:indent$}StructLiteral({})", "", name, indent = self.indent);
+        self.indent += 2;
+        self.walk_struct_literal(node);
         self.indent -= 2;
     }
 }

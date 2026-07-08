@@ -1,0 +1,15 @@
+# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+
+struct T {
+  a: Int
+}
+
+t := T {
+  a := 1,
+}
+
+# CHECK:      error: error parsing struct
+# CHECK-NEXT:  --> {{.*}}/tests/AST/struct_literal_invalid_body.bel:8:3
+# CHECK-NEXT:   |
+# CHECK-NEXT: 8 |   a := 1,
+# CHECK-NEXT:   |   ^ expected field assignment
