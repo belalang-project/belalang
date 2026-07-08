@@ -1,0 +1,9 @@
+# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+
+i: Int = 1 + "Hello"
+
+# CHECK:      error: mismatched type
+# CHECK-NEXT:  --> {{.*}}/tests/AST/infix-mismatched-type.bel:3:14
+# CHECK-NEXT:   |
+# CHECK-NEXT: 3 | i: Int = 1 + "Hello"
+# CHECK-NEXT:   |              ^^^^^^^ expected type `Integer`, found type `String`
