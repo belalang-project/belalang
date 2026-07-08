@@ -151,6 +151,7 @@ cc_library(
         "lib/IR/BIRAttrs.cpp",
         "lib/IR/BIRDialect.cpp",
         "lib/IR/BIROps.cpp",
+        "lib/IR/BIRTypes.cpp",
         "lib/Pipelines.cpp",
         "lib/Interfaces/LoopOpInterface.cpp",
         "lib/Transforms/LowerPrintToRuntime.cpp",

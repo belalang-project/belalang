@@ -11,6 +11,23 @@
 #include "belalang/BIR/IR/BIRDialect.cpp.inc"
 #include "belalang/BIR/IR/BIREnumAttrs.cpp.inc"
 
+namespace {
+using namespace belalang;
+
+struct BIROpAsmDialectInterface : public OpAsmDialectInterface {
+  using OpAsmDialectInterface::OpAsmDialectInterface;
+
+  AliasResult getAlias(Type type, raw_ostream &os) const override {
+    if (auto structType = dyn_cast<bir::StructType>(type)) {
+      auto nameAttr = structType.getName();
+      os << "struct_" << nameAttr.getValue();
+      return AliasResult::OverridableAlias;
+    }
+    return AliasResult::NoAlias;
+  }
+};
+} // namespace
+
 namespace belalang {
 namespace bir {
 
@@ -29,6 +46,8 @@ void BIRDialect::initialize() {
 #define GET_ATTRDEF_LIST
 #include "belalang/BIR/IR/BIRAttrs.cpp.inc"
       >();
+
+  addInterface<BIROpAsmDialectInterface>();
 }
 
 } // namespace bir
