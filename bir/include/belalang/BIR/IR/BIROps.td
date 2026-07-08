@@ -538,4 +538,23 @@ def BIR_CmpOp : BIR_Op<"cmp", [
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
+def BIR_GetMemberOp : BIR_Op<"get_member"> {
+  let arguments = (ins
+    BIR_RefType:$addr, // TODO: maybe make a pointer type?
+    StrAttr:$name,
+    IndexAttr:$index_attr
+  );
+
+  let results = (outs
+    BIR_RefType:$result
+  );
+
+  let assemblyFormat = [{
+    $addr `[` $index_attr `]` attr-dict
+    `:` type($addr) `->` type($result)
+  }];
+
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
 #endif // BELALANG_IR_OPS_TD_

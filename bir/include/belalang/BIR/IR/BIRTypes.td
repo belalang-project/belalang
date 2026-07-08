@@ -39,7 +39,7 @@ def BIR_StructType : BIR_Type<"Struct", "struct"> {
 def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let summary = "Reference type";
 
-  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType, FunctionType, BIR_BoolType]>:$el);
+  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType, FunctionType, BIR_BoolType, BIR_StructType]>:$el);
 
   let assemblyFormat = "`<` $el `>`";
 }
