@@ -1,0 +1,40 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+struct Point {
+  x: Int
+  y: Int
+}
+
+p := Point { x = 12, y = 23 };
+
+if (Point { x = 12, y = 23 }) == p {}
+
+# CHECK:      Program
+# CHECK-NEXT:   StructDeclStatement
+# CHECK-NEXT:     Identifier(Point)
+# CHECK-NEXT:     VarDeclStatement(Some("Int"))
+# CHECK-NEXT:       Identifier(x)
+# CHECK-NEXT:     VarDeclStatement(Some("Int"))
+# CHECK-NEXT:       Identifier(y)
+# CHECK-NEXT:   VarDeclStatement(None)
+# CHECK-NEXT:     Identifier(p)
+# CHECK-NEXT:     StructLiteral(Point)
+# CHECK-NEXT:       Identifier(Point)
+# CHECK-NEXT:       VarExpression(Assign)
+# CHECK-NEXT:         Identifier(x)
+# CHECK-NEXT:         Integer(12)
+# CHECK-NEXT:       VarExpression(Assign)
+# CHECK-NEXT:         Identifier(y)
+# CHECK-NEXT:         Integer(23)
+# CHECK-NEXT:   ExpressionStatement
+# CHECK-NEXT:     IfExpression
+# CHECK-NEXT:       InfixExpression(Eq)
+# CHECK-NEXT:         StructLiteral(Point)
+# CHECK-NEXT:           Identifier(Point)
+# CHECK-NEXT:           VarExpression(Assign)
+# CHECK-NEXT:             Identifier(x)
+# CHECK-NEXT:             Integer(12)
+# CHECK-NEXT:           VarExpression(Assign)
+# CHECK-NEXT:             Identifier(y)
+# CHECK-NEXT:             Integer(23)
+# CHECK-NEXT:         Identifier(p)
+# CHECK-NEXT:       BlockExpression

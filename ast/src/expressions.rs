@@ -214,6 +214,19 @@ pub struct MemberAccessExpression<'ast> {
     pub member: Identifier,
 }
 
+/// Represents a struct literal expression.
+///
+/// # Examples
+///
+/// ```belalang
+/// Struct { field = 12 }
+/// ```
+#[derive(Debug, Clone, Copy)]
+pub struct StructLiteral<'ast> {
+    pub name: Identifier,
+    pub fields: &'ast [VarExpression<'ast>],
+}
+
 /// Represents all expressions supported by The Belalang Compiler.
 #[derive(Debug, Clone, Copy)]
 pub struct Expression<'ast> {
@@ -239,4 +252,5 @@ pub enum ExpressionKind<'ast> {
     Prefix(PrefixExpression<'ast>),
     Block(BlockExpression<'ast>),
     MemberAccess(MemberAccessExpression<'ast>),
+    StructLiteral(StructLiteral<'ast>),
 }

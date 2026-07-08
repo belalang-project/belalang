@@ -111,5 +111,9 @@ crate.spec(
     package = "bumpalo",
     version = "3.20.3",
 )
+crate.spec(
+    package = "bitflags",
+    version = "2.13.0",
+)
 crate.from_specs()
 use_repo(crate, "crates")
