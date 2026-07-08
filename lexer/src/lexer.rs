@@ -431,6 +431,13 @@ impl<'sess> Lexer<'sess> {
                     kind: TokenKind::Comma,
                 })
             },
+            Some('.') => {
+                self.advance();
+                Ok(Token {
+                    span: SourceSpan::default(),
+                    kind: TokenKind::Dot,
+                })
+            },
             Some('\\') => {
                 self.advance();
                 Ok(Token {

@@ -1,0 +1,6 @@
+some_struct.member
+
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+# CHECK: Ident("some_struct") <0..11>
+# CHECK: Dot <11..12>
+# CHECK: Ident("member") <12..18>
