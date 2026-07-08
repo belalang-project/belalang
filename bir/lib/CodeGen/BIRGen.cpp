@@ -261,9 +261,21 @@ void BIRScopeGuard::start_body() {
 }
 
 std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr() {
-  // TODO: handle yielding block
   auto op = bir::ScopeOp::create(builder, loc, mlir::Type{});
-  return std::make_unique<BIRScopeGuard>(builder, &op.getScopeRegion());
+  return std::make_unique<BIRScopeGuard>(builder, &op.getScopeRegion(), mlir::Value());
+}
+
+std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr_ty(TypeKind resultTy) {
+  mlir::Type ty = mapType(resultTy);
+  auto op = bir::ScopeOp::create(builder, loc, ty);
+  mlir::Value result = op.getNumResults() > 0 ? op.getResult(0) : mlir::Value();
+  return std::make_unique<BIRScopeGuard>(builder, &op.getScopeRegion(), result);
+}
+
+std::unique_ptr<BIRValue> BIRScopeGuard::get_value() const {
+  if (resultValue)
+    return std::make_unique<BIRValue>(resultValue);
+  return nullptr;
 }
 
 void BIRGen::build_condition(const BIRValue &cond) {

@@ -82,6 +82,7 @@ mod ffi {
         fn build_if_expr_ty(self: Pin<&mut BIRGen>, cond: &BIRValue, resultTy: TypeKind) -> UniquePtr<BIRIfGuard>;
         fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
         fn build_block_expr(self: Pin<&mut BIRGen>) -> UniquePtr<BIRScopeGuard>;
+        fn build_block_expr_ty(self: Pin<&mut BIRGen>, resultTy: TypeKind) -> UniquePtr<BIRScopeGuard>;
         fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
         fn build_continue(self: Pin<&mut BIRGen>);
         fn build_break(self: Pin<&mut BIRGen>);
@@ -93,6 +94,7 @@ mod ffi {
         fn start_else(self: Pin<&mut BIRIfGuard>);
         fn start_body(self: Pin<&mut BIRScopeGuard>);
         fn get_value(self: &BIRIfGuard) -> UniquePtr<BIRValue>;
+        fn get_value(self: &BIRScopeGuard) -> UniquePtr<BIRValue>;
         fn optimize(self: Pin<&mut BIRGen>) -> bool;
         fn dump(self: &BIRGen);
         fn dump_to_string(self: &BIRGen) -> String;
@@ -387,16 +389,17 @@ impl<'sess> BIRGen<'sess> {
                 guard.get_value()
             },
             ExpressionKind::Block(blk) => {
-                let mut guard = self.inner.pin_mut().build_block_expr();
+                let ty = self.ty_checker.infer_expr(expr);
+                let mut guard = if let Some(ffi_ty) = map_type(ty) {
+                    self.inner.pin_mut().build_block_expr_ty(ffi_ty)
+                } else {
+                    self.inner.pin_mut().build_block_expr()
+                };
                 guard.pin_mut().start_body();
 
-                for stmt in blk.statements {
-                    self.generate_statement(stmt);
-                }
+                self.generate_block_body(blk, ty);
 
-                // TODO: handle yielding blocks
-                self.inner.pin_mut().build_empty_yield();
-                cxx::UniquePtr::null()
+                guard.get_value()
             },
             _ => todo!("Generation for expression {:?} not implemented", expr.kind),
         }
@@ -457,8 +460,11 @@ impl<'sess> BIRGen<'sess> {
                 }
             } else {
                 self.generate_statement(stmt);
-                self.inner.pin_mut().build_empty_yield();
             }
+        }
+
+        if !has_yield {
+            self.inner.pin_mut().build_empty_yield();
         }
     }
 }
