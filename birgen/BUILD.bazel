@@ -17,6 +17,7 @@ rust_library(
         "//ast",
         "//lexer",
         "//session",
+        "//ty",
         "@cxx.rs//:cxx",
     ],
     link_deps = [

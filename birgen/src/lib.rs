@@ -42,6 +42,7 @@ mod ffi {
         String,
         Int,
         Float,
+        Bool,
     }
 
     unsafe extern "C++" {
@@ -78,6 +79,7 @@ mod ffi {
         fn build_empty_return(self: Pin<&mut BIRGen>);
         fn build_main_return(self: Pin<&mut BIRGen>);
         fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
+        fn build_if_expr_ty(self: Pin<&mut BIRGen>, cond: &BIRValue, resultTy: TypeKind) -> UniquePtr<BIRIfGuard>;
         fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
         fn build_block_expr(self: Pin<&mut BIRGen>) -> UniquePtr<BIRScopeGuard>;
         fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
@@ -128,6 +130,7 @@ pub struct BIRGen<'sess> {
     session: &'sess Session,
     inner: cxx::UniquePtr<ffi::BIRGen>,
     symbol_table: HashMap<Symbol, cxx::UniquePtr<ffi::BIRValue>>,
+    ty_checker: ty::TypeChecker<'sess>,
 }
 
 impl<'sess> BIRGen<'sess> {
@@ -136,10 +139,12 @@ impl<'sess> BIRGen<'sess> {
             session,
             inner: ffi::create_birgen(),
             symbol_table: HashMap::new(),
+            ty_checker: ty::TypeChecker::new(session),
         }
     }
 
     pub fn generate_program<'ast>(&mut self, program: &Program<'ast>) {
+        self.ty_checker.infer(program);
         for stmt in program.statements {
             self.generate_statement(stmt);
         }
@@ -212,7 +217,10 @@ impl<'sess> BIRGen<'sess> {
                     | ExpressionKind::Infix(_)
                     | ExpressionKind::String(_)
                     | ExpressionKind::Function(_)
-                    | ExpressionKind::Call(_) => {
+                    | ExpressionKind::Call(_)
+                    | ExpressionKind::If(_)
+                    | ExpressionKind::Block(_)
+                    | ExpressionKind::Boolean(_) => {
                         let v = self.generate_expression(&value);
                         let name = self.session.lookup_string(var.name.value);
                         let declare = self.inner.pin_mut().build_var_declare(&v, name);
@@ -349,24 +357,29 @@ impl<'sess> BIRGen<'sess> {
             },
             ExpressionKind::If(if_expr) => {
                 let cond = self.generate_expression(if_expr.condition);
-                let mut guard = self.inner.pin_mut().build_if_expr(&cond);
 
-                // TODO: handle yielding if expressions
+                // TODO: handle if inferring failed?
+                let ty = self.ty_checker.infer_expr(expr);
+
+                let mut guard = if let Some(ffi_ty) = map_type(ty) {
+                    self.inner.pin_mut().build_if_expr_ty(&cond, ffi_ty)
+                } else {
+                    self.inner.pin_mut().build_if_expr(&cond)
+                };
+
                 guard.pin_mut().start_then();
-                for stmt in if_expr.consequence.statements {
-                    self.generate_statement(stmt);
-                }
+                self.generate_block_body(&if_expr.consequence, ty);
 
                 if let Some(alt) = if_expr.alternative {
                     guard.pin_mut().start_else();
+                    // TODO: maybbe make alt BlockExpression?
                     match &alt.kind {
                         ExpressionKind::Block(block) => {
-                            for stmt in block.statements {
-                                self.generate_statement(stmt);
-                            }
+                            self.generate_block_body(block, ty);
                         },
                         _ => {
-                            self.generate_expression(alt);
+                            let val = self.generate_expression(alt);
+                            self.inner.pin_mut().build_yield(&val);
                         },
                     }
                 }
@@ -427,6 +440,36 @@ impl<'sess> BIRGen<'sess> {
             session: self.session,
             inner: ffi::create_llvmgen(self.inner.pin_mut()),
         }
+    }
+
+    fn generate_block_body<'ast>(&mut self, block: &ast::BlockExpression<'ast>, yield_ty: ty::Type) {
+        let has_yield = yield_ty != ty::Type::None;
+
+        let len = block.statements.len();
+        for i in 0..len {
+            let stmt = &block.statements[i];
+            if i == len - 1 && has_yield {
+                if let StatementKind::Expression(ref expr_stmt) = stmt.kind {
+                    let val = self.generate_expression(&expr_stmt.expression);
+                    self.inner.pin_mut().build_yield(&val);
+                } else {
+                    todo!("non-expression yielding block");
+                }
+            } else {
+                self.generate_statement(stmt);
+                self.inner.pin_mut().build_empty_yield();
+            }
+        }
+    }
+}
+
+fn map_type(ty: ty::Type) -> Option<ffi::TypeKind> {
+    match ty {
+        ty::Type::String => Some(ffi::TypeKind::String),
+        ty::Type::Integer => Some(ffi::TypeKind::Int),
+        ty::Type::Float => Some(ffi::TypeKind::Float),
+        ty::Type::Boolean => Some(ffi::TypeKind::Bool),
+        _ => None,
     }
 }
 
