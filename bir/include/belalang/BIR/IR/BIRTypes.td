@@ -25,6 +25,17 @@ def BIR_BoolType : BIR_Type<"Bool", "bool"> {
   let summary = "Boolean type";
 }
 
+def BIR_StructType : BIR_Type<"Struct", "struct"> {
+  let summary = "Struct type";
+
+  let parameters = (ins
+    ArrayRefParameter<"mlir::Type", "struct members">:$members,
+    "mlir::StringAttr":$name
+  );
+
+  let hasCustomAssemblyFormat = 1;
+}
+
 def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let summary = "Reference type";
 
