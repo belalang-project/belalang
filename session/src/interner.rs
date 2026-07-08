@@ -26,21 +26,22 @@ pub mod syms {
     pub const INT: Symbol = Symbol(0);
     pub const FLOAT: Symbol = Symbol(1);
     pub const STRING: Symbol = Symbol(2);
+    pub const BOOL: Symbol = Symbol(3);
 
     // Keywords
-    pub const FN: Symbol = Symbol(3);
-    pub const WHILE: Symbol = Symbol(4);
-    pub const TRUE: Symbol = Symbol(5);
-    pub const FALSE: Symbol = Symbol(6);
-    pub const IF: Symbol = Symbol(7);
-    pub const ELSE: Symbol = Symbol(8);
-    pub const RETURN: Symbol = Symbol(9);
-    pub const STRUCT: Symbol = Symbol(10);
-    pub const BREAK: Symbol = Symbol(11);
-    pub const CONTINUE: Symbol = Symbol(12);
+    pub const FN: Symbol = Symbol(4);
+    pub const WHILE: Symbol = Symbol(5);
+    pub const TRUE: Symbol = Symbol(6);
+    pub const FALSE: Symbol = Symbol(7);
+    pub const IF: Symbol = Symbol(8);
+    pub const ELSE: Symbol = Symbol(9);
+    pub const RETURN: Symbol = Symbol(10);
+    pub const STRUCT: Symbol = Symbol(11);
+    pub const BREAK: Symbol = Symbol(12);
+    pub const CONTINUE: Symbol = Symbol(13);
 
     // Built-ins
-    pub const PRINT: Symbol = Symbol(13);
+    pub const PRINT: Symbol = Symbol(14);
 }
 
 impl Interner {
@@ -51,6 +52,7 @@ impl Interner {
         s.intern("Int");
         s.intern("Float");
         s.intern("String");
+        s.intern("Bool");
 
         // Keywords
         s.intern("fn");

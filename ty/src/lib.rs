@@ -18,6 +18,7 @@ pub enum Type {
     String,
     Integer,
     Float,
+    Boolean,
     None,
 }
 
@@ -46,7 +47,11 @@ impl<'sess> TypeChecker<'sess> {
             ast::ExpressionKind::Integer(_) => Type::Integer,
             ast::ExpressionKind::Float(_) => Type::Float,
             ast::ExpressionKind::String(_) => Type::String,
+            ast::ExpressionKind::Boolean(_) => Type::Boolean,
             ast::ExpressionKind::Identifier(i) => *self.env.get(&i.value).unwrap_or(&Type::None),
+            ast::ExpressionKind::Infix(ref infix) => self.infer_infix(infix),
+            ast::ExpressionKind::Block(ref block) => self.infer_block(block),
+            ast::ExpressionKind::If(ref if_expr) => self.infer_if(if_expr),
             _ => {
                 self.walk_expression(expr);
                 self.current_type
@@ -67,6 +72,81 @@ impl<'sess> TypeChecker<'sess> {
             );
             self.session
                 .emit(Diagnostic::error("mismatched type").with_label(label))
+        }
+    }
+
+    pub fn infer_infix<'ast>(&mut self, infix: &ast::InfixExpression<'ast>) -> Type {
+        let left_ty = self.infer_expr(infix.left);
+        let right_ty = self.infer_expr(infix.right);
+
+        if left_ty != right_ty {
+            let label = Label::primary(
+                infix.right.span,
+                format!(
+                    "expected type `{}`, found type `{}`",
+                    ty_to_str(left_ty),
+                    ty_to_str(right_ty),
+                ),
+            );
+            self.session
+                .emit(Diagnostic::error("mismatched type").with_label(label));
+        }
+
+        match infix.operator {
+            lexer::InfixKind::Eq
+            | lexer::InfixKind::Ne
+            | lexer::InfixKind::Lt
+            | lexer::InfixKind::Le
+            | lexer::InfixKind::Gt
+            | lexer::InfixKind::Ge => Type::Boolean,
+
+            lexer::InfixKind::And | lexer::InfixKind::Or => {
+                if left_ty != Type::Boolean {
+                    let label = Label::primary(
+                        infix.left.span,
+                        format!("expected type `Boolean`, found type `{}`", ty_to_str(left_ty)),
+                    );
+                    self.session
+                        .emit(Diagnostic::error("mismatched type").with_label(label));
+                }
+                Type::Boolean
+            },
+
+            _ => left_ty,
+        }
+    }
+
+    pub fn infer_block<'ast>(&mut self, block: &ast::BlockExpression<'ast>) -> Type {
+        let mut last_ty = Type::None;
+        for stmt in block.statements {
+            self.visit_statement(stmt);
+            last_ty = self.current_type;
+        }
+
+        last_ty
+    }
+
+    pub fn infer_if<'ast>(&mut self, if_expr: &ast::IfExpression<'ast>) -> Type {
+        self.check_expr(if_expr.condition, Type::Boolean);
+        let consequence_ty = self.infer_block(&if_expr.consequence);
+
+        if let Some(alt_expr) = if_expr.alternative {
+            let alternative_ty = self.infer_expr(alt_expr);
+            if consequence_ty != alternative_ty {
+                let label = Label::primary(
+                    alt_expr.span,
+                    format!(
+                        "expected type `{}`, found type `{}`",
+                        ty_to_str(consequence_ty),
+                        ty_to_str(alternative_ty),
+                    ),
+                );
+                self.session
+                    .emit(Diagnostic::error("mismatched type").with_label(label));
+            }
+            consequence_ty
+        } else {
+            Type::None
         }
     }
 }
@@ -102,6 +182,7 @@ fn sym_to_ty(symbol: Symbol) -> Type {
         syms::STRING => Type::String,
         syms::INT => Type::Integer,
         syms::FLOAT => Type::Float,
+        syms::BOOL => Type::Boolean,
         _ => Type::None,
     }
 }
@@ -111,6 +192,7 @@ fn ty_to_str(ty: Type) -> String {
         Type::String => "String",
         Type::Integer => "Integer",
         Type::Float => "Float",
+        Type::Boolean => "Boolean",
         Type::None => "None",
     })
 }

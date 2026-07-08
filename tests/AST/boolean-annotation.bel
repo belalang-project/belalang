@@ -1,0 +1,12 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+
+b: Bool = true;
+c: Bool = false;
+
+# CHECK:      Program
+# CHECK-NEXT:   VarDeclStatement(Some("Bool"))
+# CHECK-NEXT:     Identifier(b)
+# CHECK-NEXT:     Boolean(true)
+# CHECK-NEXT:   VarDeclStatement(Some("Bool"))
+# CHECK-NEXT:     Identifier(c)
+# CHECK-NEXT:     Boolean(false)
