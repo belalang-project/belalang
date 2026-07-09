@@ -15,5 +15,5 @@ x: Int = if true {
 # CHECK-NEXT:   %[[C3:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:   cf.br ^bb3(%[[C3]] : !bir.int)
 # CHECK-NEXT: ^bb3(%[[VAL:.*]]: !bir.int):  // 2 preds: ^bb1, ^bb2
-# CHECK-NEXT:   %[[VAR:.*]] = bir.var.declare "x" : <!bir.int>
-# CHECK-NEXT:   bir.var.store %[[VAL]] to %[[VAR]] : !bir.int to <!bir.int>
+# CHECK-NEXT:   %[[VAR:.*]] = bir.var.declare "x" : !bir.ref<!bir.int>
+# CHECK-NEXT:   bir.var.store %[[VAL]] to %[[VAR]] : !bir.int to !bir.ref<!bir.int>
