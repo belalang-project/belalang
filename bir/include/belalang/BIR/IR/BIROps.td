@@ -355,7 +355,7 @@ def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
   let arguments = (ins StrAttr:$name);
   let results = (outs BIR_RefType:$result);
 
-  let assemblyFormat = "$name attr-dict `:` type($result)";
+  let assemblyFormat = "$name attr-dict `:` qualified(type($result))";
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
@@ -364,7 +364,7 @@ def BIR_VarStoreOp : BIR_Op<"var.store"> {
 
   let arguments = (ins BIR_AnyType:$src, BIR_RefType:$dest);
 
-  let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` type($dest)";
+  let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` qualified(type($dest))";
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
@@ -551,7 +551,7 @@ def BIR_GetMemberOp : BIR_Op<"get_member"> {
 
   let assemblyFormat = [{
     $addr `[` $index_attr `]` attr-dict
-    `:` type($addr) `->` type($result)
+    `:` qualified(type($addr)) `->` qualified(type($result))
   }];
 
   let hasBIRGenBindings = false; // TODO: make bindings
