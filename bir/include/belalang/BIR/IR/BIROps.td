@@ -349,8 +349,8 @@ def BIR_ReturnOp : BIR_Op<"return", [
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
-def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
-  let summary = "var.declare";
+def BIR_DeclareOp : BIR_Op<"declare"> {
+  let summary = "declare";
 
   let arguments = (ins StrAttr:$name);
   let results = (outs BIR_RefType:$result);
@@ -359,8 +359,8 @@ def BIR_VarDeclareOp : BIR_Op<"var.declare"> {
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
-def BIR_VarStoreOp : BIR_Op<"var.store"> {
-  let summary = "var.store";
+def BIR_StoreOp : BIR_Op<"store"> {
+  let summary = "store";
 
   let arguments = (ins BIR_AnyType:$src, BIR_RefType:$dest);
 
@@ -368,8 +368,8 @@ def BIR_VarStoreOp : BIR_Op<"var.store"> {
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
-def BIR_VarLoadOp : BIR_Op<"var.load"> {
-  let summary = "var.load";
+def BIR_VarLoadOp : BIR_Op<"load"> {
+  let summary = "load";
 
   let arguments = (ins BIR_RefType:$ref);
   let results = (outs BIR_AnyType:$result);

@@ -411,11 +411,11 @@ struct ShrOpLowering final : public OpConversionPattern<bir::ShrOp> {
   }
 };
 
-struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp> {
-  using OpConversionPattern<bir::VarDeclareOp>::OpConversionPattern;
+struct DeclareOpLowering final : public OpConversionPattern<bir::DeclareOp> {
+  using OpConversionPattern<bir::DeclareOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::VarDeclareOp op, OpAdaptor adaptor,
+  matchAndRewrite(bir::DeclareOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     auto refType = mlir::cast<bir::RefType>(op.getType());
     auto elType = refType.getEl();
@@ -462,11 +462,11 @@ struct VarDeclareOpLowering final : public OpConversionPattern<bir::VarDeclareOp
   };
 };
 
-struct VarStoreOpLowering final : public OpConversionPattern<bir::VarStoreOp> {
-  using OpConversionPattern<bir::VarStoreOp>::OpConversionPattern;
+struct StoreOpLowering final : public OpConversionPattern<bir::StoreOp> {
+  using OpConversionPattern<bir::StoreOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::VarStoreOp op, OpAdaptor adaptor,
+  matchAndRewrite(bir::StoreOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     if (auto str = llvm::dyn_cast<bir::StringType>(adaptor.getSrc().getType())) {
       auto type = getTypeConverter()->convertType(adaptor.getSrc().getType());
@@ -651,7 +651,7 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
-               ShrOpLowering, VarDeclareOpLowering, VarStoreOpLowering,
+               ShrOpLowering, DeclareOpLowering, StoreOpLowering,
                VarLoadOpLowering, CondBrLowering, CmpOpLowering,
                GetMemberOpLowering>(
       typeConverter, patterns.getContext());

@@ -5,8 +5,8 @@
 # CHECK-NEXT:   bir.func @main() -> !bir.int {
 # CHECK-NEXT:     bir.call @brt_init() : () -> ()
 # CHECK-NEXT:     %0 = bir.constant #bir.string<"hello"> : !bir.string
-# CHECK-NEXT:     %1 = bir.var.declare "x" : !bir.ref<!bir.string>
-# CHECK-NEXT:     bir.var.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
+# CHECK-NEXT:     %1 = bir.declare "x" : !bir.ref<!bir.string>
+# CHECK-NEXT:     bir.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
 # CHECK-NEXT:     %2 = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %2 : !bir.int
 # CHECK-NEXT:   }

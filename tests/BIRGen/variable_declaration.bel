@@ -7,8 +7,8 @@ y: String
 # CHECK-NEXT:   bir.func @brt_init()
 # CHECK-NEXT:   bir.func @main() -> !bir.int {
 # CHECK-NEXT:     bir.call @brt_init() : () -> ()
-# CHECK-NEXT:     %[[C0:.*]] = bir.var.declare "x" : !bir.ref<!bir.int>
-# CHECK-NEXT:     %[[C1:.*]] = bir.var.declare "y" : !bir.ref<!bir.string>
+# CHECK-NEXT:     %[[C0:.*]] = bir.declare "x" : !bir.ref<!bir.int>
+# CHECK-NEXT:     %[[C1:.*]] = bir.declare "y" : !bir.ref<!bir.string>
 # CHECK-NEXT:     %[[C2:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %[[C2]] : !bir.int
 # CHECK-NEXT:   }
