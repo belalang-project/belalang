@@ -1,4 +1,3 @@
-load("@pypi//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_test")
 
 def lit_test(name, tests, data = [], env = {}, **kwargs):
@@ -8,8 +7,8 @@ def lit_test(name, tests, data = [], env = {}, **kwargs):
 
         py_test(
             name = target_name,
-            srcs = ["//tests:run_lit.py"],
-            main = "//tests:run_lit.py",
+            srcs = ["@llvm-project//llvm:lit"],
+            main = "lit.py",
             args = ["$(execpath %s)" % test],
             data = [test] + data + [
                 "//tests:lit.cfg.py",
@@ -20,7 +19,7 @@ def lit_test(name, tests, data = [], env = {}, **kwargs):
                 "FILECHECK": "$(rlocationpath @llvm-project//llvm:FileCheck)",
                 "NOT": "$(rlocationpath @llvm-project//llvm:not)",
             }, **env),
-            deps = [requirement("lit")],
+            deps = ["@llvm-project//llvm:lit"],
             **kwargs
         )
         individual_targets.append(":" + target_name)
