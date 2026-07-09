@@ -19,11 +19,11 @@
 bir.func @main() -> !bir.string {
   // x := "hello"
   %0 = bir.constant #bir.string<"hello"> : !bir.string
-  %1 = bir.var.declare "x" : !bir.ref<!bir.string>
-  bir.var.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
+  %1 = bir.declare "x" : !bir.ref<!bir.string>
+  bir.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
 
   // return x
-  %2 = bir.var.load %1 : (!bir.ref<!bir.string>) -> !bir.string
+  %2 = bir.load %1 : (!bir.ref<!bir.string>) -> !bir.string
   bir.return %2 : !bir.string
 }
 
@@ -49,11 +49,11 @@ bir.func @main() -> !bir.string {
 bir.func @main() {
   // x := "hello"
   %0 = bir.constant #bir.string<"hello"> : !bir.string
-  %1 = bir.var.declare "x" : !bir.ref<!bir.string>
-  bir.var.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
+  %1 = bir.declare "x" : !bir.ref<!bir.string>
+  bir.store %0 to %1 : !bir.string to !bir.ref<!bir.string>
 
   // print(x)
-  %2 = bir.var.load %1 : (!bir.ref<!bir.string>) -> !bir.string
+  %2 = bir.load %1 : (!bir.ref<!bir.string>) -> !bir.string
   bir.print %2 : !bir.string
   bir.return
 }

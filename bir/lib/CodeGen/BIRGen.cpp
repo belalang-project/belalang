@@ -143,7 +143,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v,
                                                     rust::Str name) {
   auto nakedType = v.getValue().getType();
   auto refType = bir::RefType::get(&context, nakedType);
-  auto op = bir::VarDeclareOp::create(
+  auto op = bir::DeclareOp::create(
       builder, loc, refType, llvm::StringRef(name.data(), name.size()));
   return std::make_unique<BIRValue>(op.getResult());
 }
@@ -153,7 +153,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(TypeKind v,
   mlir::Type ty = mapType(v);
 
   auto refType = bir::RefType::get(&context, ty);
-  auto op = bir::VarDeclareOp::create(
+  auto op = bir::DeclareOp::create(
       builder, loc, refType, llvm::StringRef(name.data(), name.size()));
   return std::make_unique<BIRValue>(op.getResult());
 }
@@ -161,7 +161,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(TypeKind v,
 void BIRGen::build_var_store(const BIRValue &v, const BIRValue &ref) {
   auto src = v.getValue();
   auto dest = ref.getValue();
-  bir::VarStoreOp::create(builder, loc, src, dest);
+  bir::StoreOp::create(builder, loc, src, dest);
 }
 
 std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
