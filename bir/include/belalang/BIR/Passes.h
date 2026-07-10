@@ -17,6 +17,7 @@ namespace bir {
 #include "belalang/BIR/Passes.h.inc"
 
 void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangLowerDeclToMemoryPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerPrintToRuntimePatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,

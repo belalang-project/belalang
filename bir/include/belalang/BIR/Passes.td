@@ -19,6 +19,11 @@ def BelalangLowerFuncExprPass : Pass<"bir-lower-func-expr"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
+def BelalangLowerDeclToMemoryPass : Pass<"bir-lower-decl-to-memory"> {
+  let summary = "lowers declare ops to memory";
+  let dependentDialects = ["::belalang::bir::BIRDialect"];
+}
+
 def BelalangPrepareRuntimePass : Pass<"bir-prepare-runtime"> {
   let summary = "Lower ops to calls to runtime library";
   let dependentDialects = ["::belalang::bir::BIRDialect"];

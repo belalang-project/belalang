@@ -557,4 +557,20 @@ def BIR_GetMemberOp : BIR_Op<"get_member"> {
   let hasBIRGenBindings = false; // TODO: make bindings
 }
 
+def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
+  let arguments = (ins 
+    I64Attr:$size
+  );
+
+  let results = (outs
+    BIR_RefType:$result
+  );
+
+  let assemblyFormat = [{
+    $size `:` qualified(type($result)) attr-dict
+  }];
+
+  let hasBIRGenBindings = false; // TODO: make bindings
+}
+
 #endif // BELALANG_IR_OPS_TD_

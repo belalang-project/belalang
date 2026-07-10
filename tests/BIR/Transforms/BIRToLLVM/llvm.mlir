@@ -74,7 +74,7 @@ bir.func @main() -> !bir.int {
 // CHECK: llvm.return %[[LOAD]] : i64
 
 bir.func @main() -> !bir.int {
-  %0 = bir.declare "x" : !bir.ref<!bir.int>
+  %0 = bir.alloc_heap 8 : !bir.ref<!bir.int>
   %1 = bir.constant #bir.int<12> : !bir.int
   bir.store %1 to %0 : !bir.int to !bir.ref<!bir.int>
   %2 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int

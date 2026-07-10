@@ -5,7 +5,7 @@
 # CHECK-NEXT:   bir.func @main() -> !bir.int {
 # CHECK-NEXT:     bir.call @brt_init() : () -> ()
 # CHECK-NEXT:     %[[C0:.*]] = bir.constant #bir.int<0> : !bir.int
-# CHECK-NEXT:     %[[X:.*]] = bir.declare "x" : !bir.ref<!bir.int>
+# CHECK-NEXT:     %[[X:.*]] = bir.alloc_heap 8 : !bir.ref<!bir.int>
 # CHECK-NEXT:     bir.store %[[C0]] to %[[X]] : !bir.int to !bir.ref<!bir.int>
 # CHECK-NEXT:     cf.br ^bb1
 # CHECK-NEXT:   ^bb1:  // 2 preds: ^bb0, ^bb4
