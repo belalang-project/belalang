@@ -7,15 +7,19 @@ module(
 # Dependencies
 # ------------------------------------------------------------------------------
 
-bazel_dep(name = "bazel_skylib", version = "1.9.0")
-bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "rules_pkg", version = "1.2.0")
 bazel_dep(name = "rules_rust", version = "0.71.3")
 bazel_dep(name = "rules_rust_mdbook", version = "0.71.3")
-bazel_dep(name = "rules_shell", version = "0.8.0")
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "llvm", version = "0.8.3")
 bazel_dep(name = "cxx.rs", version = "1.0.196")
+
+# required by llvm
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "rules_shell", version = "0.8.0")
+bazel_dep(name = "zlib-ng", version = "2.3.3", repo_name = "llvm_zlib")
+bazel_dep(name = "zstd", version = "1.5.7.bcr.1", repo_name = "llvm_zstd")
 
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 bazel_dep(name = "rules_python", version = "2.0.1", dev_dependency = True)
@@ -28,44 +32,24 @@ git_override(
 )
 
 # ------------------------------------------------------------------------------
-# lit
-# ------------------------------------------------------------------------------
-
-python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(
-    is_default = True,
-    python_version = "3.11",
-)
-use_repo(python, "python_3_11", "python_3_11_host")
-
-pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-pip.parse(
-    hub_name = "pypi",
-    python_version = "3.11",
-    requirements_lock = "requirements_lock.txt",
-)
-use_repo(pip, "pypi")
-
-# ------------------------------------------------------------------------------
 # Third Parties
 # ------------------------------------------------------------------------------
 
 third_party = use_extension("//third_party:defs.bzl", "third_party_deps")
-use_repo(third_party, "bdwgc")
+use_repo(third_party, "bdwgc", "llvm-raw")
+
+llvm_configure = use_repo_rule("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
+
+llvm_configure(
+    name = "llvm-project",
+    targets = [
+        "X86",
+    ],
+)
 
 # ------------------------------------------------------------------------------
-# LLVM
+# C++ Toolchain
 # ------------------------------------------------------------------------------
-
-llvm_source = use_extension("@llvm//extensions:llvm_source.bzl", "llvm_source")
-llvm_source.version(llvm_version = "22.1.4")
-use_repo(llvm_source, "llvm-raw", "llvm_config", "llvm_zlib", "llvm_zstd")
-
-llvm = use_extension("@llvm//extensions:llvm.bzl", "llvm")
-llvm.configure(targets = [
-    "X86",
-])
-use_repo(llvm, "llvm-project")
 
 register_toolchains("@llvm//toolchain:all")
 
