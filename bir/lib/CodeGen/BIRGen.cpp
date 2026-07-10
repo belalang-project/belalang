@@ -171,7 +171,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
   if (!refType)
     return nullptr;
 
-  auto resultType = refType.getEl();
+  auto resultType = refType.getReferent();
 
   auto op =
       bir::VarLoadOp::create(builder, loc, resultType, refValue.getValue());

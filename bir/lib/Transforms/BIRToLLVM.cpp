@@ -579,9 +579,9 @@ struct GetMemberOpLowering final : public OpConversionPattern<bir::GetMemberOp> 
   matchAndRewrite(bir::GetMemberOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     mlir::Type llvmResTy = getTypeConverter()->convertType(op.getType());
-    mlir::Type pointee = op.getAddr().getType().getEl();
+    mlir::Type referent = op.getAddr().getType().getReferent();
 
-    auto structTy = mlir::cast<bir::StructType>(pointee);
+    auto structTy = mlir::cast<bir::StructType>(referent);
     llvm::SmallVector<mlir::LLVM::GEPArg, 2> offset{0, op.getIndexAttr().getZExtValue()};
     const mlir::Type elementTy = getTypeConverter()->convertType(structTy);
     mlir::LLVM::GEPNoWrapFlags flags = 

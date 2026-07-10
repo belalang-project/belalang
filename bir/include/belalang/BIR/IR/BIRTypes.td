@@ -36,12 +36,21 @@ def BIR_StructType : BIR_Type<"Struct", "struct"> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_ReferencableType : AnyTypeOf<[
+  BIR_IntType,
+  BIR_FloatType,
+  BIR_StringType,
+  FunctionType,
+  BIR_BoolType,
+  BIR_StructType
+]>;
+
 def BIR_RefType : BIR_Type<"Ref", "ref"> {
   let summary = "Reference type";
 
-  let parameters = (ins AnyTypeOf<[BIR_IntType, BIR_FloatType, BIR_StringType, FunctionType, BIR_BoolType, BIR_StructType]>:$el);
+  let parameters = (ins BIR_ReferencableType:$referent);
 
-  let assemblyFormat = "`<` $el `>`";
+  let assemblyFormat = "`<` $referent `>`";
 }
 
 #endif // BELALANG_IR_TYPES_TD_
