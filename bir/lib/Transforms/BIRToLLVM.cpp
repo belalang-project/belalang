@@ -411,30 +411,15 @@ struct ShrOpLowering final : public OpConversionPattern<bir::ShrOp> {
   }
 };
 
-struct DeclareOpLowering final : public OpConversionPattern<bir::DeclareOp> {
-  using OpConversionPattern<bir::DeclareOp>::OpConversionPattern;
+struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> {
+  using OpConversionPattern<bir::AllocHeapOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::DeclareOp op, OpAdaptor adaptor,
+  matchAndRewrite(bir::AllocHeapOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
-    auto refType = mlir::cast<bir::RefType>(op.getType());
-    auto elType = refType.getEl();
+    auto elSize = op.getSize();
     auto loc = op.getLoc();
     auto ctx = op.getContext();
-
-    int64_t elSize;
-    if (mlir::isa<bir::IntType>(elType))
-      elSize = 8;
-    else if (mlir::isa<bir::FloatType>(elType))
-      elSize = 8;
-    else if (mlir::isa<bir::StringType>(elType))
-      elSize = 16;
-    else if (mlir::isa<bir::BoolType>(elType))
-      elSize = 8;
-    else if (mlir::isa<mlir::FunctionType>(elType))
-      elSize = 8;
-    else
-      return failure();
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
     if (!module.lookupSymbol(kGCAlloc)) {
@@ -651,7 +636,7 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
-               ShrOpLowering, DeclareOpLowering, StoreOpLowering,
+               ShrOpLowering, AllocHeapOpLowering, StoreOpLowering,
                VarLoadOpLowering, CondBrLowering, CmpOpLowering,
                GetMemberOpLowering>(
       typeConverter, patterns.getContext());

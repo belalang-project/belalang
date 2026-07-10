@@ -154,6 +154,7 @@ cc_library(
         "lib/IR/BIRTypes.cpp",
         "lib/Pipelines.cpp",
         "lib/Interfaces/LoopOpInterface.cpp",
+        "lib/Transforms/LowerDeclToMemory.cpp",
         "lib/Transforms/LowerPrintToRuntime.cpp",
         "lib/Transforms/PrepareRuntime.cpp",
         "lib/Transforms/FlattenCFG.cpp",
