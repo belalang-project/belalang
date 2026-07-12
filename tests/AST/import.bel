@@ -1,0 +1,10 @@
+# RUN: %belalang build --emit ast %s | %FileCheck %s
+
+import "core:math"
+import "std:io"
+import "foo:bar"
+
+# CHECK:      Program
+# CHECK-NEXT:   ImportStatement("core:math")
+# CHECK-NEXT:   ImportStatement("std:io")
+# CHECK-NEXT:   ImportStatement("foo:bar")

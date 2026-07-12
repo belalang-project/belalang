@@ -571,6 +571,7 @@ impl<'sess> Lexer<'sess> {
                     syms::ELSE => TokenKind::Else,
                     syms::RETURN => TokenKind::Return,
                     syms::STRUCT => TokenKind::Struct,
+                    syms::IMPORT => TokenKind::Import,
                     _ => TokenKind::Ident { sym },
                 };
 

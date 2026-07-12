@@ -242,6 +242,9 @@ impl<'sess> BIRGen<'sess> {
             StatementKind::StructDecl(_s) => {
                 // TODO: Implement struct declaration
             },
+            StatementKind::Import(_s) => {
+                // TODO: Implement import statement
+            },
             StatementKind::Break(_s) => {
                 self.inner.pin_mut().build_break_op();
             },

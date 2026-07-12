@@ -114,6 +114,8 @@ pub enum TokenKind {
     Return,
     /// Struct keyword `struct`
     Struct,
+    /// Import keyword `import`
+    Import,
 
     /// Dot operator `.`
     Dot,
@@ -293,6 +295,7 @@ impl std::fmt::Display for TokenKind {
             TokenKind::If => "if",
             TokenKind::Else => "else",
             TokenKind::Return => "return",
+            TokenKind::Import => "import",
 
             TokenKind::Comma => ",",
             TokenKind::Semicolon => ";",

@@ -34,6 +34,7 @@ use crate::{
     FunctionLiteral,
     Identifier,
     IfExpression,
+    ImportStatement,
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
@@ -244,6 +245,29 @@ impl<'sess, 'ast> Parser<'sess, 'ast> {
 
                 Ok(Statement {
                     kind: StatementKind::While(WhileStatement { condition, block }),
+                    span,
+                })
+            },
+
+            // match `import`
+            TokenKind::Import => {
+                self.next_token()?; // curr_token should be import string
+
+                let module = if let TokenKind::Literal {
+                    kind: LiteralKind::String,
+                    sym,
+                } = self.curr_token.kind
+                {
+                    sym
+                } else {
+                    return Err(self.error_unexpected_token());
+                };
+
+                self.has_semicolon = optional_peek!(self, TokenKind::Semicolon);
+                let span = SourceSpan::new(start_span.start, self.curr_token.span.end);
+
+                Ok(Statement {
+                    kind: StatementKind::Import(ImportStatement { module }),
                     span,
                 })
             },
