@@ -86,6 +86,7 @@ Options:
       --color <auto|always|never>  Control color output [default: auto]
       --emit <target>              What build target to emit [default: exe]
                                    [choices: bir, ast, tokens, llvm, obj, exe]
+      --sanitize <thread>          Enable a sanitizer
   -h, --help                       Print help"
     );
 }
@@ -95,6 +96,7 @@ fn main() -> anyhow::Result<()> {
     let mut src = None;
     let mut color = ColorChoice::Auto;
     let mut emit = EmitTarget::Exe;
+    let mut sanitizer = bbuild::SanitizerKind::None;
 
     let mut parser = lexopt::Parser::from_env();
     while let Some(arg) = parser.next()? {
@@ -108,6 +110,14 @@ fn main() -> anyhow::Result<()> {
                 let val = parser.value()?;
                 let s = val.string()?;
                 emit = parse_emit_target(&s).map_err(|e| anyhow::anyhow!("{}", e))?;
+            },
+            Arg::Long("sanitize") => {
+                let val = parser.value()?;
+                let s = val.string()?;
+                sanitizer = match s.as_str() {
+                    "thread" => bbuild::SanitizerKind::Thread,
+                    _ => anyhow::bail!("invalid sanitizer '{}' [choices: thread]", s),
+                };
             },
             Arg::Long("help") | Arg::Short('h') => {
                 print_help();
@@ -179,6 +189,7 @@ fn main() -> anyhow::Result<()> {
         use_color,
         emit,
         out_dir,
+        sanitizer,
     };
     let bb = if let Source::File(path) = src {
         bbuild::BBuild::new(&path, bctx)

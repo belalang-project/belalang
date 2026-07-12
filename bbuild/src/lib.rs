@@ -21,6 +21,7 @@ use ast::{
     Visitor,
 };
 use birgen::BIRGen;
+pub use birgen::SanitizerKind;
 use lexer::Lexer;
 use session::Session;
 use ty::TypeChecker;
@@ -29,6 +30,7 @@ pub struct BuildContext {
     pub use_color: bool,
     pub emit: EmitTarget,
     pub out_dir: PathBuf,
+    pub sanitizer: birgen::SanitizerKind,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -165,20 +167,28 @@ impl BBuild {
 
         let llvmgen = birgen.llvmgen();
         let obj_out = self.out_obj.to_str().context("invalid UTF-8 data")?.to_string();
-        let compiled = llvmgen.compile_object_file(obj_out);
+        let compiled = llvmgen.compile_object_file(obj_out, self.bctx.sanitizer);
 
         Ok(compiled)
     }
 
     pub fn link_objects(&self) -> anyhow::Result<()> {
-        let status = Command::new(&self.cc)
-            .arg(&self.out_obj)
+        let mut cmd = Command::new(&self.cc);
+        cmd.arg(&self.out_obj)
             .arg(format!("-L{}", self.brt_dir))
             .arg("-lbrt")
-            .arg("-lbdwgc")
-            .arg("-o")
-            .arg(&self.out_exe)
-            .status()?;
+            .arg("-lbdwgc");
+
+        match self.bctx.sanitizer {
+            birgen::SanitizerKind::Thread => {
+                cmd.arg("-fsanitize=thread");
+            },
+            _ => {},
+        }
+
+        cmd.arg("-o").arg(&self.out_exe);
+
+        let status = cmd.status()?;
 
         if !status.success() {
             anyhow::bail!("linker failed with exit code: {}", status);

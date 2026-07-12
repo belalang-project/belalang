@@ -48,7 +48,7 @@ public:
   ~LLVMGen() = default;
 
   rust::String dump_to_string() const;
-  rust::String compile_object_file(rust::String out) const;
+  rust::String compile_object_file(rust::String out, SanitizerKind sanitizer) const;
 
 private:
   llvm::LLVMContext context;

@@ -12,12 +12,15 @@
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/TargetParser/Host.h"
+#include "llvm/Transforms/Instrumentation/ThreadSanitizer.h"
 #include <memory>
 #include <optional>
 
@@ -372,7 +375,8 @@ LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   this->module = std::move(llvmModule);
 }
 
-rust::String LLVMGen::compile_object_file(rust::String out) const {
+rust::String LLVMGen::compile_object_file(rust::String out,
+                                          SanitizerKind sanitizer) const {
   InitializeAllTargetInfos();
   InitializeAllTargets();
   InitializeAllTargetMCs();
@@ -394,6 +398,31 @@ rust::String LLVMGen::compile_object_file(rust::String out) const {
 
   auto tm = target->createTargetMachine(triple, cpu, features, opt, rm);
   module->setDataLayout(tm->createDataLayout());
+
+  if (sanitizer != SanitizerKind::None) {
+    // https://llvm.org/docs/NewPassManager.html
+
+    llvm::LoopAnalysisManager lam;
+    llvm::FunctionAnalysisManager fam;
+    llvm::CGSCCAnalysisManager cgam;
+    llvm::ModuleAnalysisManager mam;
+
+    llvm::PassBuilder pb;
+    pb.registerModuleAnalyses(mam);
+    pb.registerCGSCCAnalyses(cgam);
+    pb.registerFunctionAnalyses(fam);
+    pb.registerLoopAnalyses(lam);
+    pb.crossRegisterProxies(lam, fam, cgam, mam);
+
+    llvm::ModulePassManager mpm;
+    if (sanitizer == SanitizerKind::Thread) {
+      mpm.addPass(llvm::ModuleThreadSanitizerPass());
+      mpm.addPass(
+          llvm::createModuleToFunctionPassAdaptor(llvm::ThreadSanitizerPass()));
+    }
+
+    mpm.run(*module, mam);
+  }
 
   std::error_code ec;
   raw_fd_ostream dest(llvm::StringRef(out.data(), out.size()), ec);
