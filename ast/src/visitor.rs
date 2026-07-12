@@ -12,6 +12,7 @@ use super::{
     FunctionLiteral,
     Identifier,
     IfExpression,
+    ImportStatement,
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
@@ -115,6 +116,10 @@ pub trait Visitor<'ast> {
 
     fn visit_continue_statement(&mut self, node: &ContinueStatement) {}
 
+    fn visit_import_statement(&mut self, node: &ImportStatement) {
+        self.walk_import_statement(node);
+    }
+
     fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
         self.walk_var_decl_statement(node);
     }
@@ -136,6 +141,7 @@ pub trait Visitor<'ast> {
             StatementKind::While(v) => self.visit_while_statement(v),
             StatementKind::VarDecl(v) => self.visit_var_decl_statement(v),
             StatementKind::StructDecl(v) => self.visit_struct_decl_statement(v),
+            StatementKind::Import(v) => self.visit_import_statement(v),
             StatementKind::Break(v) => self.visit_break_statement(v),
             StatementKind::Continue(v) => self.visit_continue_statement(v),
         }
@@ -235,6 +241,8 @@ pub trait Visitor<'ast> {
         self.visit_expression(&node.condition);
         self.visit_block(&node.block);
     }
+
+    fn walk_import_statement(&mut self, node: &ImportStatement) {}
 
     fn walk_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {
         self.visit_identifier(&node.name);

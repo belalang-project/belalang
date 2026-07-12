@@ -1,0 +1,11 @@
+# RUN: %belalang build --emit=tokens %s | %FileCheck %s
+
+import "core:math"
+import "std:io"
+import "foo:bar"
+# CHECK: Import <57..63>
+# CHECK: Literal(String, "core:math") <64..75>
+# CHECK: Import <76..82>
+# CHECK: Literal(String, "std:io") <83..91>
+# CHECK: Import <92..98>
+# CHECK: Literal(String, "foo:bar") <99..108>

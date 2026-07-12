@@ -10,6 +10,7 @@ use super::{
     FunctionLiteral,
     Identifier,
     IfExpression,
+    ImportStatement,
     IndexExpression,
     InfixExpression,
     IntegerLiteral,
@@ -73,6 +74,11 @@ impl<'ast> Visitor<'ast> for ASTDumper<'_> {
 
     fn visit_continue_statement(&mut self, node: &crate::ContinueStatement) {
         println!("{:indent$}ContinueStatement", "", indent = self.indent);
+    }
+
+    fn visit_import_statement(&mut self, node: &ImportStatement) {
+        let module = self.session.lookup_string(node.module);
+        println!("{:indent$}ImportStatement({:?})", "", module, indent = self.indent);
     }
 
     fn visit_var_decl_statement(&mut self, node: &VarDeclStatement<'ast>) {

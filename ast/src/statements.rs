@@ -43,6 +43,11 @@ pub struct StructDeclStatement<'ast> {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub struct ImportStatement {
+    pub module: Symbol,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub struct Statement<'ast> {
     pub kind: StatementKind<'ast>,
     pub span: SourceSpan,
@@ -55,6 +60,7 @@ pub enum StatementKind<'ast> {
     While(WhileStatement<'ast>),
     VarDecl(VarDeclStatement<'ast>),
     StructDecl(StructDeclStatement<'ast>),
+    Import(ImportStatement),
     Break(BreakStatement),
     Continue(ContinueStatement),
 }
