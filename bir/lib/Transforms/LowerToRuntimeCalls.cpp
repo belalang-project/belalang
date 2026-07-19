@@ -6,7 +6,7 @@
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 namespace mlir {
-#define GEN_PASS_DEF_BELALANGLOWERPRINTTORUNTIMEPASS
+#define GEN_PASS_DEF_BELALANGLOWERTORUNTIMECALLSPASS
 #include "belalang/BIR/Passes.h.inc"
 } // namespace mlir
 
@@ -142,7 +142,7 @@ static void insertBRTInitCall(mlir::Operation *op) {
 
 } // namespace
 
-void belalang::bir::populateBelalangLowerPrintToRuntimePatterns(
+void belalang::bir::populateBelalangLowerToRuntimeCallsPatterns(
     mlir::RewritePatternSet &patterns) {
   patterns.add<PrintOpLowering>(patterns.getContext());
 }
@@ -151,16 +151,16 @@ void belalang::bir::populateBelalangLowerPrintToRuntimePatterns(
 // The Pass
 // -----------------------------------------------------------------------------
 
-struct BelalangLowerPrintToRuntimePass
-    : public impl::BelalangLowerPrintToRuntimePassBase<BelalangLowerPrintToRuntimePass> {
-  using impl::BelalangLowerPrintToRuntimePassBase<
-      BelalangLowerPrintToRuntimePass>::BelalangLowerPrintToRuntimePassBase;
+struct BelalangLowerToRuntimeCallsPass
+    : public impl::BelalangLowerToRuntimeCallsPassBase<BelalangLowerToRuntimeCallsPass> {
+  using impl::BelalangLowerToRuntimeCallsPassBase<
+      BelalangLowerToRuntimeCallsPass>::BelalangLowerToRuntimeCallsPassBase;
 
   void runOnOperation() override {
     insertBRTInitCall(getOperation());
 
     mlir::RewritePatternSet patterns(&getContext());
-    populateBelalangLowerPrintToRuntimePatterns(patterns);
+    populateBelalangLowerToRuntimeCallsPatterns(patterns);
 
     if (mlir::failed(
             mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
@@ -169,6 +169,6 @@ struct BelalangLowerPrintToRuntimePass
   }
 };
 
-std::unique_ptr<mlir::Pass> belalang::bir::createBelalangLowerPrintToRuntimePass() {
-  return std::make_unique<BelalangLowerPrintToRuntimePass>();
+std::unique_ptr<mlir::Pass> belalang::bir::createBelalangLowerToRuntimeCallsPass() {
+  return std::make_unique<BelalangLowerToRuntimeCallsPass>();
 }

@@ -10,8 +10,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm) {
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
                               const BIRLoweringPipelineOptions &options) {
   pm.addPass(createBelalangLowerFuncExprPass());
-  pm.addPass(createBelalangPrepareRuntimePass());
-  pm.addPass(createBelalangLowerPrintToRuntimePass());
+  pm.addPass(createBelalangLowerToRuntimeCallsPass());
   pm.addPass(createBelalangLowerDeclToMemoryPass());
   pm.addPass(createBelalangFlattenCFGPass());
 }
