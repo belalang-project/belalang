@@ -1,9 +1,6 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
 
-// CHECK:      module {
-// CHECK-NEXT:   llvm.func @brt_init()
-// CHECK-NEXT:   llvm.func @main() -> i64 {
-// CHECK-NEXT:     llvm.call @brt_init() : () -> ()
+// CHECK-LABEL:  llvm.func @main() -> i64 {
 // CHECK-NEXT:     llvm.br ^bb1
 // CHECK-NEXT:   ^bb1:  // pred: ^bb0
 // CHECK-NEXT:     %[[VAL:.*]] = llvm.mlir.constant(42 : i64) : i64
@@ -11,7 +8,6 @@
 // CHECK-NEXT:   ^bb2(%[[ARG:.*]]: i64):  // pred: ^bb1
 // CHECK-NEXT:     llvm.return %[[ARG]] : i64
 // CHECK-NEXT:   }
-// CHECK-NEXT: }
 
 bir.func @main() -> !bir.int {
   %0 = bir.scope {
@@ -23,10 +19,7 @@ bir.func @main() -> !bir.int {
 
 // -----
 
-// CHECK:      module {
-// CHECK-NEXT:   llvm.func @brt_init()
-// CHECK-NEXT:   llvm.func @main() {
-// CHECK-NEXT:     llvm.call @brt_init() : () -> ()
+// CHECK-LABEL:  llvm.func @main() {
 // CHECK-NEXT:     llvm.br ^bb1
 // CHECK-NEXT:   ^bb1:  // pred: ^bb0
 // CHECK-NEXT:     %[[VAL:.*]] = llvm.mlir.constant(42 : i64) : i64
@@ -34,7 +27,6 @@ bir.func @main() -> !bir.int {
 // CHECK-NEXT:   ^bb2:  // pred: ^bb1
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
-// CHECK-NEXT: }
 
 bir.func @main() {
   bir.scope {

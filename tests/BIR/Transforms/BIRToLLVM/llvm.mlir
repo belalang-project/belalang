@@ -1,11 +1,9 @@
 // RUN: %bir-opt --split-input-file --convert-bir-to-llvm %s | %FileCheck %s
 
-// CHECK:      module {
-// CHECK-NEXT:   llvm.func @main() {
+// CHECK-LABEL:  llvm.func @main() {
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0 : i64) : i64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
-// CHECK-NEXT: }
 
 bir.func @main() {
   %0 = bir.constant #bir.int<0> : !bir.int
@@ -14,12 +12,10 @@ bir.func @main() {
 
 // -----
 
-// CHECK:      module {
-// CHECK-NEXT:   llvm.func @main() {
+// CHECK-LABEL:  llvm.func @main() {
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
-// CHECK-NEXT: }
 
 bir.func @main() {
   %0 = bir.constant #bir.float<0.00> : !bir.float
@@ -28,12 +24,10 @@ bir.func @main() {
 
 // -----
 
-// CHECK:      module {
-// CHECK-NEXT:   llvm.func @main() {
+// CHECK-LABEL:  llvm.func @main() {
 // CHECK-NEXT:     %[[C0:.*]] = llvm.mlir.constant(1.230000e+00 : f64) : f64
 // CHECK-NEXT:     llvm.return
 // CHECK-NEXT:   }
-// CHECK-NEXT: }
 
 bir.func @main() {
   %0 = bir.constant #bir.float<1.23> : !bir.float

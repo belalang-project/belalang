@@ -5,6 +5,7 @@
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
+#include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
@@ -624,6 +625,55 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
   }
 };
 
+static void insertBRTInitCall(mlir::Operation *op) {
+  mlir::ModuleOp module = dyn_cast_or_null<mlir::ModuleOp>(op);
+  assert(module || "unexpected non-ModuleOp");
+  mlir::MLIRContext *ctx = module.getContext();
+  mlir::OpBuilder builder(ctx);
+  mlir::Location loc = builder.getUnknownLoc();
+
+  // Sets up guard.
+  mlir::OpBuilder::InsertionGuard g(builder);
+  builder.setInsertionPointToStart(module.getBody());
+
+  // Sets up vectors for GlobalCtorsOp.
+  llvm::SmallVector<mlir::Attribute> ctors;
+  llvm::SmallVector<int32_t> prios;
+  llvm::SmallVector<mlir::Attribute> datals;
+
+  // Define types for functions.
+  auto voidTy = LLVM::LLVMVoidType::get(ctx);
+  auto funcTy = LLVM::LLVMFunctionType::get(voidTy, {});
+
+  // Makes sure no kInit or "ctor" function had been created.
+  assert(!module.lookupSymbol(kInit) || "unexpected kInit function");
+  assert(!module.lookupSymbol("ctor") || "unexpected ctor function");
+
+  // LLVM global ctor requires non-external function. Here, we create a
+  // ctor function as a wrapper to the BRT init external function.
+  auto init = LLVM::LLVMFuncOp::create(builder, loc, kInit, funcTy);
+  auto ctor = LLVM::LLVMFuncOp::create(builder, loc, "ctor", funcTy);
+
+  // Insert call to kInit in ctor.
+  {
+    mlir::OpBuilder::InsertionGuard g(builder);
+    auto entryBlk = ctor.addEntryBlock(builder);
+    builder.setInsertionPointToStart(entryBlk);
+    LLVM::CallOp::create(builder, loc, init, ValueRange{});
+    LLVM::ReturnOp::create(builder, loc, ValueRange{});
+  }
+
+  // Take note of the newly created ctor function.
+  ctors.push_back(FlatSymbolRefAttr::get(ctx, "ctor"));
+  prios.push_back(0);
+  datals.push_back(LLVM::ZeroAttr::get(ctx));
+
+  // We assume that there is no existing GlobalCtorsOp.
+  LLVM::GlobalCtorsOp::create(
+      builder, loc, builder.getArrayAttr(ctors),
+      builder.getI32ArrayAttr(prios), builder.getArrayAttr(datals));
+}
+
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
@@ -648,6 +698,8 @@ struct BelalangBIRToLLVMPass
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {
+    insertBRTInitCall(getOperation());
+
     BIRToLLVMTypeConverter typeConverter(&getContext());
 
     mlir::ConversionTarget target(getContext());

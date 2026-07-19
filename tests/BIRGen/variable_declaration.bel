@@ -3,13 +3,9 @@
 x: Int
 y: String
 
-# CHECK:      module {
-# CHECK-NEXT:   bir.func @brt_init()
-# CHECK-NEXT:   bir.func @main() -> !bir.int {
-# CHECK-NEXT:     bir.call @brt_init() : () -> ()
+# CHECK-LABEL:  bir.func @main() -> !bir.int {
 # CHECK-NEXT:     %[[C0:.*]] = bir.alloc_heap 8 : !bir.ref<!bir.int>
 # CHECK-NEXT:     %[[C1:.*]] = bir.alloc_heap 16 : !bir.ref<!bir.string>
 # CHECK-NEXT:     %[[C2:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %[[C2]] : !bir.int
 # CHECK-NEXT:   }
-# CHECK-NEXT: }

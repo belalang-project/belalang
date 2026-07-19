@@ -1,9 +1,6 @@
 # RUN: %belalang build --emit=bir %s | %FileCheck %s
 
-# CHECK:      module {
-# CHECK-NEXT:   bir.func @brt_init()
-# CHECK-NEXT:   bir.func @main() -> !bir.int {
-# CHECK-NEXT:     bir.call @brt_init() : () -> ()
+# CHECK-LABEL:  bir.func @main() -> !bir.int {
 # CHECK-NEXT:     %[[C0:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     %[[X:.*]] = bir.alloc_heap 8 : !bir.ref<!bir.int>
 # CHECK-NEXT:     bir.store %[[C0]] to %[[X]] : !bir.int to !bir.ref<!bir.int>
@@ -27,7 +24,6 @@
 # CHECK-NEXT:     %[[C0_RET:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %[[C0_RET]] : !bir.int
 # CHECK-NEXT:   }
-# CHECK-NEXT: }
 
 x := 0;
 while x < 5 {
