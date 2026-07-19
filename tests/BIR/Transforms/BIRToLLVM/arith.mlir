@@ -1,7 +1,7 @@
 // RUN: %bir-opt --split-input-file --convert-bir-to-llvm %s | %FileCheck %s
 
 // CHECK: module {
-// CHECK-NEXT: llvm.func @basic() -> i64 {
+// CHECK-LABEL: llvm.func @basic() -> i64 {
 
 bir.func @basic() -> !bir.int {
   // CHECK-NEXT: %0 = llvm.mlir.constant(4 : i64) : i64

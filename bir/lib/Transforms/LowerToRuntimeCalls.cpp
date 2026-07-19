@@ -102,44 +102,6 @@ struct PrintOpLowering : public mlir::OpRewritePattern<PrintOp> {
   }
 };
 
-static bool hasBRTInitCall(bir::FuncOp mainFunc) {
-  bool found = false;
-  mainFunc.walk([&found](bir::CallOp callOp) {
-    if (callOp.getCallee() == llvm::StringRef(kInit)) {
-      found = true;
-      return mlir::WalkResult::interrupt();
-    }
-    return mlir::WalkResult::advance();
-  });
-  return found;
-}
-
-static void insertBRTInitCall(mlir::Operation *op) {
-  mlir::ModuleOp module = dyn_cast_or_null<mlir::ModuleOp>(op);
-  assert(module);
-
-  mlir::OpBuilder builder(module.getContext());
-
-  auto mainFunc = module.lookupSymbol<bir::FuncOp>("main");
-  if (!mainFunc || mainFunc.isExternal())
-    return;
-
-  if (!module.lookupSymbol(kInit)) {
-    mlir::OpBuilder::InsertionGuard g(builder);
-    builder.setInsertionPointToStart(module.getBody());
-    auto funcType = mlir::FunctionType::get(builder.getContext(), {}, {});
-    bir::FuncOp::create(builder, builder.getUnknownLoc(), kInit,
-                        funcType);
-  }
-
-  if (!hasBRTInitCall(mainFunc)) {
-    mlir::OpBuilder::InsertionGuard g(builder);
-    builder.setInsertionPointToStart(&mainFunc.getBody().front());
-    auto callee = FlatSymbolRefAttr::get(builder.getContext(), kInit);
-    bir::CallOp::create(builder, builder.getUnknownLoc(), callee, {}, {});
-  }
-}
-
 } // namespace
 
 void belalang::bir::populateBelalangLowerToRuntimeCallsPatterns(
@@ -157,8 +119,6 @@ struct BelalangLowerToRuntimeCallsPass
       BelalangLowerToRuntimeCallsPass>::BelalangLowerToRuntimeCallsPassBase;
 
   void runOnOperation() override {
-    insertBRTInitCall(getOperation());
-
     mlir::RewritePatternSet patterns(&getContext());
     populateBelalangLowerToRuntimeCallsPatterns(patterns);
 

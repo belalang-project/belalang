@@ -2,14 +2,12 @@
 // RUN: | %bir-translate --split-input-file --bir-to-llvmir \
 // RUN: | %FileCheck %s
 
-// CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
+// CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
+// CHECK-DAG: declare ptr @brt_gc_alloc(i64)
+// CHECK-DAG: declare void @brt_init()
+// CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
-// CHECK: declare ptr @brt_gc_alloc(i64)
-
-// CHECK: declare void @brt_init()
-
-// CHECK:      define { ptr, i64 } @main() {
-// CHECK-NEXT:   call void @brt_init()
+// CHECK-LABEL:define { ptr, i64 } @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
 // CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
@@ -29,16 +27,13 @@ bir.func @main() -> !bir.string {
 
 // -----
 
-// CHECK: @str.[[H:.*]] = private constant [5 x i8] c"hello"
+// CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
+// CHECK-DAG: declare ptr @brt_gc_alloc(i64)
+// CHECK-DAG: declare void @brt_print_string({ ptr, i64 })
+// CHECK-DAG: declare void @brt_init()
+// CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
-// CHECK: declare ptr @brt_gc_alloc(i64)
-
-// CHECK: declare void @brt_print_string({ ptr, i64 })
-
-// CHECK: declare void @brt_init()
-
-// CHECK:      define void @main() {
-// CHECK-NEXT:   call void @brt_init()
+// CHECK-LABEL:define void @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
 // CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
