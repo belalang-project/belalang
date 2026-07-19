@@ -19,7 +19,7 @@ namespace bir {
 void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerDeclToMemoryPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
-void populateBelalangLowerPrintToRuntimePatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangLowerToRuntimeCallsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                        mlir::TypeConverter &typeConverter);
 

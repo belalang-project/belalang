@@ -3,7 +3,7 @@
 
 include "mlir/Pass/PassBase.td"
 
-def BelalangLowerPrintToRuntimePass : Pass<"bir-lower-print-to-runtime"> {
+def BelalangLowerToRuntimeCallsPass : Pass<"bir-lower-to-runtime-calls"> {
   let summary = "lower bir print ops to calls to runtime functions";
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
@@ -21,11 +21,6 @@ def BelalangLowerFuncExprPass : Pass<"bir-lower-func-expr"> {
 
 def BelalangLowerDeclToMemoryPass : Pass<"bir-lower-decl-to-memory"> {
   let summary = "lowers declare ops to memory";
-  let dependentDialects = ["::belalang::bir::BIRDialect"];
-}
-
-def BelalangPrepareRuntimePass : Pass<"bir-prepare-runtime"> {
-  let summary = "Lower ops to calls to runtime library";
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 

@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-lower-print-to-runtime %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lower-to-runtime-calls %s | %FileCheck %s
 
 // CHECK: bir.func private @brt_print_int(!bir.int)
 
