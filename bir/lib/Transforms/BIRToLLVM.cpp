@@ -427,11 +427,7 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
       rewriter.setInsertionPointToStart(module.getBody());
       auto funcType = LLVM::LLVMFunctionType::get(
           LLVM::LLVMPointerType::get(ctx), mlir::IntegerType::get(ctx, 64));
-      OperationState funcState(UnknownLoc::get(ctx),
-                               LLVM::LLVMFuncOp::getOperationName());
-      LLVM::LLVMFuncOp::build(rewriter, funcState, kGCAlloc,
-                              funcType);
-      rewriter.create(funcState);
+      LLVM::LLVMFuncOp::create(rewriter, loc, kGCAlloc, funcType);
     }
 
     auto i64Type = mlir::IntegerType::get(ctx, 64);
