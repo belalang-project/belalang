@@ -6,11 +6,11 @@ lit_test(
     name = "lit_test",
     tests = MLIR_TESTS,
     data = [
-        "//bir:bir-opt",
-        "//bir:bir-translate",
+        "//tools/bir-opt",
+        "//tools/bir-translate",
     ],
     env = {
-        "BIR_OPT": "$(rlocationpath //bir:bir-opt)",
-        "BIR_TRANSLATE": "$(rlocationpath //bir:bir-translate)",
+        "BIR_OPT": "$(rlocationpath //tools/bir-opt)",
+        "BIR_TRANSLATE": "$(rlocationpath //tools/bir-translate)",
     },
 )
