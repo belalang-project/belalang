@@ -1,4 +1,4 @@
-#include "belalang/BIR/CodeGen/BIRGen.h"
+#include "belalang/BIRGen/BIRGen.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
@@ -11,10 +11,9 @@
 #include <memory>
 
 namespace belalang {
-namespace bir {
-namespace codegen {
+namespace birgen {
 
-#include "belalang/BIR/CodeGen/Bindings.cpp.inc"
+#include "belalang/BIRGen/Bindings.cpp.inc"
 
 BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   // Load dialects.
@@ -340,6 +339,5 @@ bool BIRGen::run_lowering_pipeline() {
 
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
 
-} // namespace codegen
-} // namespace bir
+} // namespace birgen
 } // namespace belalang

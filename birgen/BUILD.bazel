@@ -4,15 +4,27 @@ load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
 
+cc_library(
+    name = "birgen-cc",
+    srcs = ["BIRGen.cpp"],
+    deps = [
+        "//bir",
+        "//include:BIRGen",
+        ":birgen-bridge/include",
+        "@cxx.rs//:core",
+        "@llvm-project//mlir:IR",
+    ],
+)
+
 rust_cxx_bridge(
     name = "birgen-bridge",
-    src = "src/lib.rs",
-    deps = ["//bir:bir_codegen-cc"],
+    src = "lib.rs",
+    deps = [":birgen-cc"],
 )
 
 rust_library(
     name = "birgen",
-    srcs = glob(["src/**/*.rs"]),
+    srcs = ["lib.rs"],
     deps = [
         "//ast",
         "//lexer",
@@ -22,8 +34,7 @@ rust_library(
     ],
     link_deps = [
         ":birgen-bridge",
-        "//bir",
-        "//bir:bir_codegen-cc",
+        ":birgen-cc",
     ],
 )
 

@@ -20,7 +20,7 @@ use session::{
     },
 };
 
-#[cxx::bridge(namespace = "belalang::bir::codegen")]
+#[cxx::bridge(namespace = "belalang::birgen")]
 mod ffi {
     #[repr(u8)]
     enum BinOpKind {
@@ -46,7 +46,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("belalang/BIR/CodeGen/BIRGen.h");
+        include!("belalang/BIRGen/BIRGen.h");
 
         type BIRGuard;
         type BIRFunctionGuard;

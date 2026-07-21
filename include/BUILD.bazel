@@ -13,7 +13,6 @@ cc_library(
     name = "BIR",
     hdrs = glob(
         ["belalang/BIR/**/*.h"],
-        exclude = ["belalang/BIR/CodeGen/**/*.h"],
     ),
     includes = ["."],
     deps = [
@@ -136,12 +135,12 @@ gentbl_cc_library(
 )
 
 # ------------------------------------------------------------------------------
-# BIR CodeGen Includes
+# BIRGen Includes
 # ------------------------------------------------------------------------------
 
 cc_library(
-    name = "BIR-CodeGen",
-    hdrs = glob(["belalang/BIR/CodeGen/**/*.h"]),
+    name = "BIRGen",
+    hdrs = glob(["belalang/BIRGen/**/*.h"]),
     includes = ["."],
     deps = [
         ":BelalangCXXBindingsIncGen",
@@ -151,8 +150,8 @@ cc_library(
 gentbl_cc_library(
     name = "BelalangCXXBindingsIncGen",
     tbl_outs = [
-        (["-gen-cxx-binding-decls"], "belalang/BIR/CodeGen/Bindings.h.inc"),
-        (["-gen-cxx-binding-defs"], "belalang/BIR/CodeGen/Bindings.cpp.inc"),
+        (["-gen-cxx-binding-decls"], "belalang/BIRGen/Bindings.h.inc"),
+        (["-gen-cxx-binding-defs"], "belalang/BIRGen/Bindings.cpp.inc"),
     ],
     tblgen = "//tools/bir-tblgen",
     td_file = "belalang/BIR/IR/BIROps.td",
