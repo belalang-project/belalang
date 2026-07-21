@@ -7,10 +7,10 @@ lit_test(
     name = "lit_test",
     tests = BELALANG_TESTS,
     data = [
-        "//cli:belalang",
+        "//bin/belalang",
     ],
     env = {
-        "BELALANG": "$(rlocationpath //cli:belalang)",
+        "BELALANG": "$(rlocationpath //bin/belalang)",
     },
 )
 
@@ -18,10 +18,10 @@ py_binary(
     name = "update",
     srcs = ["update.py"],
     data = [
-        "//cli:belalang",
+        "//bin/belalang",
     ],
     args = [
-        "$(location //cli:belalang)",
+        "$(location //bin/belalang)",
     ],
 )
 

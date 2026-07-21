@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 pkg_files(
     name = "belalang_binary",
-    srcs = ["//cli:belalang"],
+    srcs = ["//bin/belalang"],
     prefix = "bin",
     attributes = pkg_attributes(
         mode = "0755",

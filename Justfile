@@ -14,10 +14,10 @@ test:
 	bazelisk test //...
 
 bir-opt *args:
-	./bazel-bin/bir/bir-opt {{args}}
+	./bazel-bin/tools/bir-opt/bir-opt {{args}}
 
 bir-translate *args:
-	./bazel-bin/bir/bir-translate {{args}}
+	./bazel-bin/tools/bir-translate/bir-translate {{args}}
 
 belalang *args:
-	./bazel-bin/cli/belalang {{args}}
+	./bazel-bin/bin/belalang/belalang {{args}}
