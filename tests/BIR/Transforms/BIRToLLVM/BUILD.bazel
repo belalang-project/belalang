@@ -6,9 +6,9 @@ lit_test(
     name = "lit_test",
     tests = MLIR_TESTS,
     data = [
-        "//bir:bir-opt",
+        "//tools/bir-opt",
     ],
     env = {
-        "BIR_OPT": "$(rlocationpath //bir:bir-opt)",
+        "BIR_OPT": "$(rlocationpath //tools/bir-opt)",
     },
 )

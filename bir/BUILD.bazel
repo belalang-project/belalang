@@ -1,140 +1,20 @@
-load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library", "gentbl_rule")
+load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_rust//rust:defs.bzl", "rust_library")
-load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
 
 package(default_visibility = ["//visibility:public"])
 
-td_library(
-    name = "BelalangBIRTdFiles",
-    srcs = [
-        "include/belalang/BIR/IR/BIRAttrs.td",
-        "include/belalang/BIR/IR/BIRDialect.td",
-        "include/belalang/BIR/IR/BIROps.td",
-        "include/belalang/BIR/IR/BIRTypes.td",
-        "include/belalang/BIR/IR/BIREnumAttrs.td",
-
-        "include/belalang/BIR/Interfaces/LoopOpInterface.td",
-    ],
-    includes = ["include"],
-    deps = [
-        "@llvm-project//mlir:OpBaseTdFiles",
-        "@llvm-project//mlir:BuiltinDialectTdFiles",
-        "@llvm-project//mlir:FunctionInterfacesTdFiles",
-        "@llvm-project//mlir:SideEffectInterfacesTdFiles",
-        "@llvm-project//mlir:LoopLikeInterfaceTdFiles"
-    ],
-)
-
-td_library(
-    name = "BelalangPassesTdFiles",
-    srcs = [
-        "include/belalang/BIR/Passes.td",
-    ],
-    includes = ["include"],
-    deps = [
-        "@llvm-project//mlir:PassBaseTdFiles",
-    ],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIRDialectGen",
-    tbl_outs = [
-        (["-gen-dialect-decls"], "include/belalang/BIR/IR/BIRDialect.h.inc"),
-        (["-gen-dialect-defs"], "include/belalang/BIR/IR/BIRDialect.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIRDialect.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIRTypeGen",
-    tbl_outs = [
-        (["-gen-typedef-decls"], "include/belalang/BIR/IR/BIRTypes.h.inc"),
-        (["-gen-typedef-defs"], "include/belalang/BIR/IR/BIRTypes.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIRTypes.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIRAttrDefsGen",
-    tbl_outs = [
-        (["-gen-attrdef-decls"], "include/belalang/BIR/IR/BIRAttrs.h.inc"),
-        (["-gen-attrdef-defs"], "include/belalang/BIR/IR/BIRAttrs.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIRAttrs.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIROpGen",
-    tbl_outs = [
-        (["-gen-op-decls"], "include/belalang/BIR/IR/BIROps.h.inc"),
-        (["-gen-op-defs"], "include/belalang/BIR/IR/BIROps.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIROps.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIREnumAttrGen",
-    tbl_outs = [
-        (["-gen-enum-decls"], "include/belalang/BIR/IR/BIREnumAttrs.h.inc"),
-        (["-gen-enum-defs"], "include/belalang/BIR/IR/BIREnumAttrs.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIROps.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangBIRLoopOpInterfaceIncGen",
-    tbl_outs = [
-        (["-gen-op-interface-decls"], "include/belalang/BIR/Interfaces/LoopOpInterface.h.inc"),
-        (["-gen-op-interface-defs"], "include/belalang/BIR/Interfaces/LoopOpInterface.cpp.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/Interfaces/LoopOpInterface.td",
-    deps = [":BelalangBIRTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangPassIncGen",
-    tbl_outs = [
-        (["-gen-pass-decls"], "include/belalang/BIR/Passes.h.inc"),
-    ],
-    tblgen = "@llvm-project//mlir:mlir-tblgen",
-    td_file = "include/belalang/BIR/Passes.td",
-    deps = [":BelalangPassesTdFiles"],
-)
-
-gentbl_cc_library(
-    name = "BelalangCXXBindingsIncGen",
-    tbl_outs = [
-        (["-gen-cxx-binding-decls"], "include/belalang/BIR/CodeGen/Bindings.h.inc"),
-        (["-gen-cxx-binding-defs"], "include/belalang/BIR/CodeGen/Bindings.cpp.inc"),
-    ],
-    tblgen = ":bir-tblgen",
-    td_file = "include/belalang/BIR/IR/BIROps.td",
-    deps = [":BelalangBIRTdFiles"],
-)
+# ------------------------------------------------------------------------------
+# BIR CodeGen
+# ------------------------------------------------------------------------------
 
 cc_library(
     name = "bir_codegen-cc",
     srcs = [
         "lib/CodeGen/BIRGen.cpp",
     ],
-    hdrs = [
-        "include/belalang/BIR/CodeGen/BIRGen.h",
-    ],
     deps = [
-        ":BelalangCXXBindingsIncGen",
         ":bir",
+        "//include:BIR-CodeGen",
         "//birgen:birgen-bridge/include",
         "@cxx.rs//:core",
         "@llvm-project//mlir:IR",
@@ -145,6 +25,10 @@ cc_library(
         "@llvm-project//llvm:Instrumentation",
     ],
 )
+
+# ------------------------------------------------------------------------------
+# BIR
+# ------------------------------------------------------------------------------
 
 cc_library(
     name = "bir",
@@ -162,13 +46,7 @@ cc_library(
         "lib/Transforms/BIRToLLVM.cpp",
     ],
     deps = [
-        ":bir-include",
-        ":BelalangBIRDialectGen",
-        ":BelalangBIRTypeGen",
-        ":BelalangBIRAttrDefsGen",
-        ":BelalangBIREnumAttrGen",
-        ":BelalangBIROpGen",
-        ":BelalangPassIncGen",
+        "//include:BIR",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:FunctionInterfaces",
@@ -176,54 +54,5 @@ cc_library(
         "@llvm-project//mlir:LLVMDialect",
         "@llvm-project//mlir:ControlFlowToLLVM",
         "@llvm-project//mlir:TransformUtils",
-    ],
-)
-
-cc_library(
-    name = "bir-include",
-    hdrs = [
-        "include/belalang/BIR/IR/BIR.h",
-        "include/belalang/BIR/Passes.h",
-        "include/belalang/BIR/BRTUtils.h",
-        "include/belalang/BIR/Interfaces/LoopOpInterface.h",
-    ],
-    includes = ["include"],
-    deps = [
-        ":BelalangBIRDialectGen",
-        ":BelalangBIRTypeGen",
-        ":BelalangBIROpGen",
-        ":BelalangBIRLoopOpInterfaceIncGen",
-        ":BelalangPassIncGen",
-        "@llvm-project//mlir:IR",
-    ],
-)
-
-cc_binary(
-    name = "bir-opt",
-    srcs = ["tools/bir-opt/bir-opt.cpp"],
-    deps = [
-        ":bir",
-        "@llvm-project//mlir:MlirOptLib",
-    ],
-)
-
-cc_binary(
-    name = "bir-tblgen",
-    srcs = glob(["tools/bir-tblgen/*.cpp", "tools/bir-tblgen/*.h"]),
-    deps = [
-        ":bir",
-        "@llvm-project//llvm:TableGen",
-        "@llvm-project//mlir:TableGen",
-    ],
-)
-
-cc_binary(
-    name = "bir-translate",
-    srcs = ["tools/bir-translate/bir-translate.cpp"],
-    deps = [
-        ":bir",
-        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
-        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
-        "@llvm-project//mlir:TranslateLib",
     ],
 )
