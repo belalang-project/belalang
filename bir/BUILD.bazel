@@ -3,23 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-# ------------------------------------------------------------------------------
-# BIR CodeGen
-# ------------------------------------------------------------------------------
 
-cc_library(
-    name = "bir_codegen-cc",
-    srcs = [
-        "lib/CodeGen/BIRGen.cpp",
-    ],
-    deps = [
-        ":bir",
-        "//include:BIR-CodeGen",
-        "//birgen:birgen-bridge/include",
-        "@cxx.rs//:core",
-        "@llvm-project//mlir:IR",
-    ],
-)
 
 # ------------------------------------------------------------------------------
 # BIR

@@ -1,5 +1,5 @@
-#ifndef BELALANG_BIR_CODEGEN_BIRGEN_H_
-#define BELALANG_BIR_CODEGEN_BIRGEN_H_
+#ifndef BELALANG_BIRGEN_BIRGEN_H_
+#define BELALANG_BIRGEN_BIRGEN_H_
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -10,8 +10,7 @@
 #include <memory>
 
 namespace belalang {
-namespace bir {
-namespace codegen {
+namespace birgen {
 class BIRValue;
 class BIRGuard;
 class BIRFunctionGuard;
@@ -22,15 +21,13 @@ class BIRGen;
 
 // NOTE: manual forward decl
 class BIRWhileOpGuard;
-} // namespace codegen
-} // namespace bir
+} // namespace birgen
 } // namespace belalang
 
-#include "birgen/src/lib.rs.h"
+#include "birgen/lib.rs.h"
 
 namespace belalang {
-namespace bir {
-namespace codegen {
+namespace birgen {
 
 // -----------------------------------------------------------------------------
 // BIRValue
@@ -60,7 +57,7 @@ protected:
 };
 
 #define GET_BIRGUARD_CLASS_DECLS
-#include "belalang/BIR/CodeGen/Bindings.h.inc"
+#include "belalang/BIRGen/Bindings.h.inc"
 
 class BIRFunctionGuard : public BIRGuard {
 public:
@@ -180,7 +177,7 @@ public:
   }
 
 #define GET_BUILDER_FUNCTION_DECLS
-#include "belalang/BIR/CodeGen/Bindings.h.inc"
+#include "belalang/BIRGen/Bindings.h.inc"
 
 private:
   mlir::MLIRContext context;
@@ -193,8 +190,7 @@ private:
   mlir::Type mapType(TypeKind);
 };
 
-} // namespace codegen
-} // namespace bir
+} // namespace birgen 
 } // namespace belalang
 
-#endif // BELALANG_BIR_CODEGEN_BIRGEN_H_
+#endif // BELALANG_BIRGEN_BIRGEN_H_
