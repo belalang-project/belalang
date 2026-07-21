@@ -21,8 +21,9 @@ use ast::{
     Visitor,
 };
 use birgen::BIRGen;
-pub use birgen::SanitizerKind;
 use lexer::Lexer;
+use llvmgen::LLVMGen;
+pub use llvmgen::SanitizerKind;
 use session::Session;
 use ty::TypeChecker;
 
@@ -30,7 +31,7 @@ pub struct BuildContext {
     pub use_color: bool,
     pub emit: EmitTarget,
     pub out_dir: PathBuf,
-    pub sanitizer: birgen::SanitizerKind,
+    pub sanitizer: llvmgen::SanitizerKind,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -148,24 +149,24 @@ impl BBuild {
     pub fn dump_bir<'ast>(&self, program: &Program<'ast>) -> String {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
-        birgen.optimize();
+        birgen.run_lowering_pipeline();
         birgen.dump_to_string()
     }
 
     pub fn dump_llvm<'ast>(&self, program: &Program<'ast>) -> String {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
-        birgen.optimize();
-        let llvmgen = birgen.llvmgen();
+        birgen.run_lowering_pipeline();
+        let llvmgen = LLVMGen::new(birgen.get_module_ptr());
         llvmgen.dump_to_string()
     }
 
     pub fn compile_object_file<'ast>(&self, program: &Program<'ast>) -> anyhow::Result<String> {
         let mut birgen = BIRGen::new(&self.session);
         birgen.generate_program(program);
-        birgen.optimize();
+        birgen.run_lowering_pipeline();
 
-        let llvmgen = birgen.llvmgen();
+        let llvmgen = LLVMGen::new(birgen.get_module_ptr());
         let obj_out = self.out_obj.to_str().context("invalid UTF-8 data")?.to_string();
         let compiled = llvmgen.compile_object_file(obj_out, self.bctx.sanitizer);
 
@@ -180,7 +181,7 @@ impl BBuild {
             .arg("-lbdwgc");
 
         match self.bctx.sanitizer {
-            birgen::SanitizerKind::Thread => {
+            llvmgen::SanitizerKind::Thread => {
                 cmd.arg("-fsanitize=thread");
             },
             _ => {},

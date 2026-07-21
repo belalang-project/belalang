@@ -6,23 +6,9 @@
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/DialectRegistry.h"
 #include "mlir/IR/MLIRContext.h"
-#include "mlir/IR/Verifier.h"
 #include "mlir/Pass/PassManager.h"
-#include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
-#include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/PassManager.h"
-#include "llvm/MC/TargetRegistry.h"
-#include "llvm/Passes/PassBuilder.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/Target/TargetOptions.h"
-#include "llvm/TargetParser/Host.h"
-#include "llvm/Transforms/Instrumentation/ThreadSanitizer.h"
+
 #include <memory>
-#include <optional>
 
 namespace belalang {
 namespace bir {
@@ -31,16 +17,17 @@ namespace codegen {
 #include "belalang/BIR/CodeGen/Bindings.cpp.inc"
 
 BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
+  // Load dialects.
   mlir::DialectRegistry registry;
   registry.insert<bir::BIRDialect, mlir::LLVM::LLVMDialect>();
-  mlir::registerLLVMDialectTranslation(registry);
-  mlir::registerBuiltinDialectTranslation(registry);
   context.appendDialectRegistry(registry);
-
   context.getOrLoadDialect<bir::BIRDialect>();
+
+  // Create the module.
   module = mlir::ModuleOp::create(loc);
   builder.setInsertionPointToStart(module.getBody());
 
+  // Create the main function.
   auto retTy = bir::IntType::get(&context);
   auto main = bir::FuncOp::create(
       builder, loc, "main", mlir::FunctionType::get(&context, {}, {retTy}));
@@ -345,106 +332,13 @@ rust::String BIRGen::dump_to_string() const {
   return rust::String(os.str());
 }
 
-bool BIRGen::optimize() {
+bool BIRGen::run_lowering_pipeline() {
   mlir::PassManager pm(&context);
   bir::buildBIRLoweringPipeline(pm);
   return mlir::succeeded(pm.run(module));
 }
 
 std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
-
-// -----------------------------------------------------------------------------
-// LLVMGen
-// -----------------------------------------------------------------------------
-
-std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen) {
-  return std::make_unique<LLVMGen>(&gen.module);
-}
-
-LLVMGen::LLVMGen(mlir::ModuleOp *op) {
-  mlir::PassManager pm(op->getContext());
-  pm.addPass(bir::createBelalangBIRToLLVMPass());
-  assert(mlir::succeeded(pm.run(*op)));
-
-  auto llvmModule = mlir::translateModuleToLLVMIR(*op, context);
-  assert(llvmModule);
-
-  auto triple = Triple(sys::getDefaultTargetTriple());
-  llvmModule->setTargetTriple(triple);
-
-  this->module = std::move(llvmModule);
-}
-
-rust::String LLVMGen::compile_object_file(rust::String out,
-                                          SanitizerKind sanitizer) const {
-  InitializeAllTargetInfos();
-  InitializeAllTargets();
-  InitializeAllTargetMCs();
-  InitializeAllAsmParsers();
-  InitializeAllAsmPrinters();
-
-  auto triple = Triple(sys::getDefaultTargetTriple());
-  module->setTargetTriple(triple);
-
-  std::string error;
-  auto target = TargetRegistry::lookupTarget(triple, error);
-  if (!target)
-    return rust::String("failed to lookup target");
-
-  auto cpu = "generic";
-  auto features = "";
-  TargetOptions opt;
-  auto rm = llvm::Reloc::PIC_;
-
-  auto tm = target->createTargetMachine(triple, cpu, features, opt, rm);
-  module->setDataLayout(tm->createDataLayout());
-
-  if (sanitizer != SanitizerKind::None) {
-    // https://llvm.org/docs/NewPassManager.html
-
-    llvm::LoopAnalysisManager lam;
-    llvm::FunctionAnalysisManager fam;
-    llvm::CGSCCAnalysisManager cgam;
-    llvm::ModuleAnalysisManager mam;
-
-    llvm::PassBuilder pb;
-    pb.registerModuleAnalyses(mam);
-    pb.registerCGSCCAnalyses(cgam);
-    pb.registerFunctionAnalyses(fam);
-    pb.registerLoopAnalyses(lam);
-    pb.crossRegisterProxies(lam, fam, cgam, mam);
-
-    llvm::ModulePassManager mpm;
-    if (sanitizer == SanitizerKind::Thread) {
-      mpm.addPass(llvm::ModuleThreadSanitizerPass());
-      mpm.addPass(
-          llvm::createModuleToFunctionPassAdaptor(llvm::ThreadSanitizerPass()));
-    }
-
-    mpm.run(*module, mam);
-  }
-
-  std::error_code ec;
-  raw_fd_ostream dest(llvm::StringRef(out.data(), out.size()), ec);
-  if (ec)
-    return rust::String("failed to create destination");
-
-  legacy::PassManager pm;
-  if (tm->addPassesToEmitFile(pm, dest, nullptr, CodeGenFileType::ObjectFile))
-    return rust::String("failed to add passes");
-
-  pm.run(*module);
-
-  dest.flush();
-  return rust::String();
-}
-
-rust::String LLVMGen::dump_to_string() const {
-  std::string s;
-  llvm::raw_string_ostream os(s);
-  module->print(os, nullptr);
-  return rust::String(os.str());
-}
 
 } // namespace codegen
 } // namespace bir
