@@ -5,17 +5,13 @@
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Location.h"
 #include "mlir/IR/MLIRContext.h"
-#include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
-#include "mlir/Target/LLVMIR/Export.h"
 #include "rust/cxx.h"
-#include "llvm/IR/Module.h"
 #include <cstdint>
 #include <memory>
 
 namespace belalang {
 namespace bir {
 namespace codegen {
-class LLVMGen;
 class BIRValue;
 class BIRGuard;
 class BIRFunctionGuard;
@@ -35,25 +31,6 @@ class BIRWhileOpGuard;
 namespace belalang {
 namespace bir {
 namespace codegen {
-
-// -----------------------------------------------------------------------------
-// LLVMGen
-// -----------------------------------------------------------------------------
-
-std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
-
-class LLVMGen {
-public:
-  LLVMGen(mlir::ModuleOp *module);
-  ~LLVMGen() = default;
-
-  rust::String dump_to_string() const;
-  rust::String compile_object_file(rust::String out, SanitizerKind sanitizer) const;
-
-private:
-  llvm::LLVMContext context;
-  std::unique_ptr<llvm::Module> module;
-};
 
 // -----------------------------------------------------------------------------
 // BIRValue
@@ -196,9 +173,11 @@ public:
   void dump() const;
   rust::String dump_to_string() const;
 
-  bool optimize();
+  bool run_lowering_pipeline();
 
-  friend std::unique_ptr<LLVMGen> create_llvmgen(BIRGen &gen);
+  uintptr_t get_module_ptr() const {
+    return reinterpret_cast<uintptr_t>(&module);
+  }
 
 #define GET_BUILDER_FUNCTION_DECLS
 #include "belalang/BIR/CodeGen/Bindings.h.inc"

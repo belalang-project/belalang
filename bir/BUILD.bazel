@@ -18,11 +18,6 @@ cc_library(
         "//birgen:birgen-bridge/include",
         "@cxx.rs//:core",
         "@llvm-project//mlir:IR",
-        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
-        "@llvm-project//mlir:LLVMDialect",
-        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
-        "@llvm-project//llvm:AllTargetsAsmParsers",
-        "@llvm-project//llvm:Instrumentation",
     ],
 )
 

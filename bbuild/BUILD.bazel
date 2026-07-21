@@ -7,6 +7,7 @@ rust_library(
     srcs = glob(["src/**/*.rs"]),
     deps = [
         "//birgen",
+        "//llvmgen",
         "//diag",
         "//ast",
         "//lexer",
@@ -16,5 +17,6 @@ rust_library(
     ],
     link_deps = [
         "//bir",
+        "//llvmgen:llvmgen-cc",
     ],
 )

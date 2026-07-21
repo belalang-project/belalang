@@ -158,3 +158,17 @@ gentbl_cc_library(
     td_file = "belalang/BIR/IR/BIROps.td",
     deps = [":BelalangBIRTdFiles"],
 )
+
+# ------------------------------------------------------------------------------
+# LLVMGen Includes
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "LLVMGen",
+    hdrs = glob(["belalang/LLVMGen/**/*.h"]),
+    includes = ["."],
+    deps = [
+        "@llvm-project//llvm:Core",
+        "@llvm-project//mlir:IR",
+    ],
+)

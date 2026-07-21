@@ -1,0 +1,41 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@cxx.rs//tools/bazel:rust_cxx_bridge.bzl", "rust_cxx_bridge")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "llvmgen-cc",
+    srcs = ["LLVMGen.cpp"],
+    deps = [
+        "//include:LLVMGen",
+        "//include:BIR",
+        "//bir",
+        "//llvmgen:llvmgen-bridge/include",
+        "@cxx.rs//:core",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
+        "@llvm-project//llvm:AllTargetsAsmParsers",
+        "@llvm-project//llvm:AllTargetsCodeGens",
+        "@llvm-project//llvm:Instrumentation",
+    ]
+)
+
+rust_cxx_bridge(
+    name = "llvmgen-bridge",
+    src = "lib.rs",
+    deps = [":llvmgen-cc"],
+)
+
+rust_library(
+    name = "llvmgen",
+    srcs = ["lib.rs"],
+    deps = [
+        "@cxx.rs//:cxx",
+    ],
+    link_deps = [
+        ":llvmgen-bridge",
+    ],
+)
