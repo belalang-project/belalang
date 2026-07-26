@@ -1,10 +1,10 @@
 123; 456; 789 + 1
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Literal(Integer, "123") <0..3>
+# CHECK: LiteralInteger "123" <0..3>
 # CHECK: Semicolon <3..4>
-# CHECK: Literal(Integer, "456") <5..8>
+# CHECK: LiteralInteger "456" <5..8>
 # CHECK: Semicolon <8..9>
-# CHECK: Literal(Integer, "789") <10..13>
+# CHECK: LiteralInteger "789" <10..13>
 # CHECK: Add <14..15>
-# CHECK: Literal(Integer, "1") <16..17>
+# CHECK: LiteralInteger "1" <16..17>

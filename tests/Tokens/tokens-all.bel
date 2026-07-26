@@ -1,7 +1,7 @@
 =+(){}[],;!-/*5;5 < 10 > 5;:= >= <= += -= /= %= *= || &&
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Assign(Assign) <0..1>
+# CHECK: Assign <0..1>
 # CHECK: Add <1..2>
 # CHECK: LeftParen <2..3>
 # CHECK: RightParen <3..4>
@@ -15,22 +15,22 @@
 # CHECK: Sub <11..12>
 # CHECK: Div <12..13>
 # CHECK: Mul <13..14>
-# CHECK: Literal(Integer, "5") <14..15>
+# CHECK: LiteralInteger "5" <14..15>
 # CHECK: Semicolon <15..16>
-# CHECK: Literal(Integer, "5") <16..17>
+# CHECK: LiteralInteger "5" <16..17>
 # CHECK: Lt <18..19>
-# CHECK: Literal(Integer, "10") <20..22>
+# CHECK: LiteralInteger "10" <20..22>
 # CHECK: Gt <23..24>
-# CHECK: Literal(Integer, "5") <25..26>
+# CHECK: LiteralInteger "5" <25..26>
 # CHECK: Semicolon <26..27>
 # CHECK: Colon <27..28>
-# CHECK: Assign(Assign) <28..29>
+# CHECK: Assign <28..29>
 # CHECK: Ge <30..32>
 # CHECK: Le <33..35>
-# CHECK: Assign(AddAssign) <36..38>
-# CHECK: Assign(SubAssign) <39..41>
-# CHECK: Assign(DivAssign) <42..44>
-# CHECK: Assign(ModAssign) <45..47>
-# CHECK: Assign(MulAssign) <48..50>
+# CHECK: AddAssign <36..38>
+# CHECK: SubAssign <39..41>
+# CHECK: DivAssign <42..44>
+# CHECK: ModAssign <45..47>
+# CHECK: MulAssign <48..50>
 # CHECK: Or <51..53>
 # CHECK: And <54..56>
