@@ -1,6 +1,6 @@
 "\g"
 
-# RUN: %not %belalang build %s 2>&1 | %FileCheck %s
+# RUN: %not %belalang build --emit=tokens %s 2>&1 | %FileCheck %s
 # CHECK: error: Unknown escape string
 # CHECK:  --> {{.*}}/tests/Tokens/unknown-escape.bel:1:2
 # CHECK:   |

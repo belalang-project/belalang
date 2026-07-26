@@ -6,6 +6,36 @@ package(default_visibility = ["//visibility:public"])
 exports_files(glob(["**/*.td", "**/*.h"]))
 
 # ------------------------------------------------------------------------------
+# Lexer Includes
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "Lexer",
+    hdrs = glob(["belalang/Lexer/**/*.h"]),
+    textual_hdrs = glob([
+        "belalang/Lexer/**/*.def",
+        "belalang/Lexer/**/*.h.inc",
+    ]),
+    includes = ["."],
+    deps = [
+        "@llvm-project//llvm:Support",
+    ],
+)
+
+# ------------------------------------------------------------------------------
+# Diag Includes
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "Diag",
+    hdrs = glob(["belalang/Diag/**/*.h"]),
+    includes = ["."],
+    deps = [
+        "@llvm-project//llvm:Support",
+    ],
+)
+
+# ------------------------------------------------------------------------------
 # BIR Includes
 # ------------------------------------------------------------------------------
 

@@ -1,7 +1,8 @@
-#include "muopt/muopt.hpp"
 #include <iostream>
 #include <optional>
 #include <string_view>
+
+#include "Cmds.h"
 
 constexpr std::string_view help = R"(belalang
 
@@ -32,10 +33,8 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if (*command == "build") {
-    std::cerr << "building\n";
-    return 0;
-  }
+  if (*command == "build")
+    return belalang::cmd::build(parser);
 
   if (*command == "run") {
     std::cerr << "running\n";

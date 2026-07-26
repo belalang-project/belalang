@@ -23,8 +23,10 @@ rust_binary(
 
 cc_binary(
     name = "belalang-cc",
-    srcs = ["belalang.cpp"],
+    srcs = glob(["*.cpp", "*.h"]),
     deps = [
         "@muopt//:muopt",
+        "//lib:Lexer",
+        "//lib:Diag",
     ],
 )
