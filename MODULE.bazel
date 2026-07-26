@@ -36,7 +36,7 @@ git_override(
 # ------------------------------------------------------------------------------
 
 third_party = use_extension("//third_party:defs.bzl", "third_party_deps")
-use_repo(third_party, "bdwgc", "llvm-raw")
+use_repo(third_party, "bdwgc", "muopt", "llvm-raw")
 
 llvm_configure = use_repo_rule("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
 
