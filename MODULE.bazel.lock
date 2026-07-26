@@ -235,7 +235,7 @@
   "moduleExtensions": {
     "//third_party:defs.bzl%third_party_deps": {
       "general": {
-        "bzlTransitiveDigest": "M6sPtrz7lqQuBtXm+Z3q+sWSkiI+K2TtNLbCchMzqVY=",
+        "bzlTransitiveDigest": "6AD3Nn5GFY7sCAayikQAozDYLb+gENc3zU/0YNueLSY=",
         "usagesDigest": "IhAWKcX6mchlBXfCkPHTt6i1VEX5C02mmAOg5u+pJw8=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -258,6 +258,14 @@
               "commit": "030e74c2808a9af58c6b4ef461fd0c2c7039d647",
               "init_submodules": false,
               "remote": "https://github.com/llvm/llvm-project.git"
+            }
+          },
+          "muopt": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
+            "attributes": {
+              "commit": "b132583b93025d23871faf237578f266e798315a",
+              "init_submodules": false,
+              "remote": "https://github.com/secona/muopt.git"
             }
           }
         }

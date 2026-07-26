@@ -19,4 +19,11 @@ def _third_party_deps_impl(_ctx):
         remote = "https://github.com/llvm/llvm-project.git",
     )
 
+    new_git_repository(
+        name = "muopt",
+        commit = "b132583b93025d23871faf237578f266e798315a",
+        init_submodules = False,
+        remote = "https://github.com/secona/muopt.git",
+    )
+
 third_party_deps = module_extension(implementation = _third_party_deps_impl)
