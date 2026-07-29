@@ -24,7 +24,7 @@ impl<'sess, 'lexer> TokensDumper<'sess, 'lexer> {
             let kind_str = match token.kind {
                 TokenKind::Ident { sym } => {
                     let val = self.session.lookup_string(sym);
-                    format!("Ident(\"{}\")", val)
+                    format!("Ident \"{}\"", val)
                 },
                 TokenKind::Literal { kind, sym } => {
                     let val = self.session.lookup_string(sym);
@@ -33,10 +33,11 @@ impl<'sess, 'lexer> TokensDumper<'sess, 'lexer> {
                     } else {
                         val.to_string()
                     };
-                    format!("Literal({:?}, \"{}\")", kind, val)
+                    // format!("Literal({:?}, \"{}\")", kind, val)
+                    format!("Literal{:?} \"{}\"", kind, val)
                 },
                 TokenKind::Assign { kind } => {
-                    format!("Assign({:?})", kind)
+                    format!("{:?}", kind)
                 },
                 other => format!("{:?}", other),
             };

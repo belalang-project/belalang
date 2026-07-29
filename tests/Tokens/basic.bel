@@ -1,10 +1,10 @@
 print(1 + 2);
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Ident("print") <0..5>
+# CHECK: Ident "print" <0..5>
 # CHECK: LeftParen <5..6>
-# CHECK: Literal(Integer, "1") <6..7>
+# CHECK: LiteralInteger "1" <6..7>
 # CHECK: Add <8..9>
-# CHECK: Literal(Integer, "2") <10..11>
+# CHECK: LiteralInteger "2" <10..11>
 # CHECK: RightParen <11..12>
 # CHECK: Semicolon <12..13>

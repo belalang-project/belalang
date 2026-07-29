@@ -7,27 +7,27 @@ x: Int
 x: String
 
 # RUN: %belalang build --emit=tokens %s | %FileCheck %s
-# CHECK: Ident("x") <0..1>
+# CHECK: Ident "x" <0..1>
 # CHECK: Colon <1..2>
-# CHECK: Ident("Int") <3..6>
-# CHECK: Assign(Assign) <7..8>
-# CHECK: Literal(Integer, "12") <9..11>
-# CHECK: Ident("x") <12..13>
+# CHECK: Ident "Int" <3..6>
+# CHECK: Assign <7..8>
+# CHECK: LiteralInteger "12" <9..11>
+# CHECK: Ident "x" <12..13>
 # CHECK: Colon <14..15>
-# CHECK: Assign(Assign) <15..16>
-# CHECK: Literal(Integer, "12") <17..19>
-# CHECK: Ident("x") <20..21>
+# CHECK: Assign <15..16>
+# CHECK: LiteralInteger "12" <17..19>
+# CHECK: Ident "x" <20..21>
 # CHECK: Colon <22..23>
-# CHECK: Assign(Assign) <23..24>
-# CHECK: Literal(Float, "12.0") <25..29>
-# CHECK: Ident("x") <30..31>
+# CHECK: Assign <23..24>
+# CHECK: LiteralFloat "12.0" <25..29>
+# CHECK: Ident "x" <30..31>
 # CHECK: Colon <31..32>
-# CHECK: Ident("String") <33..39>
-# CHECK: Assign(Assign) <40..41>
-# CHECK: Literal(String, "Hello, world!") <42..57>
-# CHECK: Ident("x") <59..60>
+# CHECK: Ident "String" <33..39>
+# CHECK: Assign <40..41>
+# CHECK: LiteralString "Hello, world!" <42..57>
+# CHECK: Ident "x" <59..60>
 # CHECK: Colon <60..61>
-# CHECK: Ident("Int") <62..65>
-# CHECK: Ident("x") <66..67>
+# CHECK: Ident "Int" <62..65>
+# CHECK: Ident "x" <66..67>
 # CHECK: Colon <67..68>
-# CHECK: Ident("String") <69..75>
+# CHECK: Ident "String" <69..75>

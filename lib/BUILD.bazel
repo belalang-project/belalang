@@ -1,0 +1,38 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_rust//rust:defs.bzl", "rust_static_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# ------------------------------------------------------------------------------
+# Lexer
+# ------------------------------------------------------------------------------
+
+cc_library(
+	name = "Lexer",
+	srcs = glob(["Lexer/*.cpp"]),
+	deps = [
+		"//include:Lexer",
+		"//include:Diag",
+	],
+)
+
+# ------------------------------------------------------------------------------
+# Diag
+# ------------------------------------------------------------------------------
+
+rust_static_library(
+    name = "Diag-rs",
+    srcs = ["Diag/diag.rs"],
+    deps = [
+        "@crates//:annotate-snippets",
+    ],
+)
+
+cc_library(
+    name = "Diag",
+    srcs = ["Diag/Diag.cpp"],
+    deps = [
+        "//include:Diag",
+        ":Diag-rs",
+    ],
+)
