@@ -1,0 +1,43 @@
+#ifndef STMT
+#define STMT(name)
+#endif
+
+#ifndef EXPR
+#define EXPR(name)
+#endif
+
+#ifndef DECL
+#define DECL(name)
+#endif
+
+STMT(Return)
+STMT(While)
+STMT(Break)
+STMT(Continue)
+STMT(Import)
+STMT(Expr)
+STMT(Decl)
+
+EXPR(Bool)
+EXPR(IntLit)
+EXPR(FloatLit)
+EXPR(StringLit)
+EXPR(ArrayLit)
+EXPR(Var)
+EXPR(FunctionLit)
+EXPR(Call)
+EXPR(Index)
+EXPR(Identifier)
+EXPR(If)
+EXPR(Infix)
+EXPR(Prefix)
+EXPR(Block)
+EXPR(MemberAccess)
+EXPR(StructLiteral)
+
+DECL(Var)
+DECL(Struct)
+
+#undef STMT
+#undef EXPR
+#undef DECL

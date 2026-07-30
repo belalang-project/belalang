@@ -16,7 +16,7 @@ implicit_ty := 12
 # CHECK-NEXT:       IntLitExpr 123
 # CHECK-NEXT:   DeclStmt
 # CHECK-NEXT:     VarDecl flo_var
-# CHECK-NEXT:       FloatLitExpr 44.2
+# CHECK-NEXT:       FloatLitExpr 4.420000e+01
 # CHECK-NEXT:   DeclStmt
 # CHECK-NEXT:     VarDecl str_var
 # CHECK-NEXT:       StringLitExpr "Hello, World!"
@@ -25,7 +25,7 @@ implicit_ty := 12
 # CHECK-NEXT:       IntLitExpr 1
 # CHECK-NEXT:   ExprStmt
 # CHECK-NEXT:     VarExpr flo_var Assign
-# CHECK-NEXT:       FloatLitExpr 1.4
+# CHECK-NEXT:       FloatLitExpr 1.400000e+00
 # CHECK-NEXT:   ExprStmt
 # CHECK-NEXT:     VarExpr str_var Assign
 # CHECK-NEXT:       StringLitExpr "Hello, Mom!"

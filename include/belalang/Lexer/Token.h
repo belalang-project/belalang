@@ -33,6 +33,19 @@ class Token {
 public:
   Token() : kind(TokenKind::Unknown) {}
   Token(TokenKind kind) : kind(kind) {}
+  Token(const Token &other)
+      : kind(other.kind), spanStart(other.spanStart), spanEnd(other.spanEnd),
+        tokenStr(other.tokenStr), str(tokenStr) {}
+  Token &operator=(const Token &other) {
+    if (this != &other) {
+      kind = other.kind;
+      spanStart = other.spanStart;
+      spanEnd = other.spanEnd;
+      tokenStr = other.tokenStr;
+      str = tokenStr;
+    }
+    return *this;
+  }
 
   TokenKind getKind() { return kind; }
   llvm::StringRef getStr() { return str; }

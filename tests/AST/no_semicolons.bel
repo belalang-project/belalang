@@ -15,7 +15,7 @@ return 5
 # CHECK-NEXT:       IntLitExpr 123
 # CHECK-NEXT:   DeclStmt
 # CHECK-NEXT:     VarDecl flo_var
-# CHECK-NEXT:       FloatLitExpr 44.2
+# CHECK-NEXT:       FloatLitExpr 4.420000e+01
 # CHECK-NEXT:   DeclStmt
 # CHECK-NEXT:     VarDecl str_var
 # CHECK-NEXT:       StringLitExpr "Hello, World!"

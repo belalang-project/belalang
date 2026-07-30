@@ -27,6 +27,7 @@ cc_binary(
     deps = [
         "@muopt//:muopt",
         "//lib:Lexer",
+        "//lib:AST",
         "//lib:Diag",
     ],
 )
