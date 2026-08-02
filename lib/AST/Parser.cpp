@@ -22,14 +22,36 @@ bool Parser::tryConsumeToken(lexer::TokenKind expectedTok) {
 }
 
 // -----------------------------------------------------------------------------
+// Diagnostics
+// -----------------------------------------------------------------------------
+
+void Parser::errorAt(size_t spanStart, size_t spanEnd, std::string message,
+                     std::string label) {
+  diagEngine.print(diag::Diagnostic::error(std::move(message))
+                       .withLabel(diag::Label::primary(
+                           spanStart, spanEnd, std::move(label))));
+  hasError = true;
+}
+
+void Parser::errorAt(size_t spanStart, size_t spanEnd, std::string message) {
+  errorAt(spanStart, spanEnd, message, std::move(message));
+}
+
+// -----------------------------------------------------------------------------
 // Parsing program
 // -----------------------------------------------------------------------------
 
 Program *Parser::parseProgram() {
   llvm::SmallVector<Stmt *, 0> stmts;
-  while (tok.getKind() != lexer::TokenKind::EndOfFile) {
-    stmts.push_back(parseStmt());
+  while (tok.getKind() != lexer::TokenKind::EndOfFile && !hasError) {
+    Stmt *stmt = parseStmt();
+    if (!stmt)
+      break;
+    stmts.push_back(stmt);
   }
+
+  if (hasError)
+    return nullptr;
 
   Stmt **stmtArr = c.alloc<Stmt *>(stmts.size());
   std::copy(stmts.begin(), stmts.end(), stmtArr);
@@ -98,8 +120,12 @@ Stmt *Parser::parseWhileStmt() {
     auto guard = restrict(Restr::NoStructLiteral);
     cond = parseExpr(Precedence::Lowest);
   }
+  if (!cond)
+    return nullptr;
 
   BlockExpr *body = static_cast<BlockExpr *>(parseBlockExpr());
+  if (!body)
+    return nullptr;
   size_t end = body->getSpanEnd();
 
   return new (c) WhileStmt(start, end, cond, body);
@@ -157,7 +183,8 @@ Stmt *Parser::parseContinueStmt() {
 Stmt *Parser::parseExprStmt() {
   size_t start = tok.getSpanStart();
   Expr *e = parseExpr(Precedence::Lowest);
-  assert(e && "unexpected null expr");
+  if (!e)
+    return nullptr;
 
   size_t end = e->getSpanEnd();
   if (tok.getKind() == lexer::TokenKind::Semicolon) {
@@ -173,7 +200,8 @@ Stmt *Parser::parseExprStmt() {
 
 Stmt *Parser::parseDeclStmt() {
   Decl *d = parseDecl();
-  assert(d && "unexpected null decl");
+  if (!d)
+    return nullptr;
   return new (c) DeclStmt(d->getSpanStart(), d->getSpanEnd(), d);
 }
 
@@ -237,7 +265,8 @@ Parser::Precedence Parser::precedenceOf(lexer::TokenKind kind) {
 
 Expr *Parser::parseExpr(Precedence prec) {
   Expr *left = parsePrefix();
-  assert(left && "unexpected nullptr");
+  if (!left)
+    return nullptr;
 
   while (prec < precedenceOf(tok.getKind())) {
     if (tok.getKind() == lexer::TokenKind::LeftBrace &&
@@ -278,7 +307,8 @@ Expr *Parser::parsePrefix() {
   case lexer::TokenKind::If:
     return parseIfExpr();
   default:
-    assert(false && "unreachable");
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unknown prefix");
+    return nullptr;
   }
 }
 
@@ -324,7 +354,8 @@ Expr *Parser::parseInfix(Expr *left) {
   case lexer::TokenKind::ShiftRightAssign:
     return parseVarExpr(left);
   default:
-    assert(false && "unreachable");
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unknown prefix");
+    return nullptr;
   }
 }
 
@@ -333,8 +364,10 @@ Expr *Parser::parseIntLitExpr() {
   size_t end = tok.getSpanEnd();
   uint64_t value;
 
-  if (tok.getStr().getAsInteger(10, value))
-    assert(false && "unimplemented");
+  if (tok.getStr().getAsInteger(10, value)) {
+    errorAt(start, end, "error parsing integer");
+    return nullptr;
+  }
 
   consumeToken(); // consume the integer itself
   return new (c) IntLitExpr(start, end, value);
@@ -345,8 +378,10 @@ Expr *Parser::parseFloatLitExpr() {
   size_t end = tok.getSpanEnd();
   double value;
 
-  if (tok.getStr().getAsDouble(value))
-    assert(false && "unimplemented");
+  if (tok.getStr().getAsDouble(value)) {
+    errorAt(start, end, "error parsing float");
+    return nullptr;
+  }
 
   consumeToken(); // consume the float itself
   return new (c) FloatLitExpr(start, end, value);
@@ -380,8 +415,10 @@ Expr *Parser::parseArrayLitExpr() {
   llvm::SmallVector<Expr *, 0> elements;
 
   while (tok.getKind() != lexer::TokenKind::RightBracket) {
-    if (Expr *expr = parseExpr(Precedence::Lowest))
-      elements.push_back(expr);
+    Expr *expr = parseExpr(Precedence::Lowest);
+    if (!expr)
+      return nullptr;
+    elements.push_back(expr);
 
     if (tok.getKind() != lexer::TokenKind::Comma)
       break;
@@ -389,8 +426,10 @@ Expr *Parser::parseArrayLitExpr() {
   }
 
   size_t end = tok.getSpanEnd();
-  if (!tryConsumeToken(lexer::TokenKind::RightBracket))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightBracket)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   Expr **elementsData = c.alloc<Expr *>(elements.size());
   std::copy(elements.begin(), elements.end(), elementsData);
@@ -400,6 +439,11 @@ Expr *Parser::parseArrayLitExpr() {
 }
 
 Expr *Parser::parseVarExpr(Expr *left) {
+  if (left->getKind() != Expr::ExprKind::IdentifierExpr) {
+    errorAt(left->getSpanStart(), left->getSpanEnd(), "invalid lhs");
+    return nullptr;
+  }
+
   size_t start = left->getSpanStart();
   lexer::TokenKind assignOp = tok.getKind();
   consumeToken(); // consume the assignment operator
@@ -407,6 +451,8 @@ Expr *Parser::parseVarExpr(Expr *left) {
   llvm::StringRef name = static_cast<IdentifierExpr *>(left)->getName();
 
   Expr *value = parseExpr(Precedence::Lowest);
+  if (!value)
+    return nullptr;
   size_t end = value->getSpanEnd();
 
   return new (c) VarExpr(start, end, name, value, assignOp);
@@ -417,8 +463,10 @@ Expr *Parser::parseFunctionLitExpr() {
   consumeToken(); // consume `fn`
 
   // consume `(`
-  if (!tryConsumeToken(lexer::TokenKind::LeftParen))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::LeftParen)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   llvm::SmallVector<VarDecl *, 0> params;
   while (tok.getKind() != lexer::TokenKind::RightParen) {
@@ -430,8 +478,10 @@ Expr *Parser::parseFunctionLitExpr() {
     consumeToken(); // consume param name
 
     // consume `:`
-    if (!tryConsumeToken(lexer::TokenKind::Colon))
-      assert(false && "unimplemented");
+    if (!tryConsumeToken(lexer::TokenKind::Colon)) {
+      errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+      return nullptr;
+    }
 
     llvm::StringRef typeName = tok.getStr();
     char *typeData = c.alloc<char>(typeName.size());
@@ -445,8 +495,10 @@ Expr *Parser::parseFunctionLitExpr() {
     if (tryConsumeToken(lexer::TokenKind::RightParen))
       break;
 
-    if (!tryConsumeToken(lexer::TokenKind::Comma))
-      assert(false && "unimplemented");
+    if (!tryConsumeToken(lexer::TokenKind::Comma)) {
+      errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+      return nullptr;
+    }
   }
 
   if (tok.getKind() == lexer::TokenKind::RightParen)
@@ -462,6 +514,8 @@ Expr *Parser::parseFunctionLitExpr() {
   }
 
   BlockExpr *body = static_cast<BlockExpr *>(parseBlockExpr());
+  if (!body)
+    return nullptr;
   size_t end = body->getSpanEnd();
 
   VarDecl **paramsData = c.alloc<VarDecl *>(params.size());
@@ -477,7 +531,10 @@ Expr *Parser::parseCallExpr(Expr *left) {
 
   llvm::SmallVector<Expr *, 0> args;
   while (tok.getKind() != lexer::TokenKind::RightParen) {
-    args.push_back(parseExpr(Precedence::Lowest));
+    Expr *arg = parseExpr(Precedence::Lowest);
+    if (!arg)
+      return nullptr;
+    args.push_back(arg);
 
     if (tok.getKind() != lexer::TokenKind::Comma)
       break;
@@ -485,8 +542,10 @@ Expr *Parser::parseCallExpr(Expr *left) {
   }
 
   size_t end = tok.getSpanEnd();
-  if (!tryConsumeToken(lexer::TokenKind::RightParen))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightParen)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   Expr **argsData = c.alloc<Expr *>(args.size());
   std::copy(args.begin(), args.end(), argsData);
@@ -500,10 +559,14 @@ Expr *Parser::parseIndexExpr(Expr *left) {
   consumeToken(); // consume `[`
 
   Expr *index = parseExpr(Precedence::Lowest);
+  if (!index)
+    return nullptr;
 
   size_t end = tok.getSpanEnd();
-  if (!tryConsumeToken(lexer::TokenKind::RightBracket))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightBracket)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   return new (c) IndexExpr(start, end, left, index);
 }
@@ -530,8 +593,12 @@ Expr *Parser::parseIfExpr() {
     auto guard = restrict(Restr::NoStructLiteral);
     cond = parseExpr(Precedence::Lowest);
   }
+  if (!cond)
+    return nullptr;
 
   BlockExpr *then = static_cast<BlockExpr *>(parseBlockExpr());
+  if (!then)
+    return nullptr;
   size_t end = then->getSpanEnd();
 
   Expr *alt = nullptr;
@@ -540,8 +607,10 @@ Expr *Parser::parseIfExpr() {
       alt = parseIfExpr();
     else if (tok.getKind() == lexer::TokenKind::LeftBrace)
       alt = parseBlockExpr();
-    else
-      assert(false && "unimplemented");
+    else {
+      errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+      return nullptr;
+    }
   }
 
   if (alt)
@@ -558,6 +627,8 @@ Expr *Parser::parseInfixExpr(Expr *left) {
   consumeToken(); // consume the operator
 
   Expr *right = parseExpr(prec);
+  if (!right)
+    return nullptr;
   size_t end = right->getSpanEnd();
 
   return new (c) InfixExpr(start, end, left, right, infixOp);
@@ -569,6 +640,8 @@ Expr *Parser::parsePrefixExpr() {
   consumeToken(); // consume the prefix
 
   Expr *right = parseExpr(Precedence::Prefix);
+  if (!right)
+    return nullptr;
   size_t end = right->getSpanEnd();
 
   return new (c) PrefixExpr(start, end, prefixTok, right);
@@ -578,17 +651,24 @@ Expr *Parser::parseBlockExpr() {
   llvm::SmallVector<Stmt *, 0> stmts;
 
   size_t start = tok.getSpanStart();
-  if (!tryConsumeToken(lexer::TokenKind::LeftBrace))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::LeftBrace)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   while (tok.getKind() != lexer::TokenKind::EndOfFile &&
-         tok.getKind() != lexer::TokenKind::RightBrace) {
-    stmts.push_back(parseStmt());
+         tok.getKind() != lexer::TokenKind::RightBrace && !hasError) {
+    Stmt *stmt = parseStmt();
+    if (!stmt)
+      break;
+    stmts.push_back(stmt);
   }
 
   size_t end = tok.getSpanEnd();
-  if (!tryConsumeToken(lexer::TokenKind::RightBrace))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightBrace)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
   // Copy the statemnts data to the context's bump allocator.
   Stmt **stmtsData = c.alloc<Stmt *>(stmts.size());
@@ -624,12 +704,18 @@ Expr *Parser::parseStructLiteralExpr(Expr *left) {
     char *strData = c.alloc<char>(fieldName.size());
     std::copy(fieldName.begin(), fieldName.end(), strData);
     fieldName = llvm::StringRef(strData, fieldName.size());
+    size_t fieldEnd = tok.getSpanEnd();
     consumeToken(); // consume the field identifier
 
-    if (!tryConsumeToken(lexer::TokenKind::Assign))
-      assert(false && "unimplemented");
+    if (!tryConsumeToken(lexer::TokenKind::Assign)) {
+      errorAt(fieldStart, fieldEnd, "error parsing struct",
+              "expected field assignment");
+      return nullptr;
+    }
 
     Expr *fieldValue = parseExpr(Precedence::Lowest);
+    if (!fieldValue)
+      return nullptr;
     fields.push_back(new (c) VarExpr(fieldStart, fieldValue->getSpanEnd(),
                                      fieldName, fieldValue,
                                      lexer::TokenKind::Assign));
@@ -640,8 +726,17 @@ Expr *Parser::parseStructLiteralExpr(Expr *left) {
   }
 
   size_t end = tok.getSpanEnd();
-  if (!tryConsumeToken(lexer::TokenKind::RightBrace))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightBrace)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "error parsing struct",
+            "unexpected token");
+    return nullptr;
+  }
+
+  if (left->getKind() != Expr::ExprKind::IdentifierExpr) {
+    errorAt(left->getSpanStart(), left->getSpanEnd(), "error parsing struct",
+            "invalid struct name");
+    return nullptr;
+  }
 
   llvm::StringRef structName = static_cast<IdentifierExpr *>(left)->getName();
 
@@ -662,11 +757,15 @@ Expr *Parser::parseGroupedExpr() {
     auto guard = restrict(Restr::None);
     expr = parseExpr(Precedence::Lowest);
   }
+  if (!expr)
+    return nullptr;
 
-  if (!tryConsumeToken(lexer::TokenKind::RightParen))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::RightParen)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
+  }
 
-  return  expr;
+  return expr;
 }
 
 // -----------------------------------------------------------------------------
@@ -680,7 +779,8 @@ Decl *Parser::parseDecl() {
   case lexer::TokenKind::Ident:
     return parseVarDecl();
   default:
-    assert(false && "unimplemented");
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
   }
 }
 
@@ -705,7 +805,8 @@ Decl *Parser::parseVarDecl() {
     explicitType = llvm::StringRef(typeData, explicitType.size());
     consumeToken(); // consume the type name
   } else {
-    assert(false && "unimplemented");
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
+    return nullptr;
   }
 
   Expr *value = nullptr;
@@ -713,6 +814,8 @@ Decl *Parser::parseVarDecl() {
     consumeToken(); // consume `=`; `tok` is now the start of the value
     value = parseExpr(Precedence::Lowest);
   }
+  if (hasError)
+    return nullptr;
 
   size_t end = value ? value->getSpanEnd() : tok.getSpanEnd();
   if (tok.getKind() == lexer::TokenKind::Semicolon) {
@@ -737,11 +840,14 @@ Decl *Parser::parseStructDecl() {
   name = llvm::StringRef(strData, name.size());
   consumeToken(); // consume name
 
-  if (!tryConsumeToken(lexer::TokenKind::LeftBrace))
-    assert(false && "unimplemented");
+  if (!tryConsumeToken(lexer::TokenKind::LeftBrace)) {
+    errorAt(tok.getSpanStart(), tok.getSpanEnd(), "error parsing struct",
+            "unexpected token");
+    return nullptr;
+  }
 
   llvm::SmallVector<VarDecl *, 0> members;
-  while (tok.getKind() != lexer::TokenKind::RightBrace) {
+  while (tok.getKind() != lexer::TokenKind::RightBrace && !hasError) {
     size_t start = tok.getSpanStart();
     llvm::StringRef name = tok.getStr();
 
@@ -751,8 +857,11 @@ Decl *Parser::parseStructDecl() {
     consumeToken(); // consume member name
 
     // consume `:`
-    if (!tryConsumeToken(lexer::TokenKind::Colon))
-      assert(false && "unimplemented");
+    if (!tryConsumeToken(lexer::TokenKind::Colon)) {
+      errorAt(start, tok.getSpanEnd(), "error parsing struct",
+              "invalid statement");
+      return nullptr;
+    }
 
     llvm::StringRef typeName = tok.getStr();
     char *typeData = c.alloc<char>(typeName.size());

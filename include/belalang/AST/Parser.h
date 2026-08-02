@@ -73,6 +73,19 @@ class Parser {
   bool tryConsumeToken(lexer::TokenKind expectedTok);
 
   // ---------------------------------------------------------------------------
+  // Diagnostics
+  // ---------------------------------------------------------------------------
+
+  /// Emits an error diagnostic at the given span, using `label` as the
+  /// primary label message. Marks the parser as having failed.
+  void errorAt(size_t spanStart, size_t spanEnd, std::string message,
+               std::string label);
+
+  /// Emits an error diagnostic at the given span using `message` as both the
+  /// diagnostic and primary label message.
+  void errorAt(size_t spanStart, size_t spanEnd, std::string message);
+
+  // ---------------------------------------------------------------------------
   // Parse Methods
   // ---------------------------------------------------------------------------
 
@@ -113,6 +126,9 @@ public:
 
   Program *parseProgram();
 
+  /// Returns `true` if the parser encountered any error while parsing.
+  bool hadError() const { return hasError; }
+
 private:
   lexer::Lexer &lexer;
   ASTContext &c;
@@ -126,6 +142,8 @@ private:
 
   int depth = 0;
   bool hasSemicolon = true;
+
+  bool hasError = false;
 
   Restr restr;
 };

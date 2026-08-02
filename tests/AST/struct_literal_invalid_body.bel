@@ -1,4 +1,4 @@
-# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+# RUN: %not %belalang build --emit ast %s 2>&1 | %FileCheck %s
 
 struct T {
   a: Int

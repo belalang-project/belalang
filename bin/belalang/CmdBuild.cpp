@@ -119,7 +119,7 @@ int build(muopt::Parser &parser) {
       dumper.visitProgram(prog);
     }
 
-    return 0; // TODO: has error
+    return parser.hadError() ? 1 : 0;
   }
 
   std::cout << "error: unimplemented\n";
