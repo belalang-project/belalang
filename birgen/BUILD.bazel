@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "birgen-cc",
-    srcs = ["BIRGen.cpp"],
+    srcs = ["CxxBIRGen.cpp"],
     deps = [
         "//bir",
         "//include:BIRGen",

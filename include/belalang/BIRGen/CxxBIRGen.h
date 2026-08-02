@@ -1,5 +1,5 @@
-#ifndef BELALANG_BIRGEN_BIRGEN_H_
-#define BELALANG_BIRGEN_BIRGEN_H_
+#ifndef BELALANG_BIRGEN_CXXBIRGEN_H_
+#define BELALANG_BIRGEN_CXXBIRGEN_H_
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -17,7 +17,7 @@ class BIRFunctionGuard;
 class BIRIfGuard;
 class BIRWhileGuard;
 class BIRScopeGuard;
-class BIRGen;
+class CxxBIRGen;
 
 // NOTE: manual forward decl
 class BIRWhileOpGuard;
@@ -124,15 +124,15 @@ private:
 };
 
 // -----------------------------------------------------------------------------
-// BIRGen
+// CxxBIRGen
 // -----------------------------------------------------------------------------
 
-std::unique_ptr<BIRGen> create_birgen();
+std::unique_ptr<CxxBIRGen> create_birgen();
 
-class BIRGen {
+class CxxBIRGen {
 public:
-  BIRGen();
-  ~BIRGen() = default;
+  CxxBIRGen();
+  ~CxxBIRGen() = default;
 
   std::unique_ptr<BIRValue> build_constant_int(int64_t val);
   std::unique_ptr<BIRValue> build_constant_float(double val);
@@ -193,4 +193,4 @@ private:
 } // namespace birgen 
 } // namespace belalang
 
-#endif // BELALANG_BIRGEN_BIRGEN_H_
+#endif // BELALANG_BIRGEN_CXXBIRGEN_H_

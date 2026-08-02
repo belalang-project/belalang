@@ -1,4 +1,4 @@
-#include "belalang/BIRGen/BIRGen.h"
+#include "belalang/BIRGen/CxxBIRGen.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
@@ -15,7 +15,7 @@ namespace birgen {
 
 #include "belalang/BIRGen/Bindings.cpp.inc"
 
-BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
+CxxBIRGen::CxxBIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   // Load dialects.
   mlir::DialectRegistry registry;
   registry.insert<bir::BIRDialect, mlir::LLVM::LLVMDialect>();
@@ -34,7 +34,7 @@ BIRGen::BIRGen() : builder(&context), loc(builder.getUnknownLoc()) {
   builder.setInsertionPointToStart(entry);
 }
 
-mlir::Type BIRGen::mapType(TypeKind ty) {
+mlir::Type CxxBIRGen::mapType(TypeKind ty) {
   if (ty == TypeKind::String) {
     return bir::StringType::get(&context);
   } else if (ty == TypeKind::Int) {
@@ -48,7 +48,7 @@ mlir::Type BIRGen::mapType(TypeKind ty) {
   }
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
+std::unique_ptr<BIRValue> CxxBIRGen::build_constant_int(int64_t val) {
   auto type = builder.getType<bir::IntType>();
   llvm::APInt value(64, val);
   auto attr = bir::IntegerAttr::get(&context, type, value);
@@ -56,7 +56,7 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_int(int64_t val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
+std::unique_ptr<BIRValue> CxxBIRGen::build_constant_float(double val) {
   auto type = builder.getType<bir::FloatType>();
   llvm::APFloat value(val);
   auto attr = bir::FloatAttr::get(&context, type, value);
@@ -64,7 +64,7 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_float(double val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::Str val) {
+std::unique_ptr<BIRValue> CxxBIRGen::build_constant_string(rust::Str val) {
   auto type = builder.getType<bir::StringType>();
   llvm::StringRef value(val.data(), val.size());
   auto attr = bir::StringAttr::get(&context, type, value);
@@ -72,7 +72,7 @@ std::unique_ptr<BIRValue> BIRGen::build_constant_string(rust::Str val) {
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_constant_bool(bool val) {
+std::unique_ptr<BIRValue> CxxBIRGen::build_constant_bool(bool val) {
   auto type = builder.getType<bir::BoolType>();
   auto attr = bir::BoolAttr::get(&context, type, val);
   auto op = bir::ConstantOp::create(builder, loc, type, attr);
@@ -99,7 +99,7 @@ std::unique_ptr<BIRValue> build_binop_cmp_impl(mlir::OpBuilder &builder,
 }
 
 std::unique_ptr<BIRValue>
-BIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
+CxxBIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
   switch (kind) {
   case BinOpKind::Add:
     return build_binop_impl<bir::AddOp>(builder, loc, lhs, rhs);
@@ -128,7 +128,7 @@ BIRGen::build_binop(BinOpKind kind, const BIRValue &lhs, const BIRValue &rhs) {
   }
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v,
+std::unique_ptr<BIRValue> CxxBIRGen::build_var_declare(const BIRValue &v,
                                                     rust::Str name) {
   auto nakedType = v.getValue().getType();
   auto refType = bir::RefType::get(&context, nakedType);
@@ -137,7 +137,7 @@ std::unique_ptr<BIRValue> BIRGen::build_var_declare(const BIRValue &v,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(TypeKind v,
+std::unique_ptr<BIRValue> CxxBIRGen::build_var_declare_ty(TypeKind v,
                                                        rust::Str name) {
   mlir::Type ty = mapType(v);
 
@@ -147,13 +147,13 @@ std::unique_ptr<BIRValue> BIRGen::build_var_declare_ty(TypeKind v,
   return std::make_unique<BIRValue>(op.getResult());
 }
 
-void BIRGen::build_var_store(const BIRValue &v, const BIRValue &ref) {
+void CxxBIRGen::build_var_store(const BIRValue &v, const BIRValue &ref) {
   auto src = v.getValue();
   auto dest = ref.getValue();
   bir::StoreOp::create(builder, loc, src, dest);
 }
 
-std::unique_ptr<BIRValue> BIRGen::build_var_load(const BIRValue &refValue) {
+std::unique_ptr<BIRValue> CxxBIRGen::build_var_load(const BIRValue &refValue) {
   auto refType = dyn_cast<bir::RefType>(refValue.getValue().getType());
 
   // TODO: error or some kind
@@ -174,7 +174,7 @@ std::unique_ptr<BIRValue> BIRFunctionGuard::get_arg(size_t index) const {
 }
 
 std::unique_ptr<BIRFunctionGuard>
-BIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
+CxxBIRGen::build_fn_expr(TypeKind resultTy, rust::Slice<const TypeKind> paramTys) {
   std::vector<mlir::Type> inputs;
   for (auto ty : paramTys) {
     inputs.push_back(mapType(ty));
@@ -212,14 +212,14 @@ std::unique_ptr<BIRValue> BIRIfGuard::get_value() const {
   return nullptr;
 }
 
-std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr(const BIRValue &cond) {
+std::unique_ptr<BIRIfGuard> CxxBIRGen::build_if_expr(const BIRValue &cond) {
   auto op = bir::IfOp::create(builder, loc, mlir::TypeRange{}, cond.getValue());
   mlir::Value result = op.getNumResults() > 0 ? op.getResult() : mlir::Value();
   return std::make_unique<BIRIfGuard>(builder, &op.getThenRegion(),
                                       &op.getElseRegion(), result);
 }
 
-std::unique_ptr<BIRIfGuard> BIRGen::build_if_expr_ty(const BIRValue &cond,
+std::unique_ptr<BIRIfGuard> CxxBIRGen::build_if_expr_ty(const BIRValue &cond,
                                                      TypeKind resultTy) {
   mlir::Type ty = mapType(resultTy);
   auto op =
@@ -239,7 +239,7 @@ void BIRWhileGuard::start_body() {
   builder.setInsertionPointToEnd(&bodyRegion->front());
 }
 
-std::unique_ptr<BIRWhileGuard> BIRGen::build_while_stmt() {
+std::unique_ptr<BIRWhileGuard> CxxBIRGen::build_while_stmt() {
   auto op = bir::WhileOp::create(builder, loc);
   return std::make_unique<BIRWhileGuard>(builder, &op.getCond(), &op.getBody());
 }
@@ -249,12 +249,12 @@ void BIRScopeGuard::start_body() {
   builder.setInsertionPointToEnd(&scopeRegion->front());
 }
 
-std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr() {
+std::unique_ptr<BIRScopeGuard> CxxBIRGen::build_block_expr() {
   auto op = bir::ScopeOp::create(builder, loc, mlir::Type{});
   return std::make_unique<BIRScopeGuard>(builder, &op.getScopeRegion(), mlir::Value());
 }
 
-std::unique_ptr<BIRScopeGuard> BIRGen::build_block_expr_ty(TypeKind resultTy) {
+std::unique_ptr<BIRScopeGuard> CxxBIRGen::build_block_expr_ty(TypeKind resultTy) {
   mlir::Type ty = mapType(resultTy);
   auto op = bir::ScopeOp::create(builder, loc, ty);
   mlir::Value result = op.getNumResults() > 0 ? op.getResult(0) : mlir::Value();
@@ -267,34 +267,34 @@ std::unique_ptr<BIRValue> BIRScopeGuard::get_value() const {
   return nullptr;
 }
 
-void BIRGen::build_condition(const BIRValue &cond) {
+void CxxBIRGen::build_condition(const BIRValue &cond) {
   bir::ConditionOp::create(builder, loc, cond.getValue());
 }
 
-void BIRGen::build_continue() { bir::ContinueOp::create(builder, loc); }
+void CxxBIRGen::build_continue() { bir::ContinueOp::create(builder, loc); }
 
-void BIRGen::build_break() { bir::BreakOp::create(builder, loc); }
+void CxxBIRGen::build_break() { bir::BreakOp::create(builder, loc); }
 
-void BIRGen::build_yield(const BIRValue &val) {
+void CxxBIRGen::build_yield(const BIRValue &val) {
   bir::YieldOp::create(builder, loc, val.getValue());
 }
 
-void BIRGen::build_empty_yield() { bir::YieldOp::create(builder, loc); }
+void CxxBIRGen::build_empty_yield() { bir::YieldOp::create(builder, loc); }
 
-void BIRGen::build_print(const BIRValue &val) {
+void CxxBIRGen::build_print(const BIRValue &val) {
   bir::PrintOp::create(builder, loc, val.getValue());
 }
 
-void BIRGen::start_call(const BIRValue &callee) {
+void CxxBIRGen::start_call(const BIRValue &callee) {
   current_callee = callee.getValue();
   current_args.clear();
 }
 
-void BIRGen::add_call_arg(const BIRValue &arg) {
+void CxxBIRGen::add_call_arg(const BIRValue &arg) {
   current_args.push_back(arg.getValue());
 }
 
-std::unique_ptr<BIRValue> BIRGen::finish_call() {
+std::unique_ptr<BIRValue> CxxBIRGen::finish_call() {
   auto fnType = mlir::cast<mlir::FunctionType>(current_callee.getType());
   auto resultTypes = fnType.getResults();
 
@@ -308,13 +308,13 @@ std::unique_ptr<BIRValue> BIRGen::finish_call() {
   return std::make_unique<BIRValue>(op.getResult(0));
 }
 
-void BIRGen::build_return(const BIRValue &val) {
+void CxxBIRGen::build_return(const BIRValue &val) {
   bir::ReturnOp::create(builder, loc, val.getValue());
 }
 
-void BIRGen::build_empty_return() { bir::ReturnOp::create(builder, loc, {}); }
+void CxxBIRGen::build_empty_return() { bir::ReturnOp::create(builder, loc, {}); }
 
-void BIRGen::build_main_return() {
+void CxxBIRGen::build_main_return() {
   auto typ = bir::IntType::get(&context);
   auto val = llvm::APInt(64, 0); // return 0
   auto atr = bir::IntegerAttr::get(&context, typ, val);
@@ -322,22 +322,24 @@ void BIRGen::build_main_return() {
   bir::ReturnOp::create(builder, loc, {ret});
 }
 
-void BIRGen::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }
+void CxxBIRGen::dump() const { const_cast<mlir::ModuleOp &>(module).dump(); }
 
-rust::String BIRGen::dump_to_string() const {
+rust::String CxxBIRGen::dump_to_string() const {
   std::string s;
   llvm::raw_string_ostream os(s);
   const_cast<mlir::ModuleOp &>(module).print(os);
   return rust::String(os.str());
 }
 
-bool BIRGen::run_lowering_pipeline() {
+bool CxxBIRGen::run_lowering_pipeline() {
   mlir::PassManager pm(&context);
   bir::buildBIRLoweringPipeline(pm);
   return mlir::succeeded(pm.run(module));
 }
 
-std::unique_ptr<BIRGen> create_birgen() { return std::make_unique<BIRGen>(); }
+std::unique_ptr<CxxBIRGen> create_birgen() {
+  return std::make_unique<CxxBIRGen>();
+}
 
 } // namespace birgen
 } // namespace belalang
