@@ -77,11 +77,23 @@ public:
   }
 
 #define STMT(name)                                                             \
-  RetT visit##name##Stmt(name##Stmt *) { return; }
+  RetT visit##name##Stmt(name##Stmt *) {                                       \
+    if constexpr (!std::is_same_v<RetT, void>) {                               \
+      return RetT{};                                                           \
+    }                                                                          \
+  }
 #define EXPR(name)                                                             \
-  RetT visit##name##Expr(name##Expr *) { return; }
+  RetT visit##name##Expr(name##Expr *) {                                       \
+    if constexpr (!std::is_same_v<RetT, void>) {                               \
+      return RetT{};                                                           \
+    }                                                                          \
+  }
 #define DECL(name)                                                             \
-  RetT visit##name##Decl(name##Decl *) { return; }
+  RetT visit##name##Decl(name##Decl *) {                                       \
+    if constexpr (!std::is_same_v<RetT, void>) {                               \
+      return RetT{};                                                           \
+    }                                                                          \
+  }
 #include "ASTNodes.def"
 };
 
