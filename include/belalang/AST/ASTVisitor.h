@@ -3,22 +3,27 @@
 
 #include "belalang/AST/Decl.h"
 #include "belalang/AST/Expr.h"
-#include "belalang/AST/Stmt.h"
 #include "belalang/AST/Program.h"
+#include "belalang/AST/Stmt.h"
 
 namespace belalang {
 namespace ast {
 
-template <typename Derived> class ASTVisitor {
+template <typename Derived, typename RetT = void> class ASTVisitor {
 public:
   void visitProgram(Program *prog) {
     for (Stmt *stmt : prog->getStmts())
       visitStmt(stmt);
   }
 
-  void visitStmt(Stmt *stmt) {
-    if (!stmt)
-      return;
+  RetT visitStmt(Stmt *stmt) {
+    if (!stmt) {
+      if constexpr (std::is_same_v<RetT, void>) {
+        return;
+      } else {
+        return RetT{};
+      }
+    }
 
     switch (stmt->getKind()) {
       // clang-format off
@@ -31,9 +36,14 @@ public:
     }
   }
 
-  void visitExpr(Expr *expr) {
-    if (!expr)
-      return;
+  RetT visitExpr(Expr *expr) {
+    if (!expr) {
+      if constexpr (std::is_same_v<RetT, void>) {
+        return;
+      } else {
+        return RetT{};
+      }
+    }
 
     switch (expr->getKind()) {
       // clang-format off
@@ -46,9 +56,14 @@ public:
     }
   }
 
-  void visitDecl(Decl *decl) {
-    if (!decl)
-      return;
+  RetT visitDecl(Decl *decl) {
+    if (!decl) {
+      if constexpr (std::is_same_v<RetT, void>) {
+        return;
+      } else {
+        return RetT{};
+      }
+    }
 
     switch (decl->getKind()) {
       // clang-format off
@@ -62,11 +77,11 @@ public:
   }
 
 #define STMT(name)                                                             \
-  void visit##name##Stmt(name##Stmt *) { return; }
+  RetT visit##name##Stmt(name##Stmt *) { return; }
 #define EXPR(name)                                                             \
-  void visit##name##Expr(name##Expr *) { return; }
+  RetT visit##name##Expr(name##Expr *) { return; }
 #define DECL(name)                                                             \
-  void visit##name##Decl(name##Decl *) { return; }
+  RetT visit##name##Decl(name##Decl *) { return; }
 #include "ASTNodes.def"
 };
 
