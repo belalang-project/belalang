@@ -9,19 +9,19 @@
 "Hello, World!";
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     Integer(12)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Sub)
-# CHECK-NEXT:       Integer(12)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Not)
-# CHECK-NEXT:       Integer(12)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Sub)
-# CHECK-NEXT:       Boolean(true)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Not)
-# CHECK-NEXT:       Boolean(true)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     String("Hello, World!")
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IntLitExpr 12
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Sub
+# CHECK-NEXT:       IntLitExpr 12
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Not
+# CHECK-NEXT:       IntLitExpr 12
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Sub
+# CHECK-NEXT:       BoolExpr true
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Not
+# CHECK-NEXT:       BoolExpr true
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     StringLitExpr "Hello, World!"

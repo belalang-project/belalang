@@ -3,27 +3,25 @@ add(1, 2 * 3, 4 + 5);
 fn(x: Int, y: Int) { x + y }(2, 3);
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     CallExpression
-# CHECK-NEXT:       Identifier(add)
-# CHECK-NEXT:       Integer(1)
-# CHECK-NEXT:       InfixExpression(Mul)
-# CHECK-NEXT:         Integer(2)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     CallExpression
-# CHECK-NEXT:       FunctionLiteral(None)
-# CHECK-NEXT:         VarDeclStatement(Some("Int"))
-# CHECK-NEXT:           Identifier(x)
-# CHECK-NEXT:         VarDeclStatement(Some("Int"))
-# CHECK-NEXT:           Identifier(y)
-# CHECK-NEXT:         BlockExpression
-# CHECK-NEXT:           ExpressionStatement
-# CHECK-NEXT:             InfixExpression(Add)
-# CHECK-NEXT:               Identifier(x)
-# CHECK-NEXT:               Identifier(y)
-# CHECK-NEXT:       Integer(2)
-# CHECK-NEXT:       Integer(3)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     CallExpr
+# CHECK-NEXT:       IdentifierExpr add
+# CHECK-NEXT:       IntLitExpr 1
+# CHECK-NEXT:       InfixExpr Mul
+# CHECK-NEXT:         IntLitExpr 2
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     CallExpr
+# CHECK-NEXT:       FunctionLitExpr
+# CHECK-NEXT:         VarDecl x Int
+# CHECK-NEXT:         VarDecl y Int
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             InfixExpr Add
+# CHECK-NEXT:               IdentifierExpr x
+# CHECK-NEXT:               IdentifierExpr y
+# CHECK-NEXT:       IntLitExpr 2
+# CHECK-NEXT:       IntLitExpr 3

@@ -3,12 +3,12 @@
 arr[1];
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     ArrayLiteral
-# CHECK-NEXT:       Integer(1)
-# CHECK-NEXT:       Integer(2)
-# CHECK-NEXT:       Integer(3)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     IndexExpression
-# CHECK-NEXT:       Identifier(arr)
-# CHECK-NEXT:       Integer(1)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     ArrayLitExpr
+# CHECK-NEXT:       IntLitExpr 1
+# CHECK-NEXT:       IntLitExpr 2
+# CHECK-NEXT:       IntLitExpr 3
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IndexExpr
+# CHECK-NEXT:       IdentifierExpr arr
+# CHECK-NEXT:       IntLitExpr 1

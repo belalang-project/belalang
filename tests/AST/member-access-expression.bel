@@ -3,7 +3,6 @@
 some_struct.member
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     MemberAccessExpression
-# CHECK-NEXT:       Identifier(some_struct)
-# CHECK-NEXT:       Identifier(member)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     MemberAccessExpr .member
+# CHECK-NEXT:       IdentifierExpr some_struct

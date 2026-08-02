@@ -2,7 +2,7 @@
 1 + 2;
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       Integer(1)
-# CHECK-NEXT:       Integer(2)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       IntLitExpr 1
+# CHECK-NEXT:       IntLitExpr 2

@@ -8,25 +8,24 @@ fact := fn(n: Int) {
 };
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(fact)
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(n)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           IfExpression
-# CHECK-NEXT:             InfixExpression(Lt)
-# CHECK-NEXT:               Identifier(n)
-# CHECK-NEXT:               Integer(2)
-# CHECK-NEXT:             BlockExpression
-# CHECK-NEXT:               ReturnStatement
-# CHECK-NEXT:                 Integer(1)
-# CHECK-NEXT:         ReturnStatement
-# CHECK-NEXT:           InfixExpression(Mul)
-# CHECK-NEXT:             Identifier(n)
-# CHECK-NEXT:             CallExpression
-# CHECK-NEXT:               Identifier(fact)
-# CHECK-NEXT:               InfixExpression(Sub)
-# CHECK-NEXT:                 Identifier(n)
-# CHECK-NEXT:                 Integer(1)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl fact
+# CHECK-NEXT:       FunctionLitExpr
+# CHECK-NEXT:         VarDecl n Int
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             IfExpr
+# CHECK-NEXT:               InfixExpr Lt
+# CHECK-NEXT:                 IdentifierExpr n
+# CHECK-NEXT:                 IntLitExpr 2
+# CHECK-NEXT:               BlockExpr
+# CHECK-NEXT:                 ReturnStmt
+# CHECK-NEXT:                   IntLitExpr 1
+# CHECK-NEXT:           ReturnStmt
+# CHECK-NEXT:             InfixExpr Mul
+# CHECK-NEXT:               IdentifierExpr n
+# CHECK-NEXT:               CallExpr
+# CHECK-NEXT:                 IdentifierExpr fact
+# CHECK-NEXT:                 InfixExpr Sub
+# CHECK-NEXT:                   IdentifierExpr n
+# CHECK-NEXT:                   IntLitExpr 1

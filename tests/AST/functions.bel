@@ -14,44 +14,38 @@ v := fn() {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(add)
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ReturnStatement
-# CHECK-NEXT:           InfixExpression(Add)
-# CHECK-NEXT:             Identifier(x)
-# CHECK-NEXT:             Identifier(y)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(mul)
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           InfixExpression(Mul)
-# CHECK-NEXT:             Identifier(x)
-# CHECK-NEXT:             Identifier(y)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(sub)
-# CHECK-NEXT:     FunctionLiteral(Some("Int"))
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ReturnStatement
-# CHECK-NEXT:           InfixExpression(Sub)
-# CHECK-NEXT:             Identifier(x)
-# CHECK-NEXT:             Identifier(y)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(v)
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ReturnStatement
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl add
+# CHECK-NEXT:       FunctionLitExpr
+# CHECK-NEXT:         VarDecl x Int
+# CHECK-NEXT:         VarDecl y Int
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ReturnStmt
+# CHECK-NEXT:             InfixExpr Add
+# CHECK-NEXT:               IdentifierExpr x
+# CHECK-NEXT:               IdentifierExpr y
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl mul
+# CHECK-NEXT:       FunctionLitExpr
+# CHECK-NEXT:         VarDecl x Int
+# CHECK-NEXT:         VarDecl y Int
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             InfixExpr Mul
+# CHECK-NEXT:               IdentifierExpr x
+# CHECK-NEXT:               IdentifierExpr y
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl sub
+# CHECK-NEXT:       FunctionLitExpr -> Int
+# CHECK-NEXT:         VarDecl x Int
+# CHECK-NEXT:         VarDecl y Int
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ReturnStmt
+# CHECK-NEXT:             InfixExpr Sub
+# CHECK-NEXT:               IdentifierExpr x
+# CHECK-NEXT:               IdentifierExpr y
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl v
+# CHECK-NEXT:       FunctionLitExpr
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ReturnStmt

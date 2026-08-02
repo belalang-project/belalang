@@ -25,55 +25,55 @@ if x < y {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(price)
-# CHECK-NEXT:     Integer(50)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(status)
-# CHECK-NEXT:     IfExpression
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Identifier(price)
-# CHECK-NEXT:         Integer(30)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           String("very cheap")
-# CHECK-NEXT:       IfExpression
-# CHECK-NEXT:         InfixExpression(Lt)
-# CHECK-NEXT:           Identifier(price)
-# CHECK-NEXT:           Integer(40)
-# CHECK-NEXT:         BlockExpression
-# CHECK-NEXT:           ExpressionStatement
-# CHECK-NEXT:             String("not so cheap")
-# CHECK-NEXT:         BlockExpression
-# CHECK-NEXT:           ExpressionStatement
-# CHECK-NEXT:             String("very not cheap")
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     IfExpression
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           Identifier(x)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     IfExpression
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           Identifier(x)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           Identifier(y)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     IfExpression
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         VarDeclStatement(None)
-# CHECK-NEXT:           Identifier(a)
-# CHECK-NEXT:           Integer(10)
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           Identifier(x)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl price
+# CHECK-NEXT:       IntLitExpr 50
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl status
+# CHECK-NEXT:       IfExpr
+# CHECK-NEXT:         InfixExpr Lt
+# CHECK-NEXT:           IdentifierExpr price
+# CHECK-NEXT:           IntLitExpr 30
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             StringLitExpr "very cheap"
+# CHECK-NEXT:         IfExpr
+# CHECK-NEXT:           InfixExpr Lt
+# CHECK-NEXT:             IdentifierExpr price
+# CHECK-NEXT:             IntLitExpr 40
+# CHECK-NEXT:           BlockExpr
+# CHECK-NEXT:             ExprStmt
+# CHECK-NEXT:               StringLitExpr "not so cheap"
+# CHECK-NEXT:           BlockExpr
+# CHECK-NEXT:             ExprStmt
+# CHECK-NEXT:               StringLitExpr "very not cheap"
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IfExpr
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IdentifierExpr x
+# CHECK-NEXT:         IdentifierExpr y
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           IdentifierExpr x
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IfExpr
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IdentifierExpr x
+# CHECK-NEXT:         IdentifierExpr y
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           IdentifierExpr x
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           IdentifierExpr y
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IfExpr
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IdentifierExpr x
+# CHECK-NEXT:         IdentifierExpr y
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         DeclStmt
+# CHECK-NEXT:           VarDecl a
+# CHECK-NEXT:             IntLitExpr 10
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           IdentifierExpr x

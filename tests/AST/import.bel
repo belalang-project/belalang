@@ -5,6 +5,9 @@ import "std:io"
 import "foo:bar"
 
 # CHECK:      Program
-# CHECK-NEXT:   ImportStatement("core:math")
-# CHECK-NEXT:   ImportStatement("std:io")
-# CHECK-NEXT:   ImportStatement("foo:bar")
+# CHECK-NEXT:   ImportStmt
+# CHECK-NEXT:     StringLitExpr "core:math"
+# CHECK-NEXT:   ImportStmt
+# CHECK-NEXT:     StringLitExpr "std:io"
+# CHECK-NEXT:   ImportStmt
+# CHECK-NEXT:     StringLitExpr "foo:bar"
