@@ -3,7 +3,7 @@ true;
 false;
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     Boolean(true)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     Boolean(false)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     BoolExpr true
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     BoolExpr false

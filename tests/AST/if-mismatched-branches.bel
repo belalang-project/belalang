@@ -1,4 +1,4 @@
-# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+# RUN: %belalang build --emit ast %s | %FileCheck %s
 
 val := if true {
     1
@@ -6,11 +6,14 @@ val := if true {
     "hello"
 }
 
-# CHECK:      error: mismatched type
-# CHECK-NEXT:  --> {{.*}}/tests/AST/if-mismatched-branches.bel:5:8
-# CHECK-NEXT:   |
-# CHECK-NEXT: 5 |   } else {
-# CHECK-NEXT:   |  ________^
-# CHECK-NEXT: 6 | |     "hello"
-# CHECK-NEXT: 7 | | }
-# CHECK-NEXT:   | |_^ expected type `Integer`, found type `String`
+# CHECK:      Program
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl val
+# CHECK-NEXT:       IfExpr
+# CHECK-NEXT:         BoolExpr true
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             IntLitExpr 1
+# CHECK-NEXT:         BlockExpr
+# CHECK-NEXT:           ExprStmt
+# CHECK-NEXT:             StringLitExpr "hello"

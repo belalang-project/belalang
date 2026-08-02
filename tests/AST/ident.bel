@@ -2,5 +2,5 @@
 name;
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     Identifier(name)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IdentifierExpr name

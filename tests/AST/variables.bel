@@ -11,30 +11,27 @@ explicit_ty: Int = 12
 implicit_ty := 12
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(int_var)
-# CHECK-NEXT:     Integer(123)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(flo_var)
-# CHECK-NEXT:     Float(44.2)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(str_var)
-# CHECK-NEXT:     String("Hello, World!")
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(Assign)
-# CHECK-NEXT:       Identifier(int_var)
-# CHECK-NEXT:       Integer(1)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(Assign)
-# CHECK-NEXT:       Identifier(flo_var)
-# CHECK-NEXT:       Float(1.4)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     VarExpression(Assign)
-# CHECK-NEXT:       Identifier(str_var)
-# CHECK-NEXT:       String("Hello, Mom!")
-# CHECK-NEXT:   VarDeclStatement(Some("Int"))
-# CHECK-NEXT:     Identifier(explicit_ty)
-# CHECK-NEXT:     Integer(12)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(implicit_ty)
-# CHECK-NEXT:     Integer(12)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl int_var
+# CHECK-NEXT:       IntLitExpr 123
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl flo_var
+# CHECK-NEXT:       FloatLitExpr 4.420000e+01
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl str_var
+# CHECK-NEXT:       StringLitExpr "Hello, World!"
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     VarExpr int_var Assign
+# CHECK-NEXT:       IntLitExpr 1
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     VarExpr flo_var Assign
+# CHECK-NEXT:       FloatLitExpr 1.400000e+00
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     VarExpr str_var Assign
+# CHECK-NEXT:       StringLitExpr "Hello, Mom!"
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl explicit_ty Int
+# CHECK-NEXT:       IntLitExpr 12
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl implicit_ty
+# CHECK-NEXT:       IntLitExpr 12

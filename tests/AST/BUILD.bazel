@@ -7,10 +7,10 @@ lit_test(
     name = "lit_test",
     tests = BELALANG_TESTS,
     data = [
-        "//bin/belalang",
+        "//bin/belalang:belalang-cc",
     ],
     env = {
-        "BELALANG": "$(rlocationpath //bin/belalang)",
+        "BELALANG": "$(rlocationpath //bin/belalang:belalang-cc)",
     },
 )
 

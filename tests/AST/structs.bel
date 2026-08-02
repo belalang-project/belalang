@@ -11,15 +11,12 @@ struct C {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   StructDeclStatement
-# CHECK-NEXT:     Identifier(A)
-# CHECK-NEXT:     VarDeclStatement(Some("Int"))
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:     VarDeclStatement(Some("Int"))
-# CHECK-NEXT:       Identifier(y)
-# CHECK-NEXT:   StructDeclStatement
-# CHECK-NEXT:     Identifier(B)
-# CHECK-NEXT:   StructDeclStatement
-# CHECK-NEXT:     Identifier(C)
-# CHECK-NEXT:     VarDeclStatement(Some("String"))
-# CHECK-NEXT:       Identifier(x)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     StructDecl A
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       VarDecl y Int
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     StructDecl B
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     StructDecl C
+# CHECK-NEXT:       VarDecl x String

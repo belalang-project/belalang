@@ -24,192 +24,192 @@ add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8));
 add(a + b + c * d / f + g);
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       InfixExpression(Mul)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:       Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Not)
-# CHECK-NEXT:       PrefixExpression(Sub)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:       Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Sub)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:       Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Mul)
-# CHECK-NEXT:       InfixExpression(Mul)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:       Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Div)
-# CHECK-NEXT:       InfixExpression(Mul)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:       Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       Identifier(a)
-# CHECK-NEXT:       InfixExpression(Div)
-# CHECK-NEXT:         Identifier(b)
-# CHECK-NEXT:         Identifier(c)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Sub)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         InfixExpression(Add)
-# CHECK-NEXT:           Identifier(a)
-# CHECK-NEXT:           InfixExpression(Mul)
-# CHECK-NEXT:             Identifier(b)
-# CHECK-NEXT:             Identifier(c)
-# CHECK-NEXT:         InfixExpression(Div)
-# CHECK-NEXT:           Identifier(d)
-# CHECK-NEXT:           Identifier(e)
-# CHECK-NEXT:       Identifier(f)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       Integer(3)
-# CHECK-NEXT:       Integer(4)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Mul)
-# CHECK-NEXT:       PrefixExpression(Sub)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:       Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Eq)
-# CHECK-NEXT:       InfixExpression(Gt)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Ne)
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:       InfixExpression(Gt)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Eq)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(4)
-# CHECK-NEXT:           Integer(5)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(3)
-# CHECK-NEXT:           Integer(1)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(4)
-# CHECK-NEXT:           Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Eq)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(4)
-# CHECK-NEXT:           Integer(5)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(3)
-# CHECK-NEXT:           Integer(1)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(4)
-# CHECK-NEXT:           Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Eq)
-# CHECK-NEXT:       InfixExpression(Gt)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:       Boolean(false)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Eq)
-# CHECK-NEXT:       InfixExpression(Lt)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:       Boolean(true)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(1)
-# CHECK-NEXT:         InfixExpression(Add)
-# CHECK-NEXT:           Integer(2)
-# CHECK-NEXT:           Integer(3)
-# CHECK-NEXT:       Integer(4)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Mul)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:       Integer(2)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Div)
-# CHECK-NEXT:       Integer(2)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Sub)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     PrefixExpression(Not)
-# CHECK-NEXT:       InfixExpression(Eq)
-# CHECK-NEXT:         Boolean(true)
-# CHECK-NEXT:         Boolean(true)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     InfixExpression(Add)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Identifier(a)
-# CHECK-NEXT:         CallExpression
-# CHECK-NEXT:           Identifier(add)
-# CHECK-NEXT:           InfixExpression(Mul)
-# CHECK-NEXT:             Identifier(b)
-# CHECK-NEXT:             Identifier(c)
-# CHECK-NEXT:       Identifier(d)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     CallExpression
-# CHECK-NEXT:       Identifier(add)
-# CHECK-NEXT:       Identifier(a)
-# CHECK-NEXT:       Identifier(b)
-# CHECK-NEXT:       Integer(1)
-# CHECK-NEXT:       InfixExpression(Mul)
-# CHECK-NEXT:         Integer(2)
-# CHECK-NEXT:         Integer(3)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         Integer(4)
-# CHECK-NEXT:         Integer(5)
-# CHECK-NEXT:       CallExpression
-# CHECK-NEXT:         Identifier(add)
-# CHECK-NEXT:         Integer(6)
-# CHECK-NEXT:         InfixExpression(Mul)
-# CHECK-NEXT:           Integer(7)
-# CHECK-NEXT:           Integer(8)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     CallExpression
-# CHECK-NEXT:       Identifier(add)
-# CHECK-NEXT:       InfixExpression(Add)
-# CHECK-NEXT:         InfixExpression(Add)
-# CHECK-NEXT:           InfixExpression(Add)
-# CHECK-NEXT:             Identifier(a)
-# CHECK-NEXT:             Identifier(b)
-# CHECK-NEXT:           InfixExpression(Div)
-# CHECK-NEXT:             InfixExpression(Mul)
-# CHECK-NEXT:               Identifier(c)
-# CHECK-NEXT:               Identifier(d)
-# CHECK-NEXT:             Identifier(f)
-# CHECK-NEXT:         Identifier(g)
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       InfixExpr Mul
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:       IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Not
+# CHECK-NEXT:       PrefixExpr Sub
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:       IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Sub
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:       IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Mul
+# CHECK-NEXT:       InfixExpr Mul
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:       IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Div
+# CHECK-NEXT:       InfixExpr Mul
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:       IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       IdentifierExpr a
+# CHECK-NEXT:       InfixExpr Div
+# CHECK-NEXT:         IdentifierExpr b
+# CHECK-NEXT:         IdentifierExpr c
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Sub
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         InfixExpr Add
+# CHECK-NEXT:           IdentifierExpr a
+# CHECK-NEXT:           InfixExpr Mul
+# CHECK-NEXT:             IdentifierExpr b
+# CHECK-NEXT:             IdentifierExpr c
+# CHECK-NEXT:         InfixExpr Div
+# CHECK-NEXT:           IdentifierExpr d
+# CHECK-NEXT:           IdentifierExpr e
+# CHECK-NEXT:       IdentifierExpr f
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       IntLitExpr 3
+# CHECK-NEXT:       IntLitExpr 4
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Mul
+# CHECK-NEXT:       PrefixExpr Sub
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:       IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Eq
+# CHECK-NEXT:       InfixExpr Gt
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Ne
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:       InfixExpr Gt
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Eq
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 4
+# CHECK-NEXT:           IntLitExpr 5
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 3
+# CHECK-NEXT:           IntLitExpr 1
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 4
+# CHECK-NEXT:           IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Eq
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 4
+# CHECK-NEXT:           IntLitExpr 5
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 3
+# CHECK-NEXT:           IntLitExpr 1
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 4
+# CHECK-NEXT:           IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Eq
+# CHECK-NEXT:       InfixExpr Gt
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:       BoolExpr false
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Eq
+# CHECK-NEXT:       InfixExpr Lt
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:       BoolExpr true
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 1
+# CHECK-NEXT:         InfixExpr Add
+# CHECK-NEXT:           IntLitExpr 2
+# CHECK-NEXT:           IntLitExpr 3
+# CHECK-NEXT:       IntLitExpr 4
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Mul
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:       IntLitExpr 2
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Div
+# CHECK-NEXT:       IntLitExpr 2
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Sub
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     PrefixExpr Not
+# CHECK-NEXT:       InfixExpr Eq
+# CHECK-NEXT:         BoolExpr true
+# CHECK-NEXT:         BoolExpr true
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     InfixExpr Add
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IdentifierExpr a
+# CHECK-NEXT:         CallExpr
+# CHECK-NEXT:           IdentifierExpr add
+# CHECK-NEXT:           InfixExpr Mul
+# CHECK-NEXT:             IdentifierExpr b
+# CHECK-NEXT:             IdentifierExpr c
+# CHECK-NEXT:       IdentifierExpr d
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     CallExpr
+# CHECK-NEXT:       IdentifierExpr add
+# CHECK-NEXT:       IdentifierExpr a
+# CHECK-NEXT:       IdentifierExpr b
+# CHECK-NEXT:       IntLitExpr 1
+# CHECK-NEXT:       InfixExpr Mul
+# CHECK-NEXT:         IntLitExpr 2
+# CHECK-NEXT:         IntLitExpr 3
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         IntLitExpr 4
+# CHECK-NEXT:         IntLitExpr 5
+# CHECK-NEXT:       CallExpr
+# CHECK-NEXT:         IdentifierExpr add
+# CHECK-NEXT:         IntLitExpr 6
+# CHECK-NEXT:         InfixExpr Mul
+# CHECK-NEXT:           IntLitExpr 7
+# CHECK-NEXT:           IntLitExpr 8
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     CallExpr
+# CHECK-NEXT:       IdentifierExpr add
+# CHECK-NEXT:       InfixExpr Add
+# CHECK-NEXT:         InfixExpr Add
+# CHECK-NEXT:           InfixExpr Add
+# CHECK-NEXT:             IdentifierExpr a
+# CHECK-NEXT:             IdentifierExpr b
+# CHECK-NEXT:           InfixExpr Div
+# CHECK-NEXT:             InfixExpr Mul
+# CHECK-NEXT:               IdentifierExpr c
+# CHECK-NEXT:               IdentifierExpr d
+# CHECK-NEXT:             IdentifierExpr f
+# CHECK-NEXT:         IdentifierExpr g

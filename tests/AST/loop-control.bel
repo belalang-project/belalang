@@ -6,8 +6,8 @@ while true {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   WhileStatement
-# CHECK-NEXT:     Boolean(true)
-# CHECK-NEXT:     BlockExpression
-# CHECK-NEXT:       BreakStatement
-# CHECK-NEXT:       ContinueStatement
+# CHECK-NEXT:   WhileStmt
+# CHECK-NEXT:     BoolExpr true
+# CHECK-NEXT:     BlockExpr
+# CHECK-NEXT:       BreakStmt
+# CHECK-NEXT:       ContinueStmt

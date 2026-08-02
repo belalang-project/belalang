@@ -218,12 +218,13 @@ fn build(bb: bbuild::BBuild) -> anyhow::Result<()> {
     }
 
     let program = bb.parse_program()?;
-    bb.infer_types(&program)?;
 
     if let EmitTarget::Ast = bb.emit() {
         bb.dump_ast(&program)?;
         return Ok(());
     }
+
+    bb.infer_types(&program)?;
 
     if let EmitTarget::Bir = bb.emit() {
         println!("{}", bb.dump_bir(&program));

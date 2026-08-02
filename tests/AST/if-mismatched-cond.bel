@@ -1,11 +1,13 @@
-# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+# RUN: %belalang build --emit ast %s | %FileCheck %s
 
 if "hello" {
     1
 }
 
-# CHECK:      error: mismatched type
-# CHECK-NEXT:  --> {{.*}}/tests/AST/if-mismatched-cond.bel:3:4
-# CHECK-NEXT:   |
-# CHECK-NEXT: 3 | if "hello" {
-# CHECK-NEXT:   |    ^^^^^^^ expected type `Boolean`, found type `String`
+# CHECK:      Program
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IfExpr
+# CHECK-NEXT:       StringLitExpr "hello"
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           IntLitExpr 1

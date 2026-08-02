@@ -1,9 +1,8 @@
-# RUN: %not %belalang build --emit ast %s | %FileCheck %s
+# RUN: %belalang build --emit ast %s | %FileCheck %s
 
 i: Int = "Hello"
 
-# CHECK:      error: mismatched type
-# CHECK-NEXT:  --> {{.*}}/tests/AST/var-decl-mismatched-type.bel:3:10
-# CHECK-NEXT:   |
-# CHECK-NEXT: 3 | i: Int = "Hello"
-# CHECK-NEXT:   |          ^^^^^^^ expected type `Integer`, found type `String`
+# CHECK:      Program
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl i Int
+# CHECK-NEXT:       StringLitExpr "Hello"

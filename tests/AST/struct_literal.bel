@@ -9,32 +9,24 @@ p := Point { x = 12, y = 23 };
 if (Point { x = 12, y = 23 }) == p {}
 
 # CHECK:      Program
-# CHECK-NEXT:   StructDeclStatement
-# CHECK-NEXT:     Identifier(Point)
-# CHECK-NEXT:     VarDeclStatement(Some("Int"))
-# CHECK-NEXT:       Identifier(x)
-# CHECK-NEXT:     VarDeclStatement(Some("Int"))
-# CHECK-NEXT:       Identifier(y)
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(p)
-# CHECK-NEXT:     StructLiteral(Point)
-# CHECK-NEXT:       Identifier(Point)
-# CHECK-NEXT:       VarExpression(Assign)
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:         Integer(12)
-# CHECK-NEXT:       VarExpression(Assign)
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:         Integer(23)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     IfExpression
-# CHECK-NEXT:       InfixExpression(Eq)
-# CHECK-NEXT:         StructLiteral(Point)
-# CHECK-NEXT:           Identifier(Point)
-# CHECK-NEXT:           VarExpression(Assign)
-# CHECK-NEXT:             Identifier(x)
-# CHECK-NEXT:             Integer(12)
-# CHECK-NEXT:           VarExpression(Assign)
-# CHECK-NEXT:             Identifier(y)
-# CHECK-NEXT:             Integer(23)
-# CHECK-NEXT:         Identifier(p)
-# CHECK-NEXT:       BlockExpression
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     StructDecl Point
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       VarDecl y Int
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl p
+# CHECK-NEXT:       StructLiteralExpr Point
+# CHECK-NEXT:         VarExpr x Assign
+# CHECK-NEXT:           IntLitExpr 12
+# CHECK-NEXT:         VarExpr y Assign
+# CHECK-NEXT:           IntLitExpr 23
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     IfExpr
+# CHECK-NEXT:       InfixExpr Eq
+# CHECK-NEXT:         StructLiteralExpr Point
+# CHECK-NEXT:           VarExpr x Assign
+# CHECK-NEXT:             IntLitExpr 12
+# CHECK-NEXT:           VarExpr y Assign
+# CHECK-NEXT:             IntLitExpr 23
+# CHECK-NEXT:         IdentifierExpr p
+# CHECK-NEXT:       BlockExpr

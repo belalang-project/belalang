@@ -1,3 +1,5 @@
+#include "belalang/AST/Parser.h"
+#include "belalang/AST/ASTDumper.h"
 #include "belalang/Lexer/Lexer.h"
 #include "belalang/Diag/Diag.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -56,6 +58,8 @@ int build(muopt::Parser &parser) {
       auto value = parser.arg_value();
       if (value == "tokens")
         emit = EmitTarget::Tokens;
+      if (value == "ast")
+        emit = EmitTarget::Ast;
     }
     if (arg.has_value() && arg->is_plain()) {
       source = arg->as_str();
@@ -100,6 +104,22 @@ int build(muopt::Parser &parser) {
     }
 
     return hasError ? 1 : 0;
+  }
+
+  if (emit == EmitTarget::Ast) {
+    lexer::Lexer lexer(src, diagEngine);
+
+    ast::ASTContext astCtx;
+    ast::Parser parser(lexer, astCtx, diagEngine);
+
+    ast::Program *prog = parser.parseProgram();
+
+    if (prog) {
+      ast::ASTDumper dumper;
+      dumper.visitProgram(prog);
+    }
+
+    return parser.hadError() ? 1 : 0;
   }
 
   std::cout << "error: unimplemented\n";

@@ -5,17 +5,16 @@ while i < 10 {
 }
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(None)
-# CHECK-NEXT:     Identifier(i)
-# CHECK-NEXT:     Integer(0)
-# CHECK-NEXT:   WhileStatement
-# CHECK-NEXT:     InfixExpression(Lt)
-# CHECK-NEXT:       Identifier(i)
-# CHECK-NEXT:       Integer(10)
-# CHECK-NEXT:     BlockExpression
-# CHECK-NEXT:       ExpressionStatement
-# CHECK-NEXT:         VarExpression(Assign)
-# CHECK-NEXT:           Identifier(i)
-# CHECK-NEXT:           InfixExpression(Add)
-# CHECK-NEXT:             Identifier(i)
-# CHECK-NEXT:             Integer(1)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl i
+# CHECK-NEXT:       IntLitExpr 0
+# CHECK-NEXT:   WhileStmt
+# CHECK-NEXT:     InfixExpr Lt
+# CHECK-NEXT:       IdentifierExpr i
+# CHECK-NEXT:       IntLitExpr 10
+# CHECK-NEXT:     BlockExpr
+# CHECK-NEXT:       ExprStmt
+# CHECK-NEXT:         VarExpr i Assign
+# CHECK-NEXT:           InfixExpr Add
+# CHECK-NEXT:             IdentifierExpr i
+# CHECK-NEXT:             IntLitExpr 1

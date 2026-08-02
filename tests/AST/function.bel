@@ -7,38 +7,30 @@ fn(x: Int, y: Int) {};
 fn(x: Int, y: Int, z: Int) {};
 
 # CHECK:      Program
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:         ExpressionStatement
-# CHECK-NEXT:           InfixExpression(Add)
-# CHECK-NEXT:             Identifier(x)
-# CHECK-NEXT:             Identifier(y)
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       BlockExpression
-# CHECK-NEXT:   ExpressionStatement
-# CHECK-NEXT:     FunctionLiteral(None)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(x)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(y)
-# CHECK-NEXT:       VarDeclStatement(Some("Int"))
-# CHECK-NEXT:         Identifier(z)
-# CHECK-NEXT:       BlockExpression
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     FunctionLitExpr
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       VarDecl y Int
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:         ExprStmt
+# CHECK-NEXT:           InfixExpr Add
+# CHECK-NEXT:             IdentifierExpr x
+# CHECK-NEXT:             IdentifierExpr y
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     FunctionLitExpr
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     FunctionLitExpr
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     FunctionLitExpr
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       VarDecl y Int
+# CHECK-NEXT:       BlockExpr
+# CHECK-NEXT:   ExprStmt
+# CHECK-NEXT:     FunctionLitExpr
+# CHECK-NEXT:       VarDecl x Int
+# CHECK-NEXT:       VarDecl y Int
+# CHECK-NEXT:       VarDecl z Int
+# CHECK-NEXT:       BlockExpr

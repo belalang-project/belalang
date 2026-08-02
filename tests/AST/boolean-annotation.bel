@@ -4,9 +4,9 @@ b: Bool = true;
 c: Bool = false;
 
 # CHECK:      Program
-# CHECK-NEXT:   VarDeclStatement(Some("Bool"))
-# CHECK-NEXT:     Identifier(b)
-# CHECK-NEXT:     Boolean(true)
-# CHECK-NEXT:   VarDeclStatement(Some("Bool"))
-# CHECK-NEXT:     Identifier(c)
-# CHECK-NEXT:     Boolean(false)
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl b Bool
+# CHECK-NEXT:       BoolExpr true
+# CHECK-NEXT:   DeclStmt
+# CHECK-NEXT:     VarDecl c Bool
+# CHECK-NEXT:       BoolExpr false
