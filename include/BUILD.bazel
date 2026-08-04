@@ -214,3 +214,22 @@ cc_library(
         "@llvm-project//mlir:IR",
     ],
 )
+
+# ------------------------------------------------------------------------------
+# Version Includes
+# ------------------------------------------------------------------------------
+
+genrule(
+    name = "VersionHIncGen",
+    srcs = ["belalang/Version.h.inc.in"],
+    outs = ["belalang/Version.h.inc"],
+    stamp = 1,
+    cmd = "$(location //tools:expand_version.sh) $< $@",
+    tools = ["//tools:expand_version.sh"],
+)
+
+cc_library(
+    name = "Version",
+    hdrs = ["belalang/Version.h", "belalang/Version.h.inc"],
+    includes = ["."],
+)

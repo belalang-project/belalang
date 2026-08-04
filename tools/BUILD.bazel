@@ -1,0 +1,4 @@
+exports_files(
+    srcs = ["expand_version.sh"],
+    visibility = ["//visibility:public"],
+)

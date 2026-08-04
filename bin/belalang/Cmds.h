@@ -7,8 +7,9 @@ namespace belalang {
 namespace cmd {
 
 int build(muopt::Parser &);
+int version();
 
-} // namespace cmd 
+} // namespace cmd
 } // namespace belalang
 
 #endif // BIN_BELALANG_COMMANDS_H_

@@ -29,5 +29,6 @@ cc_binary(
         "//lib:Lexer",
         "//lib:AST",
         "//lib:Diag",
+        "//include:Version",
     ],
 )
