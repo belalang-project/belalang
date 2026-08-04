@@ -11,6 +11,7 @@ Usage: belalang [OPTIONS] <COMMAND> <PATH>
 Commands:
   build    Compile a .bel file
   run      Run a .bel file
+  version  Print version information
   help     Print help message
 )";
 
@@ -35,6 +36,9 @@ int main(int argc, char **argv) {
 
   if (*command == "build")
     return belalang::cmd::build(parser);
+
+  if (*command == "version")
+    return belalang::cmd::version();
 
   if (*command == "run") {
     std::cerr << "running\n";
