@@ -21,6 +21,7 @@ public:
   ~LLVMGen() = default;
 
   std::string dumpToString() const;
+  void compileObjFile(std::string outfile, SanitizerKind san) const;
 
 private:
   llvm::LLVMContext llvmCtx;
