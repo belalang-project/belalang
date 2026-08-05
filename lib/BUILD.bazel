@@ -54,6 +54,29 @@ cc_library(
 )
 
 # ------------------------------------------------------------------------------
+# LLVMGen
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "LLVMGen",
+    srcs = [
+        "LLVMGen/LLVMGen.cpp",
+    ],
+    deps = [
+        "//include:BIR",
+        "//include:LLVMGen",
+        "//bir",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:LLVMToLLVMIRTranslation",
+        "@llvm-project//llvm:AllTargetsAsmParsers",
+        "@llvm-project//llvm:AllTargetsCodeGens",
+        "@llvm-project//llvm:Instrumentation",
+    ],
+)
+
+# ------------------------------------------------------------------------------
 # Diag
 # ------------------------------------------------------------------------------
 

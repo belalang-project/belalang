@@ -1,6 +1,7 @@
 #include "belalang/AST/Parser.h"
 #include "belalang/AST/ASTDumper.h"
 #include "belalang/BIRGen/BIRGen.h"
+#include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
 #include "belalang/Diag/Diag.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -63,6 +64,8 @@ int build(muopt::Parser &parser) {
         emit = EmitTarget::Ast;
       if (value == "bir")
         emit = EmitTarget::Bir;
+      if (value == "llvm")
+        emit = EmitTarget::Llvm;
     }
     if (arg.has_value() && arg->is_plain()) {
       source = arg->as_str();
@@ -145,6 +148,29 @@ int build(muopt::Parser &parser) {
 
     std::cout << birgen.dumpToString() << "\n";
     return parser.hadError() ? 1 : 0;
+  }
+
+  if (emit == EmitTarget::Llvm) {
+    lexer::Lexer lexer(src, diagEngine);
+
+    ast::ASTContext astCtx;
+    ast::Parser parser(lexer, astCtx, diagEngine);
+
+    ast::Program *prog = parser.parseProgram();
+    if (!prog)
+      return parser.hadError() ? 1 : 0;
+
+    birgen::BIRGen birgen(diagEngine);
+    birgen.generateProgram(prog);
+
+    if (!birgen.runLoweringPipeline()) {
+      std::cerr << "error: BIR lowering pipeline failed\n";
+      return 1;
+    }
+
+    llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
+    std::cout << llvmgen.dumpToString() << "\n";
+    return 0;
   }
 
   std::cout << "error: unimplemented\n";
