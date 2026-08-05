@@ -8,7 +8,7 @@ cc_library(
     name = "birgen-cc",
     srcs = ["CxxBIRGen.cpp"],
     deps = [
-        "//bir",
+        "//lib:BIR",
         "//include:BIRGen",
         ":birgen-bridge/include",
         "@cxx.rs//:core",

@@ -17,7 +17,7 @@ cc_library(
 )
 
 # ------------------------------------------------------------------------------
-# Lexer
+# AST
 # ------------------------------------------------------------------------------
 
 cc_library(
@@ -27,6 +27,25 @@ cc_library(
         "//include:Lexer",
         "//include:AST",
         "//include:Diag",
+    ],
+)
+
+# ------------------------------------------------------------------------------
+# BIR
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "BIR",
+    srcs = glob(["BIR/**/*.cpp"]),
+    deps = [
+        "//include:BIR",
+        "@llvm-project//mlir:Pass",
+        "@llvm-project//mlir:Support",
+        "@llvm-project//mlir:FunctionInterfaces",
+        "@llvm-project//mlir:ControlFlowDialect",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:ControlFlowToLLVM",
+        "@llvm-project//mlir:TransformUtils",
     ],
 )
 
@@ -46,7 +65,7 @@ cc_library(
         "//include:BIRGen",
         "//include:Diag",
         "//include:Lexer",
-        "//bir",
+        "//lib:BIR",
         "@llvm-project//mlir:IR",
         "@llvm-project//mlir:Pass",
         "@llvm-project//mlir:Support",
@@ -65,7 +84,7 @@ cc_library(
     deps = [
         "//include:BIR",
         "//include:LLVMGen",
-        "//bir",
+        "//lib:BIR",
         "@llvm-project//mlir:IR",
         "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
         "@llvm-project//mlir:LLVMDialect",

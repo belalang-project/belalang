@@ -6,7 +6,7 @@ cc_binary(
     name = "bir-translate",
     srcs = ["bir-translate.cpp"],
     deps = [
-        "//bir",
+        "//lib:BIR",
         "@llvm-project//mlir:BuiltinToLLVMIRTranslation",
         "@llvm-project//mlir:LLVMToLLVMIRTranslation",
         "@llvm-project//mlir:TranslateLib",

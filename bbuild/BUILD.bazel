@@ -16,7 +16,7 @@ rust_library(
         "@crates//:anyhow",
     ],
     link_deps = [
-        "//bir",
+        "//lib:BIR",
         "//llvmgen:llvmgen-cc",
     ],
 )

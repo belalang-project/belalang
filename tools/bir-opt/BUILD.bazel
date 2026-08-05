@@ -6,7 +6,7 @@ cc_binary(
     name = "bir-opt",
     srcs = ["bir-opt.cpp"],
     deps = [
-        "//bir",
+        "//lib:BIR",
         "@llvm-project//mlir:MlirOptLib",
     ],
 )

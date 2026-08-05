@@ -17,7 +17,7 @@ rust_binary(
         "@crates//:anyhow",
     ],
     link_deps = [
-        "//bir",
+        "//lib:BIR",
     ],
 )
 
@@ -32,6 +32,6 @@ cc_binary(
         "//lib:BIRGen",
         "//lib:LLVMGen",
         "//include:Version",
-        "//bir",
+        "//lib:BIR",
     ],
 )
