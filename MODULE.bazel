@@ -72,32 +72,8 @@ register_toolchains("@rust_toolchains//:all")
 
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 crate.spec(
-    package = "anyhow",
-    version = "1.0.100",
-)
-crate.spec(
-    package = "libc",
-    version = "0.2.177",
-)
-crate.spec(
-    package = "unicode-ident",
-    version = "1.0.18",
-)
-crate.spec(
     package = "annotate-snippets",
     version = "0.12.16",
-)
-crate.spec(
-    package = "lexopt",
-    version = "0.3.2",
-)
-crate.spec(
-    package = "bumpalo",
-    version = "3.20.3",
-)
-crate.spec(
-    package = "bitflags",
-    version = "2.13.0",
 )
 crate.from_specs()
 use_repo(crate, "crates")

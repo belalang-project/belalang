@@ -18,7 +18,6 @@ pkg_files(
     name = "brt_library",
     srcs = [
         "//brt:brt",
-        "//brt:brt_rs",
         "//brt:bdwgc",
     ],
     prefix = "lib",
