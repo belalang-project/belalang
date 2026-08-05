@@ -1,4 +1,4 @@
-#include "belalang/LLVMGen/LLVMGen.h"
+#include "belalang/LLVMGen/CxxLLVMGen.h"
 
 #include "belalang/BIR/Passes.h"
 #include "mlir/Pass/PassManager.h"
@@ -19,12 +19,12 @@ using namespace llvm;
 namespace belalang {
 namespace llvmgen {
 
-std::unique_ptr<LLVMGen> create_llvmgen(uintptr_t module_ptr) {
-  return std::make_unique<LLVMGen>(
+std::unique_ptr<CxxLLVMGen> create_llvmgen(uintptr_t module_ptr) {
+  return std::make_unique<CxxLLVMGen>(
       reinterpret_cast<mlir::ModuleOp *>(module_ptr));
 }
 
-LLVMGen::LLVMGen(mlir::ModuleOp *op) {
+CxxLLVMGen::CxxLLVMGen(mlir::ModuleOp *op) {
   // Convert BIR dialect to LLVM Dialect.
   mlir::PassManager pm(op->getContext());
   pm.addPass(bir::createBelalangBIRToLLVMPass());
@@ -40,7 +40,7 @@ LLVMGen::LLVMGen(mlir::ModuleOp *op) {
   assert(llvmModule && "translation to LLVM IR failed.");
 }
 
-rust::String LLVMGen::compile_object_file(rust::String out,
+rust::String CxxLLVMGen::compile_object_file(rust::String out,
                                           SanitizerKind sanitizer) const {
   InitializeAllTargetInfos();
   InitializeAllTargets();
@@ -101,7 +101,7 @@ rust::String LLVMGen::compile_object_file(rust::String out,
   return rust::String();
 }
 
-rust::String LLVMGen::dump_to_string() const {
+rust::String CxxLLVMGen::dump_to_string() const {
   std::string s;
   llvm::raw_string_ostream os(s);
   llvmModule->print(os, nullptr);

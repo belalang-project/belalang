@@ -10,20 +10,20 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("belalang/LLVMGen/LLVMGen.h");
+        include!("belalang/LLVMGen/CxxLLVMGen.h");
 
-        type LLVMGen;
+        type CxxLLVMGen;
 
-        fn create_llvmgen(module_ptr: usize) -> UniquePtr<LLVMGen>;
-        fn dump_to_string(self: &LLVMGen) -> String;
-        fn compile_object_file(self: &LLVMGen, out: String, sanitizer: SanitizerKind) -> String;
+        fn create_llvmgen(module_ptr: usize) -> UniquePtr<CxxLLVMGen>;
+        fn dump_to_string(self: &CxxLLVMGen) -> String;
+        fn compile_object_file(self: &CxxLLVMGen, out: String, sanitizer: SanitizerKind) -> String;
     }
 }
 
 pub use ffi::SanitizerKind;
 
 pub struct LLVMGen {
-    inner: UniquePtr<ffi::LLVMGen>,
+    inner: UniquePtr<ffi::CxxLLVMGen>,
 }
 
 impl LLVMGen {
