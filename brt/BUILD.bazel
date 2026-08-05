@@ -1,4 +1,3 @@
-load("@rules_rust//rust:defs.bzl", "rust_static_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,15 +17,4 @@ genrule(
     outs = ["libbdwgc.a"],
     cmd = "cp $(location @bdwgc//:bdwgc) $(RULEDIR)/libbdwgc.a",
     visibility = ["//visibility:public"],
-)
-
-rust_static_library(
-    name = "brt_rs",
-    srcs = ["src/lib.rs"],
-    deps = [
-        "@crates//:libc",
-    ],
-    link_deps = [
-        "@bdwgc//:bdwgc",
-    ],
 )

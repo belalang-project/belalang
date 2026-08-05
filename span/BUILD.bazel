@@ -1,7 +1,0 @@
-load("@rules_rust//rust:defs.bzl", "rust_library")
-
-rust_library(
-	name = "span",
-	srcs = glob(["src/*.rs"]),
-	visibility = ["//visibility:public"],
-)

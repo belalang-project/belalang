@@ -3,26 +3,8 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-rust_binary(
-    name = "belalang",
-    srcs = ["belalang.rs"],
-    deps = [
-        "//bbuild",
-        "//birgen",
-        "//diag",
-        "//ast",
-        "//lexer",
-        "//session",
-        "@crates//:lexopt",
-        "@crates//:anyhow",
-    ],
-    link_deps = [
-        "//bir",
-    ],
-)
-
 cc_binary(
-    name = "belalang-cc",
+    name = "belalang",
     srcs = glob(["*.cpp", "*.h"]),
     deps = [
         "@muopt//:muopt",
@@ -32,6 +14,6 @@ cc_binary(
         "//lib:BIRGen",
         "//lib:LLVMGen",
         "//include:Version",
-        "//bir",
+        "//lib:BIR",
     ],
 )
