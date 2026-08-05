@@ -46,7 +46,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("belalang/BIRGen/BIRGen.h");
+        include!("belalang/BIRGen/CxxBIRGen.h");
 
         type BIRGuard;
         type BIRFunctionGuard;
@@ -54,69 +54,74 @@ mod ffi {
         type BIRWhileGuard;
         type BIRScopeGuard;
         type BIRValue;
-        type BIRGen;
+        type CxxBIRGen;
 
-        fn create_birgen() -> UniquePtr<BIRGen>;
+        fn create_birgen() -> UniquePtr<CxxBIRGen>;
 
-        fn build_constant_int(self: Pin<&mut BIRGen>, val: i64) -> UniquePtr<BIRValue>;
-        fn build_constant_float(self: Pin<&mut BIRGen>, val: f64) -> UniquePtr<BIRValue>;
-        fn build_constant_string(self: Pin<&mut BIRGen>, val: &str) -> UniquePtr<BIRValue>;
-        fn build_constant_bool(self: Pin<&mut BIRGen>, val: bool) -> UniquePtr<BIRValue>;
-        fn build_binop(self: Pin<&mut BIRGen>, kind: BinOpKind, lhs: &BIRValue, rhs: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_print(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_var_declare(self: Pin<&mut BIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
-        fn build_var_declare_ty(self: Pin<&mut BIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
-        fn build_var_load(self: Pin<&mut BIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
-        fn build_var_store(self: Pin<&mut BIRGen>, v: &BIRValue, refv: &BIRValue);
+        fn build_constant_int(self: Pin<&mut CxxBIRGen>, val: i64) -> UniquePtr<BIRValue>;
+        fn build_constant_float(self: Pin<&mut CxxBIRGen>, val: f64) -> UniquePtr<BIRValue>;
+        fn build_constant_string(self: Pin<&mut CxxBIRGen>, val: &str) -> UniquePtr<BIRValue>;
+        fn build_constant_bool(self: Pin<&mut CxxBIRGen>, val: bool) -> UniquePtr<BIRValue>;
+        fn build_binop(
+            self: Pin<&mut CxxBIRGen>,
+            kind: BinOpKind,
+            lhs: &BIRValue,
+            rhs: &BIRValue,
+        ) -> UniquePtr<BIRValue>;
+        fn build_print(self: Pin<&mut CxxBIRGen>, val: &BIRValue);
+        fn build_var_declare(self: Pin<&mut CxxBIRGen>, v: &BIRValue, name: &str) -> UniquePtr<BIRValue>;
+        fn build_var_declare_ty(self: Pin<&mut CxxBIRGen>, v: TypeKind, name: &str) -> UniquePtr<BIRValue>;
+        fn build_var_load(self: Pin<&mut CxxBIRGen>, refValue: &BIRValue) -> UniquePtr<BIRValue>;
+        fn build_var_store(self: Pin<&mut CxxBIRGen>, v: &BIRValue, refv: &BIRValue);
         fn build_fn_expr(
-            self: Pin<&mut BIRGen>,
+            self: Pin<&mut CxxBIRGen>,
             resultTy: TypeKind,
             paramTys: &[TypeKind],
         ) -> UniquePtr<BIRFunctionGuard>;
-        fn build_return(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_empty_return(self: Pin<&mut BIRGen>);
-        fn build_main_return(self: Pin<&mut BIRGen>);
-        fn build_if_expr(self: Pin<&mut BIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
-        fn build_if_expr_ty(self: Pin<&mut BIRGen>, cond: &BIRValue, resultTy: TypeKind) -> UniquePtr<BIRIfGuard>;
-        fn build_while_stmt(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileGuard>;
-        fn build_block_expr(self: Pin<&mut BIRGen>) -> UniquePtr<BIRScopeGuard>;
-        fn build_block_expr_ty(self: Pin<&mut BIRGen>, resultTy: TypeKind) -> UniquePtr<BIRScopeGuard>;
-        fn build_condition(self: Pin<&mut BIRGen>, cond: &BIRValue);
-        fn build_continue(self: Pin<&mut BIRGen>);
-        fn build_break(self: Pin<&mut BIRGen>);
+        fn build_return(self: Pin<&mut CxxBIRGen>, val: &BIRValue);
+        fn build_empty_return(self: Pin<&mut CxxBIRGen>);
+        fn build_main_return(self: Pin<&mut CxxBIRGen>);
+        fn build_if_expr(self: Pin<&mut CxxBIRGen>, cond: &BIRValue) -> UniquePtr<BIRIfGuard>;
+        fn build_if_expr_ty(self: Pin<&mut CxxBIRGen>, cond: &BIRValue, resultTy: TypeKind) -> UniquePtr<BIRIfGuard>;
+        fn build_while_stmt(self: Pin<&mut CxxBIRGen>) -> UniquePtr<BIRWhileGuard>;
+        fn build_block_expr(self: Pin<&mut CxxBIRGen>) -> UniquePtr<BIRScopeGuard>;
+        fn build_block_expr_ty(self: Pin<&mut CxxBIRGen>, resultTy: TypeKind) -> UniquePtr<BIRScopeGuard>;
+        fn build_condition(self: Pin<&mut CxxBIRGen>, cond: &BIRValue);
+        fn build_continue(self: Pin<&mut CxxBIRGen>);
+        fn build_break(self: Pin<&mut CxxBIRGen>);
         fn start_cond(self: Pin<&mut BIRWhileGuard>);
         fn start_body(self: Pin<&mut BIRWhileGuard>);
-        fn build_yield(self: Pin<&mut BIRGen>, val: &BIRValue);
-        fn build_empty_yield(self: Pin<&mut BIRGen>);
+        fn build_yield(self: Pin<&mut CxxBIRGen>, val: &BIRValue);
+        fn build_empty_yield(self: Pin<&mut CxxBIRGen>);
         fn start_then(self: Pin<&mut BIRIfGuard>);
         fn start_else(self: Pin<&mut BIRIfGuard>);
         fn start_body(self: Pin<&mut BIRScopeGuard>);
         fn get_value(self: &BIRIfGuard) -> UniquePtr<BIRValue>;
         fn get_value(self: &BIRScopeGuard) -> UniquePtr<BIRValue>;
-        fn run_lowering_pipeline(self: Pin<&mut BIRGen>) -> bool;
-        fn dump(self: &BIRGen);
-        fn dump_to_string(self: &BIRGen) -> String;
-        fn get_module_ptr(self: &BIRGen) -> usize;
+        fn run_lowering_pipeline(self: Pin<&mut CxxBIRGen>) -> bool;
+        fn dump(self: &CxxBIRGen);
+        fn dump_to_string(self: &CxxBIRGen) -> String;
+        fn get_module_ptr(self: &CxxBIRGen) -> usize;
 
         // <AutoGenerated>
 
         // BreakOp
-        fn build_break_op(self: Pin<&mut BIRGen>);
+        fn build_break_op(self: Pin<&mut CxxBIRGen>);
 
         // ContinueOp
-        fn build_continue_op(self: Pin<&mut BIRGen>);
+        fn build_continue_op(self: Pin<&mut CxxBIRGen>);
 
         // WhileOp
         type BIRWhileOpGuard;
         fn enter_cond(self: Pin<&mut BIRWhileOpGuard>);
         fn enter_body(self: Pin<&mut BIRWhileOpGuard>);
-        fn build_while_op(self: Pin<&mut BIRGen>) -> UniquePtr<BIRWhileOpGuard>;
+        fn build_while_op(self: Pin<&mut CxxBIRGen>) -> UniquePtr<BIRWhileOpGuard>;
 
         // </AutoGenerated>
 
-        fn start_call(self: Pin<&mut BIRGen>, callee: &BIRValue);
-        fn add_call_arg(self: Pin<&mut BIRGen>, arg: &BIRValue);
-        fn finish_call(self: Pin<&mut BIRGen>) -> UniquePtr<BIRValue>;
+        fn start_call(self: Pin<&mut CxxBIRGen>, callee: &BIRValue);
+        fn add_call_arg(self: Pin<&mut CxxBIRGen>, arg: &BIRValue);
+        fn finish_call(self: Pin<&mut CxxBIRGen>) -> UniquePtr<BIRValue>;
 
         fn get_value(self: &BIRFunctionGuard) -> UniquePtr<BIRValue>;
         fn get_arg(self: &BIRFunctionGuard, index: usize) -> UniquePtr<BIRValue>;
@@ -126,7 +131,7 @@ mod ffi {
 pub struct BIRGen<'sess> {
     #[allow(dead_code)]
     session: &'sess Session,
-    inner: cxx::UniquePtr<ffi::BIRGen>,
+    inner: cxx::UniquePtr<ffi::CxxBIRGen>,
     symbol_table: HashMap<Symbol, cxx::UniquePtr<ffi::BIRValue>>,
     ty_checker: ty::TypeChecker<'sess>,
 }

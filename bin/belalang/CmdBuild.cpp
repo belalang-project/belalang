@@ -1,5 +1,6 @@
 #include "belalang/AST/Parser.h"
 #include "belalang/AST/ASTDumper.h"
+#include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Lexer/Lexer.h"
 #include "belalang/Diag/Diag.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -60,6 +61,8 @@ int build(muopt::Parser &parser) {
         emit = EmitTarget::Tokens;
       if (value == "ast")
         emit = EmitTarget::Ast;
+      if (value == "bir")
+        emit = EmitTarget::Bir;
     }
     if (arg.has_value() && arg->is_plain()) {
       source = arg->as_str();
@@ -119,6 +122,28 @@ int build(muopt::Parser &parser) {
       dumper.visitProgram(prog);
     }
 
+    return parser.hadError() ? 1 : 0;
+  }
+
+  if (emit == EmitTarget::Bir) {
+    lexer::Lexer lexer(src, diagEngine);
+
+    ast::ASTContext astCtx;
+    ast::Parser parser(lexer, astCtx, diagEngine);
+
+    ast::Program *prog = parser.parseProgram();
+    if (!prog)
+      return parser.hadError() ? 1 : 0;
+
+    birgen::BIRGen birgen(diagEngine);
+    birgen.generateProgram(prog);
+
+    if (!birgen.runLoweringPipeline()) {
+      std::cerr << "error: BIR lowering pipeline failed\n";
+      return 1;
+    }
+
+    std::cout << birgen.dumpToString() << "\n";
     return parser.hadError() ? 1 : 0;
   }
 

@@ -31,6 +31,29 @@ cc_library(
 )
 
 # ------------------------------------------------------------------------------
+# BIRGen
+# ------------------------------------------------------------------------------
+
+cc_library(
+    name = "BIRGen",
+    srcs = [
+        "BIRGen/BIRGen.cpp",
+        "BIRGen/TypeChecker.cpp",
+    ],
+    deps = [
+        "//include:AST",
+        "//include:BIR",
+        "//include:BIRGen",
+        "//include:Diag",
+        "//include:Lexer",
+        "//bir",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:Pass",
+        "@llvm-project//mlir:Support",
+    ],
+)
+
+# ------------------------------------------------------------------------------
 # Diag
 # ------------------------------------------------------------------------------
 
