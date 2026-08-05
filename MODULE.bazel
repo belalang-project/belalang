@@ -12,7 +12,6 @@ bazel_dep(name = "rules_rust", version = "0.71.3")
 bazel_dep(name = "rules_rust_mdbook", version = "0.71.3")
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "llvm", version = "0.8.3")
-bazel_dep(name = "cxx.rs", version = "1.0.196")
 
 # required by llvm
 bazel_dep(name = "bazel_skylib", version = "1.9.0")

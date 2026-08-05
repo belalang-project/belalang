@@ -7,34 +7,11 @@
 
 using namespace belalang;
 
-enum ActionType {
-  GenRustBindingDecls,
-  GenCXXBindingDecls,
-  GenCXXBindingDefs,
-};
+enum ActionType {};
 
-llvm::cl::opt<ActionType> action(
-    llvm::cl::desc("Action to perform:"),
-    llvm::cl::values(clEnumValN(GenRustBindingDecls, "gen-rust-binding-decls",
-                                "Generate Rust binding declarations")),
-    llvm::cl::values(clEnumValN(GenCXXBindingDecls, "gen-cxx-binding-decls",
-                                "Generate C++ BIR binding declarations")),
-    llvm::cl::values(clEnumValN(GenCXXBindingDefs, "gen-cxx-binding-defs",
-                                "Generate C++ BIR binding definitions")));
+llvm::cl::opt<ActionType> action(llvm::cl::desc("Action to perform:"));
 
 bool BIRTableGenMain(llvm::raw_ostream &OS, const llvm::RecordKeeper &Records) {
-  switch (action) {
-  case GenRustBindingDecls:
-    bir::emitRustBindingDecls(Records, OS);
-    break;
-  case GenCXXBindingDecls:
-    bir::emitCXXBindingDecls(Records, OS);
-    break;
-  case GenCXXBindingDefs:
-    bir::emitCXXBindingDefs(Records, OS);
-    break;
-  }
-
   return false;
 }
 

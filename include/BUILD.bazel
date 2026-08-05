@@ -186,20 +186,8 @@ cc_library(
     hdrs = glob(["belalang/BIRGen/**/*.h"]),
     includes = ["."],
     deps = [
-        ":BelalangCXXBindingsIncGen",
         ":Diag",
     ],
-)
-
-gentbl_cc_library(
-    name = "BelalangCXXBindingsIncGen",
-    tbl_outs = [
-        (["-gen-cxx-binding-decls"], "belalang/BIRGen/Bindings.h.inc"),
-        (["-gen-cxx-binding-defs"], "belalang/BIRGen/Bindings.cpp.inc"),
-    ],
-    tblgen = "//tools/bir-tblgen",
-    td_file = "belalang/BIR/IR/BIROps.td",
-    deps = [":BelalangBIRTdFiles"],
 )
 
 # ------------------------------------------------------------------------------
