@@ -30,6 +30,7 @@ cc_binary(
         "//lib:AST",
         "//lib:Diag",
         "//lib:BIRGen",
+        "//lib:LLVMGen",
         "//include:Version",
         "//bir",
     ],

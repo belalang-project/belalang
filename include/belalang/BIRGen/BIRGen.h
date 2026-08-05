@@ -18,6 +18,10 @@ public:
   BIRGen(diag::DiagnosticEngine &diagEngine);
   ~BIRGen() = default;
 
+  uintptr_t getModulePtr() const {
+    return reinterpret_cast<uintptr_t>(&module);
+  }
+
   mlir::ModuleOp generateProgram(ast::Program *prog);
   bool runLoweringPipeline();
   std::string dumpToString() const;

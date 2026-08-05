@@ -7,36 +7,25 @@
 #include <cstdint>
 #include <memory>
 
-#include "rust/cxx.h"
-
 namespace belalang {
 namespace llvmgen {
-class LLVMGen;
-} // namespace llvmgen
-} // namespace belalang
 
-#include "llvmgen/lib.rs.h"
-
-namespace belalang {
-namespace llvmgen {
+enum class SanitizerKind {
+  None,
+  Thread,
+};
 
 class LLVMGen {
 public:
-  LLVMGen(mlir::ModuleOp *module);
+  LLVMGen(uintptr_t);
   ~LLVMGen() = default;
 
-  rust::String dump_to_string() const;
-  rust::String compile_object_file(rust::String out,
-                                   SanitizerKind sanitizer) const;
+  std::string dumpToString() const;
 
 private:
   llvm::LLVMContext llvmCtx;
   std::unique_ptr<llvm::Module> llvmModule;
 };
-
-/// Creates an LLVMGen instance. `module_ptr` should point to the lowered
-/// `mlir::ModuleOp` containing bir operations.
-std::unique_ptr<LLVMGen> create_llvmgen(uintptr_t module_ptr);
 
 } // namespace llvmgen
 } // namespace belalang

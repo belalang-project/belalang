@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "llvmgen-cc",
-    srcs = ["LLVMGen.cpp"],
+    srcs = ["CxxLLVMGen.cpp"],
     deps = [
         "//include:LLVMGen",
         "//include:BIR",
