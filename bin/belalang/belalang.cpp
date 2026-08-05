@@ -41,8 +41,7 @@ int main(int argc, char **argv) {
     return belalang::cmd::version();
 
   if (*command == "run") {
-    std::cerr << "running\n";
-    return 0;
+    return belalang::cmd::run(parser);
   }
 
   std::cerr << "error: unknown command: " << *command << "\n";
