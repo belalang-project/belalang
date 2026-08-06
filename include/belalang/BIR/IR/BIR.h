@@ -23,6 +23,7 @@ using namespace llvm;
 #define GET_ATTRDEF_CLASSES
 #include "belalang/BIR/IR/BIRAttrs.h.inc"
 
+#include "belalang/BIR/IR/BIRTypesDetails.h"
 #define GET_TYPEDEF_CLASSES
 #include "belalang/BIR/IR/BIRTypes.h.inc"
 

@@ -25,8 +25,13 @@ def BIR_BoolType : BIR_Type<"Bool", "bool"> {
   let summary = "Boolean type";
 }
 
-def BIR_StructType : BIR_Type<"Struct", "struct"> {
+def BIR_StructType : BIR_Type<"Struct", "struct", [MutableType]> {
   let summary = "Struct type";
+
+  let storageClass = "StructTypeStorage";
+  let genStorageClass = 0;
+
+  let genVerifyDecl = 1;
 
   let parameters = (ins
     ArrayRefParameter<"mlir::Type", "struct members">:$members,
