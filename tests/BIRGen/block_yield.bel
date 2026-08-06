@@ -6,12 +6,11 @@ x: Int = {
     42
 }
 
-# CHECK:      cf.br ^bb1
-# CHECK-NEXT: ^bb1:  // pred: ^bb0
+# CHECK:      %[[VAL:.*]] = bir.scope {
 # CHECK-NEXT:   %[[C1:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT:   %[[C2:.*]] = bir.constant #bir.int<2> : !bir.int
 # CHECK-NEXT:   %[[C3:.*]] = bir.constant #bir.int<42> : !bir.int
-# CHECK-NEXT:   cf.br ^bb2(%[[C3]] : !bir.int)
-# CHECK-NEXT: ^bb2(%[[VAL:.*]]: !bir.int):  // pred: ^bb1
-# CHECK-NEXT:   %[[VAR:.*]] = bir.alloc_heap 8 : !bir.ref<!bir.int>
-# CHECK-NEXT:   bir.store %[[VAL]] to %[[VAR]] : !bir.int to !bir.ref<!bir.int>
+# CHECK-NEXT:   bir.yield %[[C3]] : !bir.int
+# CHECK-NEXT: } : !bir.int
+# CHECK-NEXT: %[[VAR:.*]] = bir.declare "x" : !bir.ref<!bir.int>
+# CHECK-NEXT: bir.store %[[VAL]] to %[[VAR]] : !bir.int to !bir.ref<!bir.int>
