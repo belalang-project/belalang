@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include "gc.h"
 #include "errors.h"
 #include "utils.h"
