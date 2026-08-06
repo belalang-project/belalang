@@ -44,6 +44,7 @@ namespace cmd {
 
 enum class EmitTarget {
   Bir,
+  BirLowered,
   Ast,
   Tokens,
   Llvm,
@@ -64,6 +65,8 @@ int build(muopt::Parser &parser) {
         emit = EmitTarget::Ast;
       if (value == "bir")
         emit = EmitTarget::Bir;
+      if (value == "bir-lowered")
+        emit = EmitTarget::BirLowered;
       if (value == "llvm")
         emit = EmitTarget::Llvm;
     }
@@ -128,7 +131,7 @@ int build(muopt::Parser &parser) {
     return parser.hadError() ? 1 : 0;
   }
 
-  if (emit == EmitTarget::Bir) {
+  if (emit == EmitTarget::Bir || emit == EmitTarget::BirLowered) {
     lexer::Lexer lexer(src, diagEngine);
 
     ast::ASTContext astCtx;
@@ -141,7 +144,7 @@ int build(muopt::Parser &parser) {
     birgen::BIRGen birgen(diagEngine);
     birgen.generateProgram(prog);
 
-    if (!birgen.runLoweringPipeline()) {
+    if (emit == EmitTarget::BirLowered && !birgen.runLoweringPipeline()) {
       std::cerr << "error: BIR lowering pipeline failed\n";
       return 1;
     }
