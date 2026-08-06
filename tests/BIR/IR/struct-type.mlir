@@ -13,3 +13,11 @@ bir.func @f(%0: !bir.struct<"T", {!bir.int, !bir.int}>) {
 bir.func @f(%0: !bir.struct<"T", {}>) {
   bir.return
 }
+
+// -----
+
+// CHECK: !struct_T = !bir.struct<"T", {!bir.ref<!bir.struct<"T">>}>
+// CHECK: bir.func @f(%{{.*}}: !struct_T)
+bir.func @f(%0: !bir.struct<"T", {!bir.ref<!bir.struct<"T">>}>) {
+  bir.return
+}
