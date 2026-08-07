@@ -259,6 +259,24 @@ mlir::Value BIRGen::visitVarExpr(VarExpr *expr) {
   case TokenKind::DivAssign:
     res = bir::DivOp::create(builder, loc, lhs.getType(), lhs, rhs);
     break;
+  case TokenKind::ModAssign:
+    res = bir::ModOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
+  case TokenKind::BitAndAssign:
+    res = bir::AndOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
+  case TokenKind::BitOrAssign:
+    res = bir::OrOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
+  case TokenKind::BitXorAssign:
+    res = bir::XorOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
+  case TokenKind::ShiftLeftAssign:
+    res = bir::ShlOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
+  case TokenKind::ShiftRightAssign:
+    res = bir::ShrOp::create(builder, loc, lhs.getType(), lhs, rhs);
+    break;
   default:
     llvm_unreachable("unknown assign op");
   }
