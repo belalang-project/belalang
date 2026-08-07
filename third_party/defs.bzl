@@ -9,7 +9,7 @@ def _third_party_deps_impl(_ctx):
         urls = ["https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"],
     )
 
-    LLVM_COMMIT = "030e74c2808a9af58c6b4ef461fd0c2c7039d647"
+    LLVM_COMMIT = "6716e3108af4eba29b28140d17d1f022eb7adb64"
 
     new_git_repository(
         name = "llvm-raw",

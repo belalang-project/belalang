@@ -231,7 +231,7 @@
   "moduleExtensions": {
     "//third_party:defs.bzl%third_party_deps": {
       "general": {
-        "bzlTransitiveDigest": "6AD3Nn5GFY7sCAayikQAozDYLb+gENc3zU/0YNueLSY=",
+        "bzlTransitiveDigest": "i3eoVHo1nKSEiiCFKDTrpJniJFRp++8FWX2n+lMsKvU=",
         "usagesDigest": "IhAWKcX6mchlBXfCkPHTt6i1VEX5C02mmAOg5u+pJw8=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -251,7 +251,7 @@
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
             "attributes": {
               "build_file_content": "# empty",
-              "commit": "030e74c2808a9af58c6b4ef461fd0c2c7039d647",
+              "commit": "6716e3108af4eba29b28140d17d1f022eb7adb64",
               "init_submodules": false,
               "remote": "https://github.com/llvm/llvm-project.git"
             }
