@@ -10,8 +10,8 @@
 namespace belalang {
 namespace birgen {
 
-TypeChecker::TypeChecker(diag::DiagnosticEngine &diagEngine)
-    : diagEngine(diagEngine) {}
+TypeChecker::TypeChecker(ast::ASTContext ctx, diag::DiagnosticEngine &diagEngine)
+    : ctx(ctx), diagEngine(diagEngine) {}
 
 void TypeChecker::infer(ast::Program *prog) { visitProgram(prog); }
 

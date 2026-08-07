@@ -1,5 +1,6 @@
 #include "belalang/BIRGen/BIRGen.h"
 
+#include "belalang/AST/ASTContext.h"
 #include "belalang/AST/Decl.h"
 #include "belalang/AST/Expr.h"
 #include "belalang/AST/Stmt.h"
@@ -20,8 +21,8 @@ namespace birgen {
 using namespace ast;
 using namespace lexer;
 
-BIRGen::BIRGen(diag::DiagnosticEngine &diagEngine)
-    : diagEngine(diagEngine), typeChecker(diagEngine), builder(&context),
+BIRGen::BIRGen(ast::ASTContext &ctx, diag::DiagnosticEngine &diagEngine)
+    : diagEngine(diagEngine), typeChecker(ctx, diagEngine), builder(&context),
       loc(builder.getUnknownLoc()) {
   // Load dialects.
   mlir::DialectRegistry registry;

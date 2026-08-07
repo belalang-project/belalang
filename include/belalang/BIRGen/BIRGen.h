@@ -1,6 +1,7 @@
 #ifndef BELALANG_BIRGEN_BIRGEN_H_
 #define BELALANG_BIRGEN_BIRGEN_H_
 
+#include "belalang/AST/ASTContext.h"
 #include "belalang/AST/ASTVisitor.h"
 #include "belalang/BIRGen/TypeChecker.h"
 #include "belalang/Diag/Diag.h"
@@ -15,7 +16,7 @@ namespace birgen {
 
 class BIRGen : public ast::ASTVisitor<BIRGen, mlir::Value> {
 public:
-  BIRGen(diag::DiagnosticEngine &diagEngine);
+  BIRGen(ast::ASTContext &ctx, diag::DiagnosticEngine &diagEngine);
   ~BIRGen() = default;
 
   uintptr_t getModulePtr() const {

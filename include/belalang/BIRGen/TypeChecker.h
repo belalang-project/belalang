@@ -2,6 +2,7 @@
 #define BELALANG_BIRGEN_TYPECHECKER_H_
 
 #include "belalang/AST/ASTVisitor.h"
+#include "belalang/AST/ASTContext.h"
 #include "belalang/Diag/Diag.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
@@ -20,7 +21,7 @@ enum class Type {
 
 class TypeChecker : public ast::ASTVisitor<TypeChecker, Type> {
 public:
-  TypeChecker(diag::DiagnosticEngine &diagEngine);
+  TypeChecker(ast::ASTContext ctx, diag::DiagnosticEngine &diagEngine);
 
   void infer(ast::Program *prog);
   void checkExpr(ast::Expr *expr, Type expected);
@@ -38,6 +39,7 @@ public:
   Type visitExprStmt(ast::ExprStmt *stmt);
 
 private:
+  ast::ASTContext ctx;
   diag::DiagnosticEngine &diagEngine;
   llvm::StringMap<Type> env;
 

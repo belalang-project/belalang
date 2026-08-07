@@ -141,7 +141,7 @@ int build(muopt::Parser &parser) {
     if (!prog)
       return parser.hadError() ? 1 : 0;
 
-    birgen::BIRGen birgen(diagEngine);
+    birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
     if (emit == EmitTarget::BirLowered && !birgen.runLoweringPipeline()) {
@@ -163,7 +163,7 @@ int build(muopt::Parser &parser) {
     if (!prog)
       return parser.hadError() ? 1 : 0;
 
-    birgen::BIRGen birgen(diagEngine);
+    birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
     if (!birgen.runLoweringPipeline()) {
