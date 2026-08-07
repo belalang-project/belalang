@@ -33,12 +33,13 @@ public:
 #include "belalang/AST/ASTNodes.def"
 
 private:
+  ast::ASTContext &astCtx;
   diag::DiagnosticEngine &diagEngine;
   TypeChecker typeChecker;
   llvm::StringMap<mlir::Value> symbolTable;
 
   void buildMainReturn();
-  mlir::Type mapTypeName(llvm::StringRef name);
+  mlir::Type mapTypeName(ast::Type *ty);
 
   mlir::MLIRContext context;
   mlir::ModuleOp module;

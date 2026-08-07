@@ -176,12 +176,12 @@ public:
 class FunctionLitExpr : public Expr {
   llvm::ArrayRef<VarDecl *> params;
   BlockExpr *body;
-  llvm::StringRef explicitType;
+  ast::Type *explicitType;
 
 public:
   FunctionLitExpr(size_t spanStart, size_t spanEnd,
                   llvm::ArrayRef<VarDecl *> params, BlockExpr *body,
-                  llvm::StringRef explicitType)
+                  ast::Type *explicitType)
       : Expr(ExprKind::FunctionLitExpr, spanStart, spanEnd), params(params),
         body(body), explicitType(explicitType) {}
 
@@ -191,7 +191,7 @@ public:
 
   llvm::ArrayRef<VarDecl *> getParams() const { return params; }
   BlockExpr *getBody() const { return body; }
-  llvm::StringRef getExplicitType() const { return explicitType; }
+  ast::Type *getExplicitType() const { return explicitType; }
 };
 
 /// Represents call expression, e.g. `function_name()`

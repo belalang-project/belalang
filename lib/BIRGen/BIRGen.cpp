@@ -22,8 +22,8 @@ using namespace ast;
 using namespace lexer;
 
 BIRGen::BIRGen(ast::ASTContext &ctx, diag::DiagnosticEngine &diagEngine)
-    : diagEngine(diagEngine), typeChecker(ctx, diagEngine), builder(&context),
-      loc(builder.getUnknownLoc()) {
+    : astCtx(ctx), diagEngine(diagEngine), typeChecker(ctx, diagEngine),
+      builder(&context), loc(builder.getUnknownLoc()) {
   // Load dialects.
   mlir::DialectRegistry registry;
   registry.insert<bir::BIRDialect, mlir::LLVM::LLVMDialect>();
@@ -52,32 +52,19 @@ mlir::ModuleOp BIRGen::generateProgram(Program *prog) {
 // Helpers
 // -----------------------------------------------------------------------------
 
-mlir::Type BIRGen::mapTypeName(llvm::StringRef name) {
-  if (name == "String")
-    return bir::StringType::get(&context);
-  if (name == "Int")
-    return bir::IntType::get(&context);
-  if (name == "Float")
-    return bir::FloatType::get(&context);
-  if (name == "Bool")
-    return bir::BoolType::get(&context);
-
-  llvm_unreachable("unknown type");
-}
-
-static mlir::Type mapType(mlir::MLIRContext *context, Type ty) {
-  switch (ty) {
-  case Type::Integer:
-    return bir::IntType::get(context);
-  case Type::Boolean:
-    return bir::BoolType::get(context);
-  case Type::String:
-    return bir::StringType::get(context);
-  case Type::Float:
-    return bir::FloatType::get(context);
-  default:
-    return nullptr;
+mlir::Type BIRGen::mapTypeName(Type *ty) {
+  if (auto *builtinTy = llvm::dyn_cast<BuiltinType>(ty)) {
+    if (builtinTy == astCtx.stringTy)
+      return bir::StringType::get(&context);
+    if (builtinTy == astCtx.intTy)
+      return bir::IntType::get(&context);
+    if (builtinTy == astCtx.floatTy)
+      return bir::FloatType::get(&context);
+    if (builtinTy == astCtx.boolTy)
+      return bir::BoolType::get(&context);
   }
+
+  return {};
 }
 
 namespace {
@@ -269,7 +256,7 @@ mlir::Value BIRGen::visitVarExpr(VarExpr *expr) {
 }
 
 mlir::Value BIRGen::visitFunctionLitExpr(FunctionLitExpr *expr) {
-  if (expr->getExplicitType().empty())
+  if (!expr->getExplicitType())
     llvm_unreachable("not yet implemented");
 
   mlir::Type ty = mapTypeName(expr->getExplicitType());
@@ -352,10 +339,10 @@ mlir::Value BIRGen::visitIdentifierExpr(IdentifierExpr *expr) {
 mlir::Value BIRGen::visitIfExpr(IfExpr *expr) {
   mlir::Value cond = visitExpr(expr->getCond());
 
-  Type inferredTy = typeChecker.visitIfExpr(expr);
+  ast::Type *inferredTy = typeChecker.visitIfExpr(expr);
   llvm::SmallVector<mlir::Type, 1> resultTypes;
-  if (inferredTy != Type::None) {
-    if (auto ty = mapType(&context, inferredTy)) {
+  if (inferredTy != astCtx.noneTy) {
+    if (auto ty = mapTypeName(inferredTy)) {
       resultTypes.push_back(ty);
     }
   }
@@ -420,10 +407,10 @@ mlir::Value BIRGen::visitPrefixExpr(PrefixExpr *expr) {
 }
 
 mlir::Value BIRGen::visitBlockExpr(BlockExpr *expr) {
-  Type inferredTy = typeChecker.visitBlockExpr(expr);
+  ast::Type *inferredTy = typeChecker.visitBlockExpr(expr);
   llvm::SmallVector<mlir::Type, 1> resultTypes;
-  if (inferredTy != Type::None) {
-    if (auto ty = mapType(&context, inferredTy)) {
+  if (inferredTy != astCtx.noneTy) {
+    if (auto ty = mapTypeName(inferredTy)) {
       resultTypes.push_back(ty);
     }
   }

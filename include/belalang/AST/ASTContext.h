@@ -1,6 +1,8 @@
 #ifndef BELALANG_AST_ASTCONTEXT_H_
 #define BELALANG_AST_ASTCONTEXT_H_
 
+#include "belalang/AST/Type.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 
 namespace belalang {
@@ -9,8 +11,18 @@ namespace ast {
 class ASTContext {
   mutable llvm::BumpPtrAllocator allocator;
 
+  // ---------------------------------------------------------------------------
+  // Types
+  // ---------------------------------------------------------------------------
+
+  mutable llvm::SmallVector<Type *, 0> types;
+
 public:
-  ASTContext() = default;
+  ASTContext();
+
+  // ---------------------------------------------------------------------------
+  // Allocation goodies
+  // ---------------------------------------------------------------------------
 
   llvm::BumpPtrAllocator &getAllocator() const { return allocator; }
 
@@ -21,6 +33,26 @@ public:
     return static_cast<T *>(alloc(num * sizeof(T), alignof(T)));
   }
   void dealloc(void *ptr) const {}
+
+  // ---------------------------------------------------------------------------
+  // Builtin Types
+  // ---------------------------------------------------------------------------
+
+  void initBuiltinTypes();
+  void initBuiltinType(BuiltinType *&ty, BuiltinType::Kind kind);
+
+  BuiltinType *intTy;
+  BuiltinType *floatTy;
+  BuiltinType *boolTy;
+  BuiltinType *stringTy;
+  BuiltinType *noneTy;
+
+  // ---------------------------------------------------------------------------
+  // Type name conversions
+  // ---------------------------------------------------------------------------
+
+  llvm::StringRef tyToStr(Type *ty) const;
+  Type *strToTy(llvm::StringRef str) const;
 };
 
 } // namespace ast
