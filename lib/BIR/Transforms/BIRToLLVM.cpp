@@ -606,7 +606,9 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
       mlir::MLIRContext *ctx = ty.getContext();
       mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
       mlir::Type iType = mlir::IntegerType::get(ctx, 64);
-      return LLVM::LLVMStructType::getLiteral(ctx, {ptrType, iType});
+      auto stringTy = mlir::LLVM::LLVMStructType::getIdentified(ctx, "bel.String");
+      assert(stringTy.setBody({ptrType, iType}, false).succeeded());
+      return stringTy;
     });
     addConversion([this, ctx](bir::StructType ty) {
       llvm::SmallVector<mlir::Type> llvmMembers;
