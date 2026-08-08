@@ -2,16 +2,17 @@
 // RUN: | %bir-translate --split-input-file --bir-to-llvmir \
 // RUN: | %FileCheck %s
 
+// CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 // CHECK-DAG: declare ptr @brt_gc_alloc(i64)
 // CHECK-DAG: declare void @brt_init()
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
-// CHECK-LABEL:define { ptr, i64 } @main() {
+// CHECK-LABEL:define %bel.String @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
-// CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
-// CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
-// CHECK-NEXT:   ret { ptr, i64 } %[[C2]]
+// CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
+// CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8
+// CHECK-NEXT:   ret %bel.String %[[C2]]
 // CHECK-NEXT: }
 
 bir.func @main() -> !bir.string {
@@ -27,17 +28,18 @@ bir.func @main() -> !bir.string {
 
 // -----
 
+// CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 // CHECK-DAG: declare ptr @brt_gc_alloc(i64)
-// CHECK-DAG: declare void @brt_print_string({ ptr, i64 })
+// CHECK-DAG: declare void @brt_print_string(%bel.String)
 // CHECK-DAG: declare void @brt_init()
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define void @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
-// CHECK-NEXT:   store { ptr, i64 } { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
-// CHECK-NEXT:   %[[C2:.*]] = load { ptr, i64 }, ptr %[[C1]], align 8
-// CHECK-NEXT:   call void @brt_print_string({ ptr, i64 } %[[C2]])
+// CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
+// CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8
+// CHECK-NEXT:   call void @brt_print_string(%bel.String %[[C2]])
 // CHECK-NEXT:   ret void
 // CHECK-NEXT: }
 
