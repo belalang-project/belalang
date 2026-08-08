@@ -42,6 +42,10 @@ LogicalResult ConstantOp::verify() {
     return success();
   }
 
+  if (isa<bir::StructType>(ty) && isa<bir::StructAttr>(attr)) {
+    return success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 
