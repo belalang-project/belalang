@@ -4,7 +4,10 @@
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/Path.h"
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
@@ -69,6 +72,8 @@ int build(muopt::Parser &parser) {
         emit = EmitTarget::BirLowered;
       if (value == "llvm")
         emit = EmitTarget::Llvm;
+      if (value == "exe")
+        emit = EmitTarget::Exe;
     }
     if (arg.has_value() && arg->is_plain()) {
       source = arg->as_str();
@@ -173,6 +178,58 @@ int build(muopt::Parser &parser) {
 
     llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
     std::cout << llvmgen.dumpToString() << "\n";
+    return 0;
+  }
+
+  if (emit == EmitTarget::Exe) {
+    lexer::Lexer lexer(src, diagEngine);
+
+    ast::ASTContext astCtx;
+    ast::Parser parser(lexer, astCtx, diagEngine);
+
+    ast::Program *prog = parser.parseProgram();
+    if (!prog)
+      return parser.hadError() ? 1 : 0;
+
+    birgen::BIRGen birgen(astCtx, diagEngine);
+    birgen.generateProgram(prog);
+
+    if (!birgen.runLoweringPipeline()) {
+      std::cerr << "error: BIR lowering pipeline failed\n";
+      return 1;
+    }
+
+    llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
+    llvm::SmallString<128> objPath;
+    if (llvm::sys::fs::createTemporaryFile("belalang_build", "o", objPath)) {
+      std::cerr << "error: could not create temporary file\n";
+      return 1;
+    }
+    std::string objFile = objPath.str().str();
+    llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
+
+    llvm::StringRef stem = llvm::sys::path::stem(source);
+    std::string exeFile = stem.empty() ? "a.out" : stem.str();
+
+    const char *brt_dir = std::getenv("BRT_DIR");
+    std::string brt_path = brt_dir ? brt_dir : "/usr/local/lib";
+
+    const char *cc = std::getenv("CC");
+    std::string cc_cmd = cc ? cc : "cc";
+
+    std::string linkCmd = cc_cmd + " " + objFile + " -L" + brt_path +
+                          " -lbrt -lbdwgc -o " + exeFile;
+    if (std::system(linkCmd.c_str()) != 0) {
+      std::cerr << "error: linking failed\n";
+      if (std::error_code ec = llvm::sys::fs::remove(objFile))
+        std::cerr << "error: could not remove temporary file: " << ec.message()
+                  << "\n";
+      return 1;
+    }
+
+    if (std::error_code ec = llvm::sys::fs::remove(objFile))
+      std::cerr << "error: could not remove temporary file: " << ec.message()
+                << "\n";
     return 0;
   }
 
