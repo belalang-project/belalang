@@ -20,6 +20,40 @@ namespace {
 using namespace mlir;
 using namespace belalang;
 
+std::optional<mlir::Attribute>
+buildStructConstant(const mlir::TypeConverter &typeConverter,
+                    mlir::MLIRContext *ctx, bir::StructAttr structAttr) {
+  llvm::SmallVector<mlir::Attribute> members;
+  for (auto [memberAttr, memberType] :
+       llvm::zip(structAttr.getMembers(), structAttr.getMemberTypes())) {
+    if (auto intAttr = llvm::dyn_cast<bir::IntegerAttr>(memberAttr)) {
+      auto llvmTy = typeConverter.convertType(memberType);
+      if (!llvmTy)
+        return std::nullopt;
+      members.push_back(mlir::IntegerAttr::get(llvmTy, intAttr.getValue()));
+    } else if (auto floatAttr = llvm::dyn_cast<bir::FloatAttr>(memberAttr)) {
+      auto llvmTy = typeConverter.convertType(memberType);
+      if (!llvmTy)
+        return std::nullopt;
+      members.push_back(mlir::FloatAttr::get(llvmTy, floatAttr.getValue()));
+    } else if (auto boolAttr = llvm::dyn_cast<bir::BoolAttr>(memberAttr)) {
+      auto llvmTy = typeConverter.convertType(memberType);
+      if (!llvmTy)
+        return std::nullopt;
+      members.push_back(mlir::IntegerAttr::get(
+          llvmTy, static_cast<int64_t>(boolAttr.getValue())));
+    } else if (auto nested = llvm::dyn_cast<bir::StructAttr>(memberAttr)) {
+      auto nestedValue = buildStructConstant(typeConverter, ctx, nested);
+      if (!nestedValue)
+        return std::nullopt;
+      members.push_back(*nestedValue);
+    } else {
+      return std::nullopt;
+    }
+  }
+  return mlir::ArrayAttr::get(ctx, members);
+}
+
 struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
   using OpConversionPattern<bir::ConstantOp>::OpConversionPattern;
 
@@ -64,6 +98,38 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       auto c1 = LLVM::InsertValueOp::create(rewriter, op.getLoc(), container.getType(), container, addrOfOp, rewriter.getDenseI64ArrayAttr({0}));
       rewriter.replaceOpWithNewOp<LLVM::InsertValueOp>(op, c1.getType(), c1, len, rewriter.getDenseI64ArrayAttr({1}));
 
+      return success();
+    } else if (auto structAttr = llvm::dyn_cast<bir::StructAttr>(value)) {
+      auto module = op->getParentOfType<mlir::ModuleOp>();
+      auto ctx = op->getContext();
+
+      llvm::hash_code hash = llvm::hash_combine(
+          structAttr.getMembers().size(), structAttr.getMemberTypes().size());
+      for (auto member : structAttr.getMembers())
+        hash = llvm::hash_combine(hash, member);
+      for (auto memberType : structAttr.getMemberTypes())
+        hash = llvm::hash_combine(hash, memberType);
+      std::string globalName =
+          "struct." + std::to_string(static_cast<size_t>(hash));
+
+      LLVM::GlobalOp global;
+      {
+        OpBuilder::InsertionGuard guard(rewriter);
+        rewriter.setInsertionPointToStart(module.getBody());
+
+        global = module.lookupSymbol<LLVM::GlobalOp>(globalName);
+        if (!global) {
+          auto init = buildStructConstant(*getTypeConverter(), ctx, structAttr);
+          if (!init)
+            return failure();
+          global =
+              LLVM::GlobalOp::create(rewriter, op.getLoc(), type, true,
+                                     LLVM::Linkage::Private, globalName, *init);
+        }
+      }
+
+      auto addrOfOp = LLVM::AddressOfOp::create(rewriter, op.getLoc(), global);
+      rewriter.replaceOpWithNewOp<LLVM::LoadOp>(op, type, addrOfOp);
       return success();
     } else if (auto fnAttr = llvm::dyn_cast<bir::FnAttr>(value)) {
       FlatSymbolRefAttr attr = fnAttr.getValue();

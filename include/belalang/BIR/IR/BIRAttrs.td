@@ -45,6 +45,18 @@ def BIR_StringAttr : BIR_Attr<"String", "string", [TypedAttrInterface]> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_StructAttr : BIR_Attr<"Struct", "struct", [TypedAttrInterface]> {
+  let summary = "An attribute containing a struct value";
+
+  let parameters = (ins
+    AttributeSelfTypeParameter<"">:$type,
+    ArrayRefParameter<"mlir::Attribute", "">:$members,
+    ArrayRefParameter<"mlir::Type", "">:$memberTypes
+  );
+
+  let hasCustomAssemblyFormat = 1;
+}
+
 def BIR_FnAttr : BIR_Attr<"Fn", "fn", [TypedAttrInterface]> {
   let summary = "function";
 

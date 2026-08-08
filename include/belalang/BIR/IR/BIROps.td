@@ -22,7 +22,8 @@ def BIR_AnyType : AnyTypeOf<[
   BIR_FloatType,
   BIR_StringType,
   FunctionType,
-  BIR_BoolType
+  BIR_BoolType,
+  BIR_StructType
 ]>;
 
 def BIR_ConstantOp : BIR_Op<"constant", [
