@@ -537,4 +537,15 @@ def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
   }];
 }
 
+def BIR_SafepointOp : BIR_Op<"safepoint"> {
+  let arguments = (ins
+    I64Attr:$id,
+    Variadic<BIR_RefType>:$roots
+  );
+
+  let assemblyFormat = [{
+    $id (`(` $roots^ `:` type($roots) `)`)? attr-dict
+  }];
+}
+
 #endif // BELALANG_IR_OPS_TD_

@@ -742,6 +742,48 @@ static void insertBRTInitCall(mlir::Operation *op) {
       builder.getI32ArrayAttr(prios), builder.getArrayAttr(datals));
 }
 
+struct SafepointOpLowering final
+    : public OpConversionPattern<bir::SafepointOp> {
+  using OpConversionPattern<bir::SafepointOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::SafepointOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto loc = op.getLoc();
+    auto ctx = op.getContext();
+
+    auto i64Ty = mlir::IntegerType::get(ctx, 64);
+    auto i32Ty = mlir::IntegerType::get(ctx, 32);
+
+    // declare void
+    //   @llvm.experimental.stackmap(i64 <id>, i32 <numShadowBytes>, ...)
+
+    llvm::SmallVector<mlir::Value> args;
+
+    // Insert the i64 id argument.
+    args.push_back(
+        LLVM::ConstantOp::create(
+            rewriter, loc, i64Ty,
+            rewriter.getI64IntegerAttr(static_cast<int64_t>(op.getId())))
+            .getResult());
+
+    // Insert the i32 numShadowBytes argument.
+    args.push_back(LLVM::ConstantOp::create(rewriter, loc, i32Ty,
+                                            rewriter.getI32IntegerAttr(0))
+                       .getResult());
+
+    // Insert the pointers arguments.
+    for (auto root : adaptor.getRoots())
+      args.push_back(root);
+
+    LLVM::CallIntrinsicOp::create(
+        rewriter, loc, rewriter.getStringAttr("llvm.experimental.stackmap"),
+        args);
+    rewriter.eraseOp(op);
+    return success();
+  }
+};
+
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
@@ -752,8 +794,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, AllocHeapOpLowering, StoreOpLowering,
                VarLoadOpLowering, CondBrLowering, CmpOpLowering,
-               GetMemberOpLowering>(
-      typeConverter, patterns.getContext());
+               GetMemberOpLowering, SafepointOpLowering>(typeConverter,
+                                                         patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
