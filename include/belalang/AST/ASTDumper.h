@@ -1,6 +1,7 @@
 #ifndef BELALANG_AST_ASTDUMPER_H_
 #define BELALANG_AST_ASTDUMPER_H_
 
+#include "belalang/AST/ASTContext.h"
 #include "belalang/AST/ASTVisitor.h"
 #include "belalang/AST/Program.h"
 #include "belalang/AST/Stmt.h"
@@ -10,6 +11,7 @@ namespace belalang {
 namespace ast {
 
 class ASTDumper : public ASTVisitor<ASTDumper> {
+  ASTContext &ctx;
   llvm::raw_ostream &out;
   uint64_t depth;
 
@@ -20,7 +22,8 @@ class ASTDumper : public ASTVisitor<ASTDumper> {
   };
 
 public:
-  ASTDumper(llvm::raw_ostream &out = llvm::outs()) : out(out), depth(0) {}
+  ASTDumper(ASTContext &ctx, llvm::raw_ostream &out = llvm::outs())
+      : ctx(ctx), out(out), depth(0) {}
 
   void visitProgram(Program *prog);
 

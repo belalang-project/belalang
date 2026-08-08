@@ -1,4 +1,6 @@
 #include "belalang/AST/Parser.h"
+#include "belalang/AST/ASTContext.h"
+#include "belalang/AST/Type.h"
 #include "llvm/ADT/SmallVector.h"
 
 namespace belalang {
@@ -28,8 +30,8 @@ bool Parser::tryConsumeToken(lexer::TokenKind expectedTok) {
 void Parser::errorAt(size_t spanStart, size_t spanEnd, std::string message,
                      std::string label) {
   diagEngine.print(diag::Diagnostic::error(std::move(message))
-                       .withLabel(diag::Label::primary(
-                           spanStart, spanEnd, std::move(label))));
+                       .withLabel(diag::Label::primary(spanStart, spanEnd,
+                                                       std::move(label))));
   hasError = true;
 }
 
@@ -483,13 +485,10 @@ Expr *Parser::parseFunctionLitExpr() {
       return nullptr;
     }
 
-    llvm::StringRef typeName = tok.getStr();
-    char *typeData = c.alloc<char>(typeName.size());
-    std::copy(typeName.begin(), typeName.end(), typeData);
-    typeName = llvm::StringRef(typeData, typeName.size());
+    Type *ty = c.strToTy(tok.getStr());
 
     size_t end = tok.getSpanEnd();
-    params.push_back(new (c) VarDecl(start, end, name, nullptr, typeName));
+    params.push_back(new (c) VarDecl(start, end, name, nullptr, ty));
     consumeToken(); // consume type
 
     if (tryConsumeToken(lexer::TokenKind::RightParen))
@@ -504,12 +503,9 @@ Expr *Parser::parseFunctionLitExpr() {
   if (tok.getKind() == lexer::TokenKind::RightParen)
     consumeToken();
 
-  llvm::StringRef type;
+  ast::Type *type = nullptr;
   if (tryConsumeToken(lexer::TokenKind::Colon)) {
-    llvm::StringRef typeStr = tok.getStr();
-    char *strData = c.alloc<char>(typeStr.size());
-    std::copy(typeStr.begin(), typeStr.end(), strData);
-    type = llvm::StringRef(strData, typeStr.size());
+    type = c.strToTy(tok.getStr());
     consumeToken(); // consume type name
   }
 
@@ -618,7 +614,6 @@ Expr *Parser::parseIfExpr() {
 
   return new (c) IfExpr(start, end, cond, then, alt);
 }
-
 
 Expr *Parser::parseInfixExpr(Expr *left) {
   size_t start = left->getSpanStart();
@@ -743,9 +738,9 @@ Expr *Parser::parseStructLiteralExpr(Expr *left) {
   VarExpr **fieldsData = c.alloc<VarExpr *>(fields.size());
   std::copy(fields.begin(), fields.end(), fieldsData);
 
-  return new (c) StructLiteralExpr(
-      start, end, structName,
-      llvm::ArrayRef<VarExpr *>(fieldsData, fields.size()));
+  return new (c)
+      StructLiteralExpr(start, end, structName,
+                        llvm::ArrayRef<VarExpr *>(fieldsData, fields.size()));
 }
 
 Expr *Parser::parseGroupedExpr() {
@@ -795,14 +790,11 @@ Decl *Parser::parseVarDecl() {
   consumeToken(); // consume the identifier
   consumeToken(); // consume `:`
 
-  llvm::StringRef explicitType;
+  ast::Type *explicitType = nullptr;
   if (tok.getKind() == lexer::TokenKind::Assign) {
     // `name := value`; no explicit type, `tok` is the `=`.
   } else if (tok.getKind() == lexer::TokenKind::Ident) {
-    explicitType = tok.getStr();
-    char *typeData = c.alloc<char>(explicitType.size());
-    std::copy(explicitType.begin(), explicitType.end(), typeData);
-    explicitType = llvm::StringRef(typeData, explicitType.size());
+    explicitType = c.strToTy(tok.getStr());
     consumeToken(); // consume the type name
   } else {
     errorAt(tok.getSpanStart(), tok.getSpanEnd(), "unexpected token");
@@ -863,13 +855,10 @@ Decl *Parser::parseStructDecl() {
       return nullptr;
     }
 
-    llvm::StringRef typeName = tok.getStr();
-    char *typeData = c.alloc<char>(typeName.size());
-    std::copy(typeName.begin(), typeName.end(), typeData);
-    typeName = llvm::StringRef(typeData, typeName.size());
+    ast::Type *ty = c.strToTy(tok.getStr());
 
     size_t end = tok.getSpanEnd();
-    members.push_back(new (c) VarDecl(start, end, name, nullptr, typeName));
+    members.push_back(new (c) VarDecl(start, end, name, nullptr, ty));
     consumeToken(); // consume type
 
     structEnd = tok.getSpanEnd();

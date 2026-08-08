@@ -1,9 +1,9 @@
-#include "belalang/AST/Parser.h"
 #include "belalang/AST/ASTDumper.h"
+#include "belalang/AST/Parser.h"
 #include "belalang/BIRGen/BIRGen.h"
+#include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
-#include "belalang/Diag/Diag.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include <iostream>
 #include <string>
@@ -105,8 +105,8 @@ int build(muopt::Parser &parser) {
       } else if (kind == lexer::TokenKind::Ident ||
                  kind == lexer::TokenKind::LiteralInteger ||
                  kind == lexer::TokenKind::LiteralFloat) {
-        std::cout << kindStr << " \"" << tok.getStr().str() << "\" <"
-                  << start << ".." << end << ">\n";
+        std::cout << kindStr << " \"" << tok.getStr().str() << "\" <" << start
+                  << ".." << end << ">\n";
       } else {
         std::cout << kindStr << " <" << start << ".." << end << ">\n";
       }
@@ -124,7 +124,7 @@ int build(muopt::Parser &parser) {
     ast::Program *prog = parser.parseProgram();
 
     if (prog) {
-      ast::ASTDumper dumper;
+      ast::ASTDumper dumper(astCtx);
       dumper.visitProgram(prog);
     }
 
@@ -141,7 +141,7 @@ int build(muopt::Parser &parser) {
     if (!prog)
       return parser.hadError() ? 1 : 0;
 
-    birgen::BIRGen birgen(diagEngine);
+    birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
     if (emit == EmitTarget::BirLowered && !birgen.runLoweringPipeline()) {
@@ -163,7 +163,7 @@ int build(muopt::Parser &parser) {
     if (!prog)
       return parser.hadError() ? 1 : 0;
 
-    birgen::BIRGen birgen(diagEngine);
+    birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
     if (!birgen.runLoweringPipeline()) {

@@ -1,48 +1,37 @@
 #ifndef BELALANG_BIRGEN_TYPECHECKER_H_
 #define BELALANG_BIRGEN_TYPECHECKER_H_
 
+#include "belalang/AST/ASTContext.h"
 #include "belalang/AST/ASTVisitor.h"
 #include "belalang/Diag/Diag.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include <string>
 
 namespace belalang {
 namespace birgen {
 
-enum class Type {
-  String,
-  Integer,
-  Float,
-  Boolean,
-  None,
-};
-
-class TypeChecker : public ast::ASTVisitor<TypeChecker, Type> {
+class TypeChecker : public ast::ASTVisitor<TypeChecker, ast::Type *> {
 public:
-  TypeChecker(diag::DiagnosticEngine &diagEngine);
+  TypeChecker(ast::ASTContext &ctx, diag::DiagnosticEngine &diagEngine);
 
   void infer(ast::Program *prog);
-  void checkExpr(ast::Expr *expr, Type expected);
+  void checkExpr(ast::Expr *expr, ast::Type *expected);
 
-  Type visitIntLitExpr(ast::IntLitExpr *expr);
-  Type visitFloatLitExpr(ast::FloatLitExpr *expr);
-  Type visitStringLitExpr(ast::StringLitExpr *expr);
-  Type visitBoolExpr(ast::BoolExpr *expr);
-  Type visitIdentifierExpr(ast::IdentifierExpr *expr);
-  Type visitInfixExpr(ast::InfixExpr *expr);
-  Type visitBlockExpr(ast::BlockExpr *expr);
-  Type visitIfExpr(ast::IfExpr *expr);
-  Type visitVarDecl(ast::VarDecl *decl);
-  Type visitDeclStmt(ast::DeclStmt *stmt);
-  Type visitExprStmt(ast::ExprStmt *stmt);
+  ast::Type *visitIntLitExpr(ast::IntLitExpr *expr);
+  ast::Type *visitFloatLitExpr(ast::FloatLitExpr *expr);
+  ast::Type *visitStringLitExpr(ast::StringLitExpr *expr);
+  ast::Type *visitBoolExpr(ast::BoolExpr *expr);
+  ast::Type *visitIdentifierExpr(ast::IdentifierExpr *expr);
+  ast::Type *visitInfixExpr(ast::InfixExpr *expr);
+  ast::Type *visitBlockExpr(ast::BlockExpr *expr);
+  ast::Type *visitIfExpr(ast::IfExpr *expr);
+  ast::Type *visitVarDecl(ast::VarDecl *decl);
+  ast::Type *visitDeclStmt(ast::DeclStmt *stmt);
+  ast::Type *visitExprStmt(ast::ExprStmt *stmt);
 
 private:
+  ast::ASTContext &ctx;
   diag::DiagnosticEngine &diagEngine;
-  llvm::StringMap<Type> env;
-
-  std::string tyToStr(Type ty) const;
-  Type strToTy(llvm::StringRef str) const;
+  llvm::StringMap<ast::Type *> env;
 };
 
 } // namespace birgen

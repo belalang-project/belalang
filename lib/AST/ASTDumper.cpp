@@ -1,5 +1,5 @@
 #include "belalang/AST/ASTDumper.h"
-#include "belalang/Lexer/Token.h" // For TokenKind
+#include "belalang/Lexer/Token.h"
 
 // This is the ASTDumper implementation. For verbosity, we made every use of
 // IndentGuard in its own block. This is not technically needed, but helps with
@@ -105,8 +105,8 @@ void ASTDumper::visitVarExpr(VarExpr *expr) {
 
 void ASTDumper::visitFunctionLitExpr(FunctionLitExpr *expr) {
   out.indent(depth) << "FunctionLitExpr";
-  if (!expr->getExplicitType().empty()) {
-    out << " -> " << expr->getExplicitType();
+  if (expr->getExplicitType()) {
+    out << " -> " << ctx.tyToStr(expr->getExplicitType());
   }
   out << "\n";
   {
@@ -203,8 +203,8 @@ void ASTDumper::visitStructLiteralExpr(StructLiteralExpr *expr) {
 
 void ASTDumper::visitVarDecl(VarDecl *decl) {
   out.indent(depth) << "VarDecl " << decl->getName();
-  if (!decl->getExplicitType().empty()) {
-    out << " " << decl->getExplicitType();
+  if (decl->getExplicitType()) {
+    out << " " << ctx.tyToStr(decl->getExplicitType());
   }
   out << "\n";
   if (decl->getValue()) {

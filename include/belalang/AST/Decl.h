@@ -61,11 +61,11 @@ private:
 class VarDecl : public Decl {
   llvm::StringRef name;
   Expr *value;
-  llvm::StringRef explicitType;
+  Type *explicitType;
 
 public:
   VarDecl(size_t spanStart, size_t spanEnd, llvm::StringRef name, Expr *value,
-          llvm::StringRef explicitType)
+          Type *explicitType)
       : Decl(DeclKind::VarDecl, spanStart, spanEnd), name(name), value(value),
         explicitType(explicitType) {}
 
@@ -75,7 +75,7 @@ public:
 
   llvm::StringRef getName() const { return name; }
   Expr *getValue() const { return value; }
-  llvm::StringRef getExplicitType() const { return explicitType; }
+  Type *getExplicitType() const { return explicitType; }
 };
 
 /// Represents struct declaration, e.g. `struct T { ... }`

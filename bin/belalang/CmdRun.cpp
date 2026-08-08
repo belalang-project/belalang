@@ -38,7 +38,7 @@ int run(muopt::Parser &parser) {
   if (!prog)
     return astParser.hadError() ? 1 : 0;
 
-  birgen::BIRGen birgen(diagEngine);
+  birgen::BIRGen birgen(astCtx, diagEngine);
   birgen.generateProgram(prog);
 
   if (!birgen.runLoweringPipeline()) {
