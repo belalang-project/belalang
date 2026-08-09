@@ -524,16 +524,14 @@ def BIR_GetMemberOp : BIR_Op<"get_member"> {
 }
 
 def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
-  let arguments = (ins 
-    I64Attr:$size
-  );
+  let arguments = (ins);
 
   let results = (outs
     BIR_RefType:$result
   );
 
   let assemblyFormat = [{
-    $size `:` qualified(type($result)) attr-dict
+    `:` qualified(type($result)) attr-dict
   }];
 }
 

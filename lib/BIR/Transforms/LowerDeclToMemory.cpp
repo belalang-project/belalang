@@ -19,24 +19,7 @@ struct DeclareOpLowering final : public OpRewritePattern<bir::DeclareOp> {
   matchAndRewrite(bir::DeclareOp op,
                   mlir::PatternRewriter &rewriter) const override {
     auto refType = mlir::cast<bir::RefType>(op.getType());
-    auto referentTy = refType.getReferent();
-
-    int64_t elSize;
-    if (mlir::isa<bir::IntType>(referentTy))
-      elSize = 8;
-    else if (mlir::isa<bir::FloatType>(referentTy))
-      elSize = 8;
-    else if (mlir::isa<bir::StringType>(referentTy))
-      elSize = 16;
-    else if (mlir::isa<bir::BoolType>(referentTy))
-      elSize = 8;
-    else if (mlir::isa<mlir::FunctionType>(referentTy))
-      elSize = 8;
-    else
-      return failure();
-
-    mlir::Type ty = op.getResult().getType();
-    rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, ty, elSize);
+    rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, refType);
     return success();
   };
 };
