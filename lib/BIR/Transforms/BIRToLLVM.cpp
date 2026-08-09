@@ -484,9 +484,15 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
   LogicalResult
   matchAndRewrite(bir::AllocHeapOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
-    auto elSize = op.getSize();
     auto loc = op.getLoc();
     auto ctx = op.getContext();
+    auto dataLayout = mlir::DataLayout::closest(op);
+
+    // The AllocHeapOp strictly uses the RefType as the result type.
+    // We're allocating memory the size of the referent.
+    auto type = mlir::cast<bir::RefType>(op.getType());
+    auto referentLLVMTy = getTypeConverter()->convertType(type.getReferent());
+    uint64_t typeSize = dataLayout.getTypeSize(referentLLVMTy);
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
     if (!module.lookupSymbol(kGCAlloc)) {
@@ -498,12 +504,13 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
     }
 
     auto i64Type = mlir::IntegerType::get(ctx, 64);
-    auto sizeVal =
-        LLVM::ConstantOp::create(rewriter, loc, i64Type, rewriter.getI64IntegerAttr(elSize));
+    auto sizeVal = LLVM::ConstantOp::create(
+        rewriter, loc, i64Type, rewriter.getI64IntegerAttr(typeSize));
 
     auto ptrType = LLVM::LLVMPointerType::get(ctx);
     auto calleeAttr = FlatSymbolRefAttr::get(ctx, kGCAlloc);
-    auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr, sizeVal.getResult());
+    auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr,
+                                          sizeVal.getResult());
 
     rewriter.replaceOp(op, allocCall.getResult());
     return success();
