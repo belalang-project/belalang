@@ -24,6 +24,11 @@ def BelalangLowerDeclToMemoryPass : Pass<"bir-lower-decl-to-memory"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
+def BelalangInsertStackMapsPass : Pass<"bir-insert-stackmaps"> {
+  let summary = "insert stackmap safepoints at GC allocation sites";
+  let dependentDialects = ["::belalang::bir::BIRDialect"];
+}
+
 def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {
   let summary = "lower bir instructions to LLVM";
   let dependentDialects = ["::belalang::bir::BIRDialect",

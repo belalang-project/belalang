@@ -217,8 +217,11 @@ int build(muopt::Parser &parser) {
     const char *cc = std::getenv("CC");
     std::string cc_cmd = cc ? cc : "cc";
 
-    std::string linkCmd = cc_cmd + " " + objFile + " -L" + brt_path +
-                          " -lbrt -lbdwgc -o " + exeFile;
+    std::string linkCmd = cc_cmd + " -no-pie " + objFile + " -L" + brt_path +
+                          " -Wl,-T," + brt_path +
+                          "/llvm_stackmaps.ld"
+                          " -lbrt -lbdwgc -o " +
+                          exeFile;
     if (std::system(linkCmd.c_str()) != 0) {
       std::cerr << "error: linking failed\n";
       if (std::error_code ec = llvm::sys::fs::remove(objFile))

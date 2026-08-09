@@ -4,7 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "brt",
-    srcs = ["src/brt.c"],
+    srcs = glob(["src/**/*.c", "src/**/*.h"]),
     linkstatic = True,
     deps = [
         "@bdwgc//:bdwgc",
@@ -16,5 +16,13 @@ genrule(
     srcs = ["@bdwgc//:bdwgc"],
     outs = ["libbdwgc.a"],
     cmd = "cp $(location @bdwgc//:bdwgc) $(RULEDIR)/libbdwgc.a",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "llvm_stackmaps_ld",
+    srcs = ["src/llvm_stackmaps.ld"],
+    outs = ["llvm_stackmaps.ld"],
+    cmd = "cp $(location src/llvm_stackmaps.ld) $@",
     visibility = ["//visibility:public"],
 )
