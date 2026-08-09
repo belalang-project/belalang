@@ -510,6 +510,30 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
   };
 };
 
+struct AllocStackOpLowering final
+    : public OpConversionPattern<bir::AllocStackOp> {
+  using OpConversionPattern<bir::AllocStackOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::AllocStackOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto ctx = op.getContext();
+    auto loc = op.getLoc();
+
+    mlir::Type resultTy = LLVM::LLVMPointerType::get(ctx);
+    mlir::Type elementTy =
+        getTypeConverter()->convertType(op.getType().getReferent());
+
+    // Currently limit the possible allocation size to one element.
+    auto i64ty = rewriter.getI64Type();
+    mlir::Value arraySize = LLVM::ConstantOp::create(rewriter, loc, i64ty, 1);
+
+    rewriter.replaceOpWithNewOp<LLVM::AllocaOp>(op, resultTy, elementTy,
+                                                arraySize);
+    return success();
+  };
+};
+
 struct StoreOpLowering final : public OpConversionPattern<bir::StoreOp> {
   using OpConversionPattern<bir::StoreOp>::OpConversionPattern;
 
@@ -792,10 +816,10 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                CallIndirectOpLowering, ReturnOpLowering, AddOpLowering,
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
-               ShrOpLowering, AllocHeapOpLowering, StoreOpLowering,
-               VarLoadOpLowering, CondBrLowering, CmpOpLowering,
-               GetMemberOpLowering, SafepointOpLowering>(typeConverter,
-                                                         patterns.getContext());
+               ShrOpLowering, AllocHeapOpLowering, AllocStackOpLowering,
+               StoreOpLowering, VarLoadOpLowering, CondBrLowering,
+               CmpOpLowering, GetMemberOpLowering, SafepointOpLowering>(
+      typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
