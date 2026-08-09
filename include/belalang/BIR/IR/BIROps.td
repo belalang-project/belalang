@@ -537,6 +537,18 @@ def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
   }];
 }
 
+def BIR_AllocStackOp : BIR_Op<"alloc_stack"> {
+  let arguments = (ins);
+
+  let results = (outs
+    BIR_RefType:$result
+  );
+
+  let assemblyFormat = [{
+    `:` qualified(type($result)) attr-dict
+  }];
+}
+
 def BIR_SafepointOp : BIR_Op<"safepoint"> {
   let arguments = (ins
     I64Attr:$id,
