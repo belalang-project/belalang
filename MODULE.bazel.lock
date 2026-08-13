@@ -231,22 +231,12 @@
   "moduleExtensions": {
     "//third_party:defs.bzl%third_party_deps": {
       "general": {
-        "bzlTransitiveDigest": "SNm60L0Mml6LMCiT8cNvhJrYm4he9pFtIz1BQFhiw38=",
+        "bzlTransitiveDigest": "DEgRhXp9C8P1kTOby1Kfhx7NcV+CtLAtSSGrxXMATD8=",
         "usagesDigest": "IhAWKcX6mchlBXfCkPHTt6i1VEX5C02mmAOg5u+pJw8=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
         ],
         "generatedRepoSpecs": {
-          "bdwgc": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "build_file": "@@//third_party:bdwgc.BUILD",
-              "strip_prefix": "gc-8.2.12",
-              "urls": [
-                "https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"
-              ]
-            }
-          },
           "googletest": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
             "attributes": {

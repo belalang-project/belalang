@@ -5,8 +5,7 @@
 
 Belalang (Indonesian word for Grasshopper) is an experimental compiled language built using MLIR and LLVM.
 Inspired by ClangIR, it utilizes a custom MLIR dialect for its lowering system
-and uses the Boehm-Demers-Weiser GC algorithm under the hood for automatic
-memory management.
+and uses a Garbage Collector under the hood for automatic memory management.
 
 ## Examples
 

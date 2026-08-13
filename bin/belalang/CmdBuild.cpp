@@ -220,7 +220,7 @@ int build(muopt::Parser &parser) {
     std::string linkCmd = cc_cmd + " -no-pie " + objFile + " -L" + brt_path +
                           " -Wl,-T," + brt_path +
                           "/llvm_stackmaps.ld"
-                          " -lbrt -lbdwgc -o " +
+                          " -lbrt -o " +
                           exeFile;
     if (std::system(linkCmd.c_str()) != 0) {
       std::cerr << "error: linking failed\n";
