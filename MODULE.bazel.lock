@@ -231,7 +231,7 @@
   "moduleExtensions": {
     "//third_party:defs.bzl%third_party_deps": {
       "general": {
-        "bzlTransitiveDigest": "i3eoVHo1nKSEiiCFKDTrpJniJFRp++8FWX2n+lMsKvU=",
+        "bzlTransitiveDigest": "SNm60L0Mml6LMCiT8cNvhJrYm4he9pFtIz1BQFhiw38=",
         "usagesDigest": "IhAWKcX6mchlBXfCkPHTt6i1VEX5C02mmAOg5u+pJw8=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -245,6 +245,13 @@
               "urls": [
                 "https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"
               ]
+            }
+          },
+          "googletest": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
+            "attributes": {
+              "remote": "https://github.com/google/googletest.git",
+              "tag": "v1.18.0"
             }
           },
           "llvm-raw": {

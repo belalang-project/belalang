@@ -1,4 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _third_party_deps_impl(_ctx):
@@ -7,6 +7,12 @@ def _third_party_deps_impl(_ctx):
         build_file = "//third_party:bdwgc.BUILD",
         strip_prefix = "gc-8.2.12",
         urls = ["https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"],
+    )
+
+    git_repository(
+        name = "googletest",
+        remote = "https://github.com/google/googletest.git",
+        tag = "v1.18.0",
     )
 
     LLVM_COMMIT = "6716e3108af4eba29b28140d17d1f022eb7adb64"

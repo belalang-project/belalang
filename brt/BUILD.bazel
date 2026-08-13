@@ -1,10 +1,22 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "brt",
-    srcs = glob(["src/**/*.c", "src/**/*.h"]),
+    srcs = glob(
+        ["src/**/*.c", "src/**/*.h"],
+        exclude = ["src/**/*_test.*"],
+    ),
+)
+
+cc_test(
+    name = "gc_test",
+    srcs = ["src/gc_test.cpp"],
+    deps = [
+        ":brt",
+        "@googletest//:gtest_main",
+    ],
 )
 
 genrule(
