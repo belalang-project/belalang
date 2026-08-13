@@ -1,6 +1,6 @@
 #include "llvm_stackmap.h"
+#include "gc.h"
 
-#include <gc.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -24,6 +24,5 @@ void brt_print_string(struct BrString v) {
 
 void brt_init() {
   (void)get_llvm_stkmap_section();
-  GC_init();
+  brt_gc_init();
 }
-void *brt_gc_alloc(size_t size) { return GC_malloc(size); }
