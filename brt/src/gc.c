@@ -54,6 +54,6 @@ void *brt_gc_alloc(size_t size) {
   the_heap.objects = obj;
   the_heap.hp += alloc_size;
 
-  memset(obj->data, 0, alloc_size);
+  memset(obj->data, 0, payload_size);
   return obj->data;
 }
