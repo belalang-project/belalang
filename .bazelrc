@@ -23,6 +23,6 @@ build --extra_toolchains=@llvm//toolchain:all
 build --@llvm//config:empty_sysroot=True
 build --@llvm//config:experimental_stub_libgcc_s=True
 
-test --test_output=errors
+test --test_output=all
 
 build --workspace_status_command=tools/workspace_status.sh

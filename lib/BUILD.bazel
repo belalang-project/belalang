@@ -40,6 +40,7 @@ cc_library(
     deps = [
         "//include:BIR",
         "@llvm-project//mlir:Pass",
+        "@llvm-project//mlir:Analysis",
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:ControlFlowDialect",

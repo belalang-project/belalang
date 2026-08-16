@@ -67,6 +67,7 @@ cc_library(
         ":BelalangBIRLoopOpInterfaceIncGen",
         ":BelalangPassIncGen",
         "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:Analysis",
     ],
 )
 
