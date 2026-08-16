@@ -7,6 +7,10 @@
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Transforms/DialectConversion.h"
 
+namespace mlir {
+class DataFlowSolver;
+} // namespace mlir
+
 namespace belalang {
 namespace bir {
 
@@ -17,7 +21,8 @@ namespace bir {
 #include "belalang/BIR/Passes.h.inc"
 
 void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
-void populateBelalangLowerDeclToMemoryPatterns(mlir::RewritePatternSet &patterns);
+void populateBelalangLowerDeclToMemoryPatterns(
+    mlir::RewritePatternSet &patterns, mlir::DataFlowSolver &solver);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerToRuntimeCallsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,

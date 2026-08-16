@@ -1,5 +1,8 @@
+#include "belalang/BIR/Analysis/EscapeAnalysis.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
+#include "mlir/Analysis/DataFlow/Utils.h"
+#include "mlir/Analysis/DataFlowFramework.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 namespace mlir {
@@ -13,22 +16,34 @@ using namespace belalang;
 using namespace belalang::bir;
 
 struct DeclareOpLowering final : public OpRewritePattern<bir::DeclareOp> {
-  using OpRewritePattern<bir::DeclareOp>::OpRewritePattern;
+  DeclareOpLowering(mlir::MLIRContext *ctx, mlir::DataFlowSolver &solver)
+      : OpRewritePattern<bir::DeclareOp>(ctx), solver(solver) {}
 
   LogicalResult
   matchAndRewrite(bir::DeclareOp op,
                   mlir::PatternRewriter &rewriter) const override {
+    const auto *state = 
+        solver.lookupState<EscapeLattice>(op.getResult());
+    bool escapes = state && state->escapes;
+
     auto refType = mlir::cast<bir::RefType>(op.getType());
-    rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, refType);
+    if (escapes)
+      rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, refType);
+    else
+      rewriter.replaceOpWithNewOp<bir::AllocStackOp>(op, refType);
+
     return success();
   };
+
+private:
+  mlir::DataFlowSolver &solver;
 };
 
 } // namespace
 
 void belalang::bir::populateBelalangLowerDeclToMemoryPatterns(
-    mlir::RewritePatternSet &patterns) {
-  patterns.add<DeclareOpLowering>(patterns.getContext());
+    mlir::RewritePatternSet &patterns, mlir::DataFlowSolver &solver) {
+  patterns.add<DeclareOpLowering>(patterns.getContext(), solver);
 }
 
 // -----------------------------------------------------------------------------
@@ -42,8 +57,16 @@ struct BelalangLowerDeclToMemoryPass
       BelalangLowerDeclToMemoryPass>::BelalangLowerDeclToMemoryPassBase;
 
   void runOnOperation() override {
+    SymbolTableCollection symbolTable;
+
+    DataFlowSolver solver;
+    mlir::dataflow::loadBaselineAnalyses(solver);
+    solver.load<EscapeAnalysis>(symbolTable);
+    if (solver.initializeAndRun(getOperation()).failed())
+      return signalPassFailure();
+
     mlir::RewritePatternSet patterns(&getContext());
-    belalang::bir::populateBelalangLowerDeclToMemoryPatterns(patterns);
+    belalang::bir::populateBelalangLowerDeclToMemoryPatterns(patterns, solver);
 
     if (mlir::applyPatternsGreedily(getOperation(), std::move(patterns))
             .failed()) {
