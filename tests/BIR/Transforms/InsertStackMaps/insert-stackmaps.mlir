@@ -11,7 +11,7 @@
 // CHECK-NEXT:   bir.store %2 to %3 : !bir.float to !bir.ref<!bir.float>
 // CHECK-NEXT:   %4 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
 // CHECK-NEXT:   %5 = bir.constant #bir.int<1> : !bir.int
-// CHECK-NEXT:   %6 = bir.add %4, %5 : (!bir.int, !bir.int) -> !bir.int
+// CHECK-NEXT:   %6 = bir.add %4, %5 : !bir.int
 // CHECK-NEXT:   bir.safepoint 2(%1, %3 : !bir.ref<!bir.int>, !bir.ref<!bir.float>)
 // CHECK-NEXT:   %7 = bir.alloc_heap : !bir.ref<!bir.int>
 // CHECK-NEXT:   bir.store %6 to %7 : !bir.int to !bir.ref<!bir.int>
@@ -28,7 +28,7 @@ bir.func @alloc_straight_line() -> !bir.int {
   bir.store %2 to %3 : !bir.float to !bir.ref<!bir.float>
   %4 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
   %5 = bir.constant #bir.int<1> : !bir.int
-  %6 = bir.add %4, %5 : (!bir.int, !bir.int) -> !bir.int
+  %6 = bir.add %4, %5 : !bir.int
   %7 = bir.alloc_heap : !bir.ref<!bir.int>
   bir.store %6 to %7 : !bir.int to !bir.ref<!bir.int>
   %8 = bir.load %7 : (!bir.ref<!bir.int>) -> !bir.int
@@ -46,7 +46,7 @@ bir.func @alloc_straight_line() -> !bir.int {
 // CHECK-NEXT: ^bb1:  // pred: ^bb0
 // CHECK-NEXT:   %2 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
 // CHECK-NEXT:   %3 = bir.constant #bir.int<1> : !bir.int
-// CHECK-NEXT:   %4 = bir.add %2, %3 : (!bir.int, !bir.int) -> !bir.int
+// CHECK-NEXT:   %4 = bir.add %2, %3 : !bir.int
 // CHECK-NEXT:   bir.safepoint 1(%1 : !bir.ref<!bir.int>)
 // CHECK-NEXT:   %5 = bir.alloc_heap : !bir.ref<!bir.int>
 // CHECK-NEXT:   bir.store %4 to %5 : !bir.int to !bir.ref<!bir.int>
@@ -62,7 +62,7 @@ bir.func @alloc_cross_block() -> !bir.int {
 ^bb1:
   %2 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
   %3 = bir.constant #bir.int<1> : !bir.int
-  %4 = bir.add %2, %3 : (!bir.int, !bir.int) -> !bir.int
+  %4 = bir.add %2, %3 : !bir.int
   %5 = bir.alloc_heap : !bir.ref<!bir.int>
   bir.store %4 to %5 : !bir.int to !bir.ref<!bir.int>
   %6 = bir.load %5 : (!bir.ref<!bir.int>) -> !bir.int

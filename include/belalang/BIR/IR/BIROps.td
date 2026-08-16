@@ -11,6 +11,7 @@ include "mlir/IR/SymbolInterfaces.td"
 include "mlir/IR/BuiltinAttributeInterfaces.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/FunctionInterfaces.td"
+include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 
@@ -45,7 +46,7 @@ def BIR_ConstantOp : BIR_Op<"constant", [
   let hasVerifier = 1;
 }
 
-def BIR_AddOp : BIR_Op<"add"> {
+def BIR_AddOp : BIR_Op<"add", [SameTypeOperands, SameOperandsAndResultType]> {
   let summary = "add";
 
   let description = [{
@@ -59,11 +60,10 @@ def BIR_AddOp : BIR_Op<"add"> {
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
-  let assemblyFormat =
-      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_SubOp : BIR_Op<"sub"> {
+def BIR_SubOp : BIR_Op<"sub", [SameTypeOperands, SameOperandsAndResultType]> {
   let summary = "sub";
 
   let description = [{
@@ -77,11 +77,10 @@ def BIR_SubOp : BIR_Op<"sub"> {
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
-  let assemblyFormat =
-      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_MulOp : BIR_Op<"mul"> {
+def BIR_MulOp : BIR_Op<"mul", [SameTypeOperands, SameOperandsAndResultType]> {
   let summary = "mul";
 
   let description = [{
@@ -95,11 +94,10 @@ def BIR_MulOp : BIR_Op<"mul"> {
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
-  let assemblyFormat =
-      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_DivOp : BIR_Op<"div"> {
+def BIR_DivOp : BIR_Op<"div", [SameTypeOperands, SameOperandsAndResultType]> {
   let summary = "div";
 
   let description = [{
@@ -113,11 +111,10 @@ def BIR_DivOp : BIR_Op<"div"> {
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
-  let assemblyFormat =
-      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_ModOp : BIR_Op<"mod"> {
+def BIR_ModOp : BIR_Op<"mod", [SameTypeOperands, SameOperandsAndResultType]> {
   let summary = "mod";
 
   let description = [{
@@ -131,8 +128,7 @@ def BIR_ModOp : BIR_Op<"mod"> {
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
   let results = (outs BIR_AnyType:$result);
 
-  let assemblyFormat =
-      "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
+  let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
 def BIR_AndOp : BIR_Op<"and"> {
@@ -496,14 +492,6 @@ def BIR_CmpOp : BIR_Op<"cmp", [
     $kind $lhs `,` $rhs `:` type($lhs) attr-dict
   }];
 
-  let builders = [
-    OpBuilder<(ins "bir::CmpOpKind":$kind, "::mlir::Value":$lhs, "::mlir::Value":$rhs), [{
-      $_state.addTypes(bir::BoolType::get($_builder.getContext()));
-      $_state.addAttribute("kind", bir::CmpOpKindAttr::get($_builder.getContext(), kind));
-      $_state.addOperands(lhs);
-      $_state.addOperands(rhs);
-    }]>
-  ];
 }
 
 def BIR_GetMemberOp : BIR_Op<"get_member"> {

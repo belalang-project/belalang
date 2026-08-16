@@ -4,14 +4,14 @@
 
 # CHECK-NEXT: %[[C0:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C1:.*]] = bir.constant #bir.int<2> : !bir.int
-# CHECK-NEXT: %[[C2:.*]] = bir.add %[[C0]], %[[C1]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C2:.*]] = bir.add %[[C0]], %[[C1]] : !bir.int
 1 + 2;
 
 # CHECK-NEXT: %[[C3:.*]] = bir.constant #bir.int<10> : !bir.int
 # CHECK-NEXT: %[[C4:.*]] = bir.constant #bir.int<2> : !bir.int
-# CHECK-NEXT: %[[C5:.*]] = bir.div %[[C3]], %[[C4]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C5:.*]] = bir.div %[[C3]], %[[C4]] : !bir.int
 # CHECK-NEXT: %[[C6:.*]] = bir.constant #bir.int<2> : !bir.int
-# CHECK-NEXT: %[[C7:.*]] = bir.mul %[[C5]], %[[C6]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C7:.*]] = bir.mul %[[C5]], %[[C6]] : !bir.int
 10 / 2 * 2;
 
 # CHECK-NEXT: %8 = bir.constant #bir.int<0> : !bir.int

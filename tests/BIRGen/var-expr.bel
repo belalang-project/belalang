@@ -8,31 +8,31 @@ x := 0;
 
 # CHECK-NEXT: %[[C2:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C3:.*]] = bir.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT: %[[C4:.*]] = bir.add %[[C3]], %[[C2]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C4:.*]] = bir.add %[[C3]], %[[C2]] : !bir.int
 # CHECK-NEXT: bir.store %[[C4]] to %[[C1]] : !bir.int to !bir.ref<!bir.int>
 x += 1;
 
 # CHECK-NEXT: %[[C5:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C6:.*]] = bir.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT: %[[C7:.*]] = bir.sub %[[C6]], %[[C5]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C7:.*]] = bir.sub %[[C6]], %[[C5]] : !bir.int
 # CHECK-NEXT: bir.store %[[C7]] to %[[C1]] : !bir.int to !bir.ref<!bir.int>
 x -= 1;
 
 # CHECK-NEXT: %[[C8:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C9:.*]] = bir.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT: %[[C10:.*]] = bir.mul %[[C9]], %[[C8]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C10:.*]] = bir.mul %[[C9]], %[[C8]] : !bir.int
 # CHECK-NEXT: bir.store %[[C10]] to %[[C1]] : !bir.int to !bir.ref<!bir.int>
 x *= 1;
 
 # CHECK-NEXT: %[[C11:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C12:.*]] = bir.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT: %[[C13:.*]] = bir.div %[[C12]], %[[C11]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C13:.*]] = bir.div %[[C12]], %[[C11]] : !bir.int
 # CHECK-NEXT: bir.store %[[C13]] to %[[C1]] : !bir.int to !bir.ref<!bir.int>
 x /= 1;
 
 # CHECK-NEXT: %[[C14:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT: %[[C15:.*]] = bir.load %[[C1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT: %[[C16:.*]] = bir.mod %[[C15]], %[[C14]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT: %[[C16:.*]] = bir.mod %[[C15]], %[[C14]] : !bir.int
 # CHECK-NEXT: bir.store %[[C16]] to %[[C1]] : !bir.int to !bir.ref<!bir.int>
 x %= 1;
 

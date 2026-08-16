@@ -13,7 +13,7 @@
 # CHECK-NEXT:       bir.scope {
 # CHECK-NEXT:         %[[C1:.*]] = bir.constant #bir.int<1> : !bir.int
 # CHECK-NEXT:         %[[L2:.*]] = bir.load %[[X]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT:         %[[ADD:.*]] = bir.add %[[L2]], %[[C1]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT:         %[[ADD:.*]] = bir.add %[[L2]], %[[C1]] : !bir.int
 # CHECK-NEXT:         bir.store %[[ADD]] to %[[X]] : !bir.int to !bir.ref<!bir.int>
 # CHECK-NEXT:         bir.yield
 # CHECK-NEXT:       }

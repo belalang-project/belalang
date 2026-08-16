@@ -11,19 +11,19 @@ bir.func @basic() -> !bir.int {
   %1 = bir.constant #bir.int<2> : !bir.int
 
   // CHECK-NEXT: %2 = llvm.add %0, %1 : i64
-  %2 = bir.add %0, %1 : (!bir.int, !bir.int) -> !bir.int
+  %2 = bir.add %0, %1 : !bir.int
 
   // CHECK-NEXT: %3 = llvm.sub %0, %1 : i64
-  %3 = bir.sub %0, %1 : (!bir.int, !bir.int) -> !bir.int
+  %3 = bir.sub %0, %1 : !bir.int
 
   // CHECK-NEXT: %4 = llvm.mul %0, %1 : i64
-  %4 = bir.mul %0, %1 : (!bir.int, !bir.int) -> !bir.int
+  %4 = bir.mul %0, %1 : !bir.int
 
   // CHECK-NEXT: %5 = llvm.sdiv %0, %1 : i64
-  %5 = bir.div %0, %1 : (!bir.int, !bir.int) -> !bir.int
+  %5 = bir.div %0, %1 : !bir.int
 
   // CHECK-NEXT: %6 = llvm.srem %0, %1 : i64
-  %6 = bir.mod %0, %1 : (!bir.int, !bir.int) -> !bir.int
+  %6 = bir.mod %0, %1 : !bir.int
 
   // CHECK-NEXT: %7 = llvm.and %0, %1 : i64
   %7 = bir.and %0, %1 : (!bir.int, !bir.int) -> !bir.int
