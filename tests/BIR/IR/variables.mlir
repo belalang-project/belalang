@@ -21,7 +21,7 @@ bir.func @main() -> !bir.int {
   // return x + 1
   %2 = bir.constant #bir.int<1> : !bir.int
   %3 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  %4 = bir.add %3, %2 : (!bir.int, !bir.int) -> !bir.int
+  %4 = bir.add %3, %2 : !bir.int
   bir.return %4 : !bir.int
 }
 

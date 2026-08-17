@@ -9,7 +9,7 @@
 # CHECK-NEXT:       bir.store %[[ARG1]] to %[[V1]] : !bir.int to !bir.ref<!bir.int>
 # CHECK-NEXT:       %[[V2:.*]] = bir.load %[[V0]] : (!bir.ref<!bir.int>) -> !bir.int
 # CHECK-NEXT:       %[[V3:.*]] = bir.load %[[V1]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT:       %[[V4:.*]] = bir.add %[[V2]], %[[V3]] : (!bir.int, !bir.int) -> !bir.int
+# CHECK-NEXT:       %[[V4:.*]] = bir.add %[[V2]], %[[V3]] : !bir.int
 # CHECK-NEXT:       bir.return %[[V4]] : !bir.int
 # CHECK-NEXT:     }
 # CHECK-NEXT:     %[[V5:.*]] = bir.declare "add" : !bir.ref<(!bir.int, !bir.int) -> !bir.int>
