@@ -431,6 +431,10 @@ def BIR_CondBrOp : BIR_Op<"cond_br", [
   }];
 }
 
+// -----------------------------------------------------------------------------
+// Loops
+// -----------------------------------------------------------------------------
+
 def BIR_WhileOp : BIR_Op<"while", [
   LoopOpInterface,
   NoRegionArguments,
@@ -453,14 +457,14 @@ def BIR_ConditionOp : BIR_Op<"condition", [
 
 def BIR_BreakOp : BIR_Op<"break", [
   Terminator,
-  // TODO: specify ancestor of breakable scopes
+  AncestorOneOf<["WhileOp"]>,
 ]> {
   let assemblyFormat = "attr-dict";
 }
 
 def BIR_ContinueOp : BIR_Op<"continue", [
   Terminator,
-  // TODO: specify ancestor of continueable scopes
+  AncestorOneOf<["WhileOp"]>,
 ]> {
   let assemblyFormat = "attr-dict";
 }
