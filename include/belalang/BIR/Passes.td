@@ -29,6 +29,11 @@ def BelalangInsertStackMapsPass : Pass<"bir-insert-stackmaps"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
+def BelalangOptimizeStructLayoutPass : Pass<"bir-optimize-struct-layout"> {
+  let summary = "compute compact physical layouts for BIR structs";
+  let dependentDialects = ["::belalang::bir::BIRDialect"];
+}
+
 def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {
   let summary = "lower bir instructions to LLVM";
   let dependentDialects = ["::belalang::bir::BIRDialect",
