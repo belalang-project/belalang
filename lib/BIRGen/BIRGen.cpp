@@ -229,8 +229,7 @@ mlir::Value BIRGen::visitVarExpr(VarExpr *expr) {
   }
 
   auto refType = llvm::cast<bir::RefType>(dest.getType());
-  auto loadOp =
-      bir::VarLoadOp::create(builder, loc, refType.getReferent(), dest);
+  auto loadOp = bir::LoadOp::create(builder, loc, refType.getReferent(), dest);
   mlir::Value lhs = loadOp.getResult();
 
   mlir::Value res;
@@ -349,8 +348,7 @@ mlir::Value BIRGen::visitIdentifierExpr(IdentifierExpr *expr) {
 
   mlir::Value ref = it->second;
   auto refType = llvm::cast<bir::RefType>(ref.getType());
-  auto loadOp =
-      bir::VarLoadOp::create(builder, loc, refType.getReferent(), ref);
+  auto loadOp = bir::LoadOp::create(builder, loc, refType.getReferent(), ref);
   return loadOp.getResult();
 }
 

@@ -343,7 +343,7 @@ def BIR_StoreOp : BIR_Op<"store"> {
   let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` qualified(type($dest))";
 }
 
-def BIR_VarLoadOp : BIR_Op<"load"> {
+def BIR_LoadOp : BIR_Op<"load"> {
   let summary = "load";
 
   let arguments = (ins BIR_RefType:$ref);
