@@ -2,6 +2,7 @@
 #define BELALANG_IR_TYPES_TD_
 
 include "belalang/BIR/IR/BIRDialect.td"
+include "mlir/Interfaces/DataLayoutInterfaces.td"
 
 class BIR_Type<string name, string typeMnemonic, list<Trait> traits = [],
                string baseCppClass = "::mlir::Type">
@@ -9,23 +10,34 @@ class BIR_Type<string name, string typeMnemonic, list<Trait> traits = [],
   let mnemonic = typeMnemonic;
 }
 
-def BIR_IntType : BIR_Type<"Int", "int"> {
+def BIR_IntType : BIR_Type<"Int", "int", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "Integer number type";
 }
 
-def BIR_FloatType : BIR_Type<"Float", "float"> {
+def BIR_FloatType : BIR_Type<"Float", "float", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "Floating-point number type";
 }
 
-def BIR_StringType : BIR_Type<"String", "string"> {
+def BIR_StringType : BIR_Type<"String", "string", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "String type";
 }
 
-def BIR_BoolType : BIR_Type<"Bool", "bool"> {
+def BIR_BoolType : BIR_Type<"Bool", "bool", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "Boolean type";
 }
 
-def BIR_StructType : BIR_Type<"Struct", "struct", [MutableType]> {
+def BIR_StructType : BIR_Type<"Struct", "struct", [
+  MutableType,
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "Struct type";
 
   let storageClass = "StructTypeStorage";
@@ -50,7 +62,9 @@ def BIR_ReferencableType : AnyTypeOf<[
   BIR_StructType
 ]>;
 
-def BIR_RefType : BIR_Type<"Ref", "ref"> {
+def BIR_RefType : BIR_Type<"Ref", "ref", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
   let summary = "Reference type";
 
   let parameters = (ins BIR_ReferencableType:$referent);
