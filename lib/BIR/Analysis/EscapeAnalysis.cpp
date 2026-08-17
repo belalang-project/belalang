@@ -39,7 +39,7 @@ EscapeAnalysis::visitOperation(mlir::Operation *op,
     }
   }
 
-  if (mlir::isa<bir::VarLoadOp>(op) && !results.empty() &&
+  if (mlir::isa<bir::LoadOp>(op) && !results.empty() &&
       results.front()->escapes) {
     propagateIfChanged(operands.front(), operands.front()->markEscapes());
   }

@@ -560,11 +560,11 @@ struct StoreOpLowering final : public OpConversionPattern<bir::StoreOp> {
   };
 };
 
-struct VarLoadOpLowering final : public OpConversionPattern<bir::VarLoadOp> {
-  using OpConversionPattern<bir::VarLoadOp>::OpConversionPattern;
+struct LoadOpLowering final : public OpConversionPattern<bir::LoadOp> {
+  using OpConversionPattern<bir::LoadOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(bir::VarLoadOp op, OpAdaptor adaptor,
+  matchAndRewrite(bir::LoadOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
     auto type = getTypeConverter()->convertType(op.getType());
     if (!type)
@@ -824,9 +824,9 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                SubOpLowering, MulOpLowering, DivOpLowering, ModOpLowering,
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, AllocHeapOpLowering, AllocStackOpLowering,
-               StoreOpLowering, VarLoadOpLowering, CondBrLowering,
-               CmpOpLowering, GetMemberOpLowering, SafepointOpLowering>(
-      typeConverter, patterns.getContext());
+               StoreOpLowering, LoadOpLowering, CondBrLowering, CmpOpLowering,
+               GetMemberOpLowering, SafepointOpLowering>(typeConverter,
+                                                         patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
