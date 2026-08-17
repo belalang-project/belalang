@@ -62,7 +62,7 @@ def BIR_FnAttr : BIR_Attr<"Fn", "fn", [TypedAttrInterface]> {
 
   let parameters = (ins
     AttributeSelfTypeParameter<"">:$type,
-    "FlatSymbolRefAttr":$value
+    "mlir::FlatSymbolRefAttr":$value
   );
 
   let assemblyFormat = "`<` $value `>`";

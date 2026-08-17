@@ -217,9 +217,9 @@ def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
 
     ::mlir::Region *getCallableRegion() { return &getBody(); }
 
-    ArrayRef<::mlir::Type> getArgumentTypes() { return getFunctionType().getInputs(); }
+    ::llvm::ArrayRef<::mlir::Type> getArgumentTypes() { return getFunctionType().getInputs(); }
 
-    ArrayRef<::mlir::Type> getResultTypes() { return getFunctionType().getResults(); }
+    ::llvm::ArrayRef<::mlir::Type> getResultTypes() { return getFunctionType().getResults(); }
 
     mlir::Type getResType();
   }];
@@ -271,12 +271,12 @@ def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
   TypesMatchWith<
     "callee input types match argument types",
     "callee", "callee_operands",
-    "::llvm::cast<FunctionType>($_self).getInputs()"
+    "::llvm::cast<::mlir::FunctionType>($_self).getInputs()"
   >,
   TypesMatchWith<
     "callee result types match result types",
     "callee", "results",
-    "::llvm::cast<FunctionType>($_self).getResults()"
+    "::llvm::cast<::mlir::FunctionType>($_self).getResults()"
   >
 ]> {
   let summary = "call_indirect";
@@ -297,16 +297,16 @@ def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
       return {operand_begin(), operand_end()};
     }
 
-    MutableOperandRange getArgOperandsMutable() {
+    ::mlir::MutableOperandRange getArgOperandsMutable() {
       return getCalleeOperandsMutable();
     }
 
-    CallInterfaceCallable getCallableForCallee() {
+    ::mlir::CallInterfaceCallable getCallableForCallee() {
       return getCallee();
     }
 
-    void setCalleeFromCallable(CallInterfaceCallable callee) {
-      setOperand(0, cast<mlir::Value>(callee));
+    void setCalleeFromCallable(::mlir::CallInterfaceCallable callee) {
+      setOperand(0, mlir::cast<mlir::Value>(callee));
     }
   }];
 }
@@ -386,7 +386,7 @@ def BIR_IfOp : BIR_Op<"if", [
 
   let extraClassDeclaration = [{
     bool hasElse() { return !getElseRegion().empty(); }
-    static LogicalResult ensureRegionTerm(::mlir::Builder &, ::mlir::Region &);
+    static ::mlir::LogicalResult ensureRegionTerm(::mlir::Builder &, ::mlir::Region &);
   }];
 
   let hasCustomAssemblyFormat = 1;

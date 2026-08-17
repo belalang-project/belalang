@@ -18,32 +18,32 @@ namespace bir {
 // ConstantOp
 // -----------------------------------------------------------------------------
 
-LogicalResult ConstantOp::verify() {
+mlir::LogicalResult ConstantOp::verify() {
   mlir::Type ty = getType();
   mlir::Attribute attr = getValue();
 
-  if (isa<bir::IntType>(ty) && isa<bir::IntegerAttr>(attr)) {
-    return success();
+  if (mlir::isa<bir::IntType>(ty) && mlir::isa<bir::IntegerAttr>(attr)) {
+    return mlir::success();
   }
 
-  if (isa<bir::FloatType>(ty) && isa<bir::FloatAttr>(attr)) {
-    return success();
+  if (mlir::isa<bir::FloatType>(ty) && mlir::isa<bir::FloatAttr>(attr)) {
+    return mlir::success();
   }
 
-  if (isa<bir::StringType>(ty) && isa<bir::StringAttr>(attr)) {
-    return success();
+  if (mlir::isa<bir::StringType>(ty) && mlir::isa<bir::StringAttr>(attr)) {
+    return mlir::success();
   }
 
-  if (isa<FunctionType>(ty) && isa<bir::FnAttr>(attr)) {
-    return success();
+  if (mlir::isa<mlir::FunctionType>(ty) && mlir::isa<bir::FnAttr>(attr)) {
+    return mlir::success();
   }
 
-  if (isa<bir::BoolType>(ty) && isa<bir::BoolAttr>(attr)) {
-    return success();
+  if (mlir::isa<bir::BoolType>(ty) && mlir::isa<bir::BoolAttr>(attr)) {
+    return mlir::success();
   }
 
-  if (isa<bir::StructType>(ty) && isa<bir::StructAttr>(attr)) {
-    return success();
+  if (mlir::isa<bir::StructType>(ty) && mlir::isa<bir::StructAttr>(attr)) {
+    return mlir::success();
   }
 
   return emitOpError() << "type and attribute mismatch.";
@@ -92,11 +92,11 @@ mlir::Type FuncOp::getResType() {
 // FuncExprOp
 // -----------------------------------------------------------------------------
 
-LogicalResult FuncExprOp::verify() {
+mlir::LogicalResult FuncExprOp::verify() {
   auto &body = getBody().front();
   auto term = body.getTerminator();
 
-  auto returnOp = dyn_cast_or_null<bir::ReturnOp>(term);
+  auto returnOp = mlir::dyn_cast_or_null<bir::ReturnOp>(term);
   if (!returnOp)
     return emitOpError() << "body must be terminated by a 'bir.return' op";
 
@@ -106,7 +106,7 @@ LogicalResult FuncExprOp::verify() {
     return emitOpError() << "returned types do not match function signature types";
   }
 
-  return success();
+  return mlir::success();
 }
 
 // -----------------------------------------------------------------------------
@@ -149,13 +149,13 @@ mlir::ParseResult CallOp::parse(mlir::OpAsmParser &parser,
   if (parser.parseColon())
     return mlir::failure();
 
-  SmallVector<Type> argTypes;
-  SmallVector<DictionaryAttr> argAttrs;
-  SmallVector<Type> resultTypes;
-  SmallVector<DictionaryAttr> resultAttrs;
+  llvm::SmallVector<mlir::Type> argTypes;
+  llvm::SmallVector<mlir::DictionaryAttr> argAttrs;
+  llvm::SmallVector<mlir::Type> resultTypes;
+  llvm::SmallVector<mlir::DictionaryAttr> resultAttrs;
 
-  if (call_interface_impl::parseFunctionSignature(parser, argTypes, argAttrs,
-                                                  resultTypes, resultAttrs))
+  if (mlir::call_interface_impl::parseFunctionSignature(
+          parser, argTypes, argAttrs, resultTypes, resultAttrs))
     return mlir::failure();
 
   result.addTypes(resultTypes);
@@ -172,7 +172,7 @@ void CallOp::print(mlir::OpAsmPrinter &p) {
   p << '(' << getArgOperands() << ')';
   p << " : ";
 
-  call_interface_impl::printFunctionSignature(
+  mlir::call_interface_impl::printFunctionSignature(
       p, getOperands().getTypes(), getArgAttrsAttr(), false,
       (*this)->getResultTypes(), getResAttrsAttr());
 }
@@ -183,7 +183,7 @@ void CallOp::print(mlir::OpAsmPrinter &p) {
 
 mlir::LogicalResult
 CallOp::verifySymbolUses(mlir::SymbolTableCollection &symbolTable) {
-  auto fnAttr = (*this)->getAttrOfType<FlatSymbolRefAttr>("callee");
+  auto fnAttr = (*this)->getAttrOfType<mlir::FlatSymbolRefAttr>("callee");
   auto fn = symbolTable.lookupNearestSymbolFrom<bir::FuncOp>(*this, fnAttr);
 
   if (!fn)
@@ -221,13 +221,13 @@ mlir::LogicalResult IfOp::ensureRegionTerm(mlir::Builder &b, mlir::Region &r) {
     builder.createBlock(&r);
 
   mlir::Block &blk = r.back();
-  if (!blk.empty() && blk.back().hasTrait<OpTrait::IsTerminator>())
-    return success();
+  if (!blk.empty() && blk.back().hasTrait<mlir::OpTrait::IsTerminator>())
+    return mlir::success();
 
   // Create the yield op to terminate the block
   builder.setInsertionPointToEnd(&blk);
   bir::YieldOp::create(builder, builder.getUnknownLoc());
-  return success();
+  return mlir::success();
 }
 
 mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result) {
@@ -235,22 +235,23 @@ mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result
   mlir::Region *thenRegion = result.addRegion();
   mlir::Region *elseRegion = result.addRegion();
 
-  OpAsmParser::UnresolvedOperand cond;
+  mlir::OpAsmParser::UnresolvedOperand cond;
   mlir::Type ty = bir::BoolType::get(p.getContext());
 
-  if (failed(p.parseOperand(cond)) || failed(p.resolveOperand(cond, ty, result.operands)))
-    return failure();
+  if (mlir::failed(p.parseOperand(cond)) ||
+      mlir::failed(p.resolveOperand(cond, ty, result.operands)))
+    return mlir::failure();
 
-  if (failed(p.parseRegion(*thenRegion)))
-    return failure();
-  if (failed(ensureRegionTerm(p.getBuilder(), *thenRegion)))
-    return failure();
+  if (mlir::failed(p.parseRegion(*thenRegion)))
+    return mlir::failure();
+  if (mlir::failed(ensureRegionTerm(p.getBuilder(), *thenRegion)))
+    return mlir::failure();
 
-  if (succeeded(p.parseOptionalKeyword("else"))) {
-    if (failed(p.parseRegion(*elseRegion)))
-      return failure();
-    if (failed(ensureRegionTerm(p.getBuilder(), *elseRegion)))
-      return failure();
+  if (mlir::succeeded(p.parseOptionalKeyword("else"))) {
+    if (mlir::failed(p.parseRegion(*elseRegion)))
+      return mlir::failure();
+    if (mlir::failed(ensureRegionTerm(p.getBuilder(), *elseRegion)))
+      return mlir::failure();
   }
 
   if (p.parseOptionalColon().succeeded()) {
@@ -260,14 +261,14 @@ mlir::ParseResult IfOp::parse(mlir::OpAsmParser &p, mlir::OperationState &result
 
     mlir::Type resultTy;
     if (p.parseType(resultTy).failed())
-      return failure();
+      return mlir::failure();
     result.addTypes(resultTy);
   }
 
-  if (failed(p.parseOptionalAttrDict(result.attributes)))
-    return failure();
+  if (mlir::failed(p.parseOptionalAttrDict(result.attributes)))
+    return mlir::failure();
 
-  return success();
+  return mlir::success();
 }
 
 void IfOp::print(mlir::OpAsmPrinter &p) {
@@ -287,10 +288,10 @@ void IfOp::print(mlir::OpAsmPrinter &p) {
 // ConditionOp
 // -----------------------------------------------------------------------------
 
-LogicalResult bir::ConditionOp::verify() {
-  if (!isa<LoopOpInterface>(getOperation()->getParentOp()))
+mlir::LogicalResult bir::ConditionOp::verify() {
+  if (!mlir::isa<LoopOpInterface>(getOperation()->getParentOp()))
     return emitOpError("must be within a conditional region");
-  return success();
+  return mlir::success();
 }
 
 } // namespace bir

@@ -114,8 +114,9 @@ void belalang::bir::populateBelalangLowerToRuntimeCallsPatterns(
 // -----------------------------------------------------------------------------
 
 struct BelalangLowerToRuntimeCallsPass
-    : public impl::BelalangLowerToRuntimeCallsPassBase<BelalangLowerToRuntimeCallsPass> {
-  using impl::BelalangLowerToRuntimeCallsPassBase<
+    : public mlir::impl::BelalangLowerToRuntimeCallsPassBase<
+          BelalangLowerToRuntimeCallsPass> {
+  using mlir::impl::BelalangLowerToRuntimeCallsPassBase<
       BelalangLowerToRuntimeCallsPass>::BelalangLowerToRuntimeCallsPassBase;
 
   void runOnOperation() override {

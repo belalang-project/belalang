@@ -15,7 +15,7 @@ using namespace belalang::bir;
 
 class BIRScopeOpFlattening : public mlir::OpRewritePattern<bir::ScopeOp> {
 public:
-  using OpRewritePattern<bir::ScopeOp>::OpRewritePattern;
+  using mlir::OpRewritePattern<bir::ScopeOp>::OpRewritePattern;
 
   mlir::LogicalResult
   matchAndRewrite(bir::ScopeOp op,
@@ -35,27 +35,28 @@ public:
     rewriter.inlineRegionBefore(op.getScopeRegion(), continueBlock);
 
     rewriter.setInsertionPointToEnd(currentBlock);
-    cf::BranchOp::create(rewriter, op.getLoc(), mlir::ValueRange(), beforeBody);
+    mlir::cf::BranchOp::create(rewriter, op.getLoc(), mlir::ValueRange(),
+                               beforeBody);
 
     rewriter.setInsertionPointToEnd(afterBody);
-    if (auto yieldOp = dyn_cast<bir::YieldOp>(afterBody->getTerminator()))
-      rewriter.replaceOpWithNewOp<cf::BranchOp>(yieldOp, yieldOp.getArgs(),
-                                                continueBlock);
+    if (auto yieldOp = mlir::dyn_cast<bir::YieldOp>(afterBody->getTerminator()))
+      rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(
+          yieldOp, yieldOp.getArgs(), continueBlock);
 
     rewriter.replaceOp(op, continueBlock->getArguments());
 
-    return success();
+    return mlir::success();
   }
 };
 
 class BIRIfOpFlattening : public mlir::OpRewritePattern<bir::IfOp> {
 public:
-  using OpRewritePattern<bir::IfOp>::OpRewritePattern;
+  using mlir::OpRewritePattern<bir::IfOp>::OpRewritePattern;
 
   mlir::LogicalResult
   matchAndRewrite(bir::IfOp op,
                   mlir::PatternRewriter &rewriter) const override {
-    OpBuilder::InsertionGuard guard(rewriter);
+    mlir::OpBuilder::InsertionGuard guard(rewriter);
 
     mlir::Block *currentBlock = rewriter.getInsertionBlock();
     mlir::Block *continueBlock =
@@ -71,9 +72,9 @@ public:
     rewriter.inlineRegionBefore(op.getThenRegion(), continueBlock);
 
     if (auto thenYieldOp =
-            dyn_cast<bir::YieldOp>(thenAfterBody->getTerminator())) {
+            mlir::dyn_cast<bir::YieldOp>(thenAfterBody->getTerminator())) {
       rewriter.setInsertionPointToEnd(thenAfterBody);
-      rewriter.replaceOpWithNewOp<cf::BranchOp>(
+      rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(
           thenYieldOp, thenYieldOp.getArgs(), continueBlock);
     }
 
@@ -89,9 +90,9 @@ public:
     }
 
     if (auto elseYieldOp =
-            dyn_cast<bir::YieldOp>(elseAfterBody->getTerminator())) {
+            mlir::dyn_cast<bir::YieldOp>(elseAfterBody->getTerminator())) {
       rewriter.setInsertionPointToEnd(elseAfterBody);
-      rewriter.replaceOpWithNewOp<cf::BranchOp>(
+      rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(
           elseYieldOp, elseYieldOp.getArgs(), continueBlock);
     }
 
@@ -101,7 +102,7 @@ public:
                           elseBeforeBody);
 
     rewriter.replaceOp(op, continueBlock->getArguments());
-    return success();
+    return mlir::success();
   }
 };
 
@@ -125,13 +126,13 @@ public:
 
     // Loop entry branch.
     rewriter.setInsertionPointToEnd(currentBlock);
-    cf::BranchOp::create(rewriter, op.getLoc(), entry);
+    mlir::cf::BranchOp::create(rewriter, op.getLoc(), entry);
 
     // Lower condition.
     auto conditionOp =
-        cast<bir::ConditionOp>(op.getCond().back().getTerminator());
+        mlir::cast<bir::ConditionOp>(op.getCond().back().getTerminator());
     {
-      OpBuilder::InsertionGuard guard(rewriter);
+      mlir::OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPoint(conditionOp);
       rewriter.replaceOpWithNewOp<bir::CondBrOp>(
           conditionOp, conditionOp.getCond(), body, exit);
@@ -139,23 +140,23 @@ public:
 
     // Replace continues and breaks with branch op.
     op.walk([&](mlir::Operation *op) {
-      if (isa<bir::BreakOp>(op)) {
-        OpBuilder::InsertionGuard guard(rewriter);
+      if (mlir::isa<bir::BreakOp>(op)) {
+        mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointAfter(op);
-        rewriter.replaceOpWithNewOp<cf::BranchOp>(op, exit);
+        rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(op, exit);
       }
-      if (isa<bir::ContinueOp>(op)) {
-        OpBuilder::InsertionGuard guard(rewriter);
+      if (mlir::isa<bir::ContinueOp>(op)) {
+        mlir::OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointAfter(op);
-        rewriter.replaceOpWithNewOp<cf::BranchOp>(op, cond);
+        rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(op, cond);
       }
     });
 
     // Lower yield terminator.
     for (mlir::Block &blk : op.getBody().getBlocks()) {
-      if (auto yield = dyn_cast<bir::YieldOp>(blk.getTerminator())) {
+      if (auto yield = mlir::dyn_cast<bir::YieldOp>(blk.getTerminator())) {
         rewriter.setInsertionPointToEnd(&op.getBody().back());
-        rewriter.replaceOpWithNewOp<cf::BranchOp>(yield, cond);
+        rewriter.replaceOpWithNewOp<mlir::cf::BranchOp>(yield, cond);
       }
     }
 
@@ -165,7 +166,7 @@ public:
 
     // Yay!
     rewriter.eraseOp(op);
-    return success();
+    return mlir::success();
   }
 };
 
@@ -182,17 +183,17 @@ void belalang::bir::populateBelalangFlattenCFGPatterns(
 }
 
 struct BelalangFlattenCFGPass
-    : public impl::BelalangFlattenCFGPassBase<BelalangFlattenCFGPass> {
-  using impl::BelalangFlattenCFGPassBase<
+    : public mlir::impl::BelalangFlattenCFGPassBase<BelalangFlattenCFGPass> {
+  using mlir::impl::BelalangFlattenCFGPassBase<
       BelalangFlattenCFGPass>::BelalangFlattenCFGPassBase;
 
   void runOnOperation() override {
     mlir::RewritePatternSet patterns(&getContext());
     belalang::bir::populateBelalangFlattenCFGPatterns(patterns);
 
-    llvm::SmallVector<Operation *, 16> ops;
-    getOperation()->walk<mlir::WalkOrder::PostOrder>([&](Operation *op) {
-      if (isa<ScopeOp, IfOp, WhileOp>(op))
+    llvm::SmallVector<mlir::Operation *, 16> ops;
+    getOperation()->walk<mlir::WalkOrder::PostOrder>([&](mlir::Operation *op) {
+      if (mlir::isa<ScopeOp, IfOp, WhileOp>(op))
         ops.push_back(op);
     });
 

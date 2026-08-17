@@ -15,9 +15,6 @@
 
 #include "belalang/BIR/Interfaces/LoopOpInterface.h"
 
-using namespace mlir;
-using namespace llvm;
-
 #include "belalang/BIR/IR/BIRDialect.h.inc"
 #include "belalang/BIR/IR/BIREnumAttrs.h.inc"
 
