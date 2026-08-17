@@ -1,7 +1,92 @@
 #include "belalang/BIR/IR/BIR.h"
+#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 
 namespace belalang {
 namespace bir {
+
+// -----------------------------------------------------------------------------
+// IntType
+// -----------------------------------------------------------------------------
+
+llvm::TypeSize
+IntType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                           mlir::DataLayoutEntryListRef params) const {
+  return llvm::TypeSize::getFixed(64);
+}
+
+uint64_t IntType::getABIAlignment(const mlir::DataLayout &dl,
+                                  mlir::DataLayoutEntryListRef params) const {
+  return 8;
+}
+
+// -----------------------------------------------------------------------------
+// FloatType
+// -----------------------------------------------------------------------------
+
+llvm::TypeSize
+FloatType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                             mlir::DataLayoutEntryListRef params) const {
+  return llvm::TypeSize::getFixed(64);
+}
+
+uint64_t FloatType::getABIAlignment(const mlir::DataLayout &dl,
+                                    mlir::DataLayoutEntryListRef params) const {
+  return 8;
+}
+
+// -----------------------------------------------------------------------------
+// BoolType
+// -----------------------------------------------------------------------------
+
+llvm::TypeSize
+BoolType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                            mlir::DataLayoutEntryListRef params) const {
+  return llvm::TypeSize::getFixed(8);
+}
+
+uint64_t BoolType::getABIAlignment(const mlir::DataLayout &dl,
+                                   mlir::DataLayoutEntryListRef params) const {
+  return 1;
+}
+
+// -----------------------------------------------------------------------------
+// StringType
+// -----------------------------------------------------------------------------
+
+static mlir::Type getStringLLVMType(mlir::MLIRContext *ctx) {
+  auto ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
+  auto lengthType = mlir::IntegerType::get(ctx, 64);
+  return mlir::LLVM::LLVMStructType::getLiteral(ctx, {ptrType, lengthType});
+}
+
+llvm::TypeSize
+StringType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                              mlir::DataLayoutEntryListRef params) const {
+  return dl.getTypeSizeInBits(getStringLLVMType(getContext()));
+}
+
+uint64_t
+StringType::getABIAlignment(const mlir::DataLayout &dl,
+                            mlir::DataLayoutEntryListRef params) const {
+  return dl.getTypeABIAlignment(getStringLLVMType(getContext()));
+}
+
+// -----------------------------------------------------------------------------
+// StructType
+// -----------------------------------------------------------------------------
+
+llvm::TypeSize
+RefType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                           mlir::DataLayoutEntryListRef params) const {
+  auto ptrType = mlir::LLVM::LLVMPointerType::get(getContext());
+  return dl.getTypeSizeInBits(ptrType);
+}
+
+uint64_t RefType::getABIAlignment(const mlir::DataLayout &dl,
+                                  mlir::DataLayoutEntryListRef params) const {
+  auto ptrType = mlir::LLVM::LLVMPointerType::get(getContext());
+  return dl.getTypeABIAlignment(ptrType);
+}
 
 mlir::Type StructType::parse(mlir::AsmParser &p) {
   const mlir::SMLoc loc = p.getCurrentLocation();
@@ -94,6 +179,38 @@ llvm::ArrayRef<mlir::Type> StructType::getMembers() const {
   return getImpl()->members;
 }
 mlir::StringAttr StructType::getName() const { return getImpl()->name; }
+
+llvm::TypeSize
+StructType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                              mlir::DataLayoutEntryListRef params) const {
+  unsigned stSize = 0;
+  uint64_t stAlign = 1;
+
+  for (mlir::Type ty : getMembers()) {
+    uint64_t tyAlign = dl.getTypeABIAlignment(ty);
+
+    stSize = llvm::alignTo(stSize, tyAlign);
+    stSize += dl.getTypeSize(ty).getFixedValue();
+
+    stAlign = std::max(tyAlign, stAlign);
+  }
+
+  stSize = llvm::alignTo(stSize, stAlign);
+  return llvm::TypeSize::getFixed(stSize * 8); // We want in bits.
+}
+
+uint64_t
+StructType::getABIAlignment(const mlir::DataLayout &dl,
+                            mlir::DataLayoutEntryListRef params) const {
+  uint64_t stAlign = 1;
+
+  for (mlir::Type ty : getMembers()) {
+    uint64_t tyAlign = dl.getTypeABIAlignment(ty);
+    stAlign = std::max(tyAlign, stAlign);
+  }
+
+  return stAlign;
+}
 
 } // namespace bir
 } // namespace belalang
