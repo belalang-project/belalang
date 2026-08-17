@@ -47,10 +47,17 @@ def BIR_StructType : BIR_Type<"Struct", "struct", [
 
   let parameters = (ins
     ArrayRefParameter<"mlir::Type", "struct members">:$members,
-    "mlir::StringAttr":$name
+    "mlir::StringAttr":$name,
+    ArrayRefParameter<"int32_t", "logical-to-physical field mapping">:$reorder
   );
 
   let hasCustomAssemblyFormat = 1;
+
+  let extraClassDeclaration = [{
+    ::mlir::LogicalResult setReorder(llvm::ArrayRef<int32_t> reorder);
+    ::llvm::SmallVector<int32_t> getInverseReorder() const;
+  }];
+
 }
 
 def BIR_ReferencableType : AnyTypeOf<[

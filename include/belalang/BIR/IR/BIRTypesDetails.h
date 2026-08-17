@@ -13,13 +13,16 @@ public:
   struct KeyTy {
     llvm::ArrayRef<mlir::Type> members;
     mlir::StringAttr name;
+    llvm::ArrayRef<int32_t> reorder;
 
-    KeyTy(llvm::ArrayRef<mlir::Type> members, mlir::StringAttr name)
-        : members(members), name(name) {}
+    KeyTy(llvm::ArrayRef<mlir::Type> members, mlir::StringAttr name,
+          llvm::ArrayRef<int32_t> reorder)
+        : members(members), name(name), reorder(reorder) {}
   };
 
-  StructTypeStorage(llvm::ArrayRef<mlir::Type> members, mlir::StringAttr name)
-      : members(members), name(name) {}
+  StructTypeStorage(llvm::ArrayRef<mlir::Type> members, mlir::StringAttr name,
+                    llvm::ArrayRef<int32_t> reorder)
+      : members(members), name(name), reorder(reorder) {}
 
   // ---------------------------------------------------------------------------
   // Type Uniquing Infrastructure
@@ -34,27 +37,31 @@ public:
   static StructTypeStorage *construct(mlir::TypeStorageAllocator &allocator,
                                       const KeyTy &key) {
     llvm::ArrayRef<mlir::Type> members = allocator.copyInto(key.members);
+    llvm::ArrayRef<int32_t> reorder = allocator.copyInto(key.reorder);
     return new (allocator.allocate<StructTypeStorage>())
-        StructTypeStorage(members, key.name);
+        StructTypeStorage(members, key.name, reorder);
   }
 
   mlir::LogicalResult mutate(mlir::TypeStorageAllocator &allocator,
                              llvm::ArrayRef<mlir::Type> members,
-                             mlir::StringAttr name) {
-    if (this->members == members)
+                             mlir::StringAttr name,
+                             llvm::ArrayRef<int32_t> reorder) {
+    if (this->members == members && this->reorder == reorder)
       return mlir::success();
 
     // Already defined differently.
-    if (!this->members.empty())
+    if (!this->members.empty() && this->members != members)
       return mlir::failure();
 
     this->members = allocator.copyInto(members);
     this->name = name;
+    this->reorder = allocator.copyInto(reorder);
     return mlir::success();
   }
 
   llvm::ArrayRef<mlir::Type> members;
   mlir::StringAttr name;
+  llvm::ArrayRef<int32_t> reorder;
 };
 
 } // namespace detail

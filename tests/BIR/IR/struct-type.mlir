@@ -21,3 +21,11 @@ bir.func @f(%0: !bir.struct<"T", {}>) {
 bir.func @f(%0: !bir.struct<"T", {!bir.ref<!bir.struct<"T">>}>) {
   bir.return
 }
+
+// -----
+
+// CHECK: !struct_T = !bir.struct<"T", {!bir.bool, !bir.int}, reorder = [1, 0]>
+// CHECK: bir.func @f(%{{.*}}: !struct_T)
+bir.func @f(%0: !bir.struct<"T", {!bir.bool, !bir.int}, reorder = [1, 0]>) {
+  bir.return
+}

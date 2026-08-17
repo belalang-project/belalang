@@ -72,8 +72,8 @@ TEST_F(BIRTypesTest, RefTypeMatchesLLVMPointer) {
 
 TEST_F(BIRTypesTest, EmptyStructType) {
   auto dl = getDataLayout();
-  auto ty =
-      StructType::get(&context, {}, mlir::StringAttr::get(&context, "Empty"));
+  auto ty = StructType::get(&context, {},
+                            mlir::StringAttr::get(&context, "Empty"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 0);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 1);
@@ -83,7 +83,7 @@ TEST_F(BIRTypesTest, StructTypeWithLeadingPadding) {
   auto dl = getDataLayout();
   auto ty = StructType::get(&context,
                             {BoolType::get(&context), IntType::get(&context)},
-                            mlir::StringAttr::get(&context, "BoolInt"));
+                            mlir::StringAttr::get(&context, "BoolInt"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 128);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
@@ -93,7 +93,7 @@ TEST_F(BIRTypesTest, StructTypeWithTrailingPadding) {
   auto dl = getDataLayout();
   auto ty = StructType::get(&context,
                             {IntType::get(&context), BoolType::get(&context)},
-                            mlir::StringAttr::get(&context, "IntBool"));
+                            mlir::StringAttr::get(&context, "IntBool"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 128);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
@@ -104,7 +104,7 @@ TEST_F(BIRTypesTest, StructTypeWithOnlyByteAlignedMembers) {
   auto ty = StructType::get(&context,
                             {BoolType::get(&context), BoolType::get(&context),
                              BoolType::get(&context)},
-                            mlir::StringAttr::get(&context, "Bools"));
+                            mlir::StringAttr::get(&context, "Bools"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 24);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 1);
@@ -114,7 +114,7 @@ TEST_F(BIRTypesTest, StructTypeWithStringAndBool) {
   auto dl = getDataLayout();
   auto ty = StructType::get(
       &context, {StringType::get(&context), BoolType::get(&context)},
-      mlir::StringAttr::get(&context, "StringBool"));
+      mlir::StringAttr::get(&context, "StringBool"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 192);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
@@ -124,11 +124,23 @@ TEST_F(BIRTypesTest, StructTypeWithReferenceAndBool) {
   auto dl = getDataLayout();
   auto ty = StructType::get(
       &context,
-      {RefType::get(&context, IntType::get(&context)),
-       BoolType::get(&context)},
-      mlir::StringAttr::get(&context, "RefBool"));
+      {RefType::get(&context, IntType::get(&context)), BoolType::get(&context)},
+      mlir::StringAttr::get(&context, "RefBool"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 128);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, StructTypeReorderUsesPhysicalOrder) {
+  auto dl = getDataLayout();
+  auto ty = StructType::get(&context,
+                            {BoolType::get(&context), IntType::get(&context),
+                             BoolType::get(&context), IntType::get(&context)},
+                            mlir::StringAttr::get(&context, "Reordered"),
+                            {2, 0, 3, 1});
+
+  EXPECT_EQ(ty.getReorder(), llvm::ArrayRef<int32_t>({2, 0, 3, 1}));
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 192);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
@@ -136,10 +148,10 @@ TEST_F(BIRTypesTest, NestedStructType) {
   auto dl = getDataLayout();
   auto inner = StructType::get(
       &context, {BoolType::get(&context), IntType::get(&context)},
-      mlir::StringAttr::get(&context, "Inner"));
+      mlir::StringAttr::get(&context, "Inner"), {});
   auto outer = StructType::get(
       &context, {BoolType::get(&context), inner, BoolType::get(&context)},
-      mlir::StringAttr::get(&context, "Outer"));
+      mlir::StringAttr::get(&context, "Outer"), {});
 
   EXPECT_EQ(dl.getTypeSizeInBits(outer).getFixedValue(), 256);
   EXPECT_EQ(dl.getTypeABIAlignment(outer), 8);
