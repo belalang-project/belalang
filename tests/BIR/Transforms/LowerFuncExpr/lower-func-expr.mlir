@@ -67,3 +67,19 @@ bir.func @void_return() {
   }
   bir.return
 }
+
+// -----
+
+// Allocations from nested regions are hoisted in source order.
+// CHECK-LABEL: bir.func @hoist_alloc_stack
+// CHECK-NEXT: %[[FIRST:.*]] = bir.alloc_stack : !bir.ref<!bir.int>
+// CHECK-NEXT: %[[SECOND:.*]] = bir.alloc_stack : !bir.ref<!bir.int>
+// CHECK-NEXT: bir.scope
+bir.func @hoist_alloc_stack() {
+  bir.scope {
+    %first = bir.alloc_stack : !bir.ref<!bir.int>
+    %second = bir.alloc_stack : !bir.ref<!bir.int>
+    bir.yield
+  }
+  bir.return
+}

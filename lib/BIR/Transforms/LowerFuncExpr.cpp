@@ -55,6 +55,32 @@ struct BelalangLowerFuncExprPass
   using impl::BelalangLowerFuncExprPassBase<
       BelalangLowerFuncExprPass>::BelalangLowerFuncExprPassBase;
 
+  /// Hoists AllocStackOps to the start of the current function body.
+  void hoistAllocStackOps() {
+    mlir::Operation *op = getOperation();
+
+    op->walk<mlir::WalkOrder::PreOrder>([&](bir::FuncOp fn) {
+      if (fn.getRegion().empty())
+        return;
+
+      mlir::Block &entry = fn.getBody().front();
+      mlir::Operation *lastHoisted = nullptr;
+
+      fn.getBody().walk<mlir::WalkOrder::PostOrder>([&](bir::AllocStackOp op) {
+        if (op->getParentOfType<bir::FuncOp>() != fn ||
+            op->getBlock() == &entry)
+          return;
+
+        if (lastHoisted)
+          op->moveAfter(lastHoisted);
+        else
+          op->moveBefore(&entry, entry.begin());
+
+        lastHoisted = op;
+      });
+    });
+  }
+
   void runOnOperation() override {
     mlir::RewritePatternSet patterns(&getContext());
     belalang::bir::populateBelalangLowerFuncExprPatterns(patterns);
@@ -63,6 +89,8 @@ struct BelalangLowerFuncExprPass
             mlir::applyPatternsGreedily(getOperation(), std::move(patterns)))) {
       signalPassFailure();
     }
+
+    hoistAllocStackOps();
   }
 };
 
