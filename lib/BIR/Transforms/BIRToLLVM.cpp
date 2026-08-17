@@ -834,8 +834,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
 // -----------------------------------------------------------------------------
 
 struct BelalangBIRToLLVMPass
-    : public impl::BelalangBIRToLLVMPassBase<BelalangBIRToLLVMPass> {
-  using impl::BelalangBIRToLLVMPassBase<
+    : public mlir::impl::BelalangBIRToLLVMPassBase<BelalangBIRToLLVMPass> {
+  using mlir::impl::BelalangBIRToLLVMPassBase<
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {

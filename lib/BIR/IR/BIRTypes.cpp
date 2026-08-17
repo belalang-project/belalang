@@ -21,7 +21,7 @@ mlir::Type StructType::parse(mlir::AsmParser &p) {
 
   // Matches optional `>`.
   // This parses a struct type without a body used in self-referencing types.
-  SMLoc greaterLoc = p.getCurrentLocation();
+  mlir::SMLoc greaterLoc = p.getCurrentLocation();
   if (p.parseOptionalGreater().succeeded()) {
     auto nameAttr = p.getBuilder().getStringAttr(name);
     auto structTy = StructType::get(ctx, {}, nameAttr);
@@ -50,9 +50,10 @@ mlir::Type StructType::parse(mlir::AsmParser &p) {
     return {};
 
   // `{<member1>, <member2>, ..., <membern>}`
-  if (p.parseCommaSeparatedList(AsmParser::Delimiter::Braces, [&p, &members]() {
-         return p.parseType(members.emplace_back());
-       }).failed())
+  if (p.parseCommaSeparatedList(
+           mlir::AsmParser::Delimiter::Braces,
+           [&p, &members]() { return p.parseType(members.emplace_back()); })
+          .failed())
     return {};
 
   // `>`
@@ -67,7 +68,7 @@ mlir::Type StructType::parse(mlir::AsmParser &p) {
 }
 
 void StructType::print(mlir::AsmPrinter &p) const {
-  FailureOr<AsmPrinter::CyclicPrintReset> cyclicPrint;
+  mlir::FailureOr<mlir::AsmPrinter::CyclicPrintReset> cyclicPrint;
 
   p << '<';
   cyclicPrint = p.tryStartCyclicPrint(*this);

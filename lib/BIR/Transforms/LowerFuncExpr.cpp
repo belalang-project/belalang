@@ -19,12 +19,12 @@ struct FuncExprOpLowering : public mlir::OpRewritePattern<FuncExprOp> {
                   mlir::PatternRewriter &rewriter) const override {
     // TODO: handle nested functions
     auto enclosingFunc = op->getParentOfType<FuncOp>();
-    auto module = op->getParentOfType<ModuleOp>();
+    auto module = op->getParentOfType<mlir::ModuleOp>();
     mlir::SymbolTable symTable(module);
-    FlatSymbolRefAttr symbolRef;
+    mlir::FlatSymbolRefAttr symbolRef;
 
     {
-      OpBuilder::InsertionGuard guard(rewriter);
+      mlir::OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       std::string baseName = ("fn." + enclosingFunc.getName() + ".anon").str();
       auto fn = FuncOp::create(rewriter, op.getLoc(), baseName, op.getType());
@@ -36,7 +36,7 @@ struct FuncExprOpLowering : public mlir::OpRewritePattern<FuncExprOp> {
 
     auto attr = FnAttr::get(op.getContext(), op.getType(), symbolRef);
     rewriter.replaceOpWithNewOp<ConstantOp>(op, op.getType(), attr);
-    return success();
+    return mlir::success();
   }
 };
 } // namespace
@@ -51,8 +51,9 @@ void belalang::bir::populateBelalangLowerFuncExprPatterns(
 }
 
 struct BelalangLowerFuncExprPass
-    : public impl::BelalangLowerFuncExprPassBase<BelalangLowerFuncExprPass> {
-  using impl::BelalangLowerFuncExprPassBase<
+    : public mlir::impl::BelalangLowerFuncExprPassBase<
+          BelalangLowerFuncExprPass> {
+  using mlir::impl::BelalangLowerFuncExprPassBase<
       BelalangLowerFuncExprPass>::BelalangLowerFuncExprPassBase;
 
   /// Hoists AllocStackOps to the start of the current function body.

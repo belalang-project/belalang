@@ -14,16 +14,16 @@
 namespace {
 using namespace belalang;
 
-struct BIROpAsmDialectInterface : public OpAsmDialectInterface {
-  using OpAsmDialectInterface::OpAsmDialectInterface;
+struct BIROpAsmDialectInterface : public mlir::OpAsmDialectInterface {
+  using mlir::OpAsmDialectInterface::OpAsmDialectInterface;
 
-  AliasResult getAlias(Type type, raw_ostream &os) const override {
-    if (auto structType = dyn_cast<bir::StructType>(type)) {
+  AliasResult getAlias(mlir::Type type, llvm::raw_ostream &os) const override {
+    if (auto structType = mlir::dyn_cast<bir::StructType>(type)) {
       auto nameAttr = structType.getName();
       os << "struct_" << nameAttr.getValue();
-      return AliasResult::OverridableAlias;
+      return mlir::OpAsmAliasResult::OverridableAlias;
     }
-    return AliasResult::NoAlias;
+    return mlir::OpAsmAliasResult::NoAlias;
   }
 };
 } // namespace

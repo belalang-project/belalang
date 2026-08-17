@@ -15,11 +15,11 @@ namespace {
 using namespace belalang;
 using namespace belalang::bir;
 
-struct DeclareOpLowering final : public OpRewritePattern<bir::DeclareOp> {
+struct DeclareOpLowering final : public mlir::OpRewritePattern<bir::DeclareOp> {
   DeclareOpLowering(mlir::MLIRContext *ctx, mlir::DataFlowSolver &solver)
-      : OpRewritePattern<bir::DeclareOp>(ctx), solver(solver) {}
+      : mlir::OpRewritePattern<bir::DeclareOp>(ctx), solver(solver) {}
 
-  LogicalResult
+  mlir::LogicalResult
   matchAndRewrite(bir::DeclareOp op,
                   mlir::PatternRewriter &rewriter) const override {
     const auto *state = 
@@ -32,7 +32,7 @@ struct DeclareOpLowering final : public OpRewritePattern<bir::DeclareOp> {
     else
       rewriter.replaceOpWithNewOp<bir::AllocStackOp>(op, refType);
 
-    return success();
+    return mlir::success();
   };
 
 private:
@@ -51,15 +51,15 @@ void belalang::bir::populateBelalangLowerDeclToMemoryPatterns(
 // -----------------------------------------------------------------------------
 
 struct BelalangLowerDeclToMemoryPass
-    : public impl::BelalangLowerDeclToMemoryPassBase<
+    : public mlir::impl::BelalangLowerDeclToMemoryPassBase<
           BelalangLowerDeclToMemoryPass> {
-  using impl::BelalangLowerDeclToMemoryPassBase<
+  using mlir::impl::BelalangLowerDeclToMemoryPassBase<
       BelalangLowerDeclToMemoryPass>::BelalangLowerDeclToMemoryPassBase;
 
   void runOnOperation() override {
-    SymbolTableCollection symbolTable;
+    mlir::SymbolTableCollection symbolTable;
 
-    DataFlowSolver solver;
+    mlir::DataFlowSolver solver;
     mlir::dataflow::loadBaselineAnalyses(solver);
     solver.load<EscapeAnalysis>(symbolTable);
     if (solver.initializeAndRun(getOperation()).failed())

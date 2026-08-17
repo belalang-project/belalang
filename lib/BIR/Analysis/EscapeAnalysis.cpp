@@ -49,8 +49,9 @@ EscapeAnalysis::visitOperation(mlir::Operation *op,
 
 void EscapeAnalysis::visitBranchOperand(mlir::OpOperand &operand) {
   mlir::Operation *op = operand.getOwner();
-  assert(isa<RegionBranchOpInterface>(op) || isa<BranchOpInterface>(op) ||
-         isa<RegionBranchTerminatorOpInterface>(op));
+  assert(mlir::isa<mlir::RegionBranchOpInterface>(op) ||
+         mlir::isa<mlir::BranchOpInterface>(op) ||
+         mlir::isa<mlir::RegionBranchTerminatorOpInterface>(op));
 
   auto *visitOp = mlir::isa<mlir::RegionBranchTerminatorOpInterface>(op)
                       ? op->getParentOp()
@@ -67,7 +68,7 @@ void EscapeAnalysis::visitBranchOperand(mlir::OpOperand &operand) {
 
 void EscapeAnalysis::visitCallOperand(mlir::OpOperand &operand) {
   mlir::Operation *op = operand.getOwner();
-  assert(mlir::isa<CallOpInterface>(op));
+  assert(mlir::isa<mlir::CallOpInterface>(op));
 
   EscapeLattice *lattice = getLatticeElement(operand.get());
   propagateIfChanged(lattice, lattice->markEscapes());

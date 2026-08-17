@@ -14,9 +14,9 @@ using namespace belalang;
 using namespace belalang::bir;
 
 struct BelalangInsertStackMapsPass
-    : public impl::BelalangInsertStackMapsPassBase<
+    : public mlir::impl::BelalangInsertStackMapsPassBase<
           BelalangInsertStackMapsPass> {
-  using impl::BelalangInsertStackMapsPassBase<
+  using mlir::impl::BelalangInsertStackMapsPassBase<
       BelalangInsertStackMapsPass>::BelalangInsertStackMapsPassBase;
 
   void runOnOperation() override {
