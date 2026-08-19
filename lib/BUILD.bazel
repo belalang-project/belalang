@@ -118,6 +118,7 @@ cc_library(
 
 rust_static_library(
     name = "Diag-rs",
+    crate_name = "belalang_diag",
     srcs = ["Diag/diag.rs"],
     deps = [
         "@crates//:annotate-snippets",
