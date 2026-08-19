@@ -24,8 +24,11 @@ std::optional<mlir::Attribute>
 buildStructConstant(const mlir::TypeConverter &typeConverter,
                     mlir::MLIRContext *ctx, bir::StructAttr structAttr) {
   llvm::SmallVector<mlir::Attribute> members;
-  for (auto [memberAttr, memberType] :
-       llvm::zip(structAttr.getMembers(), structAttr.getMemberTypes())) {
+  auto structType = cast<bir::StructType>(structAttr.getType());
+
+  for (int32_t i : structType.getInverseReorder()) {
+    auto memberAttr = structAttr.getMembers()[i];
+    auto memberType = structAttr.getMemberTypes()[i];
     if (auto intAttr = llvm::dyn_cast<bir::IntegerAttr>(memberAttr)) {
       auto llvmTy = typeConverter.convertType(memberType);
       if (!llvmTy)
@@ -676,7 +679,11 @@ struct GetMemberOpLowering final : public OpConversionPattern<bir::GetMemberOp> 
     mlir::Type referent = op.getAddr().getType().getReferent();
 
     auto structTy = mlir::cast<bir::StructType>(referent);
-    llvm::SmallVector<mlir::LLVM::GEPArg, 2> offset{0, op.getIndexAttr().getZExtValue()};
+    unsigned physicalIndex = op.getIndexAttr().getZExtValue();
+    if (auto layout = structTy.getReorder(); !layout.empty()) {
+      physicalIndex = layout[physicalIndex];
+    }
+    llvm::SmallVector<mlir::LLVM::GEPArg, 2> offset{0, physicalIndex};
     const mlir::Type elementTy = getTypeConverter()->convertType(structTy);
     mlir::LLVM::GEPNoWrapFlags flags = 
         mlir::LLVM::GEPNoWrapFlags::inbounds | mlir::LLVM::GEPNoWrapFlags::nuw;
@@ -709,8 +716,8 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
     });
     addConversion([this, ctx](bir::StructType ty) {
       llvm::SmallVector<mlir::Type> llvmMembers;
-      for (auto m : ty.getMembers())
-        llvmMembers.push_back(convertType(m));
+      for (int32_t i : ty.getInverseReorder())
+        llvmMembers.push_back(convertType(ty.getMembers()[i]));
       auto llvmStruct = LLVM::LLVMStructType::getIdentified(ctx, ty.getName());
       assert(llvmStruct.setBody(llvmMembers, false).succeeded());
       return llvmStruct;
