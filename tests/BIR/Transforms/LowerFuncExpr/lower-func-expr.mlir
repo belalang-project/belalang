@@ -1,11 +1,10 @@
 // RUN: %bir-opt --split-input-file --bir-lower-func-expr %s | %FileCheck %s
 
-// CHECK-LABEL: bir.func @fn.explicit_return.anon
+// CHECK-LABEL: bir.func private @fn.explicit_return.anon
 // CHECK: %{{.*}} = bir.constant #bir.int<42> : !bir.int
 // CHECK: bir.return
 
 // CHECK-LABEL: bir.func @explicit_return
-// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.explicit_return.anon> : () -> !bir.int
 // CHECK-NEXT:   bir.return
 bir.func @explicit_return() {
   %0 = bir.func_expr : () -> !bir.int {
@@ -17,11 +16,10 @@ bir.func @explicit_return() {
 
 // -----
 
-// CHECK-LABEL: bir.func @fn.with_args.anon
+// CHECK-LABEL: bir.func private @fn.with_args.anon
 // CHECK: bir.return
 
 // CHECK-LABEL: bir.func @with_args
-// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.with_args.anon> : (!bir.int) -> !bir.int
 // CHECK-NEXT:   bir.return
 bir.func @with_args() {
   %0 = bir.func_expr : (!bir.int) -> !bir.int {
@@ -33,11 +31,10 @@ bir.func @with_args() {
 
 // -----
 
-// CHECK-LABEL: bir.func @fn.void_return.anon
+// CHECK-LABEL: bir.func private @fn.void_return.anon
 // CHECK: bir.return
 
 // CHECK-LABEL: bir.func @void_return
-// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.void_return.anon> : () -> ()
 // CHECK-NEXT:   bir.return
 bir.func @void_return() {
   %0 = bir.func_expr : () -> () {
@@ -48,15 +45,13 @@ bir.func @void_return() {
 
 // -----
 
-// CHECK-LABEL: bir.func @fn.void_return.anon_0
+// CHECK-LABEL: bir.func private @fn.void_return.anon_0
 // CHECK: bir.return
 
-// CHECK-LABEL: bir.func @fn.void_return.anon
+// CHECK-LABEL: bir.func private @fn.void_return.anon
 // CHECK: bir.return
 
 // CHECK-LABEL: bir.func @void_return
-// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.void_return.anon_0> : () -> ()
-// CHECK-NEXT:   %{{.*}} = bir.constant #bir.fn<@fn.void_return.anon> : () -> ()
 // CHECK-NEXT:   bir.return
 bir.func @void_return() {
   %0 = bir.func_expr : () -> () {
