@@ -15,6 +15,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   pm.addPass(createBelalangLowerDeclToMemoryPass());
   pm.addPass(createBelalangFlattenCFGPass());
   pm.addPass(createBelalangInsertStackMapsPass());
+  pm.addPass(createBelalangVerifyLoweredFormPass());
 }
 
 void registerBIRPipelines() {
