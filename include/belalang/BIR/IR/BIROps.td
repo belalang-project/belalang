@@ -29,6 +29,7 @@ def BIR_AnyType : AnyTypeOf<[
 
 def BIR_ConstantOp : BIR_Op<"constant", [
   AllTypesMatch<["value", "result"]>,
+  Pure,
 ]> {
   let summary = "constant";
 
@@ -46,7 +47,11 @@ def BIR_ConstantOp : BIR_Op<"constant", [
   let hasVerifier = 1;
 }
 
-def BIR_AddOp : BIR_Op<"add", [SameTypeOperands, SameOperandsAndResultType]> {
+def BIR_AddOp : BIR_Op<"add", [
+  SameTypeOperands,
+  SameOperandsAndResultType,
+  Pure
+]> {
   let summary = "add";
 
   let description = [{
@@ -63,7 +68,11 @@ def BIR_AddOp : BIR_Op<"add", [SameTypeOperands, SameOperandsAndResultType]> {
   let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_SubOp : BIR_Op<"sub", [SameTypeOperands, SameOperandsAndResultType]> {
+def BIR_SubOp : BIR_Op<"sub", [
+  SameTypeOperands,
+  SameOperandsAndResultType,
+  Pure
+]> {
   let summary = "sub";
 
   let description = [{
@@ -80,7 +89,11 @@ def BIR_SubOp : BIR_Op<"sub", [SameTypeOperands, SameOperandsAndResultType]> {
   let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_MulOp : BIR_Op<"mul", [SameTypeOperands, SameOperandsAndResultType]> {
+def BIR_MulOp : BIR_Op<"mul", [
+  SameTypeOperands,
+  SameOperandsAndResultType,
+  Pure
+]> {
   let summary = "mul";
 
   let description = [{
@@ -97,7 +110,11 @@ def BIR_MulOp : BIR_Op<"mul", [SameTypeOperands, SameOperandsAndResultType]> {
   let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_DivOp : BIR_Op<"div", [SameTypeOperands, SameOperandsAndResultType]> {
+def BIR_DivOp : BIR_Op<"div", [
+  SameTypeOperands,
+  SameOperandsAndResultType,
+  Pure
+]> {
   let summary = "div";
 
   let description = [{
@@ -114,7 +131,11 @@ def BIR_DivOp : BIR_Op<"div", [SameTypeOperands, SameOperandsAndResultType]> {
   let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_ModOp : BIR_Op<"mod", [SameTypeOperands, SameOperandsAndResultType]> {
+def BIR_ModOp : BIR_Op<"mod", [
+  SameTypeOperands,
+  SameOperandsAndResultType,
+  Pure
+]> {
   let summary = "mod";
 
   let description = [{
@@ -131,7 +152,7 @@ def BIR_ModOp : BIR_Op<"mod", [SameTypeOperands, SameOperandsAndResultType]> {
   let assemblyFormat = "$lhs `,` $rhs `:` type($lhs) attr-dict";
 }
 
-def BIR_AndOp : BIR_Op<"and"> {
+def BIR_AndOp : BIR_Op<"and", [Pure]> {
   let summary = "and";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -141,7 +162,7 @@ def BIR_AndOp : BIR_Op<"and"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_OrOp : BIR_Op<"or"> {
+def BIR_OrOp : BIR_Op<"or", [Pure]> {
   let summary = "or";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -151,7 +172,7 @@ def BIR_OrOp : BIR_Op<"or"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_XorOp : BIR_Op<"xor"> {
+def BIR_XorOp : BIR_Op<"xor", [Pure]> {
   let summary = "xor";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -161,7 +182,7 @@ def BIR_XorOp : BIR_Op<"xor"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_ShlOp : BIR_Op<"shl"> {
+def BIR_ShlOp : BIR_Op<"shl", [Pure]> {
   let summary = "shl";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -171,7 +192,7 @@ def BIR_ShlOp : BIR_Op<"shl"> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_ShrOp : BIR_Op<"shr"> {
+def BIR_ShrOp : BIR_Op<"shr", [Pure]> {
   let summary = "shr";
 
   let arguments = (ins BIR_AnyType:$lhs, BIR_AnyType:$rhs);
@@ -498,7 +519,7 @@ def BIR_CmpOp : BIR_Op<"cmp", [
 
 }
 
-def BIR_GetMemberOp : BIR_Op<"get_member"> {
+def BIR_GetMemberOp : BIR_Op<"get_member", [Pure]> {
   let arguments = (ins
     BIR_RefType:$addr, // TODO: maybe make a pointer type?
     StrAttr:$name,

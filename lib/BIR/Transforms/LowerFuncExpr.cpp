@@ -28,6 +28,7 @@ struct FuncExprOpLowering : public mlir::OpRewritePattern<FuncExprOp> {
       rewriter.setInsertionPointToStart(module.getBody());
       std::string baseName = ("fn." + enclosingFunc.getName() + ".anon").str();
       auto fn = FuncOp::create(rewriter, op.getLoc(), baseName, op.getType());
+      fn.setPrivate();
       rewriter.inlineRegionBefore(op.getBody(), fn.getBody(),
                                   fn.getBody().end());
       auto finalName = symTable.insert(fn);
