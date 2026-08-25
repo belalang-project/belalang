@@ -507,8 +507,13 @@ void BIRGen::buildMainReturn() {
 }
 
 bool BIRGen::runLoweringPipeline() {
+  return runLoweringPipeline(bir::BIRLoweringPipelineOptions());
+}
+
+bool BIRGen::runLoweringPipeline(
+    const bir::BIRLoweringPipelineOptions &options) {
   mlir::PassManager pm(&context);
-  bir::buildBIRLoweringPipeline(pm);
+  bir::buildBIRLoweringPipeline(pm, options);
   return mlir::succeeded(pm.run(module));
 }
 

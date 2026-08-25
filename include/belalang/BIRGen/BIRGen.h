@@ -12,6 +12,10 @@
 #include <string>
 
 namespace belalang {
+namespace bir {
+struct BIRLoweringPipelineOptions;
+} // namespace bir
+
 namespace birgen {
 
 class BIRGen : public ast::ASTVisitor<BIRGen, mlir::Value> {
@@ -25,6 +29,7 @@ public:
 
   mlir::ModuleOp generateProgram(ast::Program *prog);
   bool runLoweringPipeline();
+  bool runLoweringPipeline(const bir::BIRLoweringPipelineOptions &options);
   std::string dumpToString() const;
 
 #define STMT(name) mlir::Value visit##name##Stmt(ast::name##Stmt *);

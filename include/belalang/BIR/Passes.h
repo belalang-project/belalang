@@ -33,7 +33,21 @@ void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
 // -----------------------------------------------------------------------------
 
 struct BIRLoweringPipelineOptions
-    : public mlir::PassPipelineOptions<BIRLoweringPipelineOptions> {};
+    : public mlir::PassPipelineOptions<BIRLoweringPipelineOptions> {
+  mlir::detail::PassOptions::Option<bool> enableDCE{
+      *this,
+      "enable-dce",
+      llvm::cl::desc("Enables dead code elimination."),
+      llvm::cl::init(true),
+  };
+
+  mlir::detail::PassOptions::Option<bool> enableMem2Reg{
+      *this,
+      "enable-mem2reg",
+      llvm::cl::desc("Enables mem2reg."),
+      llvm::cl::init(true),
+  };
+};
 
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm);
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
