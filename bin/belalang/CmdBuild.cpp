@@ -1,5 +1,6 @@
 #include "belalang/AST/ASTDumper.h"
 #include "belalang/AST/Parser.h"
+#include "belalang/BIR/Passes.h"
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
@@ -10,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include "Cmds.h"
 
@@ -42,6 +44,54 @@ static std::string escapeString(llvm::StringRef str) {
   return result;
 }
 
+static bool parseBoolean(std::string_view value, bool &result) {
+  if (value == "true") {
+    result = true;
+    return true;
+  }
+  if (value == "false") {
+    result = false;
+    return true;
+  }
+  return false;
+}
+
+static bool parseBIRGenOption(std::string_view option,
+                              belalang::bir::BIRLoweringPipelineOptions &opts) {
+  size_t eq = option.find('=');
+  if (eq == std::string_view::npos) {
+    std::cerr << "error: malformed BIRGen option: " << option << "\n";
+    std::cerr << "hint: expected <name>=<true|false>\n";
+    return false;
+  }
+
+  std::string_view name = option.substr(0, eq);
+  std::string_view rawValue = option.substr(eq + 1);
+
+  if (name == "enable-dce") {
+    if (!parseBoolean(rawValue, opts.enableDCE.getValue())) {
+      std::cerr << "error: invalid value for BIRGen option '" << name
+                << "': " << rawValue << "\n";
+      std::cerr << "hint: expected true or false\n";
+      return false;
+    }
+    return true;
+  }
+
+  if (name == "enable-mem2reg") {
+    if (!parseBoolean(rawValue, opts.enableMem2Reg.getValue())) {
+      std::cerr << "error: invalid value for BIRGen option '" << name
+                << "': " << rawValue << "\n";
+      std::cerr << "hint: expected true or false\n";
+      return false;
+    }
+    return true;
+  }
+
+  std::cerr << "error: unknown BIRGen option: " << name << "\n";
+  return false;
+}
+
 namespace belalang {
 namespace cmd {
 
@@ -57,6 +107,7 @@ enum class EmitTarget {
 
 int build(muopt::Parser &parser) {
   auto emit = EmitTarget::Exe;
+  bir::BIRLoweringPipelineOptions birOptions;
   std::string source;
 
   while (auto arg = parser.next()) {
@@ -74,6 +125,15 @@ int build(muopt::Parser &parser) {
         emit = EmitTarget::Llvm;
       if (value == "exe")
         emit = EmitTarget::Exe;
+    }
+    if (arg.has_value() && arg->is_long("bir-lowering-pipeline")) {
+      auto value = parser.arg_value();
+      if (!value.has_value()) {
+        std::cerr << "error: missing value for --birgen\n";
+        return 1;
+      }
+      if (!parseBIRGenOption(*value, birOptions))
+        return 1;
     }
     if (arg.has_value() && arg->is_plain()) {
       source = arg->as_str();
@@ -149,7 +209,8 @@ int build(muopt::Parser &parser) {
     birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
-    if (emit == EmitTarget::BirLowered && !birgen.runLoweringPipeline()) {
+    if (emit == EmitTarget::BirLowered &&
+        !birgen.runLoweringPipeline(birOptions)) {
       std::cerr << "error: BIR lowering pipeline failed\n";
       return 1;
     }
@@ -171,7 +232,7 @@ int build(muopt::Parser &parser) {
     birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
-    if (!birgen.runLoweringPipeline()) {
+    if (!birgen.runLoweringPipeline(birOptions)) {
       std::cerr << "error: BIR lowering pipeline failed\n";
       return 1;
     }
@@ -194,7 +255,7 @@ int build(muopt::Parser &parser) {
     birgen::BIRGen birgen(astCtx, diagEngine);
     birgen.generateProgram(prog);
 
-    if (!birgen.runLoweringPipeline()) {
+    if (!birgen.runLoweringPipeline(birOptions)) {
       std::cerr << "error: BIR lowering pipeline failed\n";
       return 1;
     }

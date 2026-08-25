@@ -1,4 +1,5 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=enable-dce=false %s | %FileCheck --check-prefix=NODCE %s
 
 // CHECK-LABEL: bir.func @drops_dead_pure_work
 // CHECK-NOT: bir.add
@@ -18,8 +19,14 @@ bir.func @drops_dead_pure_work() {
 // -----
 
 // CHECK-NOT: @fn.drops_unused_func_expr.anon
+
 // CHECK-LABEL: bir.func @drops_unused_func_expr
 // CHECK-NEXT: bir.return
+
+// NODCE-LABEL: bir.func private @fn.drops_unused_func_expr.anon
+// NODCE-LABEL: bir.func @drops_unused_func_expr
+// NODCE-NEXT: bir.return
+
 bir.func @drops_unused_func_expr() {
   %0 = bir.func_expr : () -> () {
     bir.return
