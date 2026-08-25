@@ -18,6 +18,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   if (options.enableMem2Reg) {
     pm.addPass(mlir::createMem2Reg());
   }
+  pm.addPass(mlir::createCSEPass());
   if (options.enableDCE) {
     pm.addPass(mlir::createTrivialDeadCodeEliminationPass());
     pm.addPass(mlir::createSymbolDCEPass());
