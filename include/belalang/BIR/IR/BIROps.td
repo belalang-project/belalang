@@ -14,6 +14,7 @@ include "mlir/Interfaces/FunctionInterfaces.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
+include "mlir/Interfaces/MemorySlotInterfaces.td"
 
 class BIR_Op<string mnemonic, list<Trait> traits = []>
     : Op<BIR_Dialect, mnemonic, traits> {}
@@ -356,7 +357,9 @@ def BIR_DeclareOp : BIR_Op<"declare"> {
   let assemblyFormat = "$name attr-dict `:` qualified(type($result))";
 }
 
-def BIR_StoreOp : BIR_Op<"store"> {
+def BIR_StoreOp : BIR_Op<"store", [
+  DeclareOpInterfaceMethods<PromotableMemOpInterface>
+]> {
   let summary = "store";
 
   let arguments = (ins BIR_AnyType:$src, BIR_RefType:$dest);
@@ -364,7 +367,9 @@ def BIR_StoreOp : BIR_Op<"store"> {
   let assemblyFormat = "$src `to` $dest attr-dict `:` type($src) `to` qualified(type($dest))";
 }
 
-def BIR_LoadOp : BIR_Op<"load"> {
+def BIR_LoadOp : BIR_Op<"load", [
+  DeclareOpInterfaceMethods<PromotableMemOpInterface>
+]> {
   let summary = "load";
 
   let arguments = (ins BIR_RefType:$ref);
@@ -397,7 +402,7 @@ def BIR_YieldOp : BIR_Op<"yield", [
 }
 
 def BIR_IfOp : BIR_Op<"if", [
-  NoRegionArguments,
+  NoRegionArguments
 ]> {
   let summary = "if";
 
@@ -548,7 +553,9 @@ def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
   }];
 }
 
-def BIR_AllocStackOp : BIR_Op<"alloc_stack"> {
+def BIR_AllocStackOp : BIR_Op<"alloc_stack", [
+  DeclareOpInterfaceMethods<PromotableAllocationOpInterface>
+]> {
   let arguments = (ins);
 
   let results = (outs
