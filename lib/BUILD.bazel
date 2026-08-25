@@ -48,6 +48,7 @@ cc_library(
         "@llvm-project//mlir:FunctionInterfaces",
         "@llvm-project//mlir:ControlFlowDialect",
         "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:MemorySlotInterfaces",
         "@llvm-project//mlir:ControlFlowToLLVM",
         "@llvm-project//mlir:TransformUtils",
         "@llvm-project//mlir:Transforms",

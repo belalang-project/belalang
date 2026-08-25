@@ -5,6 +5,7 @@
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/Interfaces/FunctionImplementation.h"
+#include "mlir/Interfaces/MemorySlotInterfaces.h"
 #include "mlir/Support/LLVM.h"
 
 #define GET_OP_CLASSES
@@ -13,6 +14,39 @@
 
 namespace belalang {
 namespace bir {
+
+namespace {
+
+mlir::TypedAttr getDefaultAttr(mlir::MLIRContext *ctx, mlir::Type type) {
+  if (mlir::isa<bir::IntType>(type))
+    return bir::IntegerAttr::get(ctx, type, llvm::APInt(64, 0));
+
+  if (mlir::isa<bir::FloatType>(type))
+    return bir::FloatAttr::get(ctx, type, llvm::APFloat(0.0));
+
+  if (mlir::isa<bir::StringType>(type))
+    return bir::StringAttr::get(ctx, type, "");
+
+  if (mlir::isa<bir::BoolType>(type))
+    return bir::BoolAttr::get(ctx, type, false);
+
+  if (auto structType = mlir::dyn_cast<bir::StructType>(type)) {
+    llvm::SmallVector<mlir::Attribute> members;
+    llvm::SmallVector<mlir::Type> memberTypes;
+    for (mlir::Type memberType : structType.getMembers()) {
+      mlir::TypedAttr memberAttr = getDefaultAttr(ctx, memberType);
+      if (!memberAttr)
+        return {};
+      members.push_back(memberAttr);
+      memberTypes.push_back(memberType);
+    }
+    return bir::StructAttr::get(ctx, type, members, memberTypes);
+  }
+
+  return {};
+}
+
+} // namespace
 
 // -----------------------------------------------------------------------------
 // ConstantOp
@@ -292,6 +326,114 @@ mlir::LogicalResult bir::ConditionOp::verify() {
   if (!mlir::isa<LoopOpInterface>(getOperation()->getParentOp()))
     return emitOpError("must be within a conditional region");
   return mlir::success();
+}
+
+// -----------------------------------------------------------------------------
+// AllocStackOp: PromotableAllocationOpInterface
+// -----------------------------------------------------------------------------
+
+llvm::SmallVector<mlir::MemorySlot> AllocStackOp::getPromotableSlots() {
+  // Single-element stack allocation is promoted to a scalar SSA value.
+  auto refType = mlir::cast<bir::RefType>(getType());
+  return {mlir::MemorySlot{getResult(), refType.getReferent()}};
+}
+
+mlir::Value AllocStackOp::getDefaultValue(const mlir::MemorySlot &slot,
+                                          mlir::OpBuilder &builder) {
+  mlir::TypedAttr attr = getDefaultAttr(getContext(), slot.elemType);
+  if (!attr)
+    return {};
+  return bir::ConstantOp::create(builder, getLoc(), slot.elemType, attr);
+}
+
+void AllocStackOp::handleBlockArgument(const mlir::MemorySlot &slot,
+                                       mlir::BlockArgument argument,
+                                       mlir::OpBuilder &builder) {}
+
+std::optional<mlir::PromotableAllocationOpInterface>
+AllocStackOp::handlePromotionComplete(const mlir::MemorySlot &slot,
+                                      mlir::Value defaultValue,
+                                      mlir::OpBuilder &builder) {
+  if (defaultValue && defaultValue.use_empty())
+    defaultValue.getDefiningOp()->erase();
+  this->erase();
+  return std::nullopt;
+}
+
+// -----------------------------------------------------------------------------
+// LoadOp: PromotableMemOpInterface
+// -----------------------------------------------------------------------------
+
+bool LoadOp::loadsFrom(const mlir::MemorySlot &slot) {
+  return getRef() == slot.ptr;
+}
+
+bool LoadOp::storesTo(const mlir::MemorySlot &slot) { return false; }
+
+mlir::Value LoadOp::getStored(const mlir::MemorySlot &slot,
+                              mlir::OpBuilder &builder, mlir::Value reachingDef,
+                              const mlir::DataLayout &dataLayout) {
+  llvm_unreachable("getStored should not be called on LoadOp");
+}
+
+bool LoadOp::canUsesBeRemoved(
+    const mlir::MemorySlot &slot,
+    const llvm::SmallPtrSetImpl<mlir::OpOperand *> &blockingUses,
+    llvm::SmallVectorImpl<mlir::OpOperand *> &newBlockingUses,
+    const mlir::DataLayout &dataLayout) {
+  if (blockingUses.size() != 1)
+    return false;
+
+  mlir::Value blockingUse = (*blockingUses.begin())->get();
+  return blockingUse == slot.ptr && getRef() == slot.ptr &&
+         getResult().getType() == slot.elemType;
+}
+
+mlir::DeletionKind LoadOp::removeBlockingUses(
+    const mlir::MemorySlot &slot,
+    const llvm::SmallPtrSetImpl<mlir::OpOperand *> &blockingUses,
+    mlir::OpBuilder &builder, mlir::Value reachingDefinition,
+    const mlir::DataLayout &dataLayout) {
+  getResult().replaceAllUsesWith(reachingDefinition);
+  return mlir::DeletionKind::Delete;
+}
+
+// -----------------------------------------------------------------------------
+// StoreOp: PromotableMemOpInterface
+// -----------------------------------------------------------------------------
+
+bool StoreOp::loadsFrom(const mlir::MemorySlot &slot) { return false; }
+
+bool StoreOp::storesTo(const mlir::MemorySlot &slot) {
+  return getDest() == slot.ptr;
+}
+
+mlir::Value StoreOp::getStored(const mlir::MemorySlot &slot,
+                               mlir::OpBuilder &builder,
+                               mlir::Value reachingDef,
+                               const mlir::DataLayout &dataLayout) {
+  return getSrc();
+}
+
+bool StoreOp::canUsesBeRemoved(
+    const mlir::MemorySlot &slot,
+    const llvm::SmallPtrSetImpl<mlir::OpOperand *> &blockingUses,
+    llvm::SmallVectorImpl<mlir::OpOperand *> &newBlockingUses,
+    const mlir::DataLayout &dataLayout) {
+  if (blockingUses.size() != 1)
+    return false;
+
+  mlir::Value blockingUse = (*blockingUses.begin())->get();
+  return blockingUse == slot.ptr && getDest() == slot.ptr &&
+         getSrc() != slot.ptr && getSrc().getType() == slot.elemType;
+}
+
+mlir::DeletionKind StoreOp::removeBlockingUses(
+    const mlir::MemorySlot &slot,
+    const llvm::SmallPtrSetImpl<mlir::OpOperand *> &blockingUses,
+    mlir::OpBuilder &builder, mlir::Value reachingDefinition,
+    const mlir::DataLayout &dataLayout) {
+  return mlir::DeletionKind::Delete;
 }
 
 } // namespace bir
