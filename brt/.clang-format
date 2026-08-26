@@ -1,0 +1,12 @@
+# clang-format version 21.1.8
+BasedOnStyle: LLVM
+
+BinPackParameters: AlwaysOnePerLine # deprecated in version 23
+BinPackArguments: false # deprecated in version 23
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+BreakAfterReturnType: All
