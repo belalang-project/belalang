@@ -20,6 +20,71 @@ namespace {
 using namespace mlir;
 using namespace belalang;
 
+static void collectGCPointerOffsets(mlir::Type type,
+                                    const mlir::DataLayout &dataLayout,
+                                    uint64_t baseOffset,
+                                    llvm::SmallVectorImpl<uint32_t> &offsets) {
+  auto structType = mlir::dyn_cast<bir::StructType>(type);
+  if (!structType)
+    return;
+
+  uint64_t currentOffset = 0;
+  for (int32_t logicalIndex : structType.getInverseReorder()) {
+    mlir::Type member = structType.getMembers()[logicalIndex];
+    uint64_t memberAlign = dataLayout.getTypeABIAlignment(member);
+    currentOffset = llvm::alignTo(currentOffset, memberAlign);
+    if (mlir::isa<bir::RefType>(member))
+      offsets.push_back(static_cast<uint32_t>(baseOffset + currentOffset));
+    else
+      collectGCPointerOffsets(member, dataLayout, baseOffset + currentOffset,
+                              offsets);
+    currentOffset += dataLayout.getTypeSize(member).getFixedValue();
+  }
+}
+
+static llvm::SmallVector<uint32_t>
+getGCPointerOffsets(mlir::Type type, const mlir::DataLayout &dataLayout) {
+  llvm::SmallVector<uint32_t> offsets;
+  collectGCPointerOffsets(type, dataLayout, 0, offsets);
+  return offsets;
+}
+
+static std::string getGCLayoutGlobalName(mlir::Type type,
+                                         llvm::ArrayRef<uint32_t> offsets) {
+  llvm::hash_code hash = llvm::hash_combine(type, offsets.size());
+  for (uint32_t offset : offsets)
+    hash = llvm::hash_combine(hash, offset);
+  return "gc.ptr_offsets." + std::to_string(static_cast<size_t>(hash));
+}
+
+static mlir::Value getOrCreatePointerOffsetsGlobal(
+    mlir::Location loc, mlir::ModuleOp module, mlir::Type referentType,
+    llvm::ArrayRef<uint32_t> offsets, mlir::OpBuilder &builder) {
+  if (offsets.empty())
+    return LLVM::ZeroOp::create(
+        builder, loc, LLVM::LLVMPointerType::get(module.getContext()));
+
+  mlir::MLIRContext *ctx = module.getContext();
+  std::string globalName = getGCLayoutGlobalName(referentType, offsets);
+  auto i32Ty = mlir::IntegerType::get(ctx, 32);
+  auto arrTy = LLVM::LLVMArrayType::get(i32Ty, offsets.size());
+
+  {
+    OpBuilder::InsertionGuard guard(builder);
+    builder.setInsertionPointToStart(module.getBody());
+    if (!module.lookupSymbol<LLVM::GlobalOp>(globalName)) {
+      llvm::SmallVector<mlir::Attribute> attrs;
+      for (uint32_t offset : offsets)
+        attrs.push_back(builder.getI32IntegerAttr(offset));
+      LLVM::GlobalOp::create(builder, loc, arrTy, true, LLVM::Linkage::Private,
+                             globalName, builder.getArrayAttr(attrs));
+    }
+  }
+
+  return LLVM::AddressOfOp::create(builder, loc,
+                                   LLVM::LLVMPointerType::get(ctx), globalName);
+}
+
 std::optional<mlir::Attribute>
 buildStructConstant(const mlir::TypeConverter &typeConverter,
                     mlir::MLIRContext *ctx, bir::StructAttr structAttr) {
@@ -498,22 +563,32 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
     uint64_t typeSize = dataLayout.getTypeSize(referentLLVMTy);
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
-    if (!module.lookupSymbol(kGCAlloc)) {
+    if (!module.lookupSymbol(kGCAllocLayout)) {
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
       auto funcType = LLVM::LLVMFunctionType::get(
-          LLVM::LLVMPointerType::get(ctx), mlir::IntegerType::get(ctx, 64));
-      LLVM::LLVMFuncOp::create(rewriter, loc, kGCAlloc, funcType);
+          LLVM::LLVMPointerType::get(ctx),
+          {mlir::IntegerType::get(ctx, 64), mlir::IntegerType::get(ctx, 64),
+           LLVM::LLVMPointerType::get(ctx)});
+      LLVM::LLVMFuncOp::create(rewriter, loc, kGCAllocLayout, funcType);
     }
 
     auto i64Type = mlir::IntegerType::get(ctx, 64);
     auto sizeVal = LLVM::ConstantOp::create(
         rewriter, loc, i64Type, rewriter.getI64IntegerAttr(typeSize));
+    auto pointerOffsets = getGCPointerOffsets(type.getReferent(), dataLayout);
+    auto pointerCountVal = LLVM::ConstantOp::create(
+        rewriter, loc, i64Type,
+        rewriter.getI64IntegerAttr(pointerOffsets.size()));
+    auto offsetsVal = getOrCreatePointerOffsetsGlobal(
+        loc, module, type.getReferent(), pointerOffsets, rewriter);
 
     auto ptrType = LLVM::LLVMPointerType::get(ctx);
-    auto calleeAttr = FlatSymbolRefAttr::get(ctx, kGCAlloc);
-    auto allocCall = LLVM::CallOp::create(rewriter, loc, ptrType, calleeAttr,
-                                          sizeVal.getResult());
+    auto calleeAttr = FlatSymbolRefAttr::get(ctx, kGCAllocLayout);
+    auto allocCall = LLVM::CallOp::create(
+        rewriter, loc, ptrType, calleeAttr,
+        ValueRange{sizeVal.getResult(), pointerCountVal.getResult(),
+                   offsetsVal});
 
     rewriter.replaceOp(op, allocCall.getResult());
     return success();
