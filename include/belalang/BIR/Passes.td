@@ -37,7 +37,8 @@ def BelalangVerifyLoweredFormPass : Pass<"bir-verify-lowered-form"> {
 
 def BelalangOptimizeStructLayoutPass : Pass<"bir-optimize-struct-layout"> {
   let summary = "compute compact physical layouts for BIR structs";
-  let dependentDialects = ["::belalang::bir::BIRDialect"];
+  let dependentDialects = ["::belalang::bir::BIRDialect",
+                           "::mlir::LLVM::LLVMDialect"];
 }
 
 def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {

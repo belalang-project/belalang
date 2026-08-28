@@ -4,13 +4,13 @@
 
 // CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
-// CHECK-DAG: declare ptr @brt_gc_alloc(i64)
+// CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
 // CHECK-DAG: declare void @brt_init()
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define %bel.String @main() {
 // CHECK-NEXT:   call void (i64, i32, ...) @llvm.experimental.stackmap(i64 {{[0-9]+}}, i32 0)
-// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
+// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
 // CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8
 // CHECK-NEXT:   ret %bel.String %[[C2]]
@@ -31,14 +31,14 @@ bir.func @main() -> !bir.string {
 
 // CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
-// CHECK-DAG: declare ptr @brt_gc_alloc(i64)
+// CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
 // CHECK-DAG: declare void @brt_print_string(%bel.String)
 // CHECK-DAG: declare void @brt_init()
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define void @main() {
 // CHECK-NEXT:   call void (i64, i32, ...) @llvm.experimental.stackmap(i64 {{[0-9]+}}, i32 0)
-// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc(i64 16)
+// CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
 // CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8
 // CHECK-NEXT:   call void @brt_print_string(%bel.String %[[C2]])

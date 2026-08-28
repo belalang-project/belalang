@@ -57,11 +57,13 @@ bir.func @main() -> !bir.int {
 
 // -----
 
-// CHECK: llvm.func @brt_gc_alloc(i64) -> !llvm.ptr
+// CHECK: llvm.func @brt_gc_alloc_layout(i64, i64, !llvm.ptr) -> !llvm.ptr
 
 // CHECK-LABEL: llvm.func @main() -> i64
 // CHECK: %[[SIZE:.*]] = llvm.mlir.constant(8 : i64) : i64
-// CHECK: %[[PTR:.*]] = llvm.call @brt_gc_alloc(%[[SIZE]]) : (i64) -> !llvm.ptr
+// CHECK: %[[PTR_COUNT:.*]] = llvm.mlir.constant(0 : i64) : i64
+// CHECK: %[[OFFSETS:.*]] = llvm.mlir.zero : !llvm.ptr
+// CHECK: %[[PTR:.*]] = llvm.call @brt_gc_alloc_layout(%[[SIZE]], %[[PTR_COUNT]], %[[OFFSETS]]) : (i64, i64, !llvm.ptr) -> !llvm.ptr
 // CHECK: %[[VAL:.*]] = llvm.mlir.constant(12 : i64) : i64
 // CHECK: llvm.store %[[VAL]], %[[PTR]] : i64, !llvm.ptr
 // CHECK: %[[LOAD:.*]] = llvm.load %[[PTR]] : !llvm.ptr -> i64
@@ -85,5 +87,20 @@ bir.func @f()
 
 bir.func @main() {
   %0 = bir.constant #bir.fn<@f> : () -> ()
+  bir.return
+}
+
+// -----
+
+// CHECK-DAG: llvm.mlir.global private constant @gc.ptr_offsets.{{[0-9]+}}([8 : i32])
+// CHECK: llvm.func @brt_gc_alloc_layout(i64, i64, !llvm.ptr) -> !llvm.ptr
+// CHECK-LABEL: llvm.func @main()
+// CHECK: %[[SIZE:.*]] = llvm.mlir.constant(16 : i64) : i64
+// CHECK: %[[PTR_COUNT:.*]] = llvm.mlir.constant(1 : i64) : i64
+// CHECK: %[[OFFSETS:.*]] = llvm.mlir.addressof {{.*}} : !llvm.ptr
+// CHECK: llvm.call @brt_gc_alloc_layout(%[[SIZE]], %[[PTR_COUNT]], %[[OFFSETS]]) : (i64, i64, !llvm.ptr) -> !llvm.ptr
+
+bir.func @main() {
+  %0 = bir.alloc_heap : !bir.ref<!bir.struct<"Box", {!bir.ref<!bir.int>, !bir.int}, reorder = [1, 0]>>
   bir.return
 }
