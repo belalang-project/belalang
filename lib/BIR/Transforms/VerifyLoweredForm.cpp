@@ -13,7 +13,7 @@ using namespace belalang::bir;
 bool isUnexpectedAfterLowering(mlir::Operation *op) {
   return mlir::isa<bir::DeclareOp, bir::ScopeOp, bir::IfOp, bir::WhileOp,
                    bir::BreakOp, bir::ContinueOp, bir::ConditionOp,
-                   bir::YieldOp, bir::FuncExprOp, bir::PrintOp>(op);
+                   bir::YieldOp, bir::FuncExprOp>(op);
 }
 
 struct BelalangVerifyLoweredFormPass

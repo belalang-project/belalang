@@ -10,8 +10,10 @@
 // CHECK:       %[[TWO:.*]] = bir.constant #bir.int<2> : !bir.int
 // CHECK:       cf.br ^bb3(%[[TWO]] : !bir.int)
 // CHECK:     ^bb3(%[[JOIN:.*]]: !bir.int):
-// CHECK:       bir.print %[[JOIN]] : !bir.int
+// CHECK:       call @use(%[[JOIN]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
+bir.func @use(!bir.int)
+
 bir.func @if_join() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
   %1 = bir.constant #bir.bool<true> : !bir.bool
@@ -25,7 +27,7 @@ bir.func @if_join() {
     bir.yield
   }
   %4 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %4 : !bir.int
+  bir.call @use(%4) : (!bir.int) -> ()
   bir.return
 }
 
@@ -41,8 +43,10 @@ bir.func @if_join() {
 // CHECK:       %[[ONE:.*]] = bir.constant #bir.int<1> : !bir.int
 // CHECK:       cf.br ^bb1(%[[ONE]] : !bir.int)
 // CHECK:     ^bb3:
-// CHECK:       bir.print %[[ITER]] : !bir.int
+// CHECK:       call @use(%[[ITER]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
+bir.func @use(!bir.int)
+
 bir.func @loop_carried() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
   %1 = bir.constant #bir.int<0> : !bir.int
@@ -56,6 +60,6 @@ bir.func @loop_carried() {
     bir.yield
   }
   %4 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %4 : !bir.int
+  bir.call @use(%4) : (!bir.int) -> ()
   bir.return
 }

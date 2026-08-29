@@ -43,6 +43,8 @@ bir.func @main() -> !bir.string {
 // CHECK-NEXT:   ret void
 // CHECK-NEXT: }
 
+bir.func private @brt_print_string(!bir.string)
+
 bir.func @main() {
   // x := "hello"
   %0 = bir.constant #bir.string<"hello"> : !bir.string
@@ -51,6 +53,6 @@ bir.func @main() {
 
   // print(x)
   %2 = bir.load %1 : (!bir.ref<!bir.string>) -> !bir.string
-  bir.print %2 : !bir.string
+  bir.call @brt_print_string(%2) : (!bir.string) -> ()
   bir.return
 }

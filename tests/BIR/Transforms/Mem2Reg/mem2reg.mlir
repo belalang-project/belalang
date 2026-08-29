@@ -2,14 +2,16 @@
 
 // CHECK-LABEL: bir.func @straight
 // CHECK-NEXT:  %[[VALUE:.*]] = bir.constant #bir.int<42> : !bir.int
-// CHECK-NEXT:  bir.print %[[VALUE]] : !bir.int
+// CHECK-NEXT:  call @use(%[[VALUE]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
+bir.func @use(!bir.int)
+
 bir.func @straight() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
   %1 = bir.constant #bir.int<42> : !bir.int
   bir.store %1 to %0 : !bir.int to !bir.ref<!bir.int>
   %2 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %2 : !bir.int
+  bir.call @use(%2) : (!bir.int) -> ()
   bir.return
 }
 
@@ -17,12 +19,14 @@ bir.func @straight() {
 
 // CHECK-LABEL: bir.func @default_load
 // CHECK-NEXT:  %[[ZERO:.*]] = bir.constant #bir.int<0> : !bir.int
-// CHECK-NEXT:  bir.print %[[ZERO]] : !bir.int
+// CHECK-NEXT:  call @use(%[[ZERO]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
+bir.func @use(!bir.int)
+
 bir.func @default_load() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
   %1 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %1 : !bir.int
+  bir.call @use(%1) : (!bir.int) -> ()
   bir.return
 }
 
@@ -33,14 +37,16 @@ bir.func @default_load() {
 // CHECK-NEXT:  %[[VALUE:.*]] = bir.constant #bir.int<7> : !bir.int
 // CHECK-NEXT:  bir.store %[[VALUE]] to %[[HEAP]] : !bir.int to !bir.ref<!bir.int>
 // CHECK-NEXT:  %[[LOAD:.*]] = bir.load %[[HEAP]] : (!bir.ref<!bir.int>) -> !bir.int
-// CHECK-NEXT:  bir.print %[[LOAD]] : !bir.int
+// CHECK-NEXT:  call @use(%[[LOAD]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
+bir.func @use(!bir.int)
+
 bir.func @heap_not_promoted() {
   %0 = bir.alloc_heap : !bir.ref<!bir.int>
   %1 = bir.constant #bir.int<7> : !bir.int
   bir.store %1 to %0 : !bir.int to !bir.ref<!bir.int>
   %2 = bir.load %0 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %2 : !bir.int
+  bir.call @use(%2) : (!bir.int) -> ()
   bir.return
 }
 

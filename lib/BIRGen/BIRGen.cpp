@@ -5,6 +5,7 @@
 #include "belalang/AST/Expr.h"
 #include "belalang/AST/Stmt.h"
 #include "belalang/BIR/IR/BIR.h"
+#include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/Builders.h"
@@ -68,6 +69,31 @@ mlir::Type BIRGen::mapTypeName(Type *ty) {
 }
 
 namespace {
+
+bir::FuncOp getOrCreatePrintFunc(mlir::ModuleOp module, mlir::OpBuilder &builder,
+                                 mlir::Location loc, mlir::Type valueType) {
+  llvm::StringRef name;
+  if (mlir::isa<bir::IntType>(valueType))
+    name = kPrintInt;
+  else if (mlir::isa<bir::FloatType>(valueType))
+    name = kPrintFloat;
+  else if (mlir::isa<bir::StringType>(valueType))
+    name = kPrintString;
+  else if (mlir::isa<bir::BoolType>(valueType))
+    name = kPrintBool;
+  else
+    return {};
+
+  if (auto func = module.lookupSymbol<bir::FuncOp>(name))
+    return func;
+
+  mlir::OpBuilder::InsertionGuard guard(builder);
+  builder.setInsertionPointToStart(module.getBody());
+  auto funcType = builder.getFunctionType({valueType}, {});
+  auto func = bir::FuncOp::create(builder, loc, name, funcType);
+  func.setPrivate();
+  return func;
+}
 
 template <typename Op>
 mlir::Value buildBinop(mlir::OpBuilder &builder, mlir::Location loc,
@@ -314,7 +340,8 @@ mlir::Value BIRGen::visitCallExpr(CallExpr *expr) {
   if (auto *ident = llvm::dyn_cast<IdentifierExpr>(expr->getCallee())) {
     if (ident->getName() == "print") {
       mlir::Value value = visitExpr(expr->getArgs()[0]);
-      bir::PrintOp::create(builder, loc, value);
+      auto printFunc = getOrCreatePrintFunc(module, builder, loc, value.getType());
+      bir::CallOp::create(builder, loc, printFunc, value);
       return {};
     }
   }

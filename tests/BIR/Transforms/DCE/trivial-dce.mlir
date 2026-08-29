@@ -40,18 +40,20 @@ bir.func @unused_get_member() {
 // CHECK: %[[STACK:.*]] = bir.alloc_stack : !bir.ref<!bir.int>
 // CHECK: bir.store %[[ZERO]] to %[[STACK]] : !bir.int to !bir.ref<!bir.int>
 // CHECK: bir.load %[[STACK]] : (!bir.ref<!bir.int>) -> !bir.int
-// CHECK: bir.print %[[ZERO]] : !bir.int
+// CHECK: call @use(%[[ZERO]]) : (!bir.int) -> ()
 // CHECK: bir.call @callee(%[[ZERO]]) : (!bir.int) -> ()
 // CHECK: %[[HEAP:.*]], %[[RELOCATED:.*]] = bir.alloc_heap : !bir.ref<!bir.int> roots(%[[STACK]] : !bir.ref<!bir.int>)
 // CHECK: bir.return
 bir.func @callee(!bir.int)
+
+bir.func @use(!bir.int)
 
 bir.func @retain_effectful_ops() {
   %0 = bir.constant #bir.int<0> : !bir.int
   %1 = bir.alloc_stack : !bir.ref<!bir.int>
   bir.store %0 to %1 : !bir.int to !bir.ref<!bir.int>
   %2 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
-  bir.print %0 : !bir.int
+  bir.call @use(%0) : (!bir.int) -> ()
   bir.call @callee(%0) : (!bir.int) -> ()
   %3, %4 = bir.alloc_heap : !bir.ref<!bir.int> roots(%1 : !bir.ref<!bir.int>)
   bir.return
@@ -78,10 +80,12 @@ bir.func @unused_bitwise_and_cmp() {
 // CHECK-LABEL: bir.func @unreachable_blocks
 // CHECK-NEXT: bir.return
 // CHECK-NEXT: }
+bir.func @use(!bir.int)
+
 bir.func @unreachable_blocks() {
   bir.return
 ^dead:
   %0 = bir.constant #bir.int<1> : !bir.int
-  bir.print %0 : !bir.int
+  bir.call @use(%0) : (!bir.int) -> ()
   bir.return
 }

@@ -24,7 +24,6 @@ void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerDeclToMemoryPatterns(
     mlir::RewritePatternSet &patterns, mlir::DataFlowSolver &solver);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
-void populateBelalangLowerToRuntimeCallsPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                        mlir::TypeConverter &typeConverter);
 
