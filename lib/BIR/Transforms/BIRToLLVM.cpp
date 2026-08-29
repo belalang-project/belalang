@@ -1,14 +1,14 @@
+#include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
-#include "belalang/BIR/BRTUtils.h"
-#include "mlir/IR/BuiltinOps.h"
-#include "mlir/IR/BuiltinDialect.h"
-#include "mlir/Transforms/DialectConversion.h"
-#include "mlir/Dialect/LLVMIR/LLVMTypes.h"
-#include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
-#include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
+#include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
+#include "mlir/Dialect/LLVMIR/LLVMTypes.h"
+#include "mlir/IR/BuiltinDialect.h"
+#include "mlir/IR/BuiltinOps.h"
+#include "mlir/Transforms/DialectConversion.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGBIRTOLLVMPASS
@@ -19,6 +19,17 @@ namespace {
 
 using namespace mlir;
 using namespace belalang;
+
+static mlir::LLVM::LLVMFuncOp getOrCreateRuntimeFunction(
+    mlir::ModuleOp module, mlir::Location loc, llvm::StringRef name,
+    mlir::LLVM::LLVMFunctionType type, mlir::OpBuilder &builder) {
+  if (auto function = module.lookupSymbol<mlir::LLVM::LLVMFuncOp>(name))
+    return function;
+
+  OpBuilder::InsertionGuard guard(builder);
+  builder.setInsertionPointToStart(module.getBody());
+  return mlir::LLVM::LLVMFuncOp::create(builder, loc, name, type);
+}
 
 static void collectGCPointerOffsets(mlir::Type type,
                                     const mlir::DataLayout &dataLayout,
@@ -558,7 +569,7 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
 
     // The AllocHeapOp strictly uses the RefType as the result type.
     // We're allocating memory the size of the referent.
-    auto type = mlir::cast<bir::RefType>(op.getType());
+    auto type = mlir::cast<bir::RefType>(op.getResult().getType());
     auto referentLLVMTy = getTypeConverter()->convertType(type.getReferent());
     uint64_t typeSize = dataLayout.getTypeSize(referentLLVMTy);
 
@@ -584,13 +595,85 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
         loc, module, type.getReferent(), pointerOffsets, rewriter);
 
     auto ptrType = LLVM::LLVMPointerType::get(ctx);
+    llvm::SmallVector<mlir::Value> rootSlots;
+
+    // Prepare slots for AllocHeapOp's roots.
+    if (!adaptor.getRoots().empty()) {
+      auto function = op->getParentOfType<FunctionOpInterface>();
+      mlir::Block &entry = function.getFunctionBody().front();
+      mlir::OpBuilder entryBuilder(ctx);
+      entryBuilder.setInsertionPointToStart(&entry);
+
+      // Create the rootsArray.
+      mlir::Value rootCount = LLVM::ConstantOp::create(
+          entryBuilder, loc, i64Type,
+          entryBuilder.getI64IntegerAttr(adaptor.getRoots().size()));
+      mlir::Value rootsArray = LLVM::AllocaOp::create(
+          entryBuilder, loc, ptrType, ptrType, rootCount);
+
+      // Point the rootsArray to the slots.
+      auto one = LLVM::ConstantOp::create(entryBuilder, loc, i64Type,
+                                          entryBuilder.getI64IntegerAttr(1));
+      for (size_t i = 0; i < adaptor.getRoots().size(); ++i) {
+        // Create the slot.
+        auto slot = LLVM::AllocaOp::create(entryBuilder, loc, ptrType, ptrType,
+                                           one.getResult());
+        rootSlots.push_back(slot.getResult());
+
+        // Make the rootsArray point to the slot which point to the object.
+        llvm::SmallVector<LLVM::GEPArg> index = {static_cast<int32_t>(i)};
+        auto element = LLVM::GEPOp::create(
+            entryBuilder, loc, ptrType, ptrType, rootsArray, index,
+            LLVM::GEPNoWrapFlags::inbounds | LLVM::GEPNoWrapFlags::nuw);
+        LLVM::StoreOp::create(entryBuilder, loc, slot.getResult(), element);
+      }
+
+      // Insert roots to its slots.
+      for (auto [root, slot] : llvm::zip_equal(adaptor.getRoots(), rootSlots))
+        LLVM::StoreOp::create(rewriter, loc, root, slot);
+
+      getOrCreateRuntimeFunction(
+          module, loc, kGCPushRoots,
+          LLVM::LLVMFunctionType::get(LLVM::LLVMVoidType::get(ctx),
+                                      {i64Type, ptrType}),
+          rewriter);
+
+      // Call the push roots runtime function.
+      LLVM::CallOp::create(rewriter, loc, mlir::TypeRange{},
+                           FlatSymbolRefAttr::get(ctx, kGCPushRoots),
+                           mlir::ValueRange{rootCount, rootsArray});
+    }
+
+    // Call the alloc layout runtime function.
     auto calleeAttr = FlatSymbolRefAttr::get(ctx, kGCAllocLayout);
     auto allocCall = LLVM::CallOp::create(
         rewriter, loc, ptrType, calleeAttr,
         ValueRange{sizeVal.getResult(), pointerCountVal.getResult(),
                    offsetsVal});
 
-    rewriter.replaceOp(op, allocCall.getResult());
+    llvm::SmallVector<mlir::Value> results = {allocCall.getResult()};
+
+    // Pop the roots if there are roots.
+    if (!rootSlots.empty()) {
+      getOrCreateRuntimeFunction(
+          module, loc, kGCPopRoots,
+          LLVM::LLVMFunctionType::get(LLVM::LLVMVoidType::get(ctx), {}),
+          rewriter);
+
+      // Call pop roots runtime function.
+      LLVM::CallOp::create(rewriter, loc, mlir::TypeRange{},
+                           FlatSymbolRefAttr::get(ctx, kGCPopRoots),
+                           mlir::ValueRange{});
+
+      // Load the relocated pointer.
+      for (mlir::Value slot : rootSlots) {
+        auto relocated = LLVM::LoadOp::create(rewriter, loc, ptrType, slot);
+        results.push_back(relocated.getResult());
+      }
+    }
+
+    // We're done with AllocHeapOp.
+    rewriter.replaceOp(op, results);
     return success();
   };
 };
@@ -855,48 +938,6 @@ static void insertBRTInitCall(mlir::Operation *op) {
       builder.getI32ArrayAttr(prios), builder.getArrayAttr(datals));
 }
 
-struct SafepointOpLowering final
-    : public OpConversionPattern<bir::SafepointOp> {
-  using OpConversionPattern<bir::SafepointOp>::OpConversionPattern;
-
-  LogicalResult
-  matchAndRewrite(bir::SafepointOp op, OpAdaptor adaptor,
-                  ConversionPatternRewriter &rewriter) const override {
-    auto loc = op.getLoc();
-    auto ctx = op.getContext();
-
-    auto i64Ty = mlir::IntegerType::get(ctx, 64);
-    auto i32Ty = mlir::IntegerType::get(ctx, 32);
-
-    // declare void
-    //   @llvm.experimental.stackmap(i64 <id>, i32 <numShadowBytes>, ...)
-
-    llvm::SmallVector<mlir::Value> args;
-
-    // Insert the i64 id argument.
-    args.push_back(
-        LLVM::ConstantOp::create(
-            rewriter, loc, i64Ty,
-            rewriter.getI64IntegerAttr(static_cast<int64_t>(op.getId())))
-            .getResult());
-
-    // Insert the i32 numShadowBytes argument.
-    args.push_back(LLVM::ConstantOp::create(rewriter, loc, i32Ty,
-                                            rewriter.getI32IntegerAttr(0))
-                       .getResult());
-
-    // Insert the pointers arguments.
-    for (auto root : adaptor.getRoots())
-      args.push_back(root);
-
-    LLVM::CallIntrinsicOp::create(
-        rewriter, loc, rewriter.getStringAttr("llvm.experimental.stackmap"),
-        args);
-    rewriter.eraseOp(op);
-    return success();
-  }
-};
-
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
@@ -907,8 +948,7 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, AllocHeapOpLowering, AllocStackOpLowering,
                StoreOpLowering, LoadOpLowering, CondBrLowering, CmpOpLowering,
-               GetMemberOpLowering, SafepointOpLowering>(typeConverter,
-                                                         patterns.getContext());
+               GetMemberOpLowering>(typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------
@@ -934,11 +974,9 @@ struct BelalangBIRToLLVMPass
     mlir::cf::populateControlFlowToLLVMConversionPatterns(typeConverter,
                                                           patterns);
 
-    if (mlir::failed(mlir::applyFullConversion(getOperation(), target,
-                                                  std::move(patterns)))) {
-      signalPassFailure();
-      return;
-    }
+    if (mlir::applyFullConversion(getOperation(), target, std::move(patterns))
+            .failed())
+      return signalPassFailure();
   }
 };
 

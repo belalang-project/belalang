@@ -42,8 +42,7 @@ bir.func @unused_get_member() {
 // CHECK: bir.load %[[STACK]] : (!bir.ref<!bir.int>) -> !bir.int
 // CHECK: bir.print %[[ZERO]] : !bir.int
 // CHECK: bir.call @callee(%[[ZERO]]) : (!bir.int) -> ()
-// CHECK: bir.safepoint 0(%[[STACK]] : !bir.ref<!bir.int>)
-// CHECK: %[[HEAP:.*]] = bir.alloc_heap : !bir.ref<!bir.int>
+// CHECK: %[[HEAP:.*]], %[[RELOCATED:.*]] = bir.alloc_heap : !bir.ref<!bir.int> roots(%[[STACK]] : !bir.ref<!bir.int>)
 // CHECK: bir.return
 bir.func @callee(!bir.int)
 
@@ -54,8 +53,7 @@ bir.func @retain_effectful_ops() {
   %2 = bir.load %1 : (!bir.ref<!bir.int>) -> !bir.int
   bir.print %0 : !bir.int
   bir.call @callee(%0) : (!bir.int) -> ()
-  bir.safepoint 0(%1 : !bir.ref<!bir.int>)
-  %3 = bir.alloc_heap : !bir.ref<!bir.int>
+  %3, %4 = bir.alloc_heap : !bir.ref<!bir.int> roots(%1 : !bir.ref<!bir.int>)
   bir.return
 }
 

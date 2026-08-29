@@ -541,15 +541,22 @@ def BIR_GetMemberOp : BIR_Op<"get_member", [Pure]> {
   }];
 }
 
-def BIR_AllocHeapOp : BIR_Op<"alloc_heap"> {
-  let arguments = (ins);
+def BIR_AllocHeapOp : BIR_Op<"alloc_heap", [
+  TypesMatchWith<"", "roots", "relocated_roots", "$_self">
+]> {
+  let arguments = (ins
+    Variadic<BIR_RefType>:$roots
+  );
 
   let results = (outs
-    BIR_RefType:$result
+    BIR_RefType:$result,
+    Variadic<BIR_RefType>:$relocated_roots
   );
 
   let assemblyFormat = [{
-    `:` qualified(type($result)) attr-dict
+    `:` qualified(type($result))
+    (`roots` `(` $roots^ `:` type($roots) `)`)?
+    attr-dict
   }];
 }
 
@@ -564,17 +571,6 @@ def BIR_AllocStackOp : BIR_Op<"alloc_stack", [
 
   let assemblyFormat = [{
     `:` qualified(type($result)) attr-dict
-  }];
-}
-
-def BIR_SafepointOp : BIR_Op<"safepoint"> {
-  let arguments = (ins
-    I64Attr:$id,
-    Variadic<BIR_RefType>:$roots
-  );
-
-  let assemblyFormat = [{
-    $id (`(` $roots^ `:` type($roots) `)`)? attr-dict
   }];
 }
 

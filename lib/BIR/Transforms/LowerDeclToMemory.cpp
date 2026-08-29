@@ -28,7 +28,8 @@ struct DeclareOpLowering final : public mlir::OpRewritePattern<bir::DeclareOp> {
 
     auto refType = mlir::cast<bir::RefType>(op.getType());
     if (escapes)
-      rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, refType);
+      rewriter.replaceOpWithNewOp<bir::AllocHeapOp>(op, refType,
+                                                    mlir::ValueRange{});
     else
       rewriter.replaceOpWithNewOp<bir::AllocStackOp>(op, refType);
 

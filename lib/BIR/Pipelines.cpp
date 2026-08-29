@@ -23,7 +23,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
     pm.addPass(mlir::createTrivialDeadCodeEliminationPass());
     pm.addPass(mlir::createSymbolDCEPass());
   }
-  pm.addPass(createBelalangInsertStackMapsPass());
+  pm.addPass(createBelalangPrepareGCAllocationsPass());
   pm.addPass(createBelalangVerifyLoweredFormPass());
 }
 
