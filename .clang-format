@@ -1,1 +1,3 @@
 BasedOnStyle: LLVM
+
+PenaltyBreakAssignment: 1000

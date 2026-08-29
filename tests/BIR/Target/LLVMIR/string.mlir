@@ -9,7 +9,6 @@
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define %bel.String @main() {
-// CHECK-NEXT:   call void (i64, i32, ...) @llvm.experimental.stackmap(i64 {{[0-9]+}}, i32 0)
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
 // CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8
@@ -37,7 +36,6 @@ bir.func @main() -> !bir.string {
 // CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define void @main() {
-// CHECK-NEXT:   call void (i64, i32, ...) @llvm.experimental.stackmap(i64 {{[0-9]+}}, i32 0)
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
 // CHECK-NEXT:   store %bel.String { ptr @str.[[H]], i64 5 }, ptr %[[C1]], align 8
 // CHECK-NEXT:   %[[C2:.*]] = load %bel.String, ptr %[[C1]], align 8

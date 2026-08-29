@@ -1,0 +1,23 @@
+# RUN: %belalang build --emit=llvm --bir-lowering-pipeline=enable-mem2reg=false %s | %FileCheck %s
+
+# CHECK: declare void @brt_gc_pop_roots()
+# CHECK: declare void @brt_gc_push_roots(i64, ptr)
+
+# CHECK-LABEL:define i64 @main() {
+# CHECK:        %[[ROOTS:.*]] = alloca ptr, i64 1
+# CHECK:        %[[SLOT:.*]] = alloca ptr, i64 1
+
+# CHECK:        %[[X:.*]] = call ptr @brt_gc_alloc_layout(i64 8, i64 0, ptr null)
+# CHECK:        store ptr %[[X]], ptr %[[SLOT]]
+# CHECK:        call void @brt_gc_push_roots(i64 1, ptr %[[ROOTS]])
+# CHECK-NEXT:   %[[Y:.*]] = call ptr @brt_gc_alloc_layout(i64 8, i64 0, ptr null)
+# CHECK-NEXT:   call void @brt_gc_pop_roots()
+# CHECK-NEXT:   %[[X_NEXT:.*]] = load ptr, ptr %[[SLOT]]
+
+# CHECK:        ret i64 0
+# CHECK-NEXT: }
+
+x := 1
+y := 2
+print(x)
+print(y)

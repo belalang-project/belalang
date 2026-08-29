@@ -4,8 +4,7 @@
 // CHECK-LABEL: bir.func @drops_dead_pure_work
 // CHECK-NOT: bir.add
 // CHECK-NOT: bir.mul
-// CHECK: bir.safepoint 0
-// CHECK-NEXT: %[[HEAP:.*]] = bir.alloc_heap : !bir.ref<!bir.int>
+// CHECK: %[[HEAP:.*]] = bir.alloc_heap : !bir.ref<!bir.int>
 // CHECK: bir.return
 bir.func @drops_dead_pure_work() {
   %0 = bir.constant #bir.int<1> : !bir.int

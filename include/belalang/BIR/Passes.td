@@ -24,8 +24,8 @@ def BelalangLowerDeclToMemoryPass : Pass<"bir-lower-decl-to-memory"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
-def BelalangInsertStackMapsPass : Pass<"bir-insert-stackmaps"> {
-  let summary = "insert stackmap safepoints at GC allocation sites";
+def BelalangPrepareGCAllocationsPass : Pass<"bir-prepare-gc-allocations"> {
+  let summary = "attach live roots and relocated results to heap allocations";
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
