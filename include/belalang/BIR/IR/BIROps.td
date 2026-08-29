@@ -221,6 +221,7 @@ def BIR_PrintOp : BIR_Op<"print"> {
 def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
                              IsolatedFromAbove]> {
   let summary = "func";
+  let hasVerifier = 1;
 
   let arguments = (ins SymbolNameAttr:$sym_name,
       TypeAttrOf<FunctionType>:$function_type,

@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --verify-roundtrip %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --verify-roundtrip --verify-diagnostics %s | %FileCheck %s
 
 // CHECK:      module {
 // CHECK-NEXT:   bir.func @main() {
@@ -38,12 +38,7 @@ bir.func @f(%arg0 : !bir.int) -> !bir.int {
 
 // -----
 
-// CHECK:      module {
-// CHECK-NEXT:   bir.func @f(%arg0: !bir.int) -> (!bir.int, !bir.int) {
-// CHECK-NEXT:     bir.return %arg0, %arg0 : !bir.int, !bir.int
-// CHECK-NEXT:   }
-// CHECK-NEXT: }
-
+// expected-error@+1 {{'bir.func' op supports at most one result}}
 bir.func @f(%arg0 : !bir.int) -> (!bir.int, !bir.int) {
   bir.return %arg0, %arg0 : !bir.int, !bir.int
 }
