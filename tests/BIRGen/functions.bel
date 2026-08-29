@@ -21,7 +21,7 @@
 # CHECK-NEXT:     %[[V7:.*]] = bir.declare "p" : !bir.ref<!bir.int>
 # CHECK-NEXT:     bir.store %[[C3]] to %[[V7]] : !bir.int to !bir.ref<!bir.int>
 # CHECK-NEXT:     %[[V8:.*]] = bir.load %[[V7]] : (!bir.ref<!bir.int>) -> !bir.int
-# CHECK-NEXT:     bir.print %[[V8]] : !bir.int
+# CHECK-NEXT:     call @brt_print_int(%[[V8]]) : (!bir.int) -> ()
 # CHECK-NEXT:     %[[C4:.*]] = bir.constant #bir.int<0> : !bir.int
 # CHECK-NEXT:     bir.return %[[C4]] : !bir.int
 # CHECK-NEXT:   }

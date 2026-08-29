@@ -3,11 +3,6 @@
 
 include "mlir/Pass/PassBase.td"
 
-def BelalangLowerToRuntimeCallsPass : Pass<"bir-lower-to-runtime-calls"> {
-  let summary = "lower bir print ops to calls to runtime functions";
-  let dependentDialects = ["::belalang::bir::BIRDialect"];
-}
-
 def BelalangFlattenCFGPass : Pass<"bir-flatten-cfg"> {
   let summary = "flatten bir CFGs";
   let dependentDialects = ["::belalang::bir::BIRDialect",

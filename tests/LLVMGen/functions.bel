@@ -1,7 +1,6 @@
 # RUN: %belalang build --emit=llvm %s | %FileCheck %s
 
 # CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
-# CHECK-DAG: declare void @brt_print_int(i64)
 
 # CHECK-LABEL:define i64 @fn.main.anon(
 # CHECK-SAME:     i64 %[[ARG0:.*]], i64 %[[ARG1:.*]]) {
@@ -9,6 +8,7 @@
 # CHECK-NEXT:   ret i64 %[[V0]]
 # CHECK-NEXT: }
 
+# CHECK: declare void @brt_print_int(i64)
 # CHECK-LABEL:define i64 @main() {
 # CHECK-NEXT:   %[[RESULT:.*]] = call i64 @fn.main.anon(i64 2, i64 3)
 # CHECK-NEXT:   %[[MEM:.*]] = call ptr @brt_gc_alloc_layout(i64 8, i64 0, ptr null)

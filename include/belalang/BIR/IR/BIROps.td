@@ -203,21 +203,6 @@ def BIR_ShrOp : BIR_Op<"shr", [Pure]> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_PrintOp : BIR_Op<"print"> {
-  let summary = "print";
-
-  let description = [{
-    ```mlir
-    %0 = bir.constant #bir.int<0> : !bir.int
-    bir.print %0 : !bir.int
-    ```
-  }];
-
-  let arguments = (ins BIR_AnyType:$value);
-
-  let assemblyFormat = "attr-dict $value `:` type($value)";
-}
-
 def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
                              IsolatedFromAbove]> {
   let summary = "func";

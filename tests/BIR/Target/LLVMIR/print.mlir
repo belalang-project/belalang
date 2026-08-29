@@ -15,14 +15,17 @@
 // CHECK-NEXT:   ret void
 // CHECK-NEXT: }
 
+bir.func private @brt_print_float(!bir.float)
+bir.func private @brt_print_bool(!bir.bool)
+
 bir.func @print_belalang() {
   %0 = bir.constant #bir.float<3.0> : !bir.float
-  bir.print %0 : !bir.float
+  bir.call @brt_print_float(%0) : (!bir.float) -> ()
   bir.return
 }
 
 bir.func @print_bool() {
   %0 = bir.constant #bir.bool<true> : !bir.bool
-  bir.print %0 : !bir.bool
+  bir.call @brt_print_bool(%0) : (!bir.bool) -> ()
   bir.return
 }

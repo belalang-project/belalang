@@ -6,10 +6,12 @@
 // CHECK-NEXT:   bir.cond_br %0 ^bb2, ^bb3
 // CHECK-NEXT: ^bb2:  // pred: ^bb1
 // CHECK-NEXT:   %1 = bir.constant #bir.int<1> : !bir.int
-// CHECK-NEXT:   bir.print %1 : !bir.int
+// CHECK-NEXT:   call @use(%1) : (!bir.int) -> ()
 // CHECK-NEXT:   cf.br ^bb1
 // CHECK-NEXT: ^bb3:  // pred: ^bb1
 // CHECK-NEXT:   bir.return
+
+bir.func @use(!bir.int)
 
 bir.func @main() {
   bir.while {
@@ -17,7 +19,7 @@ bir.func @main() {
     bir.condition %cond
   } do {
     %v = bir.constant #bir.int<1> : !bir.int
-    bir.print %v : !bir.int
+    bir.call @use(%v) : (!bir.int) -> ()
     bir.continue
   }
   bir.return

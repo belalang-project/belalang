@@ -20,7 +20,7 @@ y := 1.0;
 # CHECK-NEXT: %[[C8:.*]] = bir.load %[[C7]] : (!bir.ref<!bir.int>) -> !bir.int
 z := x + 1;
 
-# CHECK-NEXT: bir.print %[[C8]] : !bir.int
+# CHECK-NEXT: call @brt_print_int(%[[C8]]) : (!bir.int) -> ()
 print(z);
 
 # CHECK-NEXT: %[[C10:.*]] = bir.constant #bir.int<10> : !bir.int

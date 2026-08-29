@@ -1,5 +1,7 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
 
+bir.func @use_bool(!bir.bool)
+
 bir.func @main() {
   // CHECK: %[[C0:.*]] = llvm.mlir.constant(0 : i64) : i64
   // CHECK: %[[C1:.*]] = llvm.mlir.constant(1 : i64) : i64
@@ -15,27 +17,29 @@ bir.func @main() {
   // CHECK: llvm.icmp "ne" %[[C0]], %[[C1]] : i64
 
   %2 = bir.cmp lt %0, %1 : !bir.int
-  bir.print %2 : !bir.bool
+  bir.call @use_bool(%2) : (!bir.bool) -> ()
 
   %3 = bir.cmp le %0, %1 : !bir.int
-  bir.print %3 : !bir.bool
+  bir.call @use_bool(%3) : (!bir.bool) -> ()
 
   %4 = bir.cmp gt %0, %1 : !bir.int
-  bir.print %4 : !bir.bool
+  bir.call @use_bool(%4) : (!bir.bool) -> ()
 
   %5 = bir.cmp ge %0, %1 : !bir.int
-  bir.print %5 : !bir.bool
+  bir.call @use_bool(%5) : (!bir.bool) -> ()
 
   %6 = bir.cmp eq %0, %1 : !bir.int
-  bir.print %6 : !bir.bool
+  bir.call @use_bool(%6) : (!bir.bool) -> ()
 
   %7 = bir.cmp ne %0, %1 : !bir.int
-  bir.print %7 : !bir.bool
+  bir.call @use_bool(%7) : (!bir.bool) -> ()
 
   bir.return
 }
 
 // -----
+
+bir.func @use_bool(!bir.bool)
 
 bir.func @main() {
   // CHECK: %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f64) : f64
@@ -52,23 +56,22 @@ bir.func @main() {
   // CHECK: llvm.fcmp "one" %[[C0]], %[[C1]] : f64
 
   %2 = bir.cmp lt %0, %1 : !bir.float
-  bir.print %2 : !bir.bool
+  bir.call @use_bool(%2) : (!bir.bool) -> ()
 
   %3 = bir.cmp le %0, %1 : !bir.float
-  bir.print %3 : !bir.bool
+  bir.call @use_bool(%3) : (!bir.bool) -> ()
 
   %4 = bir.cmp gt %0, %1 : !bir.float
-  bir.print %4 : !bir.bool
+  bir.call @use_bool(%4) : (!bir.bool) -> ()
 
   %5 = bir.cmp ge %0, %1 : !bir.float
-  bir.print %5 : !bir.bool
+  bir.call @use_bool(%5) : (!bir.bool) -> ()
 
   %6 = bir.cmp eq %0, %1 : !bir.float
-  bir.print %6 : !bir.bool
+  bir.call @use_bool(%6) : (!bir.bool) -> ()
 
   %7 = bir.cmp ne %0, %1 : !bir.float
-  bir.print %7 : !bir.bool
+  bir.call @use_bool(%7) : (!bir.bool) -> ()
 
   bir.return
 }
-
