@@ -122,6 +122,13 @@ mlir::Type FuncOp::getResType() {
   return getNumResults() > 0 ? getResultTypes()[0] : mlir::Type();
 }
 
+mlir::LogicalResult FuncOp::verify() {
+  if (getFunctionType().getNumResults() > 1)
+    return emitOpError() << "supports at most one result";
+
+  return mlir::success();
+}
+
 // -----------------------------------------------------------------------------
 // FuncExprOp
 // -----------------------------------------------------------------------------

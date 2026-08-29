@@ -246,10 +246,8 @@ struct FuncOpLowering final : public OpConversionPattern<bir::FuncOp> {
       resultType = LLVM::LLVMVoidType::get(getContext());
     else if (srcType.getNumResults() == 1)
       resultType = getTypeConverter()->convertType(srcType.getResult(0));
-    else {
-      // TODO: decide on num results
-      return failure();
-    }
+    else
+      llvm_unreachable("bir.func supports at most one result.");
 
     auto llvmFuncType = LLVM::LLVMFunctionType::get(resultType, inputTypes);
 
