@@ -60,13 +60,26 @@ def BIR_StructType : BIR_Type<"Struct", "struct", [
 
 }
 
+def BIR_ArrayType : BIR_Type<"Array", "array", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>,
+]> {
+  let summary = "Array type";
+
+  let parameters = (ins
+    ArrayRefParameter<"mlir::Type", "">:$members
+  );
+
+  let assemblyFormat = "`<` `[` $members `]` `>`";
+}
+
 def BIR_ReferencableType : AnyTypeOf<[
   BIR_IntType,
   BIR_FloatType,
   BIR_StringType,
   FunctionType,
   BIR_BoolType,
-  BIR_StructType
+  BIR_StructType,
+  BIR_ArrayType
 ]>;
 
 def BIR_RefType : BIR_Type<"Ref", "ref", [

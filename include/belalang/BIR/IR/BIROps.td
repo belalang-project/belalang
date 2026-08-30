@@ -25,7 +25,8 @@ def BIR_AnyType : AnyTypeOf<[
   BIR_StringType,
   FunctionType,
   BIR_BoolType,
-  BIR_StructType
+  BIR_StructType,
+  BIR_ArrayType
 ]>;
 
 def BIR_ConstantOp : BIR_Op<"constant", [
@@ -525,6 +526,24 @@ def BIR_GetMemberOp : BIR_Op<"get_member", [Pure]> {
     $addr `[` $index_attr `]` attr-dict
     `:` qualified(type($addr)) `->` qualified(type($result))
   }];
+}
+
+def BIR_GetElementOp : BIR_Op<"get_element", [Pure]> {
+  let arguments = (ins
+    BIR_ArrayType:$array,
+    IndexAttr:$index_attr
+  );
+
+  let results = (outs
+    BIR_RefType:$result
+  );
+
+  let assemblyFormat = [{
+    $array `[` $index_attr `]` attr-dict
+    `:` qualified(type($array)) `->` qualified(type($result))
+  }];
+
+  let hasVerifier = 1;
 }
 
 def BIR_AllocHeapOp : BIR_Op<"alloc_heap", [

@@ -35,22 +35,40 @@ static void collectGCPointerOffsets(mlir::Type type,
                                     const mlir::DataLayout &dataLayout,
                                     uint64_t baseOffset,
                                     llvm::SmallVectorImpl<uint32_t> &offsets) {
-  auto structType = mlir::dyn_cast<bir::StructType>(type);
-  if (!structType)
-    return;
-
   uint64_t currentOffset = 0;
-  for (int32_t logicalIndex : structType.getInverseReorder()) {
-    mlir::Type member = structType.getMembers()[logicalIndex];
+  llvm::SmallVector<mlir::Type> members;
+  if (auto structType = mlir::dyn_cast<bir::StructType>(type)) {
+    for (int32_t logicalIndex : structType.getInverseReorder())
+      members.push_back(structType.getMembers()[logicalIndex]);
+  } else if (auto arrayType = mlir::dyn_cast<bir::ArrayType>(type)) {
+    llvm::append_range(members, arrayType.getMembers());
+  } else {
+    return;
+  }
+
+  for (mlir::Type member : members) {
     uint64_t memberAlign = dataLayout.getTypeABIAlignment(member);
     currentOffset = llvm::alignTo(currentOffset, memberAlign);
-    if (mlir::isa<bir::RefType>(member))
+    if (mlir::isa<bir::RefType, bir::ArrayType>(member))
       offsets.push_back(static_cast<uint32_t>(baseOffset + currentOffset));
     else
       collectGCPointerOffsets(member, dataLayout, baseOffset + currentOffset,
                               offsets);
     currentOffset += dataLayout.getTypeSize(member).getFixedValue();
   }
+}
+
+static mlir::Type getArrayPayloadType(const mlir::TypeConverter &typeConverter,
+                                      bir::ArrayType arrayType) {
+  llvm::SmallVector<mlir::Type> members;
+  for (mlir::Type member : arrayType.getMembers()) {
+    auto converted = typeConverter.convertType(member);
+    if (!converted)
+      return {};
+    members.push_back(converted);
+  }
+  return mlir::LLVM::LLVMStructType::getLiteral(arrayType.getContext(),
+                                                members);
 }
 
 static llvm::SmallVector<uint32_t>
@@ -177,6 +195,74 @@ struct ConstantOpLowering final : public OpConversionPattern<bir::ConstantOp> {
       auto c1 = LLVM::InsertValueOp::create(rewriter, op.getLoc(), container.getType(), container, addrOfOp, rewriter.getDenseI64ArrayAttr({0}));
       rewriter.replaceOpWithNewOp<LLVM::InsertValueOp>(op, c1.getType(), c1, len, rewriter.getDenseI64ArrayAttr({1}));
 
+      return success();
+    } else if (auto arrayAttr = llvm::dyn_cast<bir::ArrayAttr>(value)) {
+      auto arrayType = mlir::cast<bir::ArrayType>(op.getType());
+      auto payloadType = getArrayPayloadType(*getTypeConverter(), arrayType);
+      if (!payloadType)
+        return failure();
+
+      auto module = op->getParentOfType<mlir::ModuleOp>();
+      auto ctx = op->getContext();
+      auto dataLayout = mlir::DataLayout::closest(op);
+      auto i64Type = mlir::IntegerType::get(ctx, 64);
+      auto ptrType = LLVM::LLVMPointerType::get(ctx);
+
+      auto allocType = LLVM::LLVMFunctionType::get(ptrType,
+                                                   {i64Type, i64Type, ptrType});
+      getOrCreateRuntimeFunction(module, op.getLoc(), kGCAllocLayout, allocType,
+                                 rewriter);
+
+      uint64_t payloadSize = dataLayout.getTypeSize(payloadType);
+      auto sizeValue = LLVM::ConstantOp::create(
+          rewriter, op.getLoc(), i64Type,
+          rewriter.getI64IntegerAttr(payloadSize));
+      auto pointerOffsets = getGCPointerOffsets(arrayType, dataLayout);
+      auto pointerCount = LLVM::ConstantOp::create(
+          rewriter, op.getLoc(), i64Type,
+          rewriter.getI64IntegerAttr(pointerOffsets.size()));
+      auto offsets = getOrCreatePointerOffsetsGlobal(
+          op.getLoc(), module, arrayType, pointerOffsets, rewriter);
+      auto allocation = LLVM::CallOp::create(
+          rewriter, op.getLoc(), ptrType,
+          FlatSymbolRefAttr::get(ctx, kGCAllocLayout),
+          ValueRange{sizeValue, pointerCount, offsets});
+
+      if (arrayAttr.getMembers().size() != arrayType.getMembers().size())
+        return failure();
+
+      for (auto [index, memberAttr, memberType] :
+           llvm::zip(llvm::seq<unsigned>(0, arrayAttr.getMembers().size()),
+                     arrayAttr.getMembers(), arrayAttr.getMemberTypes())) {
+        auto convertedType = getTypeConverter()->convertType(memberType);
+        if (!convertedType)
+          return failure();
+
+        mlir::Attribute convertedAttr;
+        if (auto intAttr = llvm::dyn_cast<bir::IntegerAttr>(memberAttr))
+          convertedAttr = rewriter.getIntegerAttr(convertedType,
+                                                  intAttr.getValue());
+        else if (auto floatAttr = llvm::dyn_cast<bir::FloatAttr>(memberAttr))
+          convertedAttr = rewriter.getFloatAttr(convertedType,
+                                                floatAttr.getValue());
+        else if (auto boolAttr = llvm::dyn_cast<bir::BoolAttr>(memberAttr))
+          convertedAttr = rewriter.getIntegerAttr(
+              convertedType, static_cast<int64_t>(boolAttr.getValue()));
+        else
+          return failure();
+
+        llvm::SmallVector<LLVM::GEPArg> indices = {0,
+                                                   static_cast<int32_t>(index)};
+        auto elementPtr = LLVM::GEPOp::create(
+            rewriter, op.getLoc(), ptrType, payloadType, allocation.getResult(),
+            indices,
+            LLVM::GEPNoWrapFlags::inbounds | LLVM::GEPNoWrapFlags::nuw);
+        auto elementValue = LLVM::ConstantOp::create(
+            rewriter, op.getLoc(), convertedType, convertedAttr);
+        LLVM::StoreOp::create(rewriter, op.getLoc(), elementValue, elementPtr);
+      }
+
+      rewriter.replaceOp(op, allocation.getResult());
       return success();
     } else if (auto structAttr = llvm::dyn_cast<bir::StructAttr>(value)) {
       auto module = op->getParentOfType<mlir::ModuleOp>();
@@ -568,7 +654,13 @@ struct AllocHeapOpLowering final : public OpConversionPattern<bir::AllocHeapOp> 
     // The AllocHeapOp strictly uses the RefType as the result type.
     // We're allocating memory the size of the referent.
     auto type = mlir::cast<bir::RefType>(op.getResult().getType());
-    auto referentLLVMTy = getTypeConverter()->convertType(type.getReferent());
+    mlir::Type referentLLVMTy;
+    if (auto arrayType = mlir::dyn_cast<bir::ArrayType>(type.getReferent()))
+      referentLLVMTy = getArrayPayloadType(*getTypeConverter(), arrayType);
+    else
+      referentLLVMTy = getTypeConverter()->convertType(type.getReferent());
+    if (!referentLLVMTy)
+      return failure();
     uint64_t typeSize = dataLayout.getTypeSize(referentLLVMTy);
 
     auto module = op->getParentOfType<mlir::ModuleOp>();
@@ -866,7 +958,8 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
       mlir::MLIRContext *ctx = ty.getContext();
       mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
       mlir::Type iType = mlir::IntegerType::get(ctx, 64);
-      auto stringTy = mlir::LLVM::LLVMStructType::getIdentified(ctx, "bel.String");
+      auto stringTy =
+          mlir::LLVM::LLVMStructType::getIdentified(ctx, "bel.String");
       assert(stringTy.setBody({ptrType, iType}, false).succeeded());
       return stringTy;
     });
@@ -881,9 +974,36 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
     addConversion([](bir::RefType ty) {
       return LLVM::LLVMPointerType::get(ty.getContext());
     });
+    addConversion([](bir::ArrayType ty) {
+      return LLVM::LLVMPointerType::get(ty.getContext());
+    });
     addConversion([](mlir::FunctionType type) -> mlir::Type {
       return LLVM::LLVMPointerType::get(type.getContext());
     });
+  }
+};
+
+struct GetElementOpLowering final
+    : public OpConversionPattern<bir::GetElementOp> {
+  using OpConversionPattern<bir::GetElementOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::GetElementOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto arrayType = mlir::cast<bir::ArrayType>(op.getArray().getType());
+    auto payloadType = getArrayPayloadType(*getTypeConverter(), arrayType);
+    auto resultType = getTypeConverter()->convertType(op.getResult().getType());
+    if (!payloadType || !resultType)
+      return failure();
+
+    llvm::SmallVector<mlir::LLVM::GEPArg, 2> indices = {
+        0, static_cast<int32_t>(op.getIndexAttr().getZExtValue())};
+    mlir::LLVM::GEPNoWrapFlags flags =
+        mlir::LLVM::GEPNoWrapFlags::inbounds |
+        mlir::LLVM::GEPNoWrapFlags::nuw;
+    rewriter.replaceOpWithNewOp<mlir::LLVM::GEPOp>(
+        op, resultType, payloadType, adaptor.getArray(), indices, flags);
+    return success();
   }
 };
 
@@ -946,7 +1066,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, AllocHeapOpLowering, AllocStackOpLowering,
                StoreOpLowering, LoadOpLowering, CondBrLowering, CmpOpLowering,
-               GetMemberOpLowering>(typeConverter, patterns.getContext());
+               GetMemberOpLowering, GetElementOpLowering>(
+      typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------

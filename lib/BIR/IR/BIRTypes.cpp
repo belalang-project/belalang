@@ -74,7 +74,7 @@ StringType::getABIAlignment(const mlir::DataLayout &dl,
 }
 
 // -----------------------------------------------------------------------------
-// StructType
+// RefType
 // -----------------------------------------------------------------------------
 
 llvm::TypeSize
@@ -89,6 +89,10 @@ uint64_t RefType::getABIAlignment(const mlir::DataLayout &dl,
   auto ptrType = mlir::LLVM::LLVMPointerType::get(getContext());
   return dl.getTypeABIAlignment(ptrType);
 }
+
+// -----------------------------------------------------------------------------
+// StructType
+// -----------------------------------------------------------------------------
 
 mlir::Type StructType::parse(mlir::AsmParser &p) {
   const mlir::SMLoc loc = p.getCurrentLocation();
@@ -274,6 +278,21 @@ StructType::getABIAlignment(const mlir::DataLayout &dl,
   }
 
   return stAlign;
+}
+
+// -----------------------------------------------------------------------------
+// ArrayType
+// -----------------------------------------------------------------------------
+
+llvm::TypeSize
+ArrayType::getTypeSizeInBits(const mlir::DataLayout &dl,
+                           mlir::DataLayoutEntryListRef params) const {
+  return dl.getTypeSizeInBits(mlir::LLVM::LLVMPointerType::get(getContext()));
+}
+
+uint64_t ArrayType::getABIAlignment(const mlir::DataLayout &dl,
+                                  mlir::DataLayoutEntryListRef params) const {
+  return dl.getTypeABIAlignment(mlir::LLVM::LLVMPointerType::get(getContext()));
 }
 
 } // namespace bir

@@ -157,6 +157,63 @@ TEST_F(BIRTypesTest, NestedStructType) {
   EXPECT_EQ(dl.getTypeABIAlignment(outer), 8);
 }
 
+TEST_F(BIRTypesTest, EmptyArrayType) {
+  auto dl = getDataLayout();
+  auto ty = ArrayType::get(&context, {});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, ArrayTypeWithOnlyByteAlignedMembers) {
+  auto dl = getDataLayout();
+  auto ty = ArrayType::get(&context,
+                           {BoolType::get(&context), BoolType::get(&context),
+                            BoolType::get(&context)});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, ArrayTypeWithLeadingPadding) {
+  auto dl = getDataLayout();
+  auto ty = ArrayType::get(&context,
+                           {BoolType::get(&context), IntType::get(&context)});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, ArrayTypeWithTrailingPadding) {
+  auto dl = getDataLayout();
+  auto ty = ArrayType::get(&context,
+                           {IntType::get(&context), BoolType::get(&context)});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, ArrayTypeWithStringAndReference) {
+  auto dl = getDataLayout();
+  auto ty = ArrayType::get(
+      &context,
+      {StringType::get(&context), RefType::get(&context, IntType::get(&context))});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
+}
+
+TEST_F(BIRTypesTest, NestedArrayType) {
+  auto dl = getDataLayout();
+  auto inner = ArrayType::get(
+      &context, {BoolType::get(&context), IntType::get(&context)});
+  auto outer = ArrayType::get(
+      &context, {BoolType::get(&context), inner, BoolType::get(&context)});
+
+  EXPECT_EQ(dl.getTypeSizeInBits(outer).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(outer), 8);
+}
+
 } // namespace
 } // namespace bir
 } // namespace belalang

@@ -57,6 +57,18 @@ def BIR_StructAttr : BIR_Attr<"Struct", "struct", [TypedAttrInterface]> {
   let hasCustomAssemblyFormat = 1;
 }
 
+def BIR_ArrayAttr : BIR_Attr<"Array", "array", [TypedAttrInterface]> {
+  let summary = "An attribute containing an array value";
+
+  let parameters = (ins
+    AttributeSelfTypeParameter<"">:$type,
+    ArrayRefParameter<"mlir::Attribute", "">:$members,
+    ArrayRefParameter<"mlir::Type", "">:$memberTypes
+  );
+
+  let hasCustomAssemblyFormat = 1;
+}
+
 def BIR_FnAttr : BIR_Attr<"Fn", "fn", [TypedAttrInterface]> {
   let summary = "function";
 
