@@ -12,3 +12,15 @@ bir.func @main() {
   %0 = bir.alloc_heap : !bir.ref<!bir.struct<"Box", {!bir.int, !bir.ref<!bir.int>}>>
   bir.return
 }
+
+// -----
+
+// CHECK-DAG: @gc.ptr_offsets.{{.*}} = private constant [1 x i32] zeroinitializer
+// CHECK-LABEL: define void @array_field() {
+// CHECK: call ptr @brt_gc_alloc_layout(i64 8, i64 1, ptr @gc.ptr_offsets.{{.*}})
+// CHECK: ret void
+
+bir.func @array_field() {
+  %0 = bir.alloc_heap : !bir.ref<!bir.struct<"ArrayBox", {!bir.array<[!bir.int, !bir.int]>}>>
+  bir.return
+}

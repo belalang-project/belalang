@@ -161,8 +161,8 @@ TEST_F(BIRTypesTest, EmptyArrayType) {
   auto dl = getDataLayout();
   auto ty = ArrayType::get(&context, {});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 0);
-  EXPECT_EQ(dl.getTypeABIAlignment(ty), 1);
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
 TEST_F(BIRTypesTest, ArrayTypeWithOnlyByteAlignedMembers) {
@@ -171,8 +171,8 @@ TEST_F(BIRTypesTest, ArrayTypeWithOnlyByteAlignedMembers) {
                            {BoolType::get(&context), BoolType::get(&context),
                             BoolType::get(&context)});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 24);
-  EXPECT_EQ(dl.getTypeABIAlignment(ty), 1);
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
+  EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
 TEST_F(BIRTypesTest, ArrayTypeWithLeadingPadding) {
@@ -180,7 +180,7 @@ TEST_F(BIRTypesTest, ArrayTypeWithLeadingPadding) {
   auto ty = ArrayType::get(&context,
                            {BoolType::get(&context), IntType::get(&context)});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 128);
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
@@ -189,7 +189,7 @@ TEST_F(BIRTypesTest, ArrayTypeWithTrailingPadding) {
   auto ty = ArrayType::get(&context,
                            {IntType::get(&context), BoolType::get(&context)});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 128);
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
@@ -199,7 +199,7 @@ TEST_F(BIRTypesTest, ArrayTypeWithStringAndReference) {
       &context,
       {StringType::get(&context), RefType::get(&context, IntType::get(&context))});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 192);
+  EXPECT_EQ(dl.getTypeSizeInBits(ty).getFixedValue(), 64);
   EXPECT_EQ(dl.getTypeABIAlignment(ty), 8);
 }
 
@@ -210,7 +210,7 @@ TEST_F(BIRTypesTest, NestedArrayType) {
   auto outer = ArrayType::get(
       &context, {BoolType::get(&context), inner, BoolType::get(&context)});
 
-  EXPECT_EQ(dl.getTypeSizeInBits(outer).getFixedValue(), 256);
+  EXPECT_EQ(dl.getTypeSizeInBits(outer).getFixedValue(), 64);
   EXPECT_EQ(dl.getTypeABIAlignment(outer), 8);
 }
 

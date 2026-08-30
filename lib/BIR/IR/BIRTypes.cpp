@@ -287,32 +287,12 @@ StructType::getABIAlignment(const mlir::DataLayout &dl,
 llvm::TypeSize
 ArrayType::getTypeSizeInBits(const mlir::DataLayout &dl,
                            mlir::DataLayoutEntryListRef params) const {
-  unsigned arSize = 0;
-  uint64_t arAlign = 1;
-
-  for (auto ty : getMembers()) {
-    uint64_t tyAlign = dl.getTypeABIAlignment(ty);
-
-    arSize = llvm::alignTo(arSize, tyAlign);
-    arSize += dl.getTypeSize(ty).getFixedValue();
-
-    arAlign = std::max(tyAlign, arAlign);
-  }
-
-  arSize = llvm::alignTo(arSize, arAlign);
-  return llvm::TypeSize::getFixed(arSize * 8); // in bits.
+  return dl.getTypeSizeInBits(mlir::LLVM::LLVMPointerType::get(getContext()));
 }
 
 uint64_t ArrayType::getABIAlignment(const mlir::DataLayout &dl,
                                   mlir::DataLayoutEntryListRef params) const {
-  uint64_t arAlign = 1;
-
-  for (mlir::Type ty : getMembers()) {
-    uint64_t tyAlign = dl.getTypeABIAlignment(ty);
-    arAlign = std::max(tyAlign, arAlign);
-  }
-
-  return arAlign;
+  return dl.getTypeABIAlignment(mlir::LLVM::LLVMPointerType::get(getContext()));
 }
 
 } // namespace bir

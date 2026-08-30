@@ -78,7 +78,8 @@ def BIR_ReferencableType : AnyTypeOf<[
   BIR_StringType,
   FunctionType,
   BIR_BoolType,
-  BIR_StructType
+  BIR_StructType,
+  BIR_ArrayType
 ]>;
 
 def BIR_RefType : BIR_Type<"Ref", "ref", [
