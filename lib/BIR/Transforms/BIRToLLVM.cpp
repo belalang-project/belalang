@@ -345,6 +345,10 @@ struct FuncOpLowering final : public OpConversionPattern<bir::FuncOp> {
     auto llvmFuncOp = LLVM::LLVMFuncOp::create(rewriter, op.getLoc(),
                                                op.getName(), llvmFuncType);
 
+    // An empty private BIR function is an external declaration.
+    if (op.isDeclaration())
+      llvmFuncOp.setLinkage(LLVM::Linkage::External);
+
     rewriter.inlineRegionBefore(op.getBody(), llvmFuncOp.getBody(),
                                 llvmFuncOp.end());
     if (failed(rewriter.convertRegionTypes(

@@ -230,6 +230,9 @@ def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
 
     ::llvm::ArrayRef<::mlir::Type> getResultTypes() { return getFunctionType().getResults(); }
 
+    // An empty body is the BIR representation of an external declaration.
+    bool isDeclaration() { return getBody().empty(); }
+
     mlir::Type getResType();
   }];
 

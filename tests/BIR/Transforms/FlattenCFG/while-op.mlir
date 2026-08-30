@@ -11,7 +11,7 @@
 // CHECK-NEXT: ^bb3:  // pred: ^bb1
 // CHECK-NEXT:   bir.return
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @main() {
   bir.while {
