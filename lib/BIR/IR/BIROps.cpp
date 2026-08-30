@@ -87,6 +87,19 @@ mlir::LogicalResult ConstantOp::verify() {
   return emitOpError() << "type and attribute mismatch.";
 }
 
+mlir::LogicalResult GetElementOp::verify() {
+  auto arrayType = mlir::cast<bir::ArrayType>(getArray().getType());
+  uint64_t index = getIndexAttr().getZExtValue();
+  if (index >= arrayType.getMembers().size())
+    return emitOpError() << "element index is out of bounds";
+
+  auto resultType = mlir::cast<bir::RefType>(getResult().getType());
+  if (resultType.getReferent() != arrayType.getMembers()[index])
+    return emitOpError() << "result type does not match array element type";
+
+  return mlir::success();
+}
+
 // -----------------------------------------------------------------------------
 // FuncOp
 // -----------------------------------------------------------------------------

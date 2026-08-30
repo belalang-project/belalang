@@ -983,6 +983,30 @@ struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
   }
 };
 
+struct GetElementOpLowering final
+    : public OpConversionPattern<bir::GetElementOp> {
+  using OpConversionPattern<bir::GetElementOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::GetElementOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto arrayType = mlir::cast<bir::ArrayType>(op.getArray().getType());
+    auto payloadType = getArrayPayloadType(*getTypeConverter(), arrayType);
+    auto resultType = getTypeConverter()->convertType(op.getResult().getType());
+    if (!payloadType || !resultType)
+      return failure();
+
+    llvm::SmallVector<mlir::LLVM::GEPArg, 2> indices = {
+        0, static_cast<int32_t>(op.getIndexAttr().getZExtValue())};
+    mlir::LLVM::GEPNoWrapFlags flags =
+        mlir::LLVM::GEPNoWrapFlags::inbounds |
+        mlir::LLVM::GEPNoWrapFlags::nuw;
+    rewriter.replaceOpWithNewOp<mlir::LLVM::GEPOp>(
+        op, resultType, payloadType, adaptor.getArray(), indices, flags);
+    return success();
+  }
+};
+
 static void insertBRTInitCall(mlir::Operation *op) {
   mlir::ModuleOp module = dyn_cast_or_null<mlir::ModuleOp>(op);
   assert(module || "unexpected non-ModuleOp");
@@ -1042,7 +1066,8 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
                AndOpLowering, OrOpLowering, XorOpLowering, ShlOpLowering,
                ShrOpLowering, AllocHeapOpLowering, AllocStackOpLowering,
                StoreOpLowering, LoadOpLowering, CondBrLowering, CmpOpLowering,
-               GetMemberOpLowering>(typeConverter, patterns.getContext());
+               GetMemberOpLowering, GetElementOpLowering>(
+      typeConverter, patterns.getContext());
 }
 
 // -----------------------------------------------------------------------------

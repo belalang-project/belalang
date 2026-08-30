@@ -528,6 +528,24 @@ def BIR_GetMemberOp : BIR_Op<"get_member", [Pure]> {
   }];
 }
 
+def BIR_GetElementOp : BIR_Op<"get_element", [Pure]> {
+  let arguments = (ins
+    BIR_ArrayType:$array,
+    IndexAttr:$index_attr
+  );
+
+  let results = (outs
+    BIR_RefType:$result
+  );
+
+  let assemblyFormat = [{
+    $array `[` $index_attr `]` attr-dict
+    `:` qualified(type($array)) `->` qualified(type($result))
+  }];
+
+  let hasVerifier = 1;
+}
+
 def BIR_AllocHeapOp : BIR_Op<"alloc_heap", [
   TypesMatchWith<"", "roots", "relocated_roots", "$_self">
 ]> {
