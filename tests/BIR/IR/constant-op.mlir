@@ -70,6 +70,14 @@ bir.func @structstruct() {
 
 // -----
 
+bir.func @arrayarray() {
+  // CHECK: bir.constant #bir.array<[#bir.int<42> : !bir.int, #bir.int<42> : !bir.int]> : !bir.array<[!bir.int, !bir.int]>
+  %0 = bir.constant #bir.array<[#bir.int<42> : !bir.int, #bir.int<42> : !bir.int]> : !bir.array<[!bir.int, !bir.int]>
+  bir.return
+}
+
+// -----
+
 bir.func @structint() {
   // expected-error@+1 {{'bir.constant' op type and attribute mismatch}}
   %0 = bir.constant #bir.struct<{#bir.int<42> : !bir.int}> : !bir.int

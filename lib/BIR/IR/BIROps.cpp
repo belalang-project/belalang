@@ -80,6 +80,10 @@ mlir::LogicalResult ConstantOp::verify() {
     return mlir::success();
   }
 
+  if (mlir::isa<bir::ArrayType>(ty) && mlir::isa<bir::ArrayAttr>(attr)) {
+    return mlir::success();
+  }
+
   return emitOpError() << "type and attribute mismatch.";
 }
 
