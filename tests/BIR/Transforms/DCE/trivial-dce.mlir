@@ -44,9 +44,9 @@ bir.func @unused_get_member() {
 // CHECK: bir.call @callee(%[[ZERO]]) : (!bir.int) -> ()
 // CHECK: %[[HEAP:.*]], %[[RELOCATED:.*]] = bir.alloc_heap : !bir.ref<!bir.int> roots(%[[STACK]] : !bir.ref<!bir.int>)
 // CHECK: bir.return
-bir.func @callee(!bir.int)
+bir.func private @callee(!bir.int)
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @retain_effectful_ops() {
   %0 = bir.constant #bir.int<0> : !bir.int
@@ -80,7 +80,7 @@ bir.func @unused_bitwise_and_cmp() {
 // CHECK-LABEL: bir.func @unreachable_blocks
 // CHECK-NEXT: bir.return
 // CHECK-NEXT: }
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @unreachable_blocks() {
   bir.return

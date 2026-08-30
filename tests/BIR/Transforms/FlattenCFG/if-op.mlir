@@ -13,7 +13,7 @@
 // CHECK-NEXT: ^bb3:  // 2 preds: ^bb1, ^bb2
 // CHECK-NEXT:   bir.return
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @main() {
   %0 = bir.constant #bir.bool<true> : !bir.bool
@@ -40,7 +40,7 @@ bir.func @main() {
 // CHECK-NEXT: ^bb2:  // 2 preds: ^bb0, ^bb1
 // CHECK-NEXT:   bir.return
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @main() {
   %0 = bir.constant #bir.bool<true> : !bir.bool
@@ -65,7 +65,7 @@ bir.func @main() {
 // CHECK-NEXT: ^bb3(%3: !bir.int):  // 2 preds: ^bb1, ^bb2
 // CHECK-NEXT:   bir.return
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @main() {
   %0 = bir.constant #bir.bool<true> : !bir.bool

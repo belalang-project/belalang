@@ -1,6 +1,6 @@
 // RUN: %bir-opt --split-input-file --verify-roundtrip --verify-diagnostics %s | %FileCheck %s
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @main() {
   // CHECK: bir.while

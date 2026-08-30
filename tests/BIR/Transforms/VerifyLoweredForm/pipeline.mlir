@@ -5,7 +5,7 @@
 // CHECK-NOT: unexpected high-level BIR operation
 // CHECK-NOT: bir.if
 
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @pipeline() {
   %0 = bir.constant #bir.int<1> : !bir.int

@@ -143,6 +143,15 @@ mlir::LogicalResult FuncOp::verify() {
   if (getFunctionType().getNumResults() > 1)
     return emitOpError() << "supports at most one result";
 
+  // MLIR declarations are only visible within the current symbol table. The
+  // generated LLVM declaration remains externally linked; this is the same
+  // distinction used by CIR for runtime and other imported functions.
+  if (isDeclaration() &&
+      mlir::SymbolTable::getSymbolVisibility(getOperation()) !=
+          mlir::SymbolTable::Visibility::Private)
+    return emitOpError()
+           << "function declarations must have private visibility";
+
   return mlir::success();
 }
 

@@ -12,7 +12,7 @@
 // CHECK:     ^bb3(%[[JOIN:.*]]: !bir.int):
 // CHECK:       call @use(%[[JOIN]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @if_join() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
@@ -45,7 +45,7 @@ bir.func @if_join() {
 // CHECK:     ^bb3:
 // CHECK:       call @use(%[[ITER]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @loop_carried() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>

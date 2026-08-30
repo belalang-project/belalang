@@ -45,8 +45,8 @@ bir.func @main() {
 // CHECK: llvm.call @f(%[[C1]]) : (i64) -> i64
 // CHECK: llvm.return %[[CALL]] : i64
 
-bir.func @f(%arg0 : !bir.int) -> !bir.int
-bir.func @g(%arg0 : !bir.int)
+bir.func private @f(%arg0 : !bir.int) -> !bir.int
+bir.func private @g(%arg0 : !bir.int)
 
 bir.func @main() -> !bir.int {
   %0 = bir.constant #bir.int<1> : !bir.int
@@ -83,7 +83,7 @@ bir.func @main() -> !bir.int {
 // CHECK-LABEL: llvm.func @main()
 // CHECK-NEXT:   %[[ADDR:.*]] = llvm.mlir.addressof @f : !llvm.ptr
 // CHECK-NEXT:   llvm.return
-bir.func @f()
+bir.func private @f()
 
 bir.func @main() {
   %0 = bir.constant #bir.fn<@f> : () -> ()

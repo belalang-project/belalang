@@ -4,7 +4,7 @@
 // CHECK-NEXT:  %[[VALUE:.*]] = bir.constant #bir.int<42> : !bir.int
 // CHECK-NEXT:  call @use(%[[VALUE]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @straight() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
@@ -21,7 +21,7 @@ bir.func @straight() {
 // CHECK-NEXT:  %[[ZERO:.*]] = bir.constant #bir.int<0> : !bir.int
 // CHECK-NEXT:  call @use(%[[ZERO]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @default_load() {
   %0 = bir.alloc_stack : !bir.ref<!bir.int>
@@ -39,7 +39,7 @@ bir.func @default_load() {
 // CHECK-NEXT:  %[[LOAD:.*]] = bir.load %[[HEAP]] : (!bir.ref<!bir.int>) -> !bir.int
 // CHECK-NEXT:  call @use(%[[LOAD]]) : (!bir.int) -> ()
 // CHECK-NEXT:  bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @heap_not_promoted() {
   %0 = bir.alloc_heap : !bir.ref<!bir.int>

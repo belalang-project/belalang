@@ -45,11 +45,11 @@ bir.func @f(%arg0 : !bir.int) -> (!bir.int, !bir.int) {
 
 // -----
 
-// CHECK: bir.func @f(!bir.int) -> !bir.int
-// CHECK: bir.func @g(!bir.int)
+// CHECK: bir.func private @f(!bir.int) -> !bir.int
+// CHECK: bir.func private @g(!bir.int)
 
-bir.func @f(%arg0 : !bir.int) -> !bir.int
-bir.func @g(%arg0 : !bir.int)
+bir.func private @f(%arg0 : !bir.int) -> !bir.int
+bir.func private @g(%arg0 : !bir.int)
 
 // CHECK:      bir.func @main() -> !bir.int {
 // CHECK-NEXT:   %[[C0:.*]] = bir.constant #bir.int<1> : !bir.int

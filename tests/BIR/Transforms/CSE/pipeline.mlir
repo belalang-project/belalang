@@ -6,7 +6,7 @@
 // CHECK: bir.call @use(%[[SUM]])
 // CHECK: bir.call @use(%[[SUM]])
 // CHECK: bir.return
-bir.func @use(!bir.int)
+bir.func private @use(!bir.int)
 
 bir.func @merges_duplicate_pure_work() {
   %0 = bir.constant #bir.int<1> : !bir.int

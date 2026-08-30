@@ -1,6 +1,6 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
 
-bir.func @use_bool(!bir.bool)
+bir.func private @use_bool(!bir.bool)
 
 bir.func @main() {
   // CHECK: %[[C0:.*]] = llvm.mlir.constant(0 : i64) : i64
@@ -39,7 +39,7 @@ bir.func @main() {
 
 // -----
 
-bir.func @use_bool(!bir.bool)
+bir.func private @use_bool(!bir.bool)
 
 bir.func @main() {
   // CHECK: %[[C0:.*]] = llvm.mlir.constant(0.000000e+00 : f64) : f64
