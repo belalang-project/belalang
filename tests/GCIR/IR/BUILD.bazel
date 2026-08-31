@@ -1,0 +1,12 @@
+load("//tests:lit.bzl", "lit_test")
+
+lit_test(
+    name = "lit_test",
+    tests = glob(["*.mlir"]),
+    data = [
+        "//tools/bir-opt",
+    ],
+    env = {
+        "BIR_OPT": "$(rlocationpath //tools/bir-opt)",
+    },
+)
