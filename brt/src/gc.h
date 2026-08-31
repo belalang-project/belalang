@@ -8,8 +8,17 @@
 extern "C" {
 #endif
 
+struct brt_gc_stats {
+  size_t allocations;
+  size_t collections;
+  size_t relocated_objects;
+  size_t relocated_bytes;
+};
+
 void
 brt_gc_init();
+void
+brt_gc_init_with_size(size_t size);
 void *
 brt_gc_alloc(size_t size);
 void *
@@ -23,6 +32,8 @@ void
 brt_gc_pop_roots();
 void
 brt_gc_collect();
+struct brt_gc_stats
+brt_gc_get_stats();
 
 #ifdef __cplusplus
 }

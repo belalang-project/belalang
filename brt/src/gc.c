@@ -4,11 +4,15 @@
 #include "errors.h"
 #include "utils.h"
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+
+#define BRT_GC_DEFAULT_HEAP_SIZE (1024 * 1024)
+#define BRT_GC_HEAP_SIZE_ENV "BELALANG_GC_HEAP_SIZE"
 
 struct gc_obj {
   /// Aligned payload size in bytes.
@@ -48,6 +52,8 @@ struct gc_heap {
   struct gc_semispace tosp;
   /// Top of the registered root-frame stack.
   struct gc_root_frame *roots;
+  /// Runtime counters reset by GC initialization.
+  struct brt_gc_stats stats;
 };
 
 /// Converts a payload pointer back to its object header.
@@ -107,6 +113,7 @@ gc_heap_init(struct gc_heap *heap,
   heap->fromsp = gc_semispace_create(semispace_size);
   heap->tosp = gc_semispace_create(semispace_size);
   heap->roots = NULL;
+  heap->stats = (struct brt_gc_stats){0};
 }
 
 /// Performs bump allocation in the active semispace and initializes the object
@@ -154,6 +161,8 @@ gc_heap_copy_obj(struct gc_heap *heap,
   memcpy(new_obj, old, sizeof(struct gc_obj) + old->size);
   new_obj->forwarding = NULL;
   old->forwarding = new_obj;
+  ++heap->stats.relocated_objects;
+  heap->stats.relocated_bytes += old->size;
   return new_obj->data;
 }
 
@@ -186,10 +195,50 @@ gc_heap_scan_copied_objects(struct gc_heap *heap)
 /// Global heap instance.
 static struct gc_heap the_heap;
 
+static size_t
+gc_heap_size_from_env()
+{
+  const char *raw = getenv(BRT_GC_HEAP_SIZE_ENV);
+  if (!raw)
+    return BRT_GC_DEFAULT_HEAP_SIZE;
+
+  if (*raw < '0' || *raw > '9')
+    brt_fatal("invalid BELALANG_GC_HEAP_SIZE");
+
+  errno = 0;
+  char *suffix;
+  unsigned long long value = strtoull(raw, &suffix, 10);
+  if (errno == ERANGE || suffix == raw)
+    brt_fatal("invalid BELALANG_GC_HEAP_SIZE");
+
+  size_t multiplier;
+  if (*suffix == '\0' || strcmp(suffix, "B") == 0)
+    multiplier = 1;
+  else if (strcmp(suffix, "KiB") == 0)
+    multiplier = ((size_t)1 << 10);
+  else if (strcmp(suffix, "MiB") == 0)
+    multiplier = ((size_t)1 << 20);
+  else if (strcmp(suffix, "GiB") == 0)
+    multiplier = ((size_t)1 << 30);
+  else
+    brt_fatal("invalid BELALANG_GC_HEAP_SIZE suffix");
+
+  if (value > SIZE_MAX / multiplier)
+    brt_fatal("BELALANG_GC_HEAP_SIZE is too large");
+
+  return (size_t)value * multiplier;
+}
+
 void
 brt_gc_init()
 {
-  gc_heap_init(&the_heap, 1024 * 1024);
+  brt_gc_init_with_size(gc_heap_size_from_env());
+}
+
+void
+brt_gc_init_with_size(size_t size)
+{
+  gc_heap_init(&the_heap, size);
 }
 
 void
@@ -235,6 +284,7 @@ brt_gc_collect()
   the_heap.tosp = old_fromsp;
 
   the_heap.tosp.hp = the_heap.tosp.start;
+  ++the_heap.stats.collections;
 }
 
 void *
@@ -255,6 +305,7 @@ brt_gc_alloc_layout(size_t size,
   if (!ptr)
     brt_fatal("out of GC heap memory");
 
+  ++the_heap.stats.allocations;
   return ptr;
 }
 
@@ -262,4 +313,10 @@ void *
 brt_gc_alloc(size_t size)
 {
   return brt_gc_alloc_layout(size, 0, NULL);
+}
+
+struct brt_gc_stats
+brt_gc_get_stats()
+{
+  return the_heap.stats;
 }
