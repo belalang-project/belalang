@@ -1,5 +1,6 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Passes.h"
+#include "belalang/GCIR/IR/GCIR.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
 #include "mlir/Transforms/Passes.h"
@@ -7,8 +8,8 @@
 int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
 
-  registry.insert<belalang::bir::BIRDialect, mlir::cf::ControlFlowDialect,
-                  mlir::LLVM::LLVMDialect>();
+  registry.insert<belalang::bir::BIRDialect, belalang::gc::GCIRDialect,
+                  mlir::cf::ControlFlowDialect, mlir::LLVM::LLVMDialect>();
 
   belalang::bir::registerPasses();
   belalang::bir::registerBIRPipelines();
