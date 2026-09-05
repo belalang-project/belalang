@@ -1,6 +1,6 @@
 # Building Belalang
 
-Belalang is a Rust + C++ project built using Bazel. We prefer to use `bazelisk` to automatically use the correct Bazel version specified in `.bazelversion`. Since Bazel hermetically downloads and manages all project dependencies and compiler toolchains (such as Rust and C++), `bazelisk` is the only build tool you need to install on your host system.
+Belalang is a C++ project built using Bazel. We prefer to use `bazelisk` to automatically use the correct Bazel version specified in `.bazelversion`. Since Bazel hermetically downloads and manages all project dependencies and compiler toolchains (such as Rust and C++), `bazelisk` is the only build tool you need to install on your host system.
 
 ## Environment Setup
 

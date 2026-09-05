@@ -13,7 +13,6 @@ namespace diag {
 // Diagnostics Information
 // -----------------------------------------------------------------------------
 
-// NOTE: need to match with lib/Diag/diag.rs
 enum class Severity {
   Error,
   Warning,

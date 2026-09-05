@@ -6,17 +6,6 @@ build --cxxopt=-std=c++17
 build --cxxopt=-fno-exceptions
 build --cxxopt=-fno-rtti
 
-# Rust options
-build --@rules_rust//rust/settings:rustfmt.toml=//:.rustfmt.toml
-build --aspects=@rules_rust//rust:defs.bzl%rustfmt_aspect
-build --output_groups=+rustfmt_checks
-
-build --@rules_rust//rust/settings:clippy_flag="-Dclippy::self_named_module_files"
-build --@rules_rust//rust/settings:clippy_flag="-Dclippy::ptr_as_ptr"
-build --@rules_rust//rust/settings:clippy_flag="-Dclippy::manual_assert"
-build --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
-build --output_groups=+clippy_checks
-
 build --incompatible_strict_action_env
 
 build --extra_toolchains=@llvm//toolchain:all

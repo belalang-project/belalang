@@ -1,8 +1,5 @@
 §
 
 # RUN: %not %belalang build --emit=tokens %s 2>&1 | %FileCheck %s
-# CHECK: error: Unknown token
-# CHECK:  --> {{.*}}/tests/Tokens/unknown-tokens.bel:1:1
-# CHECK:   |
-# CHECK: 1 | §
-# CHECK:   | ^ Unknown token
+# CHECK:      {{.*}}/tests/Tokens/unknown-tokens.bel:1:1: error: Unknown token
+# CHECK-NEXT: §

@@ -1,8 +1,6 @@
 "\x1g"
 
 # RUN: %not %belalang build --emit=tokens %s 2>&1 | %FileCheck %s
-# CHECK: error: Unknown escape string
-# CHECK:  --> {{.*}}/tests/Tokens/invalid-hex-escape.bel:1:2
-# CHECK:   |
-# CHECK: 1 | "\x1g"
-# CHECK:   |  ^^^^ Unknown escape string
+# CHECK:      {{.*}}/tests/Tokens/invalid-hex-escape.bel:1:2: error: Unknown escape string
+# CHECK-NEXT: "\x1g"
+# CHECK-NEXT:  ^~~~
