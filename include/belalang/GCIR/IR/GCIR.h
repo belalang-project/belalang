@@ -13,4 +13,7 @@
 #define GET_TYPEDEF_CLASSES
 #include "belalang/GCIR/IR/GCIRTypes.h.inc"
 
+#define GET_OP_CLASSES
+#include "belalang/GCIR/IR/GCIROps.h.inc"
+
 #endif // BELALANG_GCIR_IR_GCIR_H_

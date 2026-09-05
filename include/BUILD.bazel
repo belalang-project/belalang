@@ -192,6 +192,7 @@ cc_library(
     includes = ["."],
     deps = [
         ":BelalangGCIRDialectGen",
+        ":BelalangGCIROpGen",
         ":BelalangGCIRTypeGen",
         "@llvm-project//mlir:IR",
     ],
@@ -202,6 +203,7 @@ td_library(
     srcs = [
         "belalang/GCIR/IR/GCIRDialect.td",
         "belalang/GCIR/IR/GCIRTypes.td",
+        "belalang/GCIR/IR/GCIROps.td",
     ],
     includes = ["."],
     deps = [
@@ -217,6 +219,17 @@ gentbl_cc_library(
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
     td_file = "belalang/GCIR/IR/GCIRDialect.td",
+    deps = [":BelalangGCIRTdFiles"],
+)
+
+gentbl_cc_library(
+    name = "BelalangGCIROpGen",
+    tbl_outs = [
+        (["-gen-op-decls"], "belalang/GCIR/IR/GCIROps.h.inc"),
+        (["-gen-op-defs"], "belalang/GCIR/IR/GCIROps.cpp.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "belalang/GCIR/IR/GCIROps.td",
     deps = [":BelalangGCIRTdFiles"],
 )
 
