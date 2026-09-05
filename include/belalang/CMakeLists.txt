@@ -1,0 +1,16 @@
+add_subdirectory(BIR)
+add_subdirectory(GCIR)
+
+execute_process(
+  COMMAND git rev-parse HEAD
+  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+  OUTPUT_VARIABLE BELALANG_GIT_HASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
+)
+if(NOT BELALANG_GIT_HASH)
+  set(BELALANG_GIT_HASH unknown)
+endif()
+set(GIT_HASH "${BELALANG_GIT_HASH}")
+
+configure_file(Version.h.inc.in "${CMAKE_CURRENT_BINARY_DIR}/Version.h.inc" @ONLY)
