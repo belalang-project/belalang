@@ -1,0 +1,16 @@
+add_executable(belalang
+  belalang.cpp
+  CmdBuild.cpp
+  CmdRun.cpp
+  CmdVersion.cpp
+)
+target_link_libraries(belalang
+  PRIVATE
+    BelalangAST
+    BelalangBIR
+    BelalangBIRGen
+    BelalangDiag
+    BelalangLLVMGen
+    BelalangLexer
+    muopt
+)

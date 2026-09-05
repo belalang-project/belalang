@@ -1,0 +1,15 @@
+add_library(BelalangBIRGen
+  BIRGen.cpp
+  TypeChecker.cpp
+)
+target_link_libraries(BelalangBIRGen
+  PUBLIC
+    BelalangAST
+    BelalangBIR
+    BelalangDiag
+    BelalangLexer
+    MLIRIR
+    MLIRLLVMDialect
+    MLIRPass
+    MLIRSupport
+)
