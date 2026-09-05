@@ -8,8 +8,6 @@ t := T {
   a := 1,
 }
 
-# CHECK:      error: error parsing struct
-# CHECK-NEXT:  --> {{.*}}/tests/AST/struct_literal_invalid_body.bel:8:3
-# CHECK-NEXT:   |
-# CHECK-NEXT: 8 |   a := 1,
-# CHECK-NEXT:   |   ^ expected field assignment
+# CHECK:      {{.*}}/tests/AST/struct_literal_invalid_body.bel:8:3: error: error parsing struct: expected field assignment
+# CHECK-NEXT:   a := 1,
+# CHECK-NEXT:   ^

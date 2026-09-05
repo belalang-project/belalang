@@ -1,10 +1,6 @@
 "hello
 
 # RUN: %not %belalang build --emit=tokens %s 2>&1 | %FileCheck %s
-# CHECK: error: Unclosed string
-# CHECK:  --> {{.*}}/tests/Tokens/unclosed-string.bel:1:1
-# CHECK:   |
-# CHECK: 1 | / {{.*}}hello
-# CHECK: 2 | |
-# CHECK: 3 | | # RUN: %not %belalang build %s --emit=tokens 2>&1 | %FileCheck %s
-# CHECK:   | |____________________________________________________^ Unclosed string
+# CHECK:      {{.*}}/tests/Tokens/unclosed-string.bel:1:1: error: Unclosed string
+# CHECK-NEXT: {{.}}hello
+# CHECK-NEXT: ^~~~~~

@@ -1,5 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@rules_rust//rust:defs.bzl", "rust_static_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -134,20 +133,21 @@ cc_library(
 # Diag
 # ------------------------------------------------------------------------------
 
-rust_static_library(
-    name = "Diag-rs",
-    crate_name = "belalang_diag",
-    srcs = ["Diag/diag.rs"],
-    deps = [
-        "@crates//:annotate-snippets",
-    ],
-)
-
 cc_library(
     name = "Diag",
     srcs = ["Diag/Diag.cpp"],
     deps = [
         "//include:Diag",
-        ":Diag-rs",
+        "@llvm-project//llvm:Support",
+    ],
+)
+
+cc_test(
+    name = "DiagTest",
+    srcs = ["Diag/DiagTest.cpp"],
+    deps = [
+        ":Diag",
+        "//include:Diag",
+        "@googletest//:gtest_main",
     ],
 )
