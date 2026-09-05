@@ -18,6 +18,23 @@ Belalang uses [Bazel](https://bazel.build/) as its build system. For detailed
 instructions on how to set up and build the project, please refer to the
 [documentation](./docs).
 
+An in-progress CMake build is also available alongside Bazel. Point it at the
+root of a local `llvm-project` checkout (the directory containing `llvm/` and
+`mlir/`):
+
+```sh
+cmake -S . -B build -G Ninja \
+  -DBELALANG_LLVM_SOURCE_DIR=/path/to/llvm-project \
+  -DLLVM_TARGETS_TO_BUILD=X86
+cmake --build build
+ctest --test-dir build
+```
+
+If LLVM and MLIR are already installed as CMake packages,
+`BELALANG_LLVM_SOURCE_DIR` may be omitted and `LLVM_DIR`/`MLIR_DIR` supplied
+instead. Unit tests and developer tools can be disabled with
+`BELALANG_BUILD_TESTS=OFF` and `BELALANG_BUILD_TOOLS=OFF`, respectively.
+
 ## License
 
 Licensed under either of

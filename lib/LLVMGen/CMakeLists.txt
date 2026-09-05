@@ -1,0 +1,24 @@
+add_library(BelalangLLVMGen LLVMGen.cpp)
+target_link_libraries(BelalangLLVMGen
+  PUBLIC
+    BelalangBIR
+    LLVMCodeGen
+    LLVMCore
+    LLVMInstrumentation
+    LLVMipo
+    LLVMMC
+    LLVMPasses
+    LLVMSupport
+    LLVMTarget
+    LLVMTargetParser
+    LLVMX86AsmParser
+    LLVMX86CodeGen
+    LLVMX86Desc
+    LLVMX86Info
+    MLIRBuiltinToLLVMIRTranslation
+    MLIRIR
+    MLIRLLVMDialect
+    MLIRLLVMToLLVMIRTranslation
+    MLIRPass
+    MLIRTargetLLVMIRExport
+)
