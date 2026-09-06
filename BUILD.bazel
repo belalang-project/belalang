@@ -1,4 +1,0 @@
-exports_files(
-    srcs = ["LICENSE-MIT", "LICENSE-APACHE"],
-    visibility = ["//pkg:__pkg__"],
-)
