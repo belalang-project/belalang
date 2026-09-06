@@ -1,5 +1,5 @@
 #include "belalang/LLVMGen/LLVMGen.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Conversions/Passes.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"

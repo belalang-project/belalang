@@ -1,5 +1,5 @@
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Conversions/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/DialectRegistry.h"
 #include "mlir/Pass/PassManager.h"

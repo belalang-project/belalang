@@ -1,6 +1,6 @@
 #include "belalang/BIR/Transforms/OptimizeStructLayout.h"
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Interfaces/DataLayoutInterfaces.h"
 #include <functional>
@@ -8,7 +8,7 @@
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGOPTIMIZESTRUCTLAYOUTPASS
-#include "belalang/BIR/Passes.h.inc"
+#include "belalang/BIR/Transforms/Passes.h.inc"
 } // namespace mlir
 
 namespace {

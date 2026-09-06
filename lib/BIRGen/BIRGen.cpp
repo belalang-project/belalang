@@ -6,7 +6,7 @@
 #include "belalang/AST/Stmt.h"
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/BRTUtils.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"

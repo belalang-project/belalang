@@ -1,5 +1,5 @@
-#ifndef BELALANG_GCIR_TRANSFORMS_PASSES_TD_
-#define BELALANG_GCIR_TRANSFORMS_PASSES_TD_
+#ifndef BELALANG_GCIR_CONVERSIONS_PASSES_TD_
+#define BELALANG_GCIR_CONVERSIONS_PASSES_TD_
 
 include "mlir/Pass/PassBase.td"
 
@@ -15,4 +15,4 @@ def BelalangGCIRToLLVMPass : Pass<"convert-gcir-to-llvm"> {
                            "::mlir::LLVM::LLVMDialect"];
 }
 
-#endif // BELALANG_GCIR_TRANSFORMS_PASSES_TD_
+#endif // BELALANG_GCIR_CONVERSIONS_PASSES_TD_

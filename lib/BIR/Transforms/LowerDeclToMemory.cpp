@@ -1,13 +1,13 @@
 #include "belalang/BIR/Analysis/EscapeAnalysis.h"
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/Analysis/DataFlow/Utils.h"
 #include "mlir/Analysis/DataFlowFramework.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGLOWERDECLTOMEMORYPASS
-#include "belalang/BIR/Passes.h.inc"
+#include "belalang/BIR/Transforms/Passes.h.inc"
 } // namespace mlir
 
 namespace {

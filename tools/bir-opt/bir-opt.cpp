@@ -1,7 +1,8 @@
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
+#include "belalang/BIR/Conversions/Passes.h"
 #include "belalang/GCIR/IR/GCIR.h"
-#include "belalang/GCIR/Transforms/Passes.h"
+#include "belalang/GCIR/Conversions/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
@@ -15,6 +16,7 @@ int main(int argc, char **argv) {
                   mlir::LLVM::LLVMDialect>();
 
   belalang::bir::registerPasses();
+  belalang::bir::registerBelalangBIRToLLVMPass();
   belalang::bir::registerBIRPipelines();
   mlir::registerBelalangGCIRToLLVMPass();
   mlir::registerTransformsPasses();

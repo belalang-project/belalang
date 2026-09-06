@@ -1,5 +1,5 @@
 #include "belalang/GCIR/IR/GCIR.h"
-#include "belalang/GCIR/Transforms/Passes.h"
+#include "belalang/GCIR/Conversions/Passes.h"
 
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
@@ -11,7 +11,7 @@
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGGCIRTOLLVMPASS
-#include "belalang/GCIR/Transforms/Passes.h.inc"
+#include "belalang/GCIR/Conversions/Passes.h.inc"
 } // namespace mlir
 
 namespace {

@@ -1,6 +1,6 @@
 #include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Conversions/Passes.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
@@ -12,7 +12,7 @@
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGBIRTOLLVMPASS
-#include "belalang/BIR/Passes.h.inc"
+#include "belalang/BIR/Conversions/Passes.h.inc"
 } // namespace mlir
 
 namespace {
