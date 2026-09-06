@@ -10,9 +10,6 @@ compile_commands.json
 # rust-analyzer
 rust-project.json
 
-# bazel symlinks
-/bazel-*
-
 # Machine-local CMake configuration
 /CMakeUserPresets.json
 

@@ -8,16 +8,16 @@ default:
 	@just --list
 
 build:
-	bazelisk build //...
+	cmake --build build
 
 test:
-	bazelisk test //...
+	ctest --test-dir build --output-on-failure
 
 bir-opt *args:
-	./bazel-bin/tools/bir-opt/bir-opt {{args}}
+	./build/tools/bir-opt/bir-opt {{args}}
 
 bir-translate *args:
-	./bazel-bin/tools/bir-translate/bir-translate {{args}}
+	./build/tools/bir-translate/bir-translate {{args}}
 
 belalang *args:
-	./bazel-bin/bin/belalang/belalang {{args}}
+	./build/bin/belalang/belalang {{args}}

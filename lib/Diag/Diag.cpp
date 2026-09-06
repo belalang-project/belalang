@@ -61,7 +61,8 @@ void DiagnosticEngine::print(const Diagnostic &diag) const {
 
   std::string message = diag.message;
   if (!anchor->message.empty() && anchor->message != diag.message) {
-    message += ": ";
+    if (!message.empty())
+      message += ": ";
     message += anchor->message;
   }
 

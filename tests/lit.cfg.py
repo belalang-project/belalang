@@ -4,6 +4,8 @@ import lit
 import lit.formats
 
 config.test_source_root = os.path.dirname(os.path.abspath(__file__))
+config.test_exec_root = os.environ.get("BELALANG_TEST_EXEC_ROOT",
+                                       config.test_source_root)
 config.test_format = lit.formats.ShTest(False)
 
 config.suffixes = [".mlir", ".bel"]

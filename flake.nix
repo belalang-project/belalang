@@ -20,24 +20,6 @@
         }:
         {
           devShells.default = (pkgs.buildFHSEnv {
-            name = "bazel";
-            targetPkgs = pkgs: [
-              pkgs.bazelisk
-              pkgs.zlib
-              pkgs.python313
-              pkgs.clang-tools
-              pkgs.just
-              pkgs.stdenv.cc.cc.lib
-            ];
-            profile = ''
-              export BRT_DIR="$PWD/bazel-bin/brt"
-              export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [
-                pkgs.stdenv.cc.cc.lib
-              ]}:''${LD_LIBRARY_PATH:-}"
-            '';
-          }).env;
-
-          devShells.cmake = (pkgs.buildFHSEnv {
             name = "belalang-cmake";
             targetPkgs = pkgs: [
               pkgs.cmake
@@ -48,6 +30,7 @@
               pkgs.git
               pkgs.pkg-config
               pkgs.python313
+              pkgs.just
               pkgs.zlib
               pkgs.zlib.dev
               pkgs.libxml2

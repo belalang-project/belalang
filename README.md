@@ -14,7 +14,7 @@ directory.
 
 ## Building from Source
 
-Belalang uses [Bazel](https://bazel.build/) as its build system. For detailed
+Belalang uses [CMake](https://cmake.org/) as its build system. For detailed
 instructions on how to set up and build the project, please refer to the
 [documentation](./docs).
 
