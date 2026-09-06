@@ -194,7 +194,9 @@ cc_library(
         ":BelalangGCIRDialectGen",
         ":BelalangGCIROpGen",
         ":BelalangGCIRTypeGen",
+        ":BelalangGCIRPassIncGen",
         "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:Pass",
     ],
 )
 
@@ -204,10 +206,12 @@ td_library(
         "belalang/GCIR/IR/GCIRDialect.td",
         "belalang/GCIR/IR/GCIRTypes.td",
         "belalang/GCIR/IR/GCIROps.td",
+        "belalang/GCIR/Transforms/Passes.td",
     ],
     includes = ["."],
     deps = [
         "@llvm-project//mlir:OpBaseTdFiles",
+        "@llvm-project//mlir:PassBaseTdFiles",
     ],
 )
 
@@ -241,6 +245,16 @@ gentbl_cc_library(
     ],
     tblgen = "@llvm-project//mlir:mlir-tblgen",
     td_file = "belalang/GCIR/IR/GCIRTypes.td",
+    deps = [":BelalangGCIRTdFiles"],
+)
+
+gentbl_cc_library(
+    name = "BelalangGCIRPassIncGen",
+    tbl_outs = [
+        (["-gen-pass-decls"], "belalang/GCIR/Transforms/Passes.h.inc"),
+    ],
+    tblgen = "@llvm-project//mlir:mlir-tblgen",
+    td_file = "belalang/GCIR/Transforms/Passes.td",
     deps = [":BelalangGCIRTdFiles"],
 )
 
