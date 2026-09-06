@@ -1,0 +1,66 @@
+find_program(BELALANG_LLVM_LIT
+  NAMES llvm-lit
+  HINTS "${LLVM_TOOLS_BINARY_DIR}" "${BELALANG_LLVM_BUILD_DIR}/bin"
+  REQUIRED
+)
+find_program(BELALANG_FILECHECK
+  NAMES FileCheck
+  HINTS "${LLVM_TOOLS_BINARY_DIR}" "${BELALANG_LLVM_BUILD_DIR}/bin"
+  REQUIRED
+)
+find_program(BELALANG_NOT
+  NAMES not
+  HINTS "${LLVM_TOOLS_BINARY_DIR}" "${BELALANG_LLVM_BUILD_DIR}/bin"
+  REQUIRED
+)
+
+if(NOT TARGET bir-opt OR NOT TARGET bir-translate OR NOT TARGET belalang)
+  message(FATAL_ERROR
+    "The lit tests require BELALANG_BUILD_TOOLS=ON and the belalang executable")
+endif()
+
+set(BELALANG_LIT_ENV
+  "${CMAKE_COMMAND}" -E env
+  "BIR_OPT=$<TARGET_FILE:bir-opt>"
+  "BIR_TRANSLATE=$<TARGET_FILE:bir-translate>"
+  "BELALANG=$<TARGET_FILE:belalang>"
+  "FILECHECK=${BELALANG_FILECHECK}"
+  "NOT=${BELALANG_NOT}"
+  "BRT_DIR=$<TARGET_FILE_DIR:brt>"
+)
+
+file(GLOB_RECURSE BELALANG_LIT_TESTS
+  CONFIGURE_DEPENDS
+  RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+  "*.bel"
+  "*.mlir"
+)
+
+foreach(TEST_PATH IN LISTS BELALANG_LIT_TESTS)
+  string(REPLACE "/" "." TEST_NAME "${TEST_PATH}")
+  set(TEST_EXEC_ROOT "${CMAKE_CURRENT_BINARY_DIR}/lit/${TEST_NAME}")
+  file(MAKE_DIRECTORY "${TEST_EXEC_ROOT}")
+
+  add_test(
+    NAME "lit.${TEST_NAME}"
+    COMMAND
+      ${BELALANG_LIT_ENV}
+      "BELALANG_TEST_EXEC_ROOT=${TEST_EXEC_ROOT}"
+      "${BELALANG_LLVM_LIT}" -sv
+      "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_PATH}"
+  )
+  set_tests_properties("lit.${TEST_NAME}" PROPERTIES LABELS "lit")
+endforeach()
+
+set(BELALANG_LIT_EXEC_ROOT "${CMAKE_CURRENT_BINARY_DIR}/lit/all")
+file(MAKE_DIRECTORY "${BELALANG_LIT_EXEC_ROOT}")
+
+add_custom_target(check-belalang
+  COMMAND
+    ${BELALANG_LIT_ENV}
+    "BELALANG_TEST_EXEC_ROOT=${BELALANG_LIT_EXEC_ROOT}"
+    "${BELALANG_LLVM_LIT}" -sv "${CMAKE_CURRENT_SOURCE_DIR}"
+  DEPENDS bir-opt bir-translate belalang brt
+  USES_TERMINAL
+  COMMENT "Running Belalang lit tests"
+)
