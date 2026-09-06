@@ -1,0 +1,7 @@
+add_subdirectory(AST)
+add_subdirectory(BIR)
+add_subdirectory(BIRGen)
+add_subdirectory(Diag)
+add_subdirectory(GCIR)
+add_subdirectory(Lexer)
+add_subdirectory(LLVMGen)

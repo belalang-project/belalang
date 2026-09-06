@@ -1,0 +1,11 @@
+add_library(BelalangAST
+  ASTContext.cpp
+  ASTDumper.cpp
+  Parser.cpp
+)
+target_link_libraries(BelalangAST
+  PUBLIC
+    BelalangLexer
+    BelalangDiag
+    LLVMSupport
+)
