@@ -8,7 +8,9 @@ cc_binary(
     deps = [
         "//lib:BIR",
         "//lib:GCIR",
+        "//include:GCIR",
         "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:FuncDialect",
         "@llvm-project//mlir:MlirOptLib",
     ],
 )

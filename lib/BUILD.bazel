@@ -80,6 +80,9 @@ cc_library(
     deps = [
         "//include:GCIR",
         "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:FuncToLLVM",
+        "@llvm-project//mlir:LLVMDialect",
+        "@llvm-project//mlir:Pass",
     ],
 )
 
