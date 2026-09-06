@@ -1,10 +1,10 @@
 #include "belalang/BIR/IR/BIR.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/IR/Dominance.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGPREPAREGCALLOCATIONSPASS
-#include "belalang/BIR/Passes.h.inc"
+#include "belalang/BIR/Transforms/Passes.h.inc"
 } // namespace mlir
 
 namespace {

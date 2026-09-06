@@ -1,12 +1,12 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Interfaces/LoopOpInterface.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_BELALANGFLATTENCFGPASS
-#include "belalang/BIR/Passes.h.inc"
+#include "belalang/BIR/Transforms/Passes.h.inc"
 } // namespace mlir
 
 namespace {

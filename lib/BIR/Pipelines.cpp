@@ -1,4 +1,4 @@
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/Transforms/Passes.h"
 
 namespace belalang {

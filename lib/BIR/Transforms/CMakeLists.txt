@@ -1,5 +1,4 @@
 target_sources(BelalangBIR PRIVATE
-  BIRToLLVM.cpp
   FlattenCFG.cpp
   LowerDeclToMemory.cpp
   LowerFuncExpr.cpp

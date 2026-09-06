@@ -1,6 +1,6 @@
 #include "belalang/AST/ASTDumper.h"
 #include "belalang/AST/Parser.h"
-#include "belalang/BIR/Passes.h"
+#include "belalang/BIR/Transforms/Passes.h"
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
