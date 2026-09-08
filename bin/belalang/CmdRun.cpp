@@ -6,12 +6,12 @@
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/Path.h"
 #include "llvm/Support/Program.h"
 #include <iostream>
 #include <string>
-#include <sys/wait.h>
-#include <unistd.h>
 
 namespace belalang {
 namespace cmd {
@@ -49,10 +49,21 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   }
 
   llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
-  std::string objFile = "/tmp/belalang_out_" + std::to_string(getpid()) + ".o";
+  llvm::SmallString<128> tempDir;
+  if (auto ec = llvm::sys::fs::createUniqueDirectory("belalang-out", tempDir)) {
+    std::cerr << "error: " << ec.message() << "\n";
+    return 1;
+  }
+
+  llvm::SmallString<128> objPath(tempDir);
+  llvm::sys::path::append(objPath, "output.o");
+  std::string objFile = objPath.str().str();
+
   llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
 
-  std::string exeFile = "/tmp/belalang_exe_" + std::to_string(getpid());
+  llvm::SmallString<128> exePath(tempDir);
+  llvm::sys::path::append(exePath, "output.exe");
+  std::string exeFile = exePath.str().str();
 
   std::string libraryPath = "-L" + ctx.brt_dir;
   std::string stackmapsArg =
@@ -70,15 +81,18 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
 
   if (llvm::sys::ExecuteAndWait(ctx.cc_cmd, linkArgs) != 0) {
     std::cerr << "error: linking failed\n";
-    std::remove(objFile.c_str());
+    if (auto ec = llvm::sys::fs::remove_directories(tempDir)) {
+      std::cerr << "error: " << ec.message() << "\n";
+    };
     return 1;
   }
 
   llvm::SmallVector<llvm::StringRef, 1> runArgs = {exeFile};
   int res = llvm::sys::ExecuteAndWait(exeFile, runArgs);
+  if (auto ec = llvm::sys::fs::remove_directories(tempDir)) {
+    std::cerr << "error: " << ec.message() << "\n";
+  };
 
-  std::remove(objFile.c_str());
-  std::remove(exeFile.c_str());
   return res;
 }
 
