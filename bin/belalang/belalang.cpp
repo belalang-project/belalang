@@ -6,6 +6,7 @@
 
 #include "Cmds.h"
 #include "Ctx.h"
+#include "Term.h"
 
 constexpr std::string_view help = R"(belalang
 
@@ -53,7 +54,7 @@ int main(int argc, char **argv) {
     return belalang::cmd::run(parser, ctx);
   }
 
-  llvm::errs() << "error: unknown command: " << *command << "\n";
-  llvm::errs() << "hint: available commands are build, run, help\n";
+  belalang::cmd::term::error() << "unknown command: " << *command << "\n";
+  belalang::cmd::term::hint() << "available commands are build, run, help\n";
   return 1;
 }

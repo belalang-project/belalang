@@ -4,6 +4,7 @@ add_executable(belalang
   CmdRun.cpp
   CmdVersion.cpp
   Ctx.cpp
+  Term.cpp
 )
 target_link_libraries(belalang
   PRIVATE

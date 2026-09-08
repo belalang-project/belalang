@@ -7,6 +7,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include <optional>
 
+#include "Term.h"
+
 namespace belalang {
 namespace cmd {
 
@@ -21,8 +23,8 @@ llvm::Expected<Path> createTemporaryDirectory(llvm::StringRef prefix) {
 
 void removeTemporaryDirectory(llvm::StringRef directory) {
   if (std::error_code ec = llvm::sys::fs::remove_directories(directory, false))
-    llvm::errs() << "warning: could not remove temporary directory: "
-                 << ec.message() << "\n";
+    term::warning() << "could not remove temporary directory: " << ec.message()
+                    << "\n";
 }
 
 Path pathInDirectory(llvm::StringRef directory, llvm::StringRef filename) {

@@ -1,5 +1,6 @@
 #include "Cmds.h"
 #include "Ctx.h"
+#include "Term.h"
 #include "belalang/AST/Parser.h"
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Diag/Diag.h"
@@ -22,7 +23,7 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
 
   auto fileBuf = llvm::MemoryBuffer::getFileOrSTDIN(source);
   if (!fileBuf) {
-    llvm::errs() << "error: could not open " << source << "\n";
+    term::error() << "could not open " << source << "\n";
     return 1;
   }
   llvm::StringRef src = (*fileBuf)->getBuffer();
@@ -40,13 +41,13 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   birgen.generateProgram(prog);
 
   if (!birgen.runLoweringPipeline()) {
-    llvm::errs() << "error: BIR lowering pipeline failed\n";
+    term::error() << "BIR lowering pipeline failed\n";
     return 1;
   }
 
   auto tempDirectoryResult = createTemporaryDirectory("belalang-run");
   if (!tempDirectoryResult) {
-    llvm::errs() << "error: " << tempDirectoryResult.takeError() << "\n";
+    term::error() << tempDirectoryResult.takeError() << "\n";
     return 1;
   }
   Path tempDirectory = *tempDirectoryResult;
@@ -60,19 +61,19 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
 
   auto linkResult = link(ctx, objFile, exeFile);
   if (!linkResult) {
-    llvm::errs() << "error: " << linkResult.takeError() << "\n";
+    term::error() << linkResult.takeError() << "\n";
     removeTemporaryDirectory(tempDirectory);
     return 1;
   }
   if (*linkResult != 0) {
-    llvm::errs() << "error: linking failed\n";
+    term::error() << "linking failed\n";
     removeTemporaryDirectory(tempDirectory);
     return 1;
   }
 
   auto executeResult = execute(exeFile);
   if (!executeResult) {
-    llvm::errs() << "error: " << executeResult.takeError() << "\n";
+    term::error() << executeResult.takeError() << "\n";
     removeTemporaryDirectory(tempDirectory);
     return 1;
   }
