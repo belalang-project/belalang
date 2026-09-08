@@ -105,7 +105,7 @@ enum class EmitTarget {
   Exe,
 };
 
-int build(muopt::Parser &parser) {
+int build(muopt::Parser &parser, const BelalangCtx &ctx) {
   auto emit = EmitTarget::Exe;
   bir::BIRLoweringPipelineOptions birOptions;
   std::string source;
@@ -272,14 +272,8 @@ int build(muopt::Parser &parser) {
     llvm::StringRef stem = llvm::sys::path::stem(source);
     std::string exeFile = stem.empty() ? "a.out" : stem.str();
 
-    const char *brt_dir = std::getenv("BRT_DIR");
-    std::string brt_path = brt_dir ? brt_dir : "/usr/local/lib";
-
-    const char *cc = std::getenv("CC");
-    std::string cc_cmd = cc ? cc : "cc";
-
-    std::string linkCmd = cc_cmd + " -no-pie " + objFile + " -L" + brt_path +
-                          " -Wl,-T," + brt_path +
+    std::string linkCmd = ctx.cc_cmd + " -no-pie " + objFile + " -L" +
+                          ctx.brt_dir + " -Wl,-T," + ctx.brt_dir +
                           "/llvm_stackmaps.ld"
                           " -lbrt -o " +
                           exeFile;

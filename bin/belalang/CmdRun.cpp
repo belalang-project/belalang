@@ -1,20 +1,21 @@
+#include "Cmds.h"
+#include "Ctx.h"
 #include "belalang/AST/Parser.h"
 #include "belalang/BIRGen/BIRGen.h"
+#include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
-#include "belalang/Diag/Diag.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
-#include <unistd.h>
 #include <sys/wait.h>
-#include "Cmds.h"
+#include <unistd.h>
 
 namespace belalang {
 namespace cmd {
 
-int run(muopt::Parser &parser) {
+int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   std::string source;
   while (auto arg = parser.next()) {
     if (arg.has_value() && arg->is_plain()) {
@@ -51,15 +52,9 @@ int run(muopt::Parser &parser) {
   llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
 
   std::string exeFile = "/tmp/belalang_exe_" + std::to_string(getpid());
-  
-  const char *brt_dir = std::getenv("BRT_DIR");
-  std::string brt_path = brt_dir ? brt_dir : "/usr/local/lib";
 
-  const char *cc = std::getenv("CC");
-  std::string cc_cmd = cc ? cc : "cc";
-
-  std::string linkCmd = cc_cmd + " -no-pie " + objFile + " -L" + brt_path +
-                        " -Wl,-T," + brt_path +
+  std::string linkCmd = ctx.cc_cmd + " -no-pie " + objFile + " -L" +
+                        ctx.brt_dir + " -Wl,-T," + ctx.brt_dir +
                         "/llvm_stackmaps.ld"
                         " -lbrt -o " +
                         exeFile;

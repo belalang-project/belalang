@@ -2,7 +2,10 @@
 #include <optional>
 #include <string_view>
 
+#include "llvm/Support/Process.h"
+
 #include "Cmds.h"
+#include "Ctx.h"
 
 constexpr std::string_view help = R"(belalang
 
@@ -34,14 +37,20 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  std::string brt_path = llvm::sys::Process::GetEnv("BRT_DIR").value_or(
+      "/usr/local/lib");
+  std::string cc_cmd = llvm::sys::Process::GetEnv("CC").value_or("cc");
+
+  belalang::cmd::BelalangCtx ctx{cc_cmd, brt_path};
+
   if (*command == "build")
-    return belalang::cmd::build(parser);
+    return belalang::cmd::build(parser, ctx);
 
   if (*command == "version")
     return belalang::cmd::version();
 
   if (*command == "run") {
-    return belalang::cmd::run(parser);
+    return belalang::cmd::run(parser, ctx);
   }
 
   std::cerr << "error: unknown command: " << *command << "\n";
