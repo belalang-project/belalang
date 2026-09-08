@@ -18,11 +18,11 @@ struct BelalangCtx {
 
 using Path = llvm::SmallString<128>;
 
-llvm::Expected<Path> createTemporaryDirectory(llvm::StringRef prefix);
-void removeTemporaryDirectory(llvm::StringRef directory);
+llvm::Expected<Path> makeTempDir(llvm::StringRef prefix);
+void removeTempDir(llvm::StringRef directory);
 
-Path pathInDirectory(llvm::StringRef directory, llvm::StringRef filename);
-Path executablePathForSource(llvm::StringRef source);
+Path pathIn(llvm::StringRef directory, llvm::StringRef filename);
+Path executablePathFor(llvm::StringRef source);
 
 llvm::Expected<int> link(const BelalangCtx &ctx, llvm::StringRef objectFile,
                          llvm::StringRef executable);

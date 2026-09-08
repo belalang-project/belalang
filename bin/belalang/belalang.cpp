@@ -24,7 +24,7 @@ Commands:
 namespace belalang {
 namespace cmd {
 
-llvm::Expected<Path> createTemporaryDirectory(llvm::StringRef prefix) {
+llvm::Expected<Path> makeTempDir(llvm::StringRef prefix) {
   Path directory;
   if (std::error_code ec = llvm::sys::fs::createUniqueDirectory(prefix,
                                                                 directory))
@@ -33,19 +33,19 @@ llvm::Expected<Path> createTemporaryDirectory(llvm::StringRef prefix) {
   return directory;
 }
 
-void removeTemporaryDirectory(llvm::StringRef directory) {
+void removeTempDir(llvm::StringRef directory) {
   if (std::error_code ec = llvm::sys::fs::remove_directories(directory, false))
     term::warning() << "could not remove temporary directory: " << ec.message()
                     << "\n";
 }
 
-Path pathInDirectory(llvm::StringRef directory, llvm::StringRef filename) {
+Path pathIn(llvm::StringRef directory, llvm::StringRef filename) {
   Path path(directory);
   llvm::sys::path::append(path, filename);
   return path;
 }
 
-Path executablePathForSource(llvm::StringRef source) {
+Path executablePathFor(llvm::StringRef source) {
   llvm::StringRef stem = llvm::sys::path::stem(source);
   return Path(stem.empty() ? "a.out" : stem);
 }

@@ -43,16 +43,15 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
     return 1;
   }
 
-  auto tempDirectoryResult = createTemporaryDirectory("belalang-run");
-  if (!tempDirectoryResult) {
-    term::error() << tempDirectoryResult.takeError() << "\n";
+  auto tempDirRes = makeTempDir("belalang-run");
+  if (!tempDirRes) {
+    term::error() << tempDirRes.takeError() << "\n";
     return 1;
   }
-  Path tempDirectory = *tempDirectoryResult;
+  Path tempDir = *tempDirRes;
 
-  std::string objFile = pathInDirectory(tempDirectory, "output.o").str().str();
-  std::string
-      exeFile = pathInDirectory(tempDirectory, "output.exe").str().str();
+  std::string objFile = pathIn(tempDir, "output.o").str().str();
+  std::string exeFile = pathIn(tempDir, "output.exe").str().str();
 
   llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
   llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
@@ -60,23 +59,23 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   auto linkResult = link(ctx, objFile, exeFile);
   if (!linkResult) {
     term::error() << linkResult.takeError() << "\n";
-    removeTemporaryDirectory(tempDirectory);
+    removeTempDir(tempDir);
     return 1;
   }
   if (*linkResult != 0) {
     term::error() << "linking failed\n";
-    removeTemporaryDirectory(tempDirectory);
+    removeTempDir(tempDir);
     return 1;
   }
 
   auto executeResult = execute(exeFile);
   if (!executeResult) {
     term::error() << executeResult.takeError() << "\n";
-    removeTemporaryDirectory(tempDirectory);
+    removeTempDir(tempDir);
     return 1;
   }
 
-  removeTemporaryDirectory(tempDirectory);
+  removeTempDir(tempDir);
   return *executeResult;
 }
 
