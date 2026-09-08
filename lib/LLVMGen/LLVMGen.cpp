@@ -40,7 +40,7 @@ LLVMGen::LLVMGen(uintptr_t ptr) {
   assert(llvmModule && "translation to LLVM IR failed.");
 }
 
-void LLVMGen::compileObjFile(std::string outfile, SanitizerKind san) const {
+void LLVMGen::compileObjFile(llvm::StringRef outfile, SanitizerKind san) const {
   llvm::InitializeAllTargetInfos();
   llvm::InitializeAllTargets();
   llvm::InitializeAllTargetMCs();
@@ -89,8 +89,7 @@ void LLVMGen::compileObjFile(std::string outfile, SanitizerKind san) const {
   }
 
   std::error_code ec;
-  llvm::raw_fd_ostream dest(llvm::StringRef(outfile.data(), outfile.size()), ec,
-                            llvm::sys::fs::OF_None);
+  llvm::raw_fd_ostream dest(outfile, ec, llvm::sys::fs::OF_None);
   if (ec)
     return;
 

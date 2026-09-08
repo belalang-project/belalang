@@ -50,8 +50,8 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   }
   Path tempDir = *tempDirRes;
 
-  std::string objFile = pathIn(tempDir, "output.o").str().str();
-  std::string exeFile = pathIn(tempDir, "output.exe").str().str();
+  Path objFile = pathIn(tempDir, "output.o");
+  Path exeFile = pathIn(tempDir, "output.exe");
 
   llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
   llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);

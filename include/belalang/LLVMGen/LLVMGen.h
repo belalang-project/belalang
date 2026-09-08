@@ -1,7 +1,7 @@
 #ifndef BELALANG_LLVMGEN_LLVMGEN_H_
 #define BELALANG_LLVMGEN_LLVMGEN_H_
 
-#include "mlir/IR/BuiltinOps.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include <cstdint>
@@ -21,7 +21,7 @@ public:
   ~LLVMGen() = default;
 
   std::string dumpToString() const;
-  void compileObjFile(std::string outfile, SanitizerKind san) const;
+  void compileObjFile(llvm::StringRef outfile, SanitizerKind san) const;
 
 private:
   llvm::LLVMContext llvmCtx;
