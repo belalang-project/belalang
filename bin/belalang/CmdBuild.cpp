@@ -267,8 +267,8 @@ int build(muopt::Parser &parser, const BelalangCtx &ctx) {
     }
     Path tempDir = *tempDirRes;
 
-    std::string objFile = pathIn(tempDir, "output.o").str().str();
-    std::string exeFile = executablePathFor(source).str().str();
+    Path objFile = pathIn(tempDir, "output.o");
+    Path exeFile = executablePathFor(source);
 
     llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
     llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
