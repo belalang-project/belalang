@@ -5,12 +5,8 @@
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/Program.h"
-#include <iostream>
+#include "llvm/Support/raw_ostream.h"
 #include <string>
 
 namespace belalang {
@@ -26,7 +22,7 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
 
   auto fileBuf = llvm::MemoryBuffer::getFileOrSTDIN(source);
   if (!fileBuf) {
-    std::cerr << "error: could not open " << source << "\n";
+    llvm::errs() << "error: could not open " << source << "\n";
     return 1;
   }
   llvm::StringRef src = (*fileBuf)->getBuffer();
@@ -44,56 +40,45 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
   birgen.generateProgram(prog);
 
   if (!birgen.runLoweringPipeline()) {
-    std::cerr << "error: BIR lowering pipeline failed\n";
+    llvm::errs() << "error: BIR lowering pipeline failed\n";
     return 1;
   }
+
+  auto tempDirectoryResult = createTemporaryDirectory("belalang-run");
+  if (!tempDirectoryResult) {
+    llvm::errs() << "error: " << tempDirectoryResult.takeError() << "\n";
+    return 1;
+  }
+  Path tempDirectory = *tempDirectoryResult;
+
+  std::string objFile = pathInDirectory(tempDirectory, "output.o").str().str();
+  std::string
+      exeFile = pathInDirectory(tempDirectory, "output.exe").str().str();
 
   llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
-  llvm::SmallString<128> tempDir;
-  if (auto ec = llvm::sys::fs::createUniqueDirectory("belalang-out", tempDir)) {
-    std::cerr << "error: " << ec.message() << "\n";
-    return 1;
-  }
-
-  llvm::SmallString<128> objPath(tempDir);
-  llvm::sys::path::append(objPath, "output.o");
-  std::string objFile = objPath.str().str();
-
   llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
 
-  llvm::SmallString<128> exePath(tempDir);
-  llvm::sys::path::append(exePath, "output.exe");
-  std::string exeFile = exePath.str().str();
-
-  std::string libraryPath = "-L" + ctx.brt_dir;
-  std::string stackmapsArg =
-      "-Wl,-T," + ctx.brt_dir + "/llvm_stackmaps.ld";
-  llvm::SmallVector<llvm::StringRef, 8> linkArgs = {
-      ctx.cc_cmd,
-      "-no-pie",
-      objFile,
-      libraryPath,
-      stackmapsArg,
-      "-lbrt",
-      "-o",
-      exeFile,
-  };
-
-  if (llvm::sys::ExecuteAndWait(ctx.cc_cmd, linkArgs) != 0) {
-    std::cerr << "error: linking failed\n";
-    if (auto ec = llvm::sys::fs::remove_directories(tempDir)) {
-      std::cerr << "error: " << ec.message() << "\n";
-    };
+  auto linkResult = link(ctx, objFile, exeFile);
+  if (!linkResult) {
+    llvm::errs() << "error: " << linkResult.takeError() << "\n";
+    removeTemporaryDirectory(tempDirectory);
+    return 1;
+  }
+  if (*linkResult != 0) {
+    llvm::errs() << "error: linking failed\n";
+    removeTemporaryDirectory(tempDirectory);
     return 1;
   }
 
-  llvm::SmallVector<llvm::StringRef, 1> runArgs = {exeFile};
-  int res = llvm::sys::ExecuteAndWait(exeFile, runArgs);
-  if (auto ec = llvm::sys::fs::remove_directories(tempDir)) {
-    std::cerr << "error: " << ec.message() << "\n";
-  };
+  auto executeResult = execute(exeFile);
+  if (!executeResult) {
+    llvm::errs() << "error: " << executeResult.takeError() << "\n";
+    removeTemporaryDirectory(tempDirectory);
+    return 1;
+  }
 
-  return res;
+  removeTemporaryDirectory(tempDirectory);
+  return *executeResult;
 }
 
 } // namespace cmd

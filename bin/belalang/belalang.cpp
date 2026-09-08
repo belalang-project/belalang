@@ -1,8 +1,8 @@
-#include <iostream>
 #include <optional>
 #include <string_view>
 
 #include "llvm/Support/Process.h"
+#include "llvm/Support/raw_ostream.h"
 
 #include "Cmds.h"
 #include "Ctx.h"
@@ -28,20 +28,20 @@ int main(int argc, char **argv) {
     command = arg->as_str();
 
   if (!command.has_value()) {
-    std::cerr << help;
+    llvm::errs() << help;
     return 1;
   }
 
   if (*command == "help") {
-    std::cerr << help;
+    llvm::outs() << help;
     return 0;
   }
 
-  std::string brt_path = llvm::sys::Process::GetEnv("BRT_DIR").value_or(
+  std::string brt = llvm::sys::Process::GetEnv("BRT_DIR").value_or(
       "/usr/local/lib");
-  std::string cc_cmd = llvm::sys::Process::GetEnv("CC").value_or("cc");
+  std::string cc = llvm::sys::Process::GetEnv("CC").value_or("cc");
 
-  belalang::cmd::BelalangCtx ctx{cc_cmd, brt_path};
+  const belalang::cmd::BelalangCtx ctx{cc, brt};
 
   if (*command == "build")
     return belalang::cmd::build(parser, ctx);
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     return belalang::cmd::run(parser, ctx);
   }
 
-  std::cerr << "error: unknown command: " << *command << "\n";
-  std::cerr << "hint: available commands are build, run, help\n";
+  llvm::errs() << "error: unknown command: " << *command << "\n";
+  llvm::errs() << "hint: available commands are build, run, help\n";
   return 1;
 }
