@@ -10,8 +10,7 @@
 #include <string>
 #include <string_view>
 
-#include "Cmds.h"
-#include "Term.h"
+#include "Belalang.h"
 
 // A very simple implementation. There maybe another more elegant way, but I
 // haven't figured it out. Maybe also move this to a header file under lexer.

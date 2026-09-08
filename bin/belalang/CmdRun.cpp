@@ -1,6 +1,4 @@
-#include "Cmds.h"
-#include "Ctx.h"
-#include "Term.h"
+#include "Belalang.h"
 #include "belalang/AST/Parser.h"
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Diag/Diag.h"
