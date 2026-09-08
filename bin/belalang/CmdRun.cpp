@@ -5,8 +5,9 @@
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include <cstdlib>
+#include "llvm/Support/Program.h"
 #include <iostream>
 #include <string>
 #include <sys/wait.h>
@@ -53,27 +54,32 @@ int run(muopt::Parser &parser, const BelalangCtx &ctx) {
 
   std::string exeFile = "/tmp/belalang_exe_" + std::to_string(getpid());
 
-  std::string linkCmd = ctx.cc_cmd + " -no-pie " + objFile + " -L" +
-                        ctx.brt_dir + " -Wl,-T," + ctx.brt_dir +
-                        "/llvm_stackmaps.ld"
-                        " -lbrt -o " +
-                        exeFile;
-  if (std::system(linkCmd.c_str()) != 0) {
+  std::string libraryPath = "-L" + ctx.brt_dir;
+  std::string stackmapsArg =
+      "-Wl,-T," + ctx.brt_dir + "/llvm_stackmaps.ld";
+  llvm::SmallVector<llvm::StringRef, 8> linkArgs = {
+      ctx.cc_cmd,
+      "-no-pie",
+      objFile,
+      libraryPath,
+      stackmapsArg,
+      "-lbrt",
+      "-o",
+      exeFile,
+  };
+
+  if (llvm::sys::ExecuteAndWait(ctx.cc_cmd, linkArgs) != 0) {
     std::cerr << "error: linking failed\n";
     std::remove(objFile.c_str());
     return 1;
   }
 
-  int res = std::system(exeFile.c_str());
-  
+  llvm::SmallVector<llvm::StringRef, 1> runArgs = {exeFile};
+  int res = llvm::sys::ExecuteAndWait(exeFile, runArgs);
+
   std::remove(objFile.c_str());
   std::remove(exeFile.c_str());
-
-  if (WIFEXITED(res)) {
-    return WEXITSTATUS(res);
-  }
-
-  return 1;
+  return res;
 }
 
 } // namespace cmd

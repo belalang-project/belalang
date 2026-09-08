@@ -5,11 +5,13 @@
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include <cstdlib>
 #include <iostream>
+#include <llvm/Support/Program.h>
 #include <string>
 #include <string_view>
 
@@ -272,12 +274,21 @@ int build(muopt::Parser &parser, const BelalangCtx &ctx) {
     llvm::StringRef stem = llvm::sys::path::stem(source);
     std::string exeFile = stem.empty() ? "a.out" : stem.str();
 
-    std::string linkCmd = ctx.cc_cmd + " -no-pie " + objFile + " -L" +
-                          ctx.brt_dir + " -Wl,-T," + ctx.brt_dir +
-                          "/llvm_stackmaps.ld"
-                          " -lbrt -o " +
-                          exeFile;
-    if (std::system(linkCmd.c_str()) != 0) {
+    std::string libraryPath = "-L" + ctx.brt_dir;
+    std::string stackmapsArg =
+        "-Wl,-T," + ctx.brt_dir + "/llvm_stackmaps.ld";
+    llvm::SmallVector<llvm::StringRef, 8> linkArgs = {
+        ctx.cc_cmd,
+        "-no-pie",
+        objFile,
+        libraryPath,
+        stackmapsArg,
+        "-lbrt",
+        "-o",
+        exeFile,
+    };
+
+    if (llvm::sys::ExecuteAndWait(ctx.cc_cmd, linkArgs) != 0) {
       std::cerr << "error: linking failed\n";
       if (std::error_code ec = llvm::sys::fs::remove(objFile))
         std::cerr << "error: could not remove temporary file: " << ec.message()
