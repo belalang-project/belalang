@@ -5,15 +5,12 @@
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "belalang/Lexer/Lexer.h"
-#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Path.h"
-#include <cstdlib>
-#include <iostream>
+#include "llvm/Support/raw_ostream.h"
 #include <string>
 #include <string_view>
 
-#include "Cmds.h"
+#include "Belalang.h"
 
 // A very simple implementation. There maybe another more elegant way, but I
 // haven't figured it out. Maybe also move this to a header file under lexer.
@@ -60,8 +57,9 @@ static bool parseBIRGenOption(std::string_view option,
                               belalang::bir::BIRLoweringPipelineOptions &opts) {
   size_t eq = option.find('=');
   if (eq == std::string_view::npos) {
-    std::cerr << "error: malformed BIRGen option: " << option << "\n";
-    std::cerr << "hint: expected <name>=<true|false>\n";
+    belalang::cmd::term::error()
+        << "malformed BIRGen option: " << option << "\n";
+    belalang::cmd::term::hint() << "expected <name>=<true|false>\n";
     return false;
   }
 
@@ -70,9 +68,10 @@ static bool parseBIRGenOption(std::string_view option,
 
   if (name == "enable-dce") {
     if (!parseBoolean(rawValue, opts.enableDCE.getValue())) {
-      std::cerr << "error: invalid value for BIRGen option '" << name
-                << "': " << rawValue << "\n";
-      std::cerr << "hint: expected true or false\n";
+      belalang::cmd::term::error()
+          << "invalid value for BIRGen option '" << name << "': " << rawValue
+          << "\n";
+      belalang::cmd::term::hint() << "expected true or false\n";
       return false;
     }
     return true;
@@ -80,15 +79,16 @@ static bool parseBIRGenOption(std::string_view option,
 
   if (name == "enable-mem2reg") {
     if (!parseBoolean(rawValue, opts.enableMem2Reg.getValue())) {
-      std::cerr << "error: invalid value for BIRGen option '" << name
-                << "': " << rawValue << "\n";
-      std::cerr << "hint: expected true or false\n";
+      belalang::cmd::term::error()
+          << "invalid value for BIRGen option '" << name << "': " << rawValue
+          << "\n";
+      belalang::cmd::term::hint() << "expected true or false\n";
       return false;
     }
     return true;
   }
 
-  std::cerr << "error: unknown BIRGen option: " << name << "\n";
+  belalang::cmd::term::error() << "unknown BIRGen option: " << name << "\n";
   return false;
 }
 
@@ -105,7 +105,7 @@ enum class EmitTarget {
   Exe,
 };
 
-int build(muopt::Parser &parser) {
+int build(muopt::Parser &parser, const BelalangCtx &ctx) {
   auto emit = EmitTarget::Exe;
   bir::BIRLoweringPipelineOptions birOptions;
   std::string source;
@@ -129,7 +129,7 @@ int build(muopt::Parser &parser) {
     if (arg.has_value() && arg->is_long("bir-lowering-pipeline")) {
       auto value = parser.arg_value();
       if (!value.has_value()) {
-        std::cerr << "error: missing value for --birgen\n";
+        term::error() << "missing value for --birgen\n";
         return 1;
       }
       if (!parseBIRGenOption(*value, birOptions))
@@ -142,7 +142,7 @@ int build(muopt::Parser &parser) {
 
   auto fileBuf = llvm::MemoryBuffer::getFileOrSTDIN(source);
   if (!fileBuf) {
-    std::cerr << "error: could not open " << source << "\n";
+    term::error() << "could not open " << source << "\n";
     return 1;
   }
   llvm::StringRef src = (*fileBuf)->getBuffer();
@@ -165,15 +165,15 @@ int build(muopt::Parser &parser) {
       auto kindStr = tok.getString();
       auto kind = tok.getKind();
       if (kind == lexer::TokenKind::LiteralString) {
-        std::cout << kindStr << " \"" << escapeString(tok.getStr()) << "\" <"
-                  << start << ".." << end << ">\n";
+        llvm::outs() << kindStr << " \"" << escapeString(tok.getStr()) << "\" <"
+                     << start << ".." << end << ">\n";
       } else if (kind == lexer::TokenKind::Ident ||
                  kind == lexer::TokenKind::LiteralInteger ||
                  kind == lexer::TokenKind::LiteralFloat) {
-        std::cout << kindStr << " \"" << tok.getStr().str() << "\" <" << start
-                  << ".." << end << ">\n";
+        llvm::outs() << kindStr << " \"" << tok.getStr() << "\" <" << start
+                     << ".." << end << ">\n";
       } else {
-        std::cout << kindStr << " <" << start << ".." << end << ">\n";
+        llvm::outs() << kindStr << " <" << start << ".." << end << ">\n";
       }
     }
 
@@ -211,11 +211,11 @@ int build(muopt::Parser &parser) {
 
     if (emit == EmitTarget::BirLowered &&
         !birgen.runLoweringPipeline(birOptions)) {
-      std::cerr << "error: BIR lowering pipeline failed\n";
+      term::error() << "BIR lowering pipeline failed\n";
       return 1;
     }
 
-    std::cout << birgen.dumpToString() << "\n";
+    llvm::outs() << birgen.dumpToString() << "\n";
     return parser.hadError() ? 1 : 0;
   }
 
@@ -233,12 +233,12 @@ int build(muopt::Parser &parser) {
     birgen.generateProgram(prog);
 
     if (!birgen.runLoweringPipeline(birOptions)) {
-      std::cerr << "error: BIR lowering pipeline failed\n";
+      term::error() << "BIR lowering pipeline failed\n";
       return 1;
     }
 
     llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
-    std::cout << llvmgen.dumpToString() << "\n";
+    llvm::outs() << llvmgen.dumpToString() << "\n";
     return 0;
   }
 
@@ -256,48 +256,41 @@ int build(muopt::Parser &parser) {
     birgen.generateProgram(prog);
 
     if (!birgen.runLoweringPipeline(birOptions)) {
-      std::cerr << "error: BIR lowering pipeline failed\n";
+      term::error() << "BIR lowering pipeline failed\n";
       return 1;
     }
+
+    auto tempDirRes = makeTempDir("belalang-build");
+    if (!tempDirRes) {
+      term::error() << tempDirRes.takeError() << "\n";
+      return 1;
+    }
+    Path tempDir = *tempDirRes;
+
+    std::string objFile = pathIn(tempDir, "output.o").str().str();
+    std::string exeFile = executablePathFor(source).str().str();
 
     llvmgen::LLVMGen llvmgen(birgen.getModulePtr());
-    llvm::SmallString<128> objPath;
-    if (llvm::sys::fs::createTemporaryFile("belalang_build", "o", objPath)) {
-      std::cerr << "error: could not create temporary file\n";
-      return 1;
-    }
-    std::string objFile = objPath.str().str();
     llvmgen.compileObjFile(objFile, llvmgen::SanitizerKind::None);
 
-    llvm::StringRef stem = llvm::sys::path::stem(source);
-    std::string exeFile = stem.empty() ? "a.out" : stem.str();
-
-    const char *brt_dir = std::getenv("BRT_DIR");
-    std::string brt_path = brt_dir ? brt_dir : "/usr/local/lib";
-
-    const char *cc = std::getenv("CC");
-    std::string cc_cmd = cc ? cc : "cc";
-
-    std::string linkCmd = cc_cmd + " -no-pie " + objFile + " -L" + brt_path +
-                          " -Wl,-T," + brt_path +
-                          "/llvm_stackmaps.ld"
-                          " -lbrt -o " +
-                          exeFile;
-    if (std::system(linkCmd.c_str()) != 0) {
-      std::cerr << "error: linking failed\n";
-      if (std::error_code ec = llvm::sys::fs::remove(objFile))
-        std::cerr << "error: could not remove temporary file: " << ec.message()
-                  << "\n";
+    auto linkRes = link(ctx, objFile, exeFile);
+    if (!linkRes) {
+      term::error() << linkRes.takeError() << "\n";
+      removeTempDir(tempDir);
+      return 1;
+    }
+    if (*linkRes != 0) {
+      term::error() << "linking failed\n";
+      removeTempDir(tempDir);
       return 1;
     }
 
-    if (std::error_code ec = llvm::sys::fs::remove(objFile))
-      std::cerr << "error: could not remove temporary file: " << ec.message()
-                << "\n";
+    removeTempDir(tempDir);
+
     return 0;
   }
 
-  std::cout << "error: unimplemented\n";
+  term::error() << "unimplemented\n";
   return 1;
 }
 
