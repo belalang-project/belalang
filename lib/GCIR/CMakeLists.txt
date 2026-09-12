@@ -1,5 +1,9 @@
 add_library(BelalangGCIR)
-add_dependencies(BelalangGCIR BelalangGCIRIncGen BelalangGCIRConversionPassIncGen)
+add_dependencies(BelalangGCIR
+  BelalangGCIRIncGen
+  BelalangGCIRConversionPassIncGen
+  BelalangGCIRTransformsPassIncGen
+)
 target_link_libraries(BelalangGCIR
   PUBLIC
     MLIRIR
@@ -9,5 +13,5 @@ target_link_libraries(BelalangGCIR
 )
 
 add_subdirectory(Conversions)
-
 add_subdirectory(IR)
+add_subdirectory(Transforms)
