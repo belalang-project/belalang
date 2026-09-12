@@ -1,1 +1,4 @@
-target_sources(MLIRGCDialect PRIVATE GCDialect.cpp)
+target_sources(MLIRGCDialect PRIVATE
+  GCDialect.cpp
+  GCOps.cpp
+)

@@ -4,6 +4,8 @@
 include "mlir/Dialect/GC/IR/GCDialect.td"
 include "mlir/Dialect/GC/IR/GCTypes.td"
 
+include "mlir/Interfaces/MemorySlotInterfaces.td"
+
 class GC_Op<string mnemonic, list<Trait> traits = []>
     : Op<GC_Dialect, mnemonic, traits> {}
 
@@ -26,7 +28,9 @@ def GC_AllocOp : GC_Op<"alloc", [
   }];
 }
 
-def GC_AllocaOp : GC_Op<"alloca"> {
+def GC_AllocaOp : GC_Op<"alloca", [
+  DeclareOpInterfaceMethods<PromotableAllocationOpInterface>
+]> {
   let arguments = (ins);
 
   let results = (outs

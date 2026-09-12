@@ -5,6 +5,7 @@
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/Types.h"
+#include "mlir/Interfaces/MemorySlotInterfaces.h"
 
 #include "llvm/ADT/TypeSwitch.h"
 

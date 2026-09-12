@@ -7,9 +7,6 @@
 #define GET_TYPEDEF_CLASSES
 #include "mlir/Dialect/GC/IR/GCTypes.cpp.inc"
 
-#define GET_OP_CLASSES
-#include "mlir/Dialect/GC/IR/GCOps.cpp.inc"
-
 namespace mlir::gc {
 
 void GCDialect::initialize() {
