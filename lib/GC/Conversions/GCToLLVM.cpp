@@ -81,6 +81,29 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
   std::string allocator;
 };
 
+struct AllocaOpLowering final : OpConversionPattern<AllocaOp> {
+  using OpConversionPattern<AllocaOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(AllocaOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    auto ctx = op.getContext();
+    auto loc = op.getLoc();
+
+    mlir::Type resultTy = LLVM::LLVMPointerType::get(ctx);
+    mlir::Type elementTy = getTypeConverter()->convertType(
+        op.getType().getPointee());
+
+    // Currently limit the possible allocation size to one element.
+    auto i64ty = rewriter.getI64Type();
+    mlir::Value arraySize = LLVM::ConstantOp::create(rewriter, loc, i64ty, 1);
+
+    rewriter.replaceOpWithNewOp<LLVM::AllocaOp>(op, resultTy, elementTy,
+                                                arraySize);
+    return success();
+  }
+};
+
 struct GCIRToLLVMPass
     : public mlir::impl::GCToLLVMPassBase<GCIRToLLVMPass> {
   using mlir::impl::GCToLLVMPassBase<
@@ -91,6 +114,7 @@ struct GCIRToLLVMPass
 
     RewritePatternSet patterns(&getContext());
     patterns.add<AllocOpLowering>(converter, &getContext(), allocator);
+    patterns.add<AllocaOpLowering>(converter, &getContext());
     populateFuncToLLVMConversionPatterns(converter, patterns);
 
     ConversionTarget target(getContext());
