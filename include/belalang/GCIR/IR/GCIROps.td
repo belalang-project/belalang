@@ -7,12 +7,20 @@ include "belalang/GCIR/IR/GCIRTypes.td"
 class GCIR_Op<string mnemonic, list<Trait> traits = []>
     : Op<GCIR_Dialect, mnemonic, traits> {}
 
-def GCIR_AllocOp : GCIR_Op<"alloc"> {
+def GCIR_AllocOp : GCIR_Op<"alloc", [
+  TypesMatchWith<"", "roots", "relocated_roots", "$_self">
+]> {
+  let arguments = (ins
+    Variadic<GCIR_PtrType>:$roots
+  );
+
   let results = (outs
-    GCIR_PtrType:$result
+    GCIR_PtrType:$result,
+    Variadic<GCIR_PtrType>:$relocated_roots
   );
 
   let assemblyFormat = [{
+    (`roots` `(` $roots^ `:` type($roots) `)`)?
     `:` qualified(type($result))
     attr-dict
   }];
