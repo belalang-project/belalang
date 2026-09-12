@@ -26,4 +26,16 @@ def GC_AllocOp : GC_Op<"alloc", [
   }];
 }
 
+def GC_AllocaOp : GC_Op<"alloca"> {
+  let arguments = (ins);
+
+  let results = (outs
+    GC_PtrType:$result
+  );
+
+  let assemblyFormat = [{
+    `:` qualified(type($result)) attr-dict
+  }];
+}
+
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_
