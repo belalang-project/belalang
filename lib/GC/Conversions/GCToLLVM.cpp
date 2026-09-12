@@ -1,5 +1,5 @@
-#include "belalang/GCIR/IR/GCIR.h"
-#include "belalang/GCIR/Conversions/Passes.h"
+#include "mlir/Dialect/GC/IR/GC.h"
+#include "mlir/Dialect/GC/Passes.h"
 
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
@@ -10,14 +10,14 @@
 #include "mlir/Transforms/DialectConversion.h"
 
 namespace mlir {
-#define GEN_PASS_DEF_BELALANGGCIRTOLLVMPASS
-#include "belalang/GCIR/Conversions/Passes.h.inc"
+#define GEN_PASS_DEF_GCTOLLVMPASS
+#include "mlir/Dialect/GC/Passes.h.inc"
 } // namespace mlir
 
 namespace {
 
 using namespace mlir;
-using namespace belalang::gc;
+using namespace mlir::gc;
 
 struct GCIRToLLVMTypeConverter final : LLVMTypeConverter {
   explicit GCIRToLLVMTypeConverter(MLIRContext *context)
@@ -82,9 +82,9 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
 };
 
 struct GCIRToLLVMPass
-    : public mlir::impl::BelalangGCIRToLLVMPassBase<GCIRToLLVMPass> {
-  using mlir::impl::BelalangGCIRToLLVMPassBase<
-      GCIRToLLVMPass>::BelalangGCIRToLLVMPassBase;
+    : public mlir::impl::GCToLLVMPassBase<GCIRToLLVMPass> {
+  using mlir::impl::GCToLLVMPassBase<
+      GCIRToLLVMPass>::GCToLLVMPassBase;
 
   void runOnOperation() override {
     GCIRToLLVMTypeConverter converter(&getContext());
@@ -95,7 +95,7 @@ struct GCIRToLLVMPass
 
     ConversionTarget target(getContext());
     target.addLegalDialect<LLVM::LLVMDialect, BuiltinDialect>();
-    target.addIllegalDialect<GCIRDialect>();
+    target.addIllegalDialect<GCDialect>();
 
     if (applyFullConversion(getOperation(), target, std::move(patterns))
             .failed())

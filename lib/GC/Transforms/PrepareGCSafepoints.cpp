@@ -1,5 +1,5 @@
-#include "belalang/GCIR/IR/GCIR.h"
-#include "belalang/GCIR/Transforms/Passes.h"
+#include "mlir/Dialect/GC/IR/GC.h"
+#include "mlir/Dialect/GC/Passes.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/ValueRange.h"
@@ -8,13 +8,12 @@
 
 namespace mlir {
 #define GEN_PASS_DEF_GCIRPREPAREGCSAFEPOINTSPASS
-#include "belalang/GCIR/Transforms/Passes.h.inc"
+#include "mlir/Dialect/GC/Passes.h.inc"
 } // namespace mlir
 
 namespace {
 
 using namespace mlir;
-using namespace belalang;
 
 static bool isLiveAcross(Value value, gc::AllocOp alloc,
                          DominanceInfo &dominance) {
@@ -89,9 +88,3 @@ struct GCIRPrepareGCSafepoints
 };
 
 } // namespace
-
-void mlir::registerGCIRPrepareGCSafepointsPass() {
-  mlir::registerPass([]() -> std::unique_ptr<mlir::Pass> {
-    return mlir::createGCIRPrepareGCSafepointsPass();
-  });
-}
