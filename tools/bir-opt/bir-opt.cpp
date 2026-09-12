@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 
   belalang::bir::registerPasses();
   belalang::bir::registerBelalangBIRToLLVMPass();
+  belalang::bir::registerBelalangBIRToGCPass();
   belalang::bir::registerBIRPipelines();
   mlir::registerPasses();
   mlir::registerTransformsPasses();
