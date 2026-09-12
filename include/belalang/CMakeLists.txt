@@ -1,5 +1,4 @@
 add_subdirectory(BIR)
-add_subdirectory(GCIR)
 
 execute_process(
   COMMAND git rev-parse HEAD

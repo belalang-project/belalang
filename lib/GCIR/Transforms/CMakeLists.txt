@@ -1,1 +1,0 @@
-target_sources(BelalangGCIR PRIVATE PrepareGCSafepoints.cpp)

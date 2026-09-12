@@ -1,9 +1,9 @@
-#ifndef BELALANG_GCIR_CONVERSIONS_PASSES_TD_
-#define BELALANG_GCIR_CONVERSIONS_PASSES_TD_
+#ifndef MLIR_DIALECT_GC_CONVERSIONS_PASSES_TD_
+#define MLIR_DIALECT_GC_CONVERSIONS_PASSES_TD_
 
 include "mlir/Pass/PassBase.td"
 
-def BelalangGCIRToLLVMPass : Pass<"convert-gcir-to-llvm"> {
+def GCToLLVMPass : Pass<"convert-gcir-to-llvm"> {
   let summary = "lower gcir allocations to LLVM";
 
   let options = [
@@ -11,8 +11,8 @@ def BelalangGCIRToLLVMPass : Pass<"convert-gcir-to-llvm"> {
            "allocator function with signature ptr(i64)">
   ];
 
-  let dependentDialects = ["::belalang::gc::GCIRDialect",
+  let dependentDialects = ["::mlir::gc::GCDialect",
                            "::mlir::LLVM::LLVMDialect"];
 }
 
-#endif // BELALANG_GCIR_CONVERSIONS_PASSES_TD_
+#endif // MLIR_DIALECT_GC_CONVERSIONS_PASSES_TD_
