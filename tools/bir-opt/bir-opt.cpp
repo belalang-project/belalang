@@ -2,6 +2,8 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Transforms/Passes.h"
 #include "mlir/Conversion/Passes.h"
+#include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/Dialect/GC/Passes.h"
@@ -12,7 +14,10 @@
 int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
 
+  mlir::registerConvertFuncToLLVMInterface(registry);
+  mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
   belalang::bir::registerBIRToLLVMInterface(registry);
+  mlir::gc::registerGCToLLVMInterface(registry);
   registry.insert<belalang::bir::BIRDialect, mlir::gc::GCDialect,
                   mlir::cf::ControlFlowDialect, mlir::func::FuncDialect,
                   mlir::LLVM::LLVMDialect>();
