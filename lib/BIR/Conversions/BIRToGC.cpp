@@ -22,8 +22,7 @@ struct AllocHeapOpConversion final
                   ConversionPatternRewriter &rewriter) const override {
     mlir::Type sourceTy = cast<bir::RefType>(op.getResult().getType());
     mlir::Type targetTy = getTypeConverter()->convertType(sourceTy);
-    rewriter.replaceOpWithNewOp<gc::AllocOp>(op, targetTy, TypeRange{},
-                                             ValueRange{});
+    rewriter.replaceOpWithNewOp<gc::AllocOp>(op, targetTy);
     return success();
   }
 };

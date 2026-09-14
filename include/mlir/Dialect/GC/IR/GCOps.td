@@ -12,6 +12,16 @@ class GC_Op<string mnemonic, list<Trait> traits = []>
 def GC_AllocOp : GC_Op<"alloc", [
   TypesMatchWith<"", "roots", "relocated_roots", "$_self">
 ]> {
+  let builders = [
+    OpBuilder<(ins "Type":$result), [{
+      build($_builder,
+            $_state,
+            result,
+            ::mlir::TypeRange{},
+            ::mlir::ValueRange{});
+    }]>
+  ];
+
   let arguments = (ins
     Variadic<GC_PtrType>:$roots
   );
