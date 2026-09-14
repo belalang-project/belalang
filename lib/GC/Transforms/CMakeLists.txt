@@ -1,1 +1,4 @@
-target_sources(MLIRGCDialect PRIVATE PrepareGCSafepoints.cpp)
+target_sources(MLIRGCDialect PRIVATE
+  LowerAllocations.cpp
+  PrepareGCSafepoints.cpp
+)

@@ -2,9 +2,11 @@
 #define MLIR_DIALECT_GC_IR_GC_H_
 
 #include "mlir/IR/Builders.h"
+#include "mlir/IR/BuiltinAttributes.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/Types.h"
+#include "mlir/Interfaces/CallInterfaces.h"
 #include "mlir/Interfaces/MemorySlotInterfaces.h"
 
 #include "llvm/ADT/TypeSwitch.h"
