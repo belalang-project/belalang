@@ -4,8 +4,6 @@
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlow.h"
 #include "mlir/Pass/Pass.h"
-#include "mlir/Pass/PassManager.h"
-#include "mlir/Transforms/DialectConversion.h"
 
 namespace mlir {
 class DataFlowSolver;
@@ -24,33 +22,6 @@ void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerDeclToMemoryPatterns(
     mlir::RewritePatternSet &patterns, mlir::DataFlowSolver &solver);
 void populateBelalangLowerFuncExprPatterns(mlir::RewritePatternSet &patterns);
-
-// -----------------------------------------------------------------------------
-// Pipelines
-// -----------------------------------------------------------------------------
-
-struct BIRLoweringPipelineOptions
-    : public mlir::PassPipelineOptions<BIRLoweringPipelineOptions> {
-  mlir::detail::PassOptions::Option<bool> enableDCE{
-      *this,
-      "enable-dce",
-      llvm::cl::desc("Enables dead code elimination."),
-      llvm::cl::init(true),
-  };
-
-  mlir::detail::PassOptions::Option<bool> enableMem2Reg{
-      *this,
-      "enable-mem2reg",
-      llvm::cl::desc("Enables mem2reg."),
-      llvm::cl::init(true),
-  };
-};
-
-void buildBIRLoweringPipeline(mlir::OpPassManager &pm);
-void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
-                              const BIRLoweringPipelineOptions &options);
-
-void registerBIRPipelines();
 
 } // namespace bir
 } // namespace belalang

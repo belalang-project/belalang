@@ -2,6 +2,8 @@ add_library(BelalangLLVMGen LLVMGen.cpp)
 target_link_libraries(BelalangLLVMGen
   PUBLIC
     BelalangBIR
+    BelalangLowering
+    MLIRArithToLLVM
     LLVMCodeGen
     LLVMCore
     LLVMInstrumentation

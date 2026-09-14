@@ -5,6 +5,7 @@
 #include "belalang/AST/ASTVisitor.h"
 #include "belalang/BIRGen/TypeChecker.h"
 #include "belalang/Diag/Diag.h"
+#include "belalang/Lowering/Pipelines.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Location.h"
@@ -12,10 +13,6 @@
 #include <string>
 
 namespace belalang {
-namespace bir {
-struct BIRLoweringPipelineOptions;
-} // namespace bir
-
 namespace birgen {
 
 class BIRGen : public ast::ASTVisitor<BIRGen, mlir::Value> {
@@ -29,7 +26,7 @@ public:
 
   mlir::ModuleOp generateProgram(ast::Program *prog);
   bool runLoweringPipeline();
-  bool runLoweringPipeline(const bir::BIRLoweringPipelineOptions &options);
+  bool runLoweringPipeline(const lowering::BIRLoweringPipelineOptions &options);
   std::string dumpToString() const;
 
 #define STMT(name) mlir::Value visit##name##Stmt(ast::name##Stmt *);

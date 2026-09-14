@@ -1,8 +1,9 @@
 #include "belalang/BIR/Transforms/Passes.h"
+#include "belalang/Lowering/Pipelines.h"
 #include "mlir/Transforms/Passes.h"
 
 namespace belalang {
-namespace bir {
+namespace lowering {
 
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm) {
   buildBIRLoweringPipeline(pm, BIRLoweringPipelineOptions());
@@ -10,10 +11,10 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm) {
 
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
                               const BIRLoweringPipelineOptions &options) {
-  pm.addPass(createBelalangLowerFuncExprPass());
-  pm.addPass(createBelalangOptimizeStructLayoutPass());
-  pm.addPass(createBelalangLowerDeclToMemoryPass());
-  pm.addPass(createBelalangFlattenCFGPass());
+  pm.addPass(bir::createBelalangLowerFuncExprPass());
+  pm.addPass(bir::createBelalangOptimizeStructLayoutPass());
+  pm.addPass(bir::createBelalangLowerDeclToMemoryPass());
+  pm.addPass(bir::createBelalangFlattenCFGPass());
   if (options.enableMem2Reg) {
     pm.addPass(mlir::createMem2Reg());
   }
@@ -22,17 +23,17 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
     pm.addPass(mlir::createTrivialDeadCodeEliminationPass());
     pm.addPass(mlir::createSymbolDCEPass());
   }
-  pm.addPass(createBelalangPrepareGCAllocationsPass());
-  pm.addPass(createBelalangVerifyLoweredFormPass());
+  pm.addPass(bir::createBelalangPrepareGCAllocationsPass());
+  pm.addPass(bir::createBelalangVerifyLoweredFormPass());
 }
 
 void registerBIRPipelines() {
   mlir::PassPipelineRegistration<BIRLoweringPipelineOptions>(
       "bir-lowering-pipeline", "Default lowering pipeline for BIR dialect.",
       [](mlir::OpPassManager &pm, const BIRLoweringPipelineOptions &options) {
-        bir::buildBIRLoweringPipeline(pm, options);
+        buildBIRLoweringPipeline(pm, options);
       });
 }
 
-} // namespace bir
+} // namespace lowering
 } // namespace belalang

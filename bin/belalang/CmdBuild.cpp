@@ -1,6 +1,7 @@
 #include "belalang/AST/ASTDumper.h"
 #include "belalang/AST/Parser.h"
 #include "belalang/BIR/Transforms/Passes.h"
+#include "belalang/Lowering/Pipelines.h"
 #include "belalang/BIRGen/BIRGen.h"
 #include "belalang/Diag/Diag.h"
 #include "belalang/LLVMGen/LLVMGen.h"
@@ -54,7 +55,7 @@ static bool parseBoolean(std::string_view value, bool &result) {
 }
 
 static bool parseBIRGenOption(std::string_view option,
-                              belalang::bir::BIRLoweringPipelineOptions &opts) {
+                              belalang::lowering::BIRLoweringPipelineOptions &opts) {
   size_t eq = option.find('=');
   if (eq == std::string_view::npos) {
     belalang::cmd::term::error()
@@ -107,7 +108,7 @@ enum class EmitTarget {
 
 int build(muopt::Parser &parser, const BelalangCtx &ctx) {
   auto emit = EmitTarget::Exe;
-  bir::BIRLoweringPipelineOptions birOptions;
+  lowering::BIRLoweringPipelineOptions birOptions;
   std::string source;
 
   while (auto arg = parser.next()) {
