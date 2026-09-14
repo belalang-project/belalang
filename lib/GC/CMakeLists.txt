@@ -5,6 +5,7 @@ add_dependencies(MLIRGCDialect
 )
 target_link_libraries(MLIRGCDialect
   PUBLIC
+    MLIRConvertToLLVMInterface
     MLIRIR
     MLIRFuncToLLVM
     MLIRLLVMDialect

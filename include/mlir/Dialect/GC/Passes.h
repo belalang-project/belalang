@@ -4,12 +4,17 @@
 #include "mlir/Pass/Pass.h"
 
 namespace mlir {
+class DialectRegistry;
 
 #define GEN_PASS_DECL
 #include "mlir/Dialect/GC/Passes.h.inc"
 
 #define GEN_PASS_REGISTRATION
 #include "mlir/Dialect/GC/Passes.h.inc"
+
+namespace gc {
+void registerGCToLLVMInterface(mlir::DialectRegistry &registry);
+} // namespace gc
 
 } // namespace mlir
 

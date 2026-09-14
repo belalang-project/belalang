@@ -1,6 +1,7 @@
 #include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/Dialect/GC/Passes.h"
 
+#include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
@@ -19,14 +20,11 @@ namespace {
 using namespace mlir;
 using namespace mlir::gc;
 
-struct GCIRToLLVMTypeConverter final : LLVMTypeConverter {
-  explicit GCIRToLLVMTypeConverter(MLIRContext *context)
-      : LLVMTypeConverter(context) {
-    addConversion([](PtrType type) {
-      return LLVM::LLVMPointerType::get(type.getContext());
-    });
-  }
-};
+static void configureGCToLLVMTypeConverter(LLVMTypeConverter &c) {
+  c.addConversion([](PtrType type) {
+    return LLVM::LLVMPointerType::get(type.getContext());
+  });
+}
 
 struct CallOpConversion final : OpConversionPattern<CallOp> {
   using OpConversionPattern<CallOp>::OpConversionPattern;
@@ -66,16 +64,23 @@ struct AllocaOpLowering final : OpConversionPattern<AllocaOp> {
   }
 };
 
+void populateGCToLLVMPatterns(mlir::RewritePatternSet &patterns,
+                              mlir::TypeConverter &typeConverter) {
+  patterns.add<CallOpConversion, AllocaOpLowering>(typeConverter,
+                                                   patterns.getContext());
+}
+
 struct GCIRToLLVMPass
     : public mlir::impl::GCToLLVMPassBase<GCIRToLLVMPass> {
   using mlir::impl::GCToLLVMPassBase<
       GCIRToLLVMPass>::GCToLLVMPassBase;
 
   void runOnOperation() override {
-    GCIRToLLVMTypeConverter converter(&getContext());
+    LLVMTypeConverter converter(&getContext());
+    configureGCToLLVMTypeConverter(converter);
 
     RewritePatternSet patterns(&getContext());
-    patterns.add<CallOpConversion, AllocaOpLowering>(converter, &getContext());
+    populateGCToLLVMPatterns(patterns, converter);
     populateFuncToLLVMConversionPatterns(converter, patterns);
 
     ConversionTarget target(getContext());
@@ -88,4 +93,27 @@ struct GCIRToLLVMPass
   }
 };
 
+struct GCToLLVMDialectInterface final : ConvertToLLVMPatternInterface {
+  GCToLLVMDialectInterface(Dialect *dialect)
+      : ConvertToLLVMPatternInterface(dialect) {}
+
+  void loadDependentDialects(MLIRContext *ctx) const final {
+    ctx->loadDialect<LLVM::LLVMDialect>();
+  }
+
+  void populateConvertToLLVMConversionPatterns(
+      ConversionTarget &target, LLVMTypeConverter &typeConverter,
+      RewritePatternSet &patterns) const final {
+    configureGCToLLVMTypeConverter(typeConverter);
+    populateGCToLLVMPatterns(patterns, typeConverter);
+  }
+};
+
 } // namespace
+
+void mlir::gc::registerGCToLLVMInterface(mlir::DialectRegistry &registry) {
+  registry.addExtension(+[](mlir::MLIRContext *context,
+                            mlir::gc::GCDialect *dialect) {
+    dialect->addInterfaces<GCToLLVMDialectInterface>();
+  });
+}

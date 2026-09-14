@@ -1,4 +1,5 @@
 // RUN: %bir-opt --split-input-file --convert-bir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-to-llvm %s | %FileCheck %s
 
 // CHECK: module {
 // CHECK-LABEL: llvm.func @basic() -> i64 {
