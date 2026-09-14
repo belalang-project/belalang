@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=only-bir=true --convert-bir-to-llvm %s | %FileCheck %s
 
 bir.func private @use_bool(!bir.bool)
 

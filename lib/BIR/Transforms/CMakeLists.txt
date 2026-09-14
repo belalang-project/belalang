@@ -5,7 +5,6 @@ target_sources(BelalangBIR PRIVATE
   OptimizeStructLayout.cpp
   PrepareGCAllocations.cpp
   VerifyLoweredForm.cpp
-  ../Pipelines.cpp
 )
 
 if(BUILD_TESTING AND BELALANG_BUILD_TESTS)

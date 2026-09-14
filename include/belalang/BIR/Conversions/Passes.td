@@ -7,6 +7,7 @@ def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {
   let summary = "lower bir instructions to LLVM";
   let dependentDialects = ["::belalang::bir::BIRDialect",
                            "::mlir::cf::ControlFlowDialect",
+                           "::mlir::gc::GCDialect",
                            "::mlir::LLVM::LLVMDialect"];
 }
 

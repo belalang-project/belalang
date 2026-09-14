@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=only-bir=true %s | %FileCheck %s
 
 // CHECK-LABEL: bir.func @pipeline
 // CHECK-NOT: bir.declare

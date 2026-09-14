@@ -1,5 +1,5 @@
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s | %FileCheck %s
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=enable-dce=false %s | %FileCheck --check-prefix=NODCE %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=only-bir=true %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline="enable-dce=false only-bir=true" %s | %FileCheck --check-prefix=NODCE %s
 
 // CHECK-LABEL: bir.func @drops_dead_pure_work
 // CHECK-NOT: bir.add

@@ -5,6 +5,7 @@
 #include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
+#include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
 #include "mlir/IR/BuiltinDialect.h"
@@ -979,6 +980,9 @@ static void configureBIRToLLVMTypeConverter(mlir::LLVMTypeConverter &c) {
   c.addConversion([](bir::RefType ty) {
     return LLVM::LLVMPointerType::get(ty.getContext());
   });
+  c.addConversion([](mlir::gc::PtrType ty) {
+    return LLVM::LLVMPointerType::get(ty.getContext());
+  });
   c.addConversion([](bir::ArrayType ty) {
     return LLVM::LLVMPointerType::get(ty.getContext());
   });
@@ -1114,7 +1118,8 @@ struct BelalangBIRToLLVMPass
     configureBIRToLLVMTypeConverter(typeConverter);
 
     mlir::ConversionTarget target(getContext());
-    target.addLegalDialect<mlir::LLVM::LLVMDialect, mlir::BuiltinDialect>();
+    target.addLegalDialect<mlir::LLVM::LLVMDialect, mlir::BuiltinDialect,
+                           mlir::gc::GCDialect>();
     target.addIllegalDialect<bir::BIRDialect>();
 
     mlir::RewritePatternSet patterns(&getContext());

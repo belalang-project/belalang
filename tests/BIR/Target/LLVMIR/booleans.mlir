@@ -1,5 +1,5 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s \
-// RUN: | %bir-translate --bir-to-llvmir \
+// RUN: | %bir-translate --mlir-to-llvmir \
 // RUN: | %FileCheck %s
 
 // CHECK:      define i1 @basic() {

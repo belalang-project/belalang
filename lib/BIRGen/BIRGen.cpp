@@ -7,6 +7,7 @@
 #include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/Transforms/Passes.h"
+#include "belalang/Lowering/Pipelines.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -534,13 +535,13 @@ void BIRGen::buildMainReturn() {
 }
 
 bool BIRGen::runLoweringPipeline() {
-  return runLoweringPipeline(bir::BIRLoweringPipelineOptions());
+  return runLoweringPipeline(lowering::BIRLoweringPipelineOptions());
 }
 
 bool BIRGen::runLoweringPipeline(
-    const bir::BIRLoweringPipelineOptions &options) {
+    const lowering::BIRLoweringPipelineOptions &options) {
   mlir::PassManager pm(&context);
-  bir::buildBIRLoweringPipeline(pm, options);
+  lowering::buildBIRLoweringPipeline(pm, options);
   return mlir::succeeded(pm.run(module));
 }
 

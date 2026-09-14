@@ -6,6 +6,7 @@ target_link_libraries(BelalangBIRGen
   PUBLIC
     BelalangAST
     BelalangBIR
+    BelalangLowering
     BelalangDiag
     BelalangLexer
     MLIRIR
