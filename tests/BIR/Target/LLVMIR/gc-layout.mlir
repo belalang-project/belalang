@@ -1,5 +1,5 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s \
-// RUN: | %bir-translate --split-input-file --bir-to-llvmir \
+// RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
 // RUN: | %FileCheck %s
 
 // CHECK-DAG: @gc.ptr_offsets.{{.*}} = private constant {{\[1 x i32\]}} {{\[i32 8\]}}

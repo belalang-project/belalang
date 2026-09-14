@@ -26,7 +26,7 @@ struct BIRLoweringPipelineOptions
       *this,
       "only-bir",
       llvm::cl::desc("Stop after lowering to BIR."),
-      llvm::cl::init(true), // TODO: make this false
+      llvm::cl::init(false),
   };
 };
 

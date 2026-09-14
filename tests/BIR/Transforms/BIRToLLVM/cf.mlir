@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline --convert-bir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=only-bir=true --convert-bir-to-llvm %s | %FileCheck %s
 
 // CHECK-LABEL:  llvm.func @main() -> i64 {
 // CHECK-NEXT:     llvm.br ^bb1

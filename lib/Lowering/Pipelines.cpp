@@ -1,7 +1,6 @@
 #include "belalang/BIR/Conversions/Passes.h"
 #include "belalang/BIR/Transforms/Passes.h"
 #include "belalang/Lowering/Pipelines.h"
-#include "mlir/Dialect/GC/Passes.h"
 #include "mlir/Transforms/Passes.h"
 
 namespace belalang {
@@ -29,11 +28,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   pm.addPass(bir::createBelalangVerifyLoweredFormPass());
   if (options.onlyBIR)
     return;
-  pm.addPass(bir::createBelalangBIRToGCPass());
   pm.addPass(bir::createBelalangBIRToLLVMPass());
-  pm.addPass(mlir::createGCIRPrepareGCSafepointsPass());
-  pm.addPass(mlir::createGCLowerAllocationsPass());
-  pm.addPass(mlir::createGCToLLVMPass());
 }
 
 void registerBIRPipelines() {
