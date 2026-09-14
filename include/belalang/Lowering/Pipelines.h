@@ -21,6 +21,13 @@ struct BIRLoweringPipelineOptions
       llvm::cl::desc("Enables mem2reg."),
       llvm::cl::init(true),
   };
+
+  mlir::detail::PassOptions::Option<bool> onlyBIR{
+      *this,
+      "only-bir",
+      llvm::cl::desc("Stop after lowering to BIR."),
+      llvm::cl::init(true), // TODO: make this false
+  };
 };
 
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm);
