@@ -28,57 +28,19 @@ struct GCIRToLLVMTypeConverter final : LLVMTypeConverter {
   }
 };
 
-struct AllocOpLowering final : OpConversionPattern<AllocOp> {
-  AllocOpLowering(TypeConverter &converter, MLIRContext *context,
-                  llvm::StringRef allocator)
-      : OpConversionPattern<AllocOp>(converter, context),
-        allocator(allocator.str()) {}
+struct CallOpConversion final : OpConversionPattern<CallOp> {
+  using OpConversionPattern<CallOp>::OpConversionPattern;
 
   LogicalResult
-  matchAndRewrite(AllocOp op, OpAdaptor,
+  matchAndRewrite(CallOp op, OpAdaptor adaptor,
                   ConversionPatternRewriter &rewriter) const override {
-    auto resultType = getTypeConverter()->convertType(op.getResult().getType());
-    if (!resultType)
+    SmallVector<Type> resultTypes;
+    if (getTypeConverter()->convertTypes(op.getResultTypes(), resultTypes).failed())
       return failure();
-
-    auto ptrType = cast<PtrType>(op.getResult().getType());
-    auto dataLayout = DataLayout::closest(op);
-    auto size = dataLayout.getTypeSize(ptrType.getPointee());
-    if (size.isScalable()) {
-      op.emitError("cannot lower allocation of a scalable type");
-      return failure();
-    }
-
-    auto module = op->getParentOfType<ModuleOp>();
-    auto *ctx = op.getContext();
-    auto i64 = IntegerType::get(ctx, 64);
-    auto llvmPtr = LLVM::LLVMPointerType::get(ctx);
-    auto functionType = LLVM::LLVMFunctionType::get(llvmPtr, {i64});
-    auto function = module.lookupSymbol<LLVM::LLVMFuncOp>(allocator);
-    if (function) {
-      if (function.getFunctionType() != functionType) {
-        op.emitError(
-            "allocator function has incompatible type; expected ptr(i64)");
-        return failure();
-      }
-    } else {
-      OpBuilder::InsertionGuard guard(rewriter);
-      rewriter.setInsertionPointToStart(module.getBody());
-      function = LLVM::LLVMFuncOp::create(rewriter, op.getLoc(), allocator,
-                                          functionType);
-    }
-
-    auto sizeValue = LLVM::ConstantOp::create(
-        rewriter, op.getLoc(), i64,
-        rewriter.getI64IntegerAttr(size.getFixedValue()));
-    auto call = LLVM::CallOp::create(rewriter, op.getLoc(), llvmPtr,
-                                     FlatSymbolRefAttr::get(ctx, allocator),
-                                     ValueRange{sizeValue});
-    rewriter.replaceOp(op, call.getResult());
+    rewriter.replaceOpWithNewOp<LLVM::CallOp>(
+        op, resultTypes, op.getCalleeAttr(), adaptor.getOperands());
     return success();
   }
-
-  std::string allocator;
 };
 
 struct AllocaOpLowering final : OpConversionPattern<AllocaOp> {
@@ -113,8 +75,7 @@ struct GCIRToLLVMPass
     GCIRToLLVMTypeConverter converter(&getContext());
 
     RewritePatternSet patterns(&getContext());
-    patterns.add<AllocOpLowering>(converter, &getContext(), allocator);
-    patterns.add<AllocaOpLowering>(converter, &getContext());
+    patterns.add<CallOpConversion, AllocaOpLowering>(converter, &getContext());
     populateFuncToLLVMConversionPatterns(converter, patterns);
 
     ConversionTarget target(getContext());

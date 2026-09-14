@@ -1,18 +1,6 @@
-// RUN: %bir-opt --convert-gcir-to-llvm %s | %FileCheck %s
-// RUN: %bir-opt --convert-gcir-to-llvm='alloc-function=my_alloc' %s | %FileCheck %s --check-prefix=CUSTOM
+// RUN: not %bir-opt --convert-gcir-to-llvm %s 2>&1 | %FileCheck %s
 
-// CHECK-LABEL: llvm.func @malloc
-// CHECK-SAME: (i64) -> !llvm.ptr
-
-// CHECK-LABEL: llvm.func @test
-// CHECK: %[[SIZE:.*]] = llvm.mlir.constant(8 : i64) : i64
-// CHECK: %[[PTR:.*]] = llvm.call @malloc(%[[SIZE]]) : (i64) -> !llvm.ptr
-// CHECK: llvm.return %[[PTR]] : !llvm.ptr
-
-// CUSTOM-LABEL: llvm.func @my_alloc
-// CUSTOM-SAME: (i64) -> !llvm.ptr
-
-// CUSTOM: llvm.call @my_alloc
+// CHECK: error: failed to legalize operation 'gc.alloc'
 
 module {
   func.func @test() -> !gc.ptr<i64> {
