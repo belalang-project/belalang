@@ -3,6 +3,7 @@ target_link_libraries(bir-opt
   PRIVATE
     BelalangBIR
     MLIRGCDialect
+    MLIRConvertToLLVMPass
     MLIRFuncDialect
     MLIRLLVMDialect
     MLIROptLib

@@ -6,6 +6,10 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 
+namespace mlir {
+class DialectRegistry;
+}
+
 namespace belalang {
 namespace bir {
 
@@ -18,6 +22,8 @@ namespace bir {
 
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                        mlir::TypeConverter &typeConverter);
+
+void registerBIRToLLVMInterface(mlir::DialectRegistry &registry);
 
 } // namespace bir
 } // namespace belalang

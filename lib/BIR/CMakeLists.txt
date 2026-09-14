@@ -9,6 +9,7 @@ target_link_libraries(BelalangBIR PUBLIC
   MLIRAnalysis
   MLIRControlFlowDialect
   MLIRControlFlowToLLVM
+  MLIRConvertToLLVMInterface
   MLIRFuncDialect
   MLIRIR
   MLIRLLVMDialect

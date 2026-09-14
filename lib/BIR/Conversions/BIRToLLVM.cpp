@@ -1,13 +1,15 @@
 #include "belalang/BIR/BRTUtils.h"
-#include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Conversions/Passes.h"
+#include "belalang/BIR/IR/BIR.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
 #include "mlir/Dialect/LLVMIR/LLVMTypes.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/DialectRegistry.h"
 #include "mlir/Transforms/DialectConversion.h"
 
 namespace mlir {
@@ -946,46 +948,44 @@ struct GetMemberOpLowering final : public OpConversionPattern<bir::GetMemberOp> 
   }
 };
 
-struct BIRToLLVMTypeConverter : public mlir::LLVMTypeConverter {
-  BIRToLLVMTypeConverter(mlir::MLIRContext *ctx)
-      : mlir::LLVMTypeConverter(ctx) {
-    addConversion([](bir::IntType ty) {
-      return mlir::IntegerType::get(ty.getContext(), 64);
-    });
-    addConversion([](bir::FloatType ty) {
-      return mlir::Float64Type::get(ty.getContext());
-    });
-    addConversion([](bir::BoolType ty) {
-      return mlir::IntegerType::get(ty.getContext(), 1);
-    });
-    addConversion([](bir::StringType ty) {
-      mlir::MLIRContext *ctx = ty.getContext();
-      mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
-      mlir::Type iType = mlir::IntegerType::get(ctx, 64);
-      auto stringTy =
-          mlir::LLVM::LLVMStructType::getIdentified(ctx, "bel.String");
-      assert(stringTy.setBody({ptrType, iType}, false).succeeded());
-      return stringTy;
-    });
-    addConversion([this, ctx](bir::StructType ty) {
-      llvm::SmallVector<mlir::Type> llvmMembers;
-      for (int32_t i : ty.getInverseReorder())
-        llvmMembers.push_back(convertType(ty.getMembers()[i]));
-      auto llvmStruct = LLVM::LLVMStructType::getIdentified(ctx, ty.getName());
-      assert(llvmStruct.setBody(llvmMembers, false).succeeded());
-      return llvmStruct;
-    });
-    addConversion([](bir::RefType ty) {
-      return LLVM::LLVMPointerType::get(ty.getContext());
-    });
-    addConversion([](bir::ArrayType ty) {
-      return LLVM::LLVMPointerType::get(ty.getContext());
-    });
-    addConversion([](mlir::FunctionType type) -> mlir::Type {
-      return LLVM::LLVMPointerType::get(type.getContext());
-    });
-  }
-};
+static void configureBIRToLLVMTypeConverter(mlir::LLVMTypeConverter &c) {
+  c.addConversion([](bir::IntType ty) {
+    return mlir::IntegerType::get(ty.getContext(), 64);
+  });
+  c.addConversion([](bir::FloatType ty) {
+    return mlir::Float64Type::get(ty.getContext());
+  });
+  c.addConversion([](bir::BoolType ty) {
+    return mlir::IntegerType::get(ty.getContext(), 1);
+  });
+  c.addConversion([](bir::StringType ty) {
+    mlir::MLIRContext *ctx = ty.getContext();
+    mlir::Type ptrType = mlir::LLVM::LLVMPointerType::get(ctx);
+    mlir::Type iType = mlir::IntegerType::get(ctx, 64);
+    auto stringTy = mlir::LLVM::LLVMStructType::getIdentified(ctx,
+                                                              "bel.String");
+    assert(stringTy.setBody({ptrType, iType}, false).succeeded());
+    return stringTy;
+  });
+  c.addConversion([&c](bir::StructType ty) {
+    llvm::SmallVector<mlir::Type> llvmMembers;
+    for (int32_t i : ty.getInverseReorder())
+      llvmMembers.push_back(c.convertType(ty.getMembers()[i]));
+    auto llvmStruct = LLVM::LLVMStructType::getIdentified(ty.getContext(),
+                                                          ty.getName());
+    assert(llvmStruct.setBody(llvmMembers, false).succeeded());
+    return llvmStruct;
+  });
+  c.addConversion([](bir::RefType ty) {
+    return LLVM::LLVMPointerType::get(ty.getContext());
+  });
+  c.addConversion([](bir::ArrayType ty) {
+    return LLVM::LLVMPointerType::get(ty.getContext());
+  });
+  c.addConversion([](mlir::FunctionType type) -> mlir::Type {
+    return LLVM::LLVMPointerType::get(type.getContext());
+  });
+}
 
 struct GetElementOpLowering final
     : public OpConversionPattern<bir::GetElementOp> {
@@ -1060,6 +1060,22 @@ static void insertBRTInitCall(mlir::Operation *op) {
       builder.getI32ArrayAttr(prios), builder.getArrayAttr(datals));
 }
 
+struct BIRToLLVMDialectInterface final : public ConvertToLLVMPatternInterface {
+  BIRToLLVMDialectInterface(Dialect *dialect)
+      : ConvertToLLVMPatternInterface(dialect) {}
+
+  void loadDependentDialects(MLIRContext *context) const final {
+    context->loadDialect<LLVM::LLVMDialect>();
+  }
+
+  void populateConvertToLLVMConversionPatterns(
+      ConversionTarget &target, LLVMTypeConverter &typeConverter,
+      RewritePatternSet &patterns) const final {
+    configureBIRToLLVMTypeConverter(typeConverter);
+    belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
+  }
+};
+
 } // namespace
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
@@ -1074,6 +1090,14 @@ void belalang::bir::populateBelalangBIRToLLVMPatterns(
       typeConverter, patterns.getContext());
 }
 
+void belalang::bir::registerBIRToLLVMInterface(
+    mlir::DialectRegistry &registry) {
+  registry.addExtension(
+      +[](mlir::MLIRContext *context, belalang::bir::BIRDialect *dialect) {
+        dialect->addInterfaces<BIRToLLVMDialectInterface>();
+      });
+}
+
 // -----------------------------------------------------------------------------
 // The Pass
 // -----------------------------------------------------------------------------
@@ -1086,7 +1110,8 @@ struct BelalangBIRToLLVMPass
   void runOnOperation() override {
     insertBRTInitCall(getOperation());
 
-    BIRToLLVMTypeConverter typeConverter(&getContext());
+    mlir::LLVMTypeConverter typeConverter(&getContext());
+    configureBIRToLLVMTypeConverter(typeConverter);
 
     mlir::ConversionTarget target(getContext());
     target.addLegalDialect<mlir::LLVM::LLVMDialect, mlir::BuiltinDialect>();
