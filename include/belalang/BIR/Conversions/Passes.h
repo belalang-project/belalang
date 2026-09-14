@@ -13,6 +13,7 @@ namespace bir {
 #include "belalang/BIR/Conversions/Passes.h.inc"
 
 #define GEN_PASS_REGISTRATION_BELALANGBIRTOLLVMPASS
+#define GEN_PASS_REGISTRATION_BELALANGBIRTOGCPASS
 #include "belalang/BIR/Conversions/Passes.h.inc"
 
 void populateBelalangBIRToLLVMPatterns(mlir::RewritePatternSet &patterns,

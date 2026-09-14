@@ -10,4 +10,10 @@ def BelalangBIRToLLVMPass : Pass<"convert-bir-to-llvm"> {
                            "::mlir::LLVM::LLVMDialect"];
 }
 
+def BelalangBIRToGCPass : Pass<"convert-bir-to-gc"> {
+  let summary = "converts BIR ops to GC ops";
+  let dependentDialects = ["::belalang::bir::BIRDialect",
+                           "::mlir::gc::GCDialect"];
+}
+
 #endif // BELALANG_CONVERSIONS_PASSES_TD_
