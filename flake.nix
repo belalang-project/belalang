@@ -30,7 +30,6 @@
               pkgs.git
               pkgs.pkg-config
               pkgs.python313
-              pkgs.just
               pkgs.zlib
               pkgs.zlib.dev
               pkgs.libxml2
@@ -38,6 +37,7 @@
             ];
             profile = ''
               export BRT_DIR="$PWD/build/brt/src"
+              export PATH="$PWD/build/bin/belalang:$PWD/build/tools/bir-opt:$PWD/build/tools/bir-tblgen:$PWD/build/tools/bir-translate:''${PATH}"
               export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [
                 pkgs.zlib
                 pkgs.libxml2
