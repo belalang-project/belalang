@@ -2,6 +2,7 @@ add_library(BelalangBIR)
 add_dependencies(BelalangBIR
   BelalangBIRIncGen
   BelalangBIRLoopOpInterfaceIncGen
+  BelalangBIRPassIncGen
   BelalangBIRTransformPassIncGen
   BelalangBIRConversionPassIncGen
 )

@@ -15,9 +15,6 @@ namespace bir {
 #define GEN_PASS_DECL
 #include "belalang/BIR/Transforms/Passes.h.inc"
 
-#define GEN_PASS_REGISTRATION
-#include "belalang/BIR/Transforms/Passes.h.inc"
-
 void populateBelalangFlattenCFGPatterns(mlir::RewritePatternSet &patterns);
 void populateBelalangLowerDeclToMemoryPatterns(
     mlir::RewritePatternSet &patterns, mlir::DataFlowSolver &solver);
