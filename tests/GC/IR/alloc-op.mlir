@@ -21,3 +21,20 @@ func.func @main() -> !gc.ptr<i64> {
   %v2, %v1_next = gc.alloc roots(%v1 : !gc.ptr<i64>) : !gc.ptr<i64>
   return %v1_next : !gc.ptr<i64>
 }
+
+// -----
+
+// CHECK-LABEL: func.func @multiple_roots
+// CHECK:         %[[I64:.*]] = gc.alloc : !gc.ptr<i64>
+// CHECK:         %[[F64:.*]] = gc.alloc : !gc.ptr<f64>
+// CHECK:         %[[OBJECT:.*]], %[[RELOCATED:.*]]:2 = gc.alloc
+// CHECK-SAME:      roots(%[[I64]], %[[F64]] : !gc.ptr<i64>, !gc.ptr<f64>)
+// CHECK-SAME:      : !gc.ptr<i1>
+// CHECK:         return %[[RELOCATED]]#0, %[[RELOCATED]]#1 : !gc.ptr<i64>, !gc.ptr<f64>
+func.func @multiple_roots() -> (!gc.ptr<i64>, !gc.ptr<f64>) {
+  %i64 = gc.alloc : !gc.ptr<i64>
+  %f64 = gc.alloc : !gc.ptr<f64>
+  %object, %i64_next, %f64_next = gc.alloc
+      roots(%i64, %f64 : !gc.ptr<i64>, !gc.ptr<f64>) : !gc.ptr<i1>
+  return %i64_next, %f64_next : !gc.ptr<i64>, !gc.ptr<f64>
+}
