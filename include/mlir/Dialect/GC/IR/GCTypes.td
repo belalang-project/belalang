@@ -2,6 +2,7 @@
 #define MLIR_DIALECT_GC_IR_GCTYPES_TD_
 
 include "mlir/Dialect/GC/IR/GCDialect.td"
+include "mlir/Interfaces/DataLayoutInterfaces.td"
 
 class GC_Type<string name, string typeMnemonic,
               list<Trait> traits = []>
@@ -9,7 +10,9 @@ class GC_Type<string name, string typeMnemonic,
   let mnemonic = typeMnemonic;
 }
 
-def GC_PtrType : GC_Type<"Ptr", "ptr"> {
+def GC_PtrType : GC_Type<"Ptr", "ptr", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>
+]> {
   let summary = "Movable garbage-collected pointer";
 
   let parameters = (ins
