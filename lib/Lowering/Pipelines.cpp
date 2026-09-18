@@ -29,15 +29,19 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   pm.addPass(bir::createBelalangVerifyLoweredFormPass());
   if (options.target == LoweringTarget::BIRLowered)
     return;
-  if (options.target == LoweringTarget::GC) {
+  // This branch is currently only enabled for GC lowering targets.
+  // This is because the GC lowering path is not yet supported.
+  //
+  // TODO: Make the GC lowering path the default and not gated.
+  if (options.target == LoweringTarget::GC ||
+      options.target == LoweringTarget::GCLowered) {
     pm.addPass(bir::createBelalangBIRToGCPass());
-    return;
-  }
-  if (options.target == LoweringTarget::GCLowered) {
-    pm.addPass(bir::createBelalangBIRToGCPass());
+    if (options.target == LoweringTarget::GC)
+      return;
     pm.addPass(mlir::createGCIRPrepareGCSafepointsPass());
     pm.addPass(mlir::createGCLowerAllocationsPass());
-    return;
+    if (options.target == LoweringTarget::GCLowered)
+      return;
   }
   pm.addPass(bir::createBelalangBIRToLLVMPass());
 }
