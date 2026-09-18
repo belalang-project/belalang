@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=only-bir=true %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --cse %s | %FileCheck %s
 
 // CHECK-LABEL: bir.func @merges_duplicate_pure_work
 // CHECK: %[[SUM:.*]] = bir.add
