@@ -1026,12 +1026,32 @@ struct BIRToLLVMDialectInterface final : public ConvertToLLVMPatternInterface {
   void populateConvertToLLVMConversionPatterns(
       ConversionTarget &target, LLVMTypeConverter &typeConverter,
       RewritePatternSet &patterns) const final {
+    target.addIllegalDialect<bir::BIRDialect>();
     configureBIRToLLVMTypeConverter(typeConverter);
     belalang::bir::populateBelalangBIRToLLVMPatterns(patterns, typeConverter);
   }
 };
 
 } // namespace
+
+std::optional<belalang::bir::GCAllocationLayout>
+belalang::bir::getGCAllocationLayout(mlir::Type referentType,
+                                     mlir::Operation *scope) {
+  mlir::LLVMTypeConverter typeConverter(referentType.getContext());
+  configureBIRToLLVMTypeConverter(typeConverter);
+
+  mlir::Type llvmType;
+  if (auto arrayType = mlir::dyn_cast<bir::ArrayType>(referentType))
+    llvmType = getArrayPayloadType(typeConverter, arrayType);
+  else
+    llvmType = typeConverter.convertType(referentType);
+  if (!llvmType)
+    return std::nullopt;
+
+  mlir::DataLayout dataLayout = mlir::DataLayout::closest(scope);
+  return GCAllocationLayout{dataLayout.getTypeSize(llvmType).getFixedValue(),
+                            getGCPointerOffsets(referentType, dataLayout)};
+}
 
 void belalang::bir::populateBelalangBIRToLLVMPatterns(
     mlir::RewritePatternSet &patterns, mlir::TypeConverter &typeConverter) {

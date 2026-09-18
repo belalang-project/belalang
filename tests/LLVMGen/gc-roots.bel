@@ -1,4 +1,5 @@
 # RUN: %belalang build --emit=llvm --bir-lowering-pipeline=enable-mem2reg=false %s | %FileCheck %s
+# RUN: %belalang build --emit=llvm --bir-lowering-pipeline=target=gc-llvm --bir-lowering-pipeline=enable-mem2reg=false %s | %FileCheck %s
 
 # CHECK: declare void @brt_gc_pop_roots()
 # CHECK: declare void @brt_gc_push_roots(i64, ptr)
