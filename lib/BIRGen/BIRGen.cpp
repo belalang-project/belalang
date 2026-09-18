@@ -4,10 +4,19 @@
 #include "belalang/AST/Decl.h"
 #include "belalang/AST/Expr.h"
 #include "belalang/AST/Stmt.h"
-#include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/BRTUtils.h"
+#include "belalang/BIR/Conversions/Passes.h"
+#include "belalang/BIR/IR/BIR.h"
 #include "belalang/BIR/Transforms/Passes.h"
 #include "belalang/Lowering/Pipelines.h"
+#include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
+#include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlow.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/GC/IR/GC.h"
+#include "mlir/Dialect/GC/Passes.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -28,7 +37,14 @@ BIRGen::BIRGen(ast::ASTContext &ctx, diag::DiagnosticEngine &diagEngine)
       builder(&context), loc(builder.getUnknownLoc()) {
   // Load dialects.
   mlir::DialectRegistry registry;
-  registry.insert<bir::BIRDialect, mlir::LLVM::LLVMDialect>();
+  mlir::arith::registerConvertArithToLLVMInterface(registry);
+  mlir::registerConvertFuncToLLVMInterface(registry);
+  mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
+  bir::registerBIRToLLVMInterface(registry);
+  mlir::gc::registerGCToLLVMInterface(registry);
+  registry.insert<bir::BIRDialect, mlir::arith::ArithDialect,
+                  mlir::cf::ControlFlowDialect, mlir::func::FuncDialect,
+                  mlir::gc::GCDialect, mlir::LLVM::LLVMDialect>();
   context.appendDialectRegistry(registry);
   context.getOrLoadDialect<bir::BIRDialect>();
 
