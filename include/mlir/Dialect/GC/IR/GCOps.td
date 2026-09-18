@@ -65,11 +65,15 @@ def GC_AllocOp : GC_Op<"alloc", [
             $_state,
             result,
             ::mlir::TypeRange{},
+            ::mlir::IntegerAttr{},
+            ::mlir::DenseI32ArrayAttr{},
             ::mlir::ValueRange{});
     }]>
   ];
 
   let arguments = (ins
+    OptionalAttr<I64Attr>:$size,
+    OptionalAttr<DenseI32ArrayAttr>:$pointer_offsets,
     Variadic<GC_PtrType>:$roots
   );
 

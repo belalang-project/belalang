@@ -1,6 +1,7 @@
+#include "belalang/Lowering/Pipelines.h"
 #include "belalang/BIR/Conversions/Passes.h"
 #include "belalang/BIR/Transforms/Passes.h"
-#include "belalang/Lowering/Pipelines.h"
+#include "mlir/Conversion/Passes.h"
 #include "mlir/Dialect/GC/Passes.h"
 #include "mlir/Transforms/Passes.h"
 
@@ -34,14 +35,20 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   //
   // TODO: Make the GC lowering path the default and not gated.
   if (options.target == LoweringTarget::GC ||
-      options.target == LoweringTarget::GCLowered) {
+      options.target == LoweringTarget::GCLowered ||
+      options.target == LoweringTarget::GCLLVM) {
     pm.addPass(bir::createBelalangBIRToGCPass());
     if (options.target == LoweringTarget::GC)
       return;
     pm.addPass(mlir::createGCIRPrepareGCSafepointsPass());
-    pm.addPass(mlir::createGCLowerAllocationsPass());
-    if (options.target == LoweringTarget::GCLowered)
+    if (options.target == LoweringTarget::GCLowered) {
+      pm.addPass(mlir::createGCLowerAllocationsPass());
       return;
+    }
+    pm.addPass(bir::createBelalangConfigureBRTRuntimePass());
+    pm.addPass(mlir::createConvertToLLVMPass());
+    pm.addPass(mlir::createReconcileUnrealizedCastsPass());
+    return;
   }
   pm.addPass(bir::createBelalangBIRToLLVMPass());
 }

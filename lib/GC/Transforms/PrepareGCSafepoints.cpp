@@ -1,8 +1,8 @@
 #include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/Dialect/GC/Passes.h"
-#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/ValueRange.h"
+#include "mlir/Interfaces/FunctionInterfaces.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
 
@@ -32,11 +32,11 @@ struct GCIRPrepareGCSafepoints
       GCIRPrepareGCSafepoints>::GCIRPrepareGCSafepointsPassBase;
 
   void runOnOperation() override {
-    getOperation()->walk([&](func::FuncOp fn) {
+    getOperation()->walk([&](FunctionOpInterface fn) {
       DominanceInfo dominance(fn);
 
       llvm::SmallVector<gc::AllocOp> allocs;
-      fn.walk([&](gc::AllocOp alloc) { allocs.push_back(alloc); });
+      fn->walk([&](gc::AllocOp alloc) { allocs.push_back(alloc); });
 
       for (gc::AllocOp alloc : allocs) {
         llvm::SmallSetVector<Value, 8> roots;
@@ -44,7 +44,7 @@ struct GCIRPrepareGCSafepoints
         for (Value root : alloc.getRoots())
           roots.insert(root);
 
-        fn.walk([&](Operation *op) {
+        fn->walk([&](Operation *op) {
           for (Value result : op->getResults()) {
             if (isa<gc::PtrType>(result.getType()) &&
                 isLiveAcross(result, alloc, dominance))
@@ -52,7 +52,7 @@ struct GCIRPrepareGCSafepoints
           }
         });
 
-        for (Block &block : fn.getBlocks()) {
+        for (Block &block : fn.getFunctionBody()) {
           for (BlockArgument argument : block.getArguments()) {
             if (isa<gc::PtrType>(argument.getType()) &&
                 isLiveAcross(argument, alloc, dominance))
@@ -66,7 +66,8 @@ struct GCIRPrepareGCSafepoints
 
         OpBuilder builder(alloc);
         gc::AllocOp prepared = gc::AllocOp::create(
-            builder, alloc.getLoc(), resultTypes, roots.getArrayRef());
+            builder, alloc.getLoc(), resultTypes, roots.getArrayRef(),
+            alloc->getAttrs());
 
         for (auto [root, reloc] : llvm::zip_equal(
                  roots.getArrayRef(), prepared.getRelocatedRoots())) {
@@ -80,7 +81,9 @@ struct GCIRPrepareGCSafepoints
           }
         }
 
-        alloc.getResult().replaceAllUsesWith(prepared.getResult());
+        for (auto [oldResult, newResult] :
+             llvm::zip(alloc->getResults(), prepared->getResults()))
+          oldResult.replaceAllUsesWith(newResult);
         alloc.erase();
       }
     });

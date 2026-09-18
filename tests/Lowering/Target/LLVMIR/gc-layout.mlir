@@ -1,6 +1,9 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s \
 // RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
 // RUN: | %FileCheck %s
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=target=gc-llvm %s \
+// RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
+// RUN: | %FileCheck %s
 
 // CHECK-DAG: @gc.ptr_offsets.{{.*}} = private constant {{\[1 x i32\]}} {{\[i32 8\]}}
 // CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
@@ -22,5 +25,20 @@ bir.func @main() {
 
 bir.func @array_field() {
   %0 = bir.alloc_heap : !bir.ref<!bir.struct<"ArrayBox", {!bir.array<[!bir.int, !bir.int]>}>>
+  bir.return
+}
+
+// -----
+
+// CHECK-DAG: @gc.ptr_offsets.{{.*}} = private constant {{\[1 x i32\]}} {{\[i32 8\]}}
+// CHECK-LABEL: define void @nested_struct() {
+// CHECK: call ptr @brt_gc_alloc_layout(i64 24, i64 1, ptr @gc.ptr_offsets.{{.*}})
+// CHECK: ret void
+
+bir.func @nested_struct() {
+  %0 = bir.alloc_heap : !bir.ref<!bir.struct<"Outer", {
+    !bir.int,
+    !bir.struct<"Inner", {!bir.int, !bir.ref<!bir.int>}>
+  }>>
   bir.return
 }

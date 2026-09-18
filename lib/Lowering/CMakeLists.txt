@@ -3,5 +3,7 @@ target_link_libraries(BelalangLowering
   PUBLIC
     BelalangBIR
     MLIRGCDialect
+    MLIRArithToLLVM
     MLIRConvertToLLVMPass
+    MLIRReconcileUnrealizedCasts
 )

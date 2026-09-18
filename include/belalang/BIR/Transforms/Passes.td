@@ -24,6 +24,11 @@ def BelalangPrepareGCAllocationsPass : Pass<"bir-prepare-gc-allocations"> {
   let dependentDialects = ["::belalang::bir::BIRDialect"];
 }
 
+def BelalangConfigureBRTRuntimePass : Pass<"bir-configure-brt-runtime", "mlir::ModuleOp"> {
+  let summary = "configure and initialize the Belalang runtime";
+  let dependentDialects = ["::mlir::LLVM::LLVMDialect"];
+}
+
 def BelalangVerifyLoweredFormPass : Pass<"bir-verify-lowered-form"> {
   let summary = "verify BIR contains only ops expected after lowering";
   let dependentDialects = ["::belalang::bir::BIRDialect",
