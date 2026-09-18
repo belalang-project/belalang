@@ -11,6 +11,7 @@ enum class LoweringTarget {
   BIRLowered,
   GC,
   GCLowered,
+  GCLLVM,
   LLVM,
 };
 
@@ -46,6 +47,9 @@ struct BIRLoweringPipelineOptions
           clEnumValN(LoweringTarget::GCLowered,
                      "gc-lowered",
                      "Lowered GC dialect."),
+          clEnumValN(LoweringTarget::GCLLVM,
+                     "gc-llvm",
+                     "LLVM dialect lowered through the GC dialect."),
           clEnumValN(LoweringTarget::LLVM,
                      "llvm",
                      "LLVM dialect.")),
