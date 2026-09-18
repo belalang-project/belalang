@@ -1,4 +1,5 @@
 target_sources(BelalangBIR PRIVATE
+  ConfigureBRTRuntime.cpp
   FlattenCFG.cpp
   LowerDeclToMemory.cpp
   LowerFuncExpr.cpp
