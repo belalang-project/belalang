@@ -60,7 +60,7 @@ static bool parseBIRGenOption(std::string_view option,
   if (eq == std::string_view::npos) {
     belalang::cmd::term::error()
         << "malformed BIRGen option: " << option << "\n";
-    belalang::cmd::term::hint() << "expected <name>=<true|false>\n";
+    belalang::cmd::term::hint() << "expected <name>=<value>\n";
     return false;
   }
 
@@ -84,6 +84,28 @@ static bool parseBIRGenOption(std::string_view option,
           << "invalid value for BIRGen option '" << name << "': " << rawValue
           << "\n";
       belalang::cmd::term::hint() << "expected true or false\n";
+      return false;
+    }
+    return true;
+  }
+
+  if (name == "target") {
+    using belalang::lowering::LoweringTarget;
+    if (rawValue == "bir-lowered")
+      opts.target = LoweringTarget::BIRLowered;
+    else if (rawValue == "gc")
+      opts.target = LoweringTarget::GC;
+    else if (rawValue == "gc-lowered")
+      opts.target = LoweringTarget::GCLowered;
+    else if (rawValue == "gc-llvm")
+      opts.target = LoweringTarget::GCLLVM;
+    else if (rawValue == "llvm")
+      opts.target = LoweringTarget::LLVM;
+    else {
+      belalang::cmd::term::error() << "invalid value for BIRGen option '"
+                                   << name << "': " << rawValue << "\n";
+      belalang::cmd::term::hint()
+          << "expected bir-lowered, gc, gc-lowered, gc-llvm, or llvm\n";
       return false;
     }
     return true;
