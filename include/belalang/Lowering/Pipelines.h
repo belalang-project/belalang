@@ -30,13 +30,6 @@ struct BIRLoweringPipelineOptions
       llvm::cl::init(true),
   };
 
-  mlir::detail::PassOptions::Option<bool> onlyBIR{
-      *this,
-      "only-bir",
-      llvm::cl::desc("Stop after lowering to BIR."),
-      llvm::cl::init(false),
-  };
-
   // clang-format off
   mlir::detail::PassOptions::Option<LoweringTarget> target{
       *this,
