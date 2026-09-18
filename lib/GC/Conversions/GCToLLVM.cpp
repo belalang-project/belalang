@@ -4,6 +4,7 @@
 #include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
+#include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -20,18 +21,6 @@ namespace {
 
 using namespace mlir;
 using namespace mlir::gc;
-
-static LLVM::LLVMFuncOp getOrCreateRuntimeFunction(ModuleOp module,
-                                                   Location loc, StringRef name,
-                                                   LLVM::LLVMFunctionType type,
-                                                   OpBuilder &builder) {
-  if (auto function = module.lookupSymbol<LLVM::LLVMFuncOp>(name))
-    return function;
-
-  OpBuilder::InsertionGuard guard(builder);
-  builder.setInsertionPointToStart(module.getBody());
-  return LLVM::LLVMFuncOp::create(builder, loc, name, type);
-}
 
 static std::string getPointerOffsetsGlobalName(ArrayRef<int32_t> offsets) {
   llvm::hash_code hash = llvm::hash_combine_range(offsets.begin(),
@@ -146,10 +135,11 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
     auto i64Type = rewriter.getI64Type();
     auto voidType = LLVM::LLVMVoidType::get(ctx);
 
-    getOrCreateRuntimeFunction(
-        module, loc, allocName.getValue(),
-        LLVM::LLVMFunctionType::get(ptrType, {i64Type, i64Type, ptrType}),
-        rewriter);
+    auto allocFn = LLVM::lookupOrCreateFn(rewriter, module,
+                                          allocName.getValue(),
+                                          {i64Type, i64Type, ptrType}, ptrType);
+    if (failed(allocFn))
+      return failure();
 
     SmallVector<Value> rootSlots;
     Value rootCount;
@@ -178,11 +168,12 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
         LLVM::StoreOp::create(rewriter, loc, root, slot);
       }
 
-      getOrCreateRuntimeFunction(
-          module, loc, pushName.getValue(),
-          LLVM::LLVMFunctionType::get(voidType, {i64Type, ptrType}), rewriter);
-      LLVM::CallOp::create(rewriter, loc, TypeRange{},
-                           FlatSymbolRefAttr::get(ctx, pushName.getValue()),
+      auto pushFn = LLVM::lookupOrCreateFn(
+          rewriter, module, pushName.getValue(), {i64Type, ptrType}, voidType);
+      if (failed(pushFn))
+        return failure();
+
+      LLVM::CallOp::create(rewriter, loc, *pushFn,
                            ValueRange{rootCount, rootsArray});
     }
 
@@ -193,18 +184,16 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
     Value pointerOffsets = getOrCreatePointerOffsetsGlobal(loc, module, offsets,
                                                            rewriter);
     auto allocated = LLVM::CallOp::create(
-        rewriter, loc, ptrType,
-        FlatSymbolRefAttr::get(ctx, allocName.getValue()),
+        rewriter, loc, *allocFn,
         ValueRange{size, pointerCount, pointerOffsets});
 
     SmallVector<Value> results = {allocated.getResult()};
     if (!rootSlots.empty()) {
-      getOrCreateRuntimeFunction(module, loc, popName.getValue(),
-                                 LLVM::LLVMFunctionType::get(voidType, {}),
-                                 rewriter);
-      LLVM::CallOp::create(rewriter, loc, TypeRange{},
-                           FlatSymbolRefAttr::get(ctx, popName.getValue()),
-                           ValueRange{});
+      auto popFn = LLVM::lookupOrCreateFn(rewriter, module, popName.getValue(),
+                                          {}, voidType);
+      if (failed(popFn))
+        return failure();
+      LLVM::CallOp::create(rewriter, loc, *popFn, ValueRange{});
       for (Value slot : rootSlots)
         results.push_back(LLVM::LoadOp::create(rewriter, loc, ptrType, slot));
     }
