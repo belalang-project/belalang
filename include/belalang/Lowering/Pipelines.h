@@ -2,9 +2,17 @@
 #define BELALANG_LOWERING_PIPELINES_H_
 
 #include "mlir/Pass/Pass.h"
+#include "llvm/Support/CommandLine.h"
 
 namespace belalang {
 namespace lowering {
+
+enum class LoweringTarget {
+  BIRLowered,
+  GC,
+  GCLowered,
+  LLVM,
+};
 
 struct BIRLoweringPipelineOptions
     : public mlir::PassPipelineOptions<BIRLoweringPipelineOptions> {
@@ -22,12 +30,27 @@ struct BIRLoweringPipelineOptions
       llvm::cl::init(true),
   };
 
-  mlir::detail::PassOptions::Option<bool> onlyBIR{
+  // clang-format off
+  mlir::detail::PassOptions::Option<LoweringTarget> target{
       *this,
-      "only-bir",
-      llvm::cl::desc("Stop after lowering to BIR."),
-      llvm::cl::init(false),
+      "target",
+      llvm::cl::desc("Set the target dialect for BIR lowering."),
+      llvm::cl::init(LoweringTarget::LLVM),
+      llvm::cl::values(
+          clEnumValN(LoweringTarget::BIRLowered,
+                     "bir-lowered",
+                     "Lowered BIR dialect."),
+          clEnumValN(LoweringTarget::GC,
+                     "gc",
+                     "GC dialect."),
+          clEnumValN(LoweringTarget::GCLowered,
+                     "gc-lowered",
+                     "Lowered GC dialect."),
+          clEnumValN(LoweringTarget::LLVM,
+                     "llvm",
+                     "LLVM dialect.")),
   };
+  // clang-format on
 };
 
 void buildBIRLoweringPipeline(mlir::OpPassManager &pm);
