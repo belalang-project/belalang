@@ -28,6 +28,9 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
   pm.addPass(bir::createBelalangVerifyLoweredFormPass());
   if (options.target == LoweringTarget::BIRLowered)
     return;
+  if (options.target == LoweringTarget::GC) {
+    pm.addPass(bir::createBelalangBIRToGCPass());
+  }
   pm.addPass(bir::createBelalangBIRToLLVMPass());
 }
 
