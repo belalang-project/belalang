@@ -5,6 +5,7 @@
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "llvm/ADT/STLExtras.h"
 
 namespace mlir {
 #define GEN_PASS_DEF_GCPROMOTEALLOCATIONSPASS
@@ -28,7 +29,17 @@ struct AllocOpPromotion final : mlir::OpRewritePattern<gc::AllocOp> {
 
     // Replace alloc with alloca if it does not escape.
     auto ty = op.getResult().getType();
-    rewriter.replaceOpWithNewOp<gc::AllocaOp>(op, ty);
+    auto alloca = gc::AllocaOp::create(rewriter, op.getLoc(), ty);
+
+    llvm::SmallVector<mlir::Value> replacements;
+    replacements.reserve(op->getNumResults());
+    replacements.push_back(alloca);
+
+    // As we're replacing the current AllocOp with an AllocaOp, replace the
+    // roots of the current AllocOp with the original roots.
+    llvm::append_range(replacements, op.getRoots());
+
+    rewriter.replaceOp(op, replacements);
     return success();
   }
 
