@@ -2,6 +2,10 @@
 // RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
 // RUN: | %FileCheck %s
 
+// RUN: %bir-opt --split-input-file --bir-lowering-pipeline=target=gc-llvm %s \
+// RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
+// RUN: | %FileCheck %s
+
 // CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 // CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
