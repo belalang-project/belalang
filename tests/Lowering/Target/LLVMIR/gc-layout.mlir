@@ -1,6 +1,7 @@
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline %s \
 // RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
 // RUN: | %FileCheck %s
+
 // RUN: %bir-opt --split-input-file --bir-lowering-pipeline=target=gc-llvm %s \
 // RUN: | %bir-translate --split-input-file --mlir-to-llvmir \
 // RUN: | %FileCheck %s
