@@ -10,6 +10,7 @@ include "belalang/BIR/Interfaces/LoopOpInterface.td"
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/IR/BuiltinAttributeInterfaces.td"
 include "mlir/IR/EnumAttr.td"
+include "mlir/Interfaces/ControlFlowInterfaces.td"
 include "mlir/Interfaces/FunctionInterfaces.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
@@ -325,6 +326,7 @@ def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
 
 def BIR_ReturnOp : BIR_Op<"return", [
   ParentOneOf<["FuncOp", "FuncExprOp"]>,
+  ReturnLike,
   Terminator,
 ]> {
   let summary = "return";
