@@ -12,6 +12,7 @@ target_link_libraries(MLIRGCDialect
     MLIRPass
 )
 
+add_subdirectory(Analysis)
 add_subdirectory(Conversions)
 add_subdirectory(IR)
 add_subdirectory(Transforms)
