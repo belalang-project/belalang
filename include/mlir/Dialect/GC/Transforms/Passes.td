@@ -7,6 +7,12 @@ def GCIRPrepareGCSafepointsPass : Pass<"gcir-prepare-gc-safepoints"> {
   let dependentDialects = ["::mlir::gc::GCDialect"];
 }
 
+def GCPromoteAllocationsPass : Pass<"gc-promote-allocations"> {
+  let summary = "promotes heap allocation to stack allocation if possible";
+
+  let dependentDialects = ["::mlir::gc::GCDialect"];
+}
+
 def GCLowerAllocationsPass : Pass<"gc-lower-allocations"> {
   let summary = "lower GC allocations to GC calls";
 
