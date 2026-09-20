@@ -6,10 +6,13 @@ include "mlir/Dialect/GC/IR/GCTypes.td"
 
 include "mlir/Interfaces/CallInterfaces.td"
 include "mlir/Interfaces/MemorySlotInterfaces.td"
+include "mlir/Interfaces/SideEffectInterfaces.td"
 
 class GC_Op<string mnemonic, list<Trait> traits = []>
     : Op<GC_Dialect, mnemonic, traits> {}
 
+// TODO: Find a way to annotate call ops whether or not it has memory side
+// effects.
 def GC_CallOp : GC_Op<"call", [CallOpInterface]> {
   let arguments = (ins
     FlatSymbolRefAttr:$callee,
@@ -78,7 +81,8 @@ def GC_AllocOp : GC_Op<"alloc", [
   );
 
   let results = (outs
-    GC_PtrType:$result,
+    Res<GC_PtrType, "",
+        [MemAlloc<DefaultResource, 0, FullEffect>]>:$result,
     Variadic<GC_PtrType>:$relocated_roots
   );
 
@@ -95,7 +99,8 @@ def GC_AllocaOp : GC_Op<"alloca", [
   let arguments = (ins);
 
   let results = (outs
-    GC_PtrType:$result
+    Res<GC_PtrType, "",
+        [MemAlloc<AutomaticAllocationScopeResource, 0, FullEffect>]>:$result
   );
 
   let assemblyFormat = [{
@@ -112,7 +117,7 @@ def GC_LoadOp : GC_Op<"load", [
   >
 ]> {
   let arguments = (ins
-    GC_PtrType:$address
+    Arg<GC_PtrType, "", [MemRead]>:$address
   );
 
   let results = (outs
@@ -134,7 +139,7 @@ def GC_StoreOp : GC_Op<"store", [
 ]> {
   let arguments = (ins
     AnyType:$value,
-    GC_PtrType:$address
+    Arg<GC_PtrType, "", [MemWrite]>:$address
   );
 
   let results = (outs);
