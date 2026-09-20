@@ -109,7 +109,8 @@ def GC_LoadOp : GC_Op<"load", [
     "address",
     "result",
     "::llvm::cast<::mlir::gc::PtrType>($_self).getPointee()"
-  >
+  >,
+  DeclareOpInterfaceMethods<PromotableMemOpInterface>
 ]> {
   let arguments = (ins
     GC_PtrType:$address
@@ -130,7 +131,8 @@ def GC_StoreOp : GC_Op<"store", [
     "address",
     "value",
     "::llvm::cast<::mlir::gc::PtrType>($_self).getPointee()"
-  >
+  >,
+  DeclareOpInterfaceMethods<PromotableMemOpInterface>
 ]> {
   let arguments = (ins
     AnyType:$value,
