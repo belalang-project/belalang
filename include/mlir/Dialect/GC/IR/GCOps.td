@@ -124,4 +124,25 @@ def GC_LoadOp : GC_Op<"load", [
   }];
 }
 
+def GC_StoreOp : GC_Op<"store", [
+  TypesMatchWith<
+    "",
+    "address",
+    "value",
+    "::llvm::cast<::mlir::gc::PtrType>($_self).getPointee()"
+  >
+]> {
+  let arguments = (ins
+    AnyType:$value,
+    GC_PtrType:$address
+  );
+
+  let results = (outs);
+
+  let assemblyFormat = [{
+    $value `,` $address
+    attr-dict `:` qualified(type($address))
+  }];
+}
+
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_
