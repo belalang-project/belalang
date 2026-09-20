@@ -29,6 +29,21 @@ set(BELALANG_LIT_ENV
   "BRT_DIR=$<TARGET_FILE_DIR:brt>"
 )
 
+file(GLOB BELALANG_EXAMPLES CONFIGURE_DEPENDS
+  "${PROJECT_SOURCE_DIR}/examples/*.bel"
+)
+
+foreach(EXAMPLE_PATH IN LISTS BELALANG_EXAMPLES)
+  get_filename_component(EXAMPLE_NAME "${EXAMPLE_PATH}" NAME_WE)
+  add_test(
+    NAME "example.${EXAMPLE_NAME}"
+    COMMAND
+      ${BELALANG_LIT_ENV}
+      "$<TARGET_FILE:belalang>" run "${EXAMPLE_PATH}"
+  )
+  set_tests_properties("example.${EXAMPLE_NAME}" PROPERTIES LABELS "example")
+endforeach()
+
 file(GLOB_RECURSE BELALANG_LIT_TESTS
   CONFIGURE_DEPENDS
   RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"

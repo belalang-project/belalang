@@ -5,6 +5,8 @@ add_library(brt
 )
 target_include_directories(brt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
+configure_file(llvm_stackmaps.ld llvm_stackmaps.ld COPYONLY)
+
 if(BUILD_TESTING AND BELALANG_BUILD_TESTS)
   file(GLOB TEST_SOURCES "*_test.cpp")
 

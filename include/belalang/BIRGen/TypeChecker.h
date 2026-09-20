@@ -20,11 +20,19 @@ public:
   ast::Type *visitFloatLitExpr(ast::FloatLitExpr *expr);
   ast::Type *visitStringLitExpr(ast::StringLitExpr *expr);
   ast::Type *visitBoolExpr(ast::BoolExpr *expr);
+  ast::Type *visitVarExpr(ast::VarExpr *expr);
+  ast::Type *visitFunctionLitExpr(ast::FunctionLitExpr *expr);
+  ast::Type *visitCallExpr(ast::CallExpr *expr);
   ast::Type *visitIdentifierExpr(ast::IdentifierExpr *expr);
   ast::Type *visitInfixExpr(ast::InfixExpr *expr);
   ast::Type *visitBlockExpr(ast::BlockExpr *expr);
   ast::Type *visitIfExpr(ast::IfExpr *expr);
   ast::Type *visitVarDecl(ast::VarDecl *decl);
+  ast::Type *visitReturnStmt(ast::ReturnStmt *stmt);
+  ast::Type *visitWhileStmt(ast::WhileStmt *stmt);
+  ast::Type *visitBreakStmt(ast::BreakStmt *stmt);
+  ast::Type *visitContinueStmt(ast::ContinueStmt *stmt);
+  ast::Type *visitImportStmt(ast::ImportStmt *stmt);
   ast::Type *visitDeclStmt(ast::DeclStmt *stmt);
   ast::Type *visitExprStmt(ast::ExprStmt *stmt);
 
