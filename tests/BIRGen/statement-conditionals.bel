@@ -1,0 +1,30 @@
+# RUN: %belalang build --emit=bir %s | %FileCheck %s
+
+x := 0
+
+if true {
+  x = 1
+} else {
+  x = 2
+}
+
+if true {
+  print(x)
+} else {
+  print(0)
+}
+
+# CHECK:      %{{.*}} = bir.if {{.*}} {
+# CHECK:        bir.store {{.*}} : !bir.int to !bir.ref<!bir.int>
+# CHECK:        bir.yield {{.*}} : !bir.int
+# CHECK:      } else {
+# CHECK:        bir.store {{.*}} : !bir.int to !bir.ref<!bir.int>
+# CHECK:        bir.yield {{.*}} : !bir.int
+# CHECK:      }
+# CHECK:      bir.if {{.*}} {
+# CHECK:        bir.call @brt_print_int
+# CHECK:        bir.yield
+# CHECK:      } else {
+# CHECK:        bir.call @brt_print_int
+# CHECK:        bir.yield
+# CHECK:      }
