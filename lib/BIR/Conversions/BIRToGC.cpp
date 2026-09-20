@@ -58,6 +58,32 @@ struct AllocStackOpConversion final
   }
 };
 
+struct LoadOpConversion final : OpConversionPattern<bir::LoadOp> {
+  using OpConversionPattern<bir::LoadOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::LoadOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    Type ty = getTypeConverter()->convertType(op.getResult().getType());
+    if (!ty)
+      return failure();
+    rewriter.replaceOpWithNewOp<gc::LoadOp>(op, ty, adaptor.getRef());
+    return success();
+  }
+};
+
+struct StoreOpConversion final : OpConversionPattern<bir::StoreOp> {
+  using OpConversionPattern<bir::StoreOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(bir::StoreOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    rewriter.replaceOpWithNewOp<gc::StoreOp>(op, adaptor.getSrc(),
+                                             adaptor.getDest());
+    return success();
+  }
+};
+
 struct BelalangBIRToGCPass
     : impl::BelalangBIRToGCPassBase<BelalangBIRToGCPass> {
   using impl::BelalangBIRToGCPassBase<
@@ -84,14 +110,15 @@ struct BelalangBIRToGCPass
 
     ConversionTarget target(getContext());
     target.addDynamicallyLegalDialect<bir::BIRDialect>([](Operation *op) {
-      return !isa<bir::AllocHeapOp, bir::AllocStackOp>(op);
+      return !isa<bir::AllocHeapOp, bir::AllocStackOp, bir::LoadOp,
+                  bir::StoreOp>(op);
     });
     target.addLegalDialect<gc::GCDialect>();
     target.addLegalOp<UnrealizedConversionCastOp>();
 
     RewritePatternSet patterns(&getContext());
-    patterns.add<AllocHeapOpConversion, AllocStackOpConversion>(typeConverter,
-                                                                ctx);
+    patterns.add<AllocHeapOpConversion, AllocStackOpConversion,
+                 LoadOpConversion, StoreOpConversion>(typeConverter, ctx);
 
     if (applyPartialConversion(getOperation(), target, std::move(patterns))
             .failed())
