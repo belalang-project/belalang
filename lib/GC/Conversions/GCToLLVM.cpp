@@ -203,10 +203,37 @@ struct AllocOpLowering final : OpConversionPattern<AllocOp> {
   }
 };
 
+struct LoadOpConversion final : OpConversionPattern<LoadOp> {
+  using OpConversionPattern<LoadOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(LoadOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    Type ty = getTypeConverter()->convertType(op.getType());
+    if (!ty)
+      return failure();
+    rewriter.replaceOpWithNewOp<LLVM::LoadOp>(op, ty, adaptor.getAddress());
+    return success();
+  }
+};
+
+struct StoreOpConversion final : OpConversionPattern<StoreOp> {
+  using OpConversionPattern<StoreOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(StoreOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    rewriter.replaceOpWithNewOp<LLVM::StoreOp>(op, adaptor.getValue(),
+                                               adaptor.getAddress());
+    return success();
+  }
+};
+
 void populateGCToLLVMPatterns(mlir::RewritePatternSet &patterns,
                               mlir::TypeConverter &typeConverter) {
-  patterns.add<CallOpConversion, AllocOpLowering, AllocaOpLowering>(
-      typeConverter, patterns.getContext());
+  patterns.add<CallOpConversion, AllocOpLowering, AllocaOpLowering,
+               LoadOpConversion, StoreOpConversion>(typeConverter,
+                                                    patterns.getContext());
 }
 
 struct GCIRToLLVMPass
