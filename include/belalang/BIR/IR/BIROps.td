@@ -205,13 +205,19 @@ def BIR_ShrOp : BIR_Op<"shr", [Pure]> {
       "$lhs `,` $rhs `:` functional-type(operands, results) attr-dict";
 }
 
-def BIR_FuncOp : BIR_Op<"func", [FunctionOpInterface, CallableOpInterface,
-                             IsolatedFromAbove]> {
+def BIR_FuncOp : BIR_Op<"func", [
+  SymbolName,
+  SymbolVisibility,
+  FunctionOpInterface,
+  CallableOpInterface,
+  IsolatedFromAbove
+]> {
   let summary = "func";
   let hasVerifier = 1;
 
   let arguments = (ins SymbolNameAttr:$sym_name,
       TypeAttrOf<FunctionType>:$function_type,
+      OptionalAttr<StrAttr>:$sym_visibility,
       OptionalAttr<DictArrayAttr>:$arg_attrs,
       OptionalAttr<DictArrayAttr>:$res_attrs);
   let regions = (region AnyRegion:$body);
