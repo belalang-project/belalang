@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: llvm/llvm-project
-          ref: 6716e3108af4eba29b28140d17d1f022eb7adb64
+          ref: 96b5cc3d836494c56c8d5ae1e73e90864eb19a5d
           path: llvm-project
       - name: Cache LLVM build
         id: llvm-cache
