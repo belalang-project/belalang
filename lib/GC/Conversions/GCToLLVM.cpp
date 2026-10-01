@@ -95,7 +95,7 @@ struct AllocaOpLowering final : OpConversionPattern<AllocaOp> {
     mlir::Value arraySize = LLVM::ConstantOp::create(rewriter, loc, i64ty, 1);
 
     rewriter.replaceOpWithNewOp<LLVM::AllocaOp>(op, resultTy, elementTy,
-                                                arraySize);
+                                                arraySize, op.getAlignment());
     return success();
   }
 };
