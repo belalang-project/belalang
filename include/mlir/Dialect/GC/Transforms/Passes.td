@@ -3,7 +3,7 @@
 
 include "mlir/Pass/PassBase.td"
 
-def GCIRPrepareGCSafepointsPass : Pass<"gcir-prepare-gc-safepoints"> {
+def GCPrepareSafepointsPass : Pass<"gc-prepare-safepoints"> {
   let dependentDialects = ["::mlir::gc::GCDialect"];
 }
 

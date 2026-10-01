@@ -5,7 +5,7 @@ target_sources(MLIRGCDialect PRIVATE
 )
 
 if(BUILD_TESTING AND BELALANG_BUILD_TESTS)
-  add_executable(MLIRGCIRTest GCTypesTest.cpp)
-  target_link_libraries(MLIRGCIRTest PRIVATE MLIRGCDialect GTest::gtest_main)
-  add_test(NAME MLIRGCIRTest COMMAND MLIRGCIRTest)
+  add_executable(MLIRGCTest GCTypesTest.cpp)
+  target_link_libraries(MLIRGCTest PRIVATE MLIRGCDialect GTest::gtest_main)
+  add_test(NAME MLIRGCTest COMMAND MLIRGCTest)
 endif()

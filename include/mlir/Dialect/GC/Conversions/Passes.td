@@ -3,8 +3,8 @@
 
 include "mlir/Pass/PassBase.td"
 
-def GCToLLVMPass : Pass<"convert-gcir-to-llvm"> {
-  let summary = "lower GCIR operations to LLVM";
+def GCToLLVMPass : Pass<"convert-gc-to-llvm"> {
+  let summary = "lower GC dialect operations to LLVM";
 
   let dependentDialects = ["::mlir::gc::GCDialect",
                            "::mlir::LLVM::LLVMDialect"];

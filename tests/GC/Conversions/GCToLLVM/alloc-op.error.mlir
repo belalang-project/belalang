@@ -1,4 +1,4 @@
-// RUN: %not %bir-opt --split-input-file --convert-gcir-to-llvm %s 2>&1 | %FileCheck %s
+// RUN: %not %bir-opt --split-input-file --convert-gc-to-llvm %s 2>&1 | %FileCheck %s
 // RUN: %not %bir-opt --split-input-file --convert-to-llvm %s 2>&1 | %FileCheck %s
 
 // CHECK: error: 'gc.alloc' op requires 'size' and 'pointer_offsets' attributes for LLVM lowering

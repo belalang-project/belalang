@@ -1,4 +1,4 @@
-// RUN: %bir-opt --allow-unregistered-dialect --split-input-file --gcir-prepare-gc-safepoints %s | %FileCheck %s
+// RUN: %bir-opt --allow-unregistered-dialect --split-input-file --gc-prepare-safepoints %s | %FileCheck %s
 
 // CHECK-LABEL: func.func @live_root
 // CHECK:         %[[OBJ:.*]], %[[ROOT_NEXT:.*]] = gc.alloc roots(%arg0 : !gc.ptr<i64>) : !gc.ptr<i64>
