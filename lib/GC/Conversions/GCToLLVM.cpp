@@ -90,12 +90,12 @@ struct AllocaOpLowering final : OpConversionPattern<AllocaOp> {
     mlir::Type elementTy = getTypeConverter()->convertType(
         op.getType().getPointee());
 
-    // Currently limit the possible allocation size to one element.
     auto i64ty = rewriter.getI64Type();
-    mlir::Value arraySize = LLVM::ConstantOp::create(rewriter, loc, i64ty, 1);
+    mlir::Value arraySize = LLVM::ConstantOp::create(rewriter, loc, i64ty,
+                                                     op.getArraySize());
 
     rewriter.replaceOpWithNewOp<LLVM::AllocaOp>(op, resultTy, elementTy,
-                                                arraySize);
+                                                arraySize, op.getAlignment());
     return success();
   }
 };
