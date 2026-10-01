@@ -96,7 +96,9 @@ def GC_AllocOp : GC_Op<"alloc", [
 def GC_AllocaOp : GC_Op<"alloca", [
   DeclareOpInterfaceMethods<PromotableAllocationOpInterface>
 ]> {
-  let arguments = (ins);
+  let arguments = (ins
+    DefaultValuedAttr<I64Attr, "0">:$alignment
+  );
 
   let results = (outs
     Res<GC_PtrType, "",
@@ -104,6 +106,9 @@ def GC_AllocaOp : GC_Op<"alloca", [
   );
 
   let assemblyFormat = [{
+    oilist(
+      `align` `(` $alignment `)`
+    )
     `:` qualified(type($result)) attr-dict
   }];
 }
