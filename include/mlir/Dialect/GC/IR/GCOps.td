@@ -177,4 +177,18 @@ def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
   }];
 }
 
+def GC_PtrCastOp : GC_Op<"ptr_cast"> {
+  let arguments = (ins
+    GC_PtrType:$source);
+
+  let results = (outs
+    GC_PtrType:$result);
+
+  let assemblyFormat = [{
+    $source attr-dict
+    `:` qualified(type($source))
+    `->` qualified(type($result))
+  }];
+}
+
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_
