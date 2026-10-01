@@ -248,11 +248,22 @@ struct PtrOffsetOpConversion final : OpConversionPattern<PtrOffsetOp> {
   }
 };
 
+struct PtrCastOpConversion final : OpConversionPattern<PtrCastOp> {
+  using OpConversionPattern<PtrCastOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(PtrCastOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    rewriter.replaceOp(op, adaptor.getSource());
+    return success();
+  }
+};
+
 void populateGCToLLVMPatterns(mlir::RewritePatternSet &patterns,
                               mlir::TypeConverter &typeConverter) {
   patterns.add<CallOpConversion, AllocOpLowering, AllocaOpLowering,
-               LoadOpConversion, StoreOpConversion, PtrOffsetOpConversion>(
-      typeConverter, patterns.getContext());
+               LoadOpConversion, StoreOpConversion, PtrOffsetOpConversion,
+               PtrCastOpConversion>(typeConverter, patterns.getContext());
 }
 
 struct GCToLLVMPass final : mlir::impl::GCToLLVMPassBase<GCToLLVMPass> {
