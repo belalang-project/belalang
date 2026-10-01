@@ -159,4 +159,19 @@ def GC_StoreOp : GC_Op<"store", [
   }];
 }
 
+def GC_PtrOffsetOp : GC_Op<"ptr_offset", [Pure]> {
+  let arguments = (ins
+    GC_PtrType:$base,
+    Index:$offset);
+
+  let results = (outs
+    GC_PtrType:$result);
+
+  let assemblyFormat = [{
+    $base `,` $offset attr-dict
+    `:` qualified(type($base)) `,` type($offset)
+    `->` qualified(type($result))
+  }];
+}
+
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_
