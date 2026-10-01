@@ -7,7 +7,7 @@
 #include "llvm/ADT/SetVector.h"
 
 namespace mlir {
-#define GEN_PASS_DEF_GCIRPREPAREGCSAFEPOINTSPASS
+#define GEN_PASS_DEF_GCPREPARESAFEPOINTSPASS
 #include "mlir/Dialect/GC/Passes.h.inc"
 } // namespace mlir
 
@@ -26,10 +26,10 @@ static bool isLiveAcross(Value value, gc::AllocOp alloc,
   });
 }
 
-struct GCIRPrepareGCSafepoints
-    : public impl::GCIRPrepareGCSafepointsPassBase<GCIRPrepareGCSafepoints> {
-  using impl::GCIRPrepareGCSafepointsPassBase<
-      GCIRPrepareGCSafepoints>::GCIRPrepareGCSafepointsPassBase;
+struct GCPrepareSafepoints final
+    : public impl::GCPrepareSafepointsPassBase<GCPrepareSafepoints> {
+  using impl::GCPrepareSafepointsPassBase<
+      GCPrepareSafepoints>::GCPrepareSafepointsPassBase;
 
   void runOnOperation() override {
     getOperation()->walk([&](FunctionOpInterface fn) {

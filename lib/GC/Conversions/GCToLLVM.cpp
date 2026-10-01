@@ -236,10 +236,8 @@ void populateGCToLLVMPatterns(mlir::RewritePatternSet &patterns,
                                                     patterns.getContext());
 }
 
-struct GCIRToLLVMPass
-    : public mlir::impl::GCToLLVMPassBase<GCIRToLLVMPass> {
-  using mlir::impl::GCToLLVMPassBase<
-      GCIRToLLVMPass>::GCToLLVMPassBase;
+struct GCToLLVMPass final : mlir::impl::GCToLLVMPassBase<GCToLLVMPass> {
+  using Base::Base;
 
   void runOnOperation() override {
     LLVMTypeConverter converter(&getContext());

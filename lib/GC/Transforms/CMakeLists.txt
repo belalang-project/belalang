@@ -1,5 +1,5 @@
 target_sources(MLIRGCDialect PRIVATE
   LowerAllocations.cpp
-  PrepareGCSafepoints.cpp
+  PrepareSafepoints.cpp
   PromoteAllocations.cpp
 )

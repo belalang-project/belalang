@@ -1,4 +1,4 @@
-// RUN: %bir-opt --split-input-file --convert-gcir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-gc-to-llvm %s | %FileCheck %s
 // RUN: %bir-opt --split-input-file --convert-to-llvm %s | %FileCheck %s
 
 module attributes {

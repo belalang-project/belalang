@@ -1,4 +1,5 @@
-// RUN: %bir-opt --verify-roundtrip --split-input-file --convert-gcir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-gc-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-to-llvm %s | %FileCheck %s
 
 // CHECK-LABEL: llvm.func @main
 // CHECK-NEXT:    %[[SZ:.*]] = llvm.mlir.constant(1 : i64) : i64

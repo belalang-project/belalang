@@ -11,13 +11,13 @@
 namespace mlir::gc {
 namespace {
 
-class GCIRTest : public ::testing::Test {
+class GCTest : public ::testing::Test {
 protected:
   MLIRContext context;
   ModuleOp module;
   OpBuilder builder;
 
-  GCIRTest()
+  GCTest()
       : module(ModuleOp::create(UnknownLoc::get(&context))), builder(&context) {
     context.getOrLoadDialect<GCDialect>();
     context.getOrLoadDialect<LLVM::LLVMDialect>();
@@ -27,7 +27,7 @@ protected:
   Location getLoc() { return UnknownLoc::get(&context); }
 };
 
-TEST_F(GCIRTest, PtrTypeMatchesLLVMPointerDataLayout) {
+TEST_F(GCTest, PtrTypeMatchesLLVMPointerDataLayout) {
   DataLayout dataLayout = DataLayout::closest(module);
   Type ptr = PtrType::get(&context, builder.getI64Type());
   Type llvmPtr = LLVM::LLVMPointerType::get(&context);
@@ -38,7 +38,7 @@ TEST_F(GCIRTest, PtrTypeMatchesLLVMPointerDataLayout) {
             dataLayout.getTypeABIAlignment(llvmPtr));
 }
 
-TEST_F(GCIRTest, AllocaHasUninitializedPromotableSlot) {
+TEST_F(GCTest, AllocaHasUninitializedPromotableSlot) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp alloca = AllocaOp::create(builder, getLoc(), ptr);
 
@@ -49,7 +49,7 @@ TEST_F(GCIRTest, AllocaHasUninitializedPromotableSlot) {
   EXPECT_FALSE(alloca.getDefaultValue(slots.front(), builder));
 }
 
-TEST_F(GCIRTest, LoadReadsFromAddress) {
+TEST_F(GCTest, LoadReadsFromAddress) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp alloca = AllocaOp::create(builder, getLoc(), ptr);
   LoadOp load = LoadOp::create(builder, getLoc(), builder.getI64Type(), alloca);
@@ -68,7 +68,7 @@ TEST_F(GCIRTest, LoadReadsFromAddress) {
   EXPECT_FALSE(effects.front().getEffectOnFullRegion());
 }
 
-TEST_F(GCIRTest, StoreWritesToAddress) {
+TEST_F(GCTest, StoreWritesToAddress) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp alloca = AllocaOp::create(builder, getLoc(), ptr);
   LoadOp value =
@@ -89,7 +89,7 @@ TEST_F(GCIRTest, StoreWritesToAddress) {
   EXPECT_FALSE(effects.front().getEffectOnFullRegion());
 }
 
-TEST_F(GCIRTest, AllocAllocatesPrimaryResult) {
+TEST_F(GCTest, AllocAllocatesPrimaryResult) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp root = AllocaOp::create(builder, getLoc(), ptr);
   Type resultTypes[] = {ptr, ptr};
@@ -111,7 +111,7 @@ TEST_F(GCIRTest, AllocAllocatesPrimaryResult) {
   EXPECT_TRUE(isOpTriviallyDead(alloc));
 }
 
-TEST_F(GCIRTest, AllocaAllocatesAutomaticStorage) {
+TEST_F(GCTest, AllocaAllocatesAutomaticStorage) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp alloca = AllocaOp::create(builder, getLoc(), ptr);
 
@@ -128,7 +128,7 @@ TEST_F(GCIRTest, AllocaAllocatesAutomaticStorage) {
   EXPECT_TRUE(isOpTriviallyDead(alloca));
 }
 
-TEST_F(GCIRTest, CallHasUnknownEffects) {
+TEST_F(GCTest, CallHasUnknownEffects) {
   CallOp call = CallOp::create(builder, getLoc(),
                                FlatSymbolRefAttr::get(&context, "callee"),
                                TypeRange{}, ValueRange{});

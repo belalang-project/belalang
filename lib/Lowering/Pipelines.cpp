@@ -40,7 +40,7 @@ void buildBIRLoweringPipeline(mlir::OpPassManager &pm,
     pm.addPass(bir::createBelalangBIRToGCPass());
     if (options.target == LoweringTarget::GC)
       return;
-    pm.addPass(mlir::createGCIRPrepareGCSafepointsPass());
+    pm.addPass(mlir::createGCPrepareSafepointsPass());
     if (options.target == LoweringTarget::GCLowered) {
       pm.addPass(mlir::createGCLowerAllocationsPass());
       return;

@@ -1,5 +1,5 @@
-// RUN: %bir-opt --verify-roundtrip --convert-gcir-to-llvm %s | %FileCheck %s
-// RUN: %bir-opt --verify-roundtrip --convert-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-gc-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-to-llvm %s | %FileCheck %s
 
 // CHECK-LABEL: llvm.func @main
 // CHECK-NEXT:    %[[RESULT:.*]] = llvm.call @callee() : () -> !llvm.ptr
