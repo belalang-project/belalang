@@ -159,7 +159,10 @@ def GC_StoreOp : GC_Op<"store", [
   }];
 }
 
-def GC_PtrOffsetOp : GC_Op<"ptr_offset", [Pure]> {
+def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
+  Pure,
+  AllTypesMatch<["base", "result"]>,
+]> {
   let arguments = (ins
     GC_PtrType:$base,
     Index:$offset);

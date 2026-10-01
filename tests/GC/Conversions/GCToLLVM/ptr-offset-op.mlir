@@ -6,8 +6,8 @@
 // CHECK-NEXT:    %[[RESULT:.*]] = llvm.getelementptr %arg0[%[[OFFSET]]] : (!llvm.ptr, i64) -> !llvm.ptr, i8
 // CHECK-NEXT:    llvm.return
 
-func.func @main(%a : !gc.ptr<i32>) {
+func.func @main(%a : !gc.ptr<i8>) {
   %off24 = arith.constant 24 : index
-  %b = gc.ptr_offset %a, %off24 : !gc.ptr<i32>, index -> !gc.ptr<i8>
+  %b = gc.ptr_offset %a, %off24 : !gc.ptr<i8>, index -> !gc.ptr<i8>
   return
 }
