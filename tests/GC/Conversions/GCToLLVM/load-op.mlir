@@ -1,4 +1,5 @@
-// RUN: %bir-opt --convert-gcir-to-llvm --split-input-file %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-gcir-to-llvm %s | %FileCheck %s
+// RUN: %bir-opt --split-input-file --convert-to-llvm %s | %FileCheck %s
 
 // CHECK-LABEL: llvm.func @main
 // CHECK-SAME:      (%[[ARG:.*]]: !llvm.ptr)
