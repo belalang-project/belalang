@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 
   registry.insert<belalang::bir::BIRDialect, mlir::gc::GCDialect,
                   mlir::cf::ControlFlowDialect, mlir::func::FuncDialect,
-                  mlir::LLVM::LLVMDialect>();
+                  mlir::LLVM::LLVMDialect, mlir::arith::ArithDialect>();
 
   belalang::bir::registerPasses();
   belalang::lowering::registerBIRPipelines();
