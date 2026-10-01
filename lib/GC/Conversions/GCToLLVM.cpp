@@ -4,7 +4,9 @@
 #include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
+#include "mlir/Dialect/LLVMIR/LLVMAttrs.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -229,11 +231,28 @@ struct StoreOpConversion final : OpConversionPattern<StoreOp> {
   }
 };
 
+struct PtrOffsetOpConversion final : OpConversionPattern<PtrOffsetOp> {
+  using Base::Base;
+
+  LogicalResult
+  matchAndRewrite(PtrOffsetOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const override {
+    Type resultType = getTypeConverter()->convertType(op.getResult().getType());
+    if (!resultType)
+      return failure();
+
+    rewriter.replaceOpWithNewOp<LLVM::GEPOp>(
+        op, resultType, rewriter.getI8Type(), adaptor.getBase(),
+        ValueRange{adaptor.getOffset()}, LLVM::GEPNoWrapFlags::none);
+    return success();
+  }
+};
+
 void populateGCToLLVMPatterns(mlir::RewritePatternSet &patterns,
                               mlir::TypeConverter &typeConverter) {
   patterns.add<CallOpConversion, AllocOpLowering, AllocaOpLowering,
-               LoadOpConversion, StoreOpConversion>(typeConverter,
-                                                    patterns.getContext());
+               LoadOpConversion, StoreOpConversion, PtrOffsetOpConversion>(
+      typeConverter, patterns.getContext());
 }
 
 struct GCToLLVMPass final : mlir::impl::GCToLLVMPassBase<GCToLLVMPass> {

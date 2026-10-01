@@ -9,6 +9,7 @@ target_link_libraries(MLIRGCDialect
     MLIRIR
     MLIRFuncToLLVM
     MLIRLLVMDialect
+    MLIRArithDialect
     MLIRPass
 )
 
