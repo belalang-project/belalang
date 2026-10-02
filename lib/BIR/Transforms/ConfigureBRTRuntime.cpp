@@ -25,7 +25,6 @@ struct BelalangConfigureBRTRuntimePass
                     builder.getStringAttr(kGCPushRoots));
     module->setAttr(mlir::gc::kRuntimePopRootsAttrName,
                     builder.getStringAttr(kGCPopRoots));
-    insertBRTInitCall(module);
   }
 };
 

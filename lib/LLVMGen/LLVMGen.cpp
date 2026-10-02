@@ -16,9 +16,26 @@
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/Transforms/Instrumentation/ThreadSanitizer.h"
+#include "llvm/Transforms/Utils/ModuleUtils.h"
 
 namespace belalang {
 namespace llvmgen {
+
+namespace {
+bool insertBRTInitCall(llvm::Module &module) {
+  llvm::LLVMContext &ctx = module.getContext();
+  llvm::FunctionType *fnType = llvm::FunctionType::get(
+      llvm::Type::getVoidTy(ctx), /*isVarArg=*/false);
+  llvm::FunctionCallee callee = module.getOrInsertFunction("brt_init", fnType);
+
+  auto *init = llvm::dyn_cast<llvm::Function>(callee.getCallee());
+  if (!init)
+    return false;
+
+  llvm::appendToGlobalCtors(module, init, /*Priority=*/0);
+  return true;
+}
+} // namespace
 
 LLVMGen::LLVMGen(uintptr_t ptr) {
   auto op = reinterpret_cast<mlir::ModuleOp *>(ptr);
@@ -31,6 +48,7 @@ LLVMGen::LLVMGen(uintptr_t ptr) {
 
   llvmModule = mlir::translateModuleToLLVMIR(*op, llvmCtx);
   assert(llvmModule && "translation to LLVM IR failed.");
+  assert(insertBRTInitCall(*llvmModule) && "insertBRTInitCall failed");
 }
 
 void LLVMGen::compileObjFile(llvm::StringRef outfile, SanitizerKind san) const {

@@ -9,8 +9,6 @@
 // CHECK-DAG: %bel.String = type { ptr, i64 }
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 // CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
-// CHECK-DAG: declare void @brt_init()
-// CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define %bel.String @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
@@ -36,8 +34,6 @@ bir.func @main() -> !bir.string {
 // CHECK-DAG: @str.[[H:.*]] = private constant [5 x i8] c"hello"
 // CHECK-DAG: declare ptr @brt_gc_alloc_layout(i64, i64, ptr)
 // CHECK-DAG: declare void @brt_print_string(%bel.String)
-// CHECK-DAG: declare void @brt_init()
-// CHECK-DAG: @llvm.global_ctors {{.*}} ptr @ctor
 
 // CHECK-LABEL:define void @main() {
 // CHECK-NEXT:   %[[C1:.*]] = call ptr @brt_gc_alloc_layout(i64 16, i64 0, ptr null)
