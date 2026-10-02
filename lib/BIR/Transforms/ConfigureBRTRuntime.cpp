@@ -1,5 +1,5 @@
-#include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/Transforms/Passes.h"
+#include "belalang/Common/BRTUtils.h"
 #include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/IR/BuiltinOps.h"
 

@@ -1,3 +1,4 @@
+#include "belalang/Common/BRTUtils.h"
 #include "belalang/LLVMGen/LLVMGen.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
@@ -26,7 +27,7 @@ bool insertBRTInitCall(llvm::Module &module) {
   llvm::LLVMContext &ctx = module.getContext();
   llvm::FunctionType *fnType = llvm::FunctionType::get(
       llvm::Type::getVoidTy(ctx), /*isVarArg=*/false);
-  llvm::FunctionCallee callee = module.getOrInsertFunction("brt_init", fnType);
+  llvm::FunctionCallee callee = module.getOrInsertFunction(kInit, fnType);
 
   auto *init = llvm::dyn_cast<llvm::Function>(callee.getCallee());
   if (!init)
