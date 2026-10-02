@@ -1,5 +1,4 @@
 add_library(BelalangBIR)
-target_sources(BelalangBIR PRIVATE BRTUtils.cpp)
 add_dependencies(BelalangBIR
   BelalangBIRIncGen
   BelalangBIRLoopOpInterfaceIncGen

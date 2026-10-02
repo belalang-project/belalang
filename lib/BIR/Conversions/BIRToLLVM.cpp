@@ -1,6 +1,6 @@
-#include "belalang/BIR/BRTUtils.h"
 #include "belalang/BIR/Conversions/Passes.h"
 #include "belalang/BIR/IR/BIR.h"
+#include "belalang/Common/BRTUtils.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/ConvertToLLVM/ToLLVMInterface.h"
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
@@ -1083,8 +1083,6 @@ struct BelalangBIRToLLVMPass
       BelalangBIRToLLVMPass>::BelalangBIRToLLVMPassBase;
 
   void runOnOperation() override {
-    insertBRTInitCall(mlir::cast<mlir::ModuleOp>(getOperation()));
-
     mlir::LLVMTypeConverter typeConverter(&getContext());
     configureBIRToLLVMTypeConverter(typeConverter);
 
