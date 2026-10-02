@@ -1,0 +1,13 @@
+# RUN: %belalang build --emit=llvm %s | %FileCheck %s
+
+# CHECK: @llvm.global_ctors = appending global [1 x
+# CHECK-SAME: ptr @brt_init
+
+# CHECK-LABEL: define i64 @main() {
+# CHECK-NEXT:    ret i64 0
+# CHECK-NEXT:  }
+
+# CHECK: declare void @brt_init()
+
+# Checks for BRT initialization.
+# Empty source should still initialize BRT.
