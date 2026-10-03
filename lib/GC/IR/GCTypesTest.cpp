@@ -38,6 +38,27 @@ TEST_F(GCTest, PtrTypeMatchesLLVMPointerDataLayout) {
             dataLayout.getTypeABIAlignment(llvmPtr));
 }
 
+TEST_F(GCTest, DerivedPtrTypeMatchesLLVMPointerDataLayout) {
+  DataLayout dataLayout = DataLayout::closest(module);
+  Type ptr = DerivedPtrType::get(&context, builder.getI64Type());
+  Type llvmPtr = LLVM::LLVMPointerType::get(&context);
+
+  EXPECT_EQ(dataLayout.getTypeSizeInBits(ptr),
+            dataLayout.getTypeSizeInBits(llvmPtr));
+  EXPECT_EQ(dataLayout.getTypeABIAlignment(ptr),
+            dataLayout.getTypeABIAlignment(llvmPtr));
+}
+
+TEST_F(GCTest, GetGCPointerPointee) {
+  Type pointee = builder.getI64Type();
+  Type ptr = PtrType::get(&context, pointee);
+  Type derivedPtr = DerivedPtrType::get(&context, pointee);
+
+  EXPECT_EQ(getGCPointerPointee(ptr), pointee);
+  EXPECT_EQ(getGCPointerPointee(derivedPtr), pointee);
+  EXPECT_FALSE(getGCPointerPointee(pointee));
+}
+
 TEST_F(GCTest, AllocaHasUninitializedPromotableSlot) {
   Type ptr = PtrType::get(&context, builder.getI64Type());
   AllocaOp alloca = AllocaOp::create(builder, getLoc(), ptr);
