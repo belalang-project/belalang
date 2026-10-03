@@ -1,6 +1,7 @@
 #include "mlir/Dialect/GC/IR/GC.h"
 #include "mlir/Dialect/GC/Passes.h"
 #include "mlir/IR/Dominance.h"
+#include "mlir/IR/PatternMatch.h"
 #include "mlir/IR/ValueRange.h"
 #include "mlir/Interfaces/FunctionInterfaces.h"
 #include "llvm/ADT/STLExtras.h"
@@ -15,18 +16,20 @@ namespace {
 
 using namespace mlir;
 
-static bool isLiveAcross(Value value, gc::AllocOp alloc,
+static bool isLiveAcross(Value value, gc::SafepointOpInterface safepoint,
                          DominanceInfo &dominance) {
-  if (!dominance.properlyDominates(value, alloc))
+  Operation *op = safepoint.getOperation();
+
+  if (!dominance.properlyDominates(value, op))
     return false;
 
   return llvm::any_of(value.getUses(), [&](OpOperand &use) {
-    return use.getOwner() != alloc.getOperation() &&
-           dominance.dominates(alloc.getOperation(), use.getOwner());
+    return use.getOwner() != op && dominance.dominates(op, use.getOwner());
   });
 }
 
-static Value findLiveDerivedPointer(FunctionOpInterface fn, gc::AllocOp alloc,
+static Value findLiveDerivedPointer(FunctionOpInterface fn,
+                                    gc::SafepointOpInterface safepoint,
                                     DominanceInfo &dominance) {
   Value liveDerivedPointer;
   fn->walk([&](Operation *op) {
@@ -34,7 +37,7 @@ static Value findLiveDerivedPointer(FunctionOpInterface fn, gc::AllocOp alloc,
       return;
     for (Value result : op->getResults()) {
       if (isa<gc::DerivedPtrType>(result.getType()) &&
-          isLiveAcross(result, alloc, dominance)) {
+          isLiveAcross(result, safepoint, dominance)) {
         liveDerivedPointer = result;
         return;
       }
@@ -47,7 +50,7 @@ static Value findLiveDerivedPointer(FunctionOpInterface fn, gc::AllocOp alloc,
   for (Block &block : fn.getFunctionBody()) {
     for (BlockArgument argument : block.getArguments()) {
       if (isa<gc::DerivedPtrType>(argument.getType()) &&
-          isLiveAcross(argument, alloc, dominance))
+          isLiveAcross(argument, safepoint, dominance))
         return argument;
     }
   }
@@ -56,38 +59,44 @@ static Value findLiveDerivedPointer(FunctionOpInterface fn, gc::AllocOp alloc,
 }
 
 struct GCPrepareSafepoints final
-    : public impl::GCPrepareSafepointsPassBase<GCPrepareSafepoints> {
-  using impl::GCPrepareSafepointsPassBase<
-      GCPrepareSafepoints>::GCPrepareSafepointsPassBase;
+    : impl::GCPrepareSafepointsPassBase<GCPrepareSafepoints> {
+  using Base::Base;
 
   void runOnOperation() override {
-    bool foundUnsupportedDerivedPointer = false;
+    bool failedPreparation = false;
+
     getOperation()->walk([&](FunctionOpInterface fn) {
-      if (foundUnsupportedDerivedPointer)
+      if (failedPreparation)
         return;
 
       DominanceInfo dominance(fn);
+      IRRewriter rewriter(&getContext());
 
-      llvm::SmallVector<gc::AllocOp> allocs;
-      fn->walk([&](gc::AllocOp alloc) { allocs.push_back(alloc); });
+      llvm::SmallVector<gc::SafepointOpInterface> safepoints;
+      fn->walk([&](Operation *op) {
+        if (auto safepoint = dyn_cast<gc::SafepointOpInterface>(op))
+          safepoints.push_back(safepoint);
+      });
 
-      for (gc::AllocOp alloc : allocs) {
-        if (findLiveDerivedPointer(fn, alloc, dominance)) {
-          alloc.emitOpError(
+      for (gc::SafepointOpInterface safepoint : safepoints) {
+        Operation *oldOp = safepoint.getOperation();
+
+        if (findLiveDerivedPointer(fn, safepoint, dominance)) {
+          oldOp->emitOpError(
               "does not support derived pointers live across safepoints");
-          foundUnsupportedDerivedPointer = true;
+          failedPreparation = true;
           return;
         }
 
         llvm::SmallSetVector<Value, 8> roots;
 
-        for (Value root : alloc.getRoots())
+        for (Value root : safepoint.getRoots())
           roots.insert(root);
 
         fn->walk([&](Operation *op) {
           for (Value result : op->getResults()) {
             if (isa<gc::PtrType>(result.getType()) &&
-                isLiveAcross(result, alloc, dominance))
+                isLiveAcross(result, safepoint, dominance))
               roots.insert(result);
           }
         });
@@ -95,40 +104,45 @@ struct GCPrepareSafepoints final
         for (Block &block : fn.getFunctionBody()) {
           for (BlockArgument argument : block.getArguments()) {
             if (isa<gc::PtrType>(argument.getType()) &&
-                isLiveAcross(argument, alloc, dominance))
+                isLiveAcross(argument, safepoint, dominance))
               roots.insert(argument);
           }
         }
 
-        llvm::SmallVector<Type> resultTypes = {alloc.getResult().getType()};
-        llvm::append_range(resultTypes,
-                           ValueRange(roots.getArrayRef()).getTypes());
+        FailureOr<gc::SafepointOpInterface>
+            prepared = safepoint.rebuildWithRoots(rewriter,
+                                                  roots.getArrayRef());
 
-        OpBuilder builder(alloc);
-        gc::AllocOp prepared = gc::AllocOp::create(
-            builder, alloc.getLoc(), resultTypes, roots.getArrayRef(),
-            alloc->getAttrs());
+        if (failed(prepared)) {
+          oldOp->emitOpError("failed to rebuild safepoint with live roots");
+          failedPreparation = true;
+          return;
+        }
+
+        Operation *preparedOp = prepared->getOperation();
 
         for (auto [root, reloc] : llvm::zip_equal(
-                 roots.getArrayRef(), prepared.getRelocatedRoots())) {
+                 roots.getArrayRef(), prepared->getRelocatedRoots())) {
           for (OpOperand *use : llvm::map_to_vector(
                    root.getUses(), [](OpOperand &use) { return &use; })) {
             Operation *owner = use->getOwner();
-            if (owner != alloc.getOperation() &&
-                owner != prepared.getOperation() &&
-                dominance.dominates(alloc.getOperation(), owner))
+            if (owner != oldOp && owner != preparedOp &&
+                dominance.dominates(oldOp, owner))
               use->set(reloc);
           }
         }
 
+        assert(oldOp->getNumResults() <= preparedOp->getNumResults() &&
+               "rebuilt safepoint dropped existing results");
+
         for (auto [oldResult, newResult] :
-             llvm::zip(alloc->getResults(), prepared->getResults()))
-          oldResult.replaceAllUsesWith(newResult);
-        alloc.erase();
+             llvm::zip(oldOp->getResults(), preparedOp->getResults()))
+          rewriter.replaceAllUsesWith(oldResult, newResult);
+        rewriter.eraseOp(oldOp);
       }
     });
 
-    if (foundUnsupportedDerivedPointer)
+    if (failedPreparation)
       signalPassFailure();
   }
 };
