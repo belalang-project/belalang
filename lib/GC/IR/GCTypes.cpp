@@ -36,5 +36,16 @@ uint64_t DerivedPtrType::getABIAlignment(const DataLayout &dataLayout,
       LLVM::LLVMPointerType::get(getContext()));
 }
 
+// -----------------------------------------------------------------------------
+// Utilities
+// -----------------------------------------------------------------------------
+
+Type getGCPointerPointee(Type type) {
+  return llvm::TypeSwitch<Type, Type>(type)
+      .Case<PtrType, DerivedPtrType>(
+          [](auto pointer) { return pointer.getPointee(); })
+      .Default(Type{});
+}
+
 } // namespace gc
 } // namespace mlir

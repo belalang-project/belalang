@@ -30,6 +30,8 @@ inline constexpr llvm::StringLiteral
 inline constexpr llvm::StringLiteral
     kRuntimePopRootsAttrName = "gc.runtime.pop_roots";
 
+mlir::Type getGCPointerPointee(mlir::Type type);
+
 } // namespace mlir::gc
 
 #endif // MLIR_DIALECT_GC_IR_GC_H_
