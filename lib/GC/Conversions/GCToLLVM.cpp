@@ -62,6 +62,9 @@ static void configureGCToLLVMTypeConverter(LLVMTypeConverter &c) {
   c.addConversion([](PtrType type) {
     return LLVM::LLVMPointerType::get(type.getContext());
   });
+  c.addConversion([](DerivedPtrType type) {
+    return LLVM::LLVMPointerType::get(type.getContext());
+  });
 }
 
 struct CallOpConversion final : OpConversionPattern<CallOp> {

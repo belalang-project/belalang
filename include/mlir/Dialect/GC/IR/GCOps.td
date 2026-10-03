@@ -161,14 +161,13 @@ def GC_StoreOp : GC_Op<"store", [
 
 def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
   Pure,
-  AllTypesMatch<["base", "result"]>,
 ]> {
   let arguments = (ins
     GC_PtrType:$base,
     Index:$offset);
 
   let results = (outs
-    GC_PtrType:$result);
+    GC_DerivedPtrType:$result);
 
   let assemblyFormat = [{
     $base `,` $offset attr-dict

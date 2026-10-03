@@ -8,6 +8,6 @@
 
 func.func @main(%a : !gc.ptr<i8>) {
   %off24 = arith.constant 24 : index
-  %b = gc.ptr_offset %a, %off24 : !gc.ptr<i8>, index -> !gc.ptr<i8>
+  %b = gc.ptr_offset %a, %off24 : !gc.ptr<i8>, index -> !gc.derived_ptr<i8>
   return
 }

@@ -1,6 +1,6 @@
 // RUN: %not %bir-opt --verify-roundtrip --split-input-file %s 2>&1 | %FileCheck %s
 
-// CHECK: error: 'gc.ptr_offset' op failed to verify that all of {base, result} have same type
+// CHECK: error: 'gc.ptr_offset' op result #0 must be derived_ptr, but got '!gc.ptr<i8>'
 
 func.func @main(%a : !gc.ptr<i32>) {
   %off24 = arith.constant 24 : index
