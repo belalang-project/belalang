@@ -178,16 +178,18 @@ def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
 
 def GC_PtrCastOp : GC_Op<"ptr_cast"> {
   let arguments = (ins
-    GC_PtrType:$source);
+    GC_AnyPtrType:$source);
 
   let results = (outs
-    GC_PtrType:$result);
+    GC_AnyPtrType:$result);
 
   let assemblyFormat = [{
     $source attr-dict
     `:` qualified(type($source))
     `->` qualified(type($result))
   }];
+
+  let hasVerifier = true;
 }
 
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_
