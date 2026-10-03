@@ -32,3 +32,13 @@ func.func @dead_derived_pointer(%derived : !gc.derived_ptr<i64>) {
   "test.use"(%object) : (!gc.ptr<i64>) -> ()
   return
 }
+
+// -----
+
+// CHECK-LABEL: func.func @preserve_discardable_attributes
+// CHECK:         %[[OBJ:.*]] = gc.alloc : !gc.ptr<i64> {test.marker = "preserved"}
+func.func @preserve_discardable_attributes() {
+  %object = gc.alloc : !gc.ptr<i64> {test.marker = "preserved"}
+  "test.use"(%object) : (!gc.ptr<i64>) -> ()
+  return
+}

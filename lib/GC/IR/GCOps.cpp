@@ -22,8 +22,9 @@ AllocOp::rebuildWithRoots(RewriterBase &rewriter, ValueRange roots) {
   for (Value root : roots)
     resultTypes.push_back(root.getType());
 
-  AllocOp rebuilt = AllocOp::create(rewriter, getLoc(), resultTypes, roots,
-                                    getProperties());
+  AllocOp rebuilt = AllocOp::create(
+      rewriter, getLoc(), resultTypes, roots, getProperties(),
+      getOperation()->getDiscardableAttrDictionary().getValue());
 
   return cast<SafepointOpInterface>(rebuilt.getOperation());
 }

@@ -3,8 +3,11 @@
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
+#include "mlir/IR/PatternMatch.h"
 #include "mlir/Interfaces/DataLayoutInterfaces.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
+
+#include "llvm/ADT/STLExtras.h"
 
 #include "gtest/gtest.h"
 
@@ -130,6 +133,39 @@ TEST_F(GCTest, AllocAllocatesPrimaryResult) {
             SideEffects::DefaultResource::get());
   EXPECT_TRUE(effects.front().getEffectOnFullRegion());
   EXPECT_TRUE(isOpTriviallyDead(alloc));
+}
+
+TEST_F(GCTest, AllocImplementsSafepointInterface) {
+  Type ptr = PtrType::get(&context, builder.getI64Type());
+  AllocaOp firstRoot = AllocaOp::create(builder, getLoc(), ptr);
+  AllocaOp secondRoot = AllocaOp::create(builder, getLoc(), ptr);
+  Type resultTypes[] = {ptr, ptr};
+  IntegerAttr size = builder.getI64IntegerAttr(8);
+  DenseI32ArrayAttr pointerOffsets = builder.getDenseI32ArrayAttr({0});
+  AllocOp alloc = AllocOp::create(builder, getLoc(), TypeRange(resultTypes),
+                                  size, pointerOffsets, ValueRange{firstRoot});
+  StringAttr marker = builder.getStringAttr("preserved");
+  alloc->setDiscardableAttr("test.marker", marker);
+
+  auto safepoint = cast<SafepointOpInterface>(alloc.getOperation());
+  ASSERT_EQ(safepoint.getRoots().size(), 1u);
+  EXPECT_EQ(safepoint.getRoots().front(), firstRoot.getResult());
+  ASSERT_EQ(safepoint.getRelocatedRoots().size(), 1u);
+
+  IRRewriter rewriter(&context);
+  SmallVector<Value> roots = {firstRoot.getResult(), secondRoot.getResult()};
+  FailureOr<SafepointOpInterface> rebuilt = safepoint.rebuildWithRoots(rewriter,
+                                                                       roots);
+
+  ASSERT_TRUE(succeeded(rebuilt));
+  auto rebuiltAlloc = cast<AllocOp>(rebuilt->getOperation());
+  EXPECT_EQ(rebuiltAlloc->getNextNode(), alloc.getOperation());
+  EXPECT_EQ(rebuiltAlloc.getSizeAttr(), size);
+  EXPECT_EQ(rebuiltAlloc.getPointerOffsetsAttr(), pointerOffsets);
+  EXPECT_EQ(rebuiltAlloc->getDiscardableAttr("test.marker"), marker);
+  EXPECT_EQ(rebuilt->getRoots().size(), roots.size());
+  EXPECT_EQ(rebuilt->getRelocatedRoots().size(), roots.size());
+  EXPECT_TRUE(llvm::equal(rebuilt->getRoots(), roots));
 }
 
 TEST_F(GCTest, AllocaAllocatesAutomaticStorage) {
