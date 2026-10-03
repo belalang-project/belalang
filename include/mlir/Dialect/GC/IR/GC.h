@@ -15,6 +15,7 @@
 #include "llvm/ADT/TypeSwitch.h"
 
 #include "mlir/Dialect/GC/IR/GCDialect.h.inc"
+#include "mlir/Dialect/GC/IR/GCInterfaces.h.inc"
 
 #define GET_TYPEDEF_CLASSES
 #include "mlir/Dialect/GC/IR/GCTypes.h.inc"

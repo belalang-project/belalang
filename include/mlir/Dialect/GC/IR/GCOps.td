@@ -2,6 +2,7 @@
 #define MLIR_DIALECT_GC_IR_GCOPS_TD_
 
 include "mlir/Dialect/GC/IR/GCDialect.td"
+include "mlir/Dialect/GC/IR/GCInterfaces.td"
 include "mlir/Dialect/GC/IR/GCTypes.td"
 
 include "mlir/Interfaces/CallInterfaces.td"
@@ -60,7 +61,8 @@ def GC_CallOp : GC_Op<"call", [CallOpInterface]> {
 }
 
 def GC_AllocOp : GC_Op<"alloc", [
-  TypesMatchWith<"", "roots", "relocated_roots", "$_self">
+  TypesMatchWith<"", "roots", "relocated_roots", "$_self">,
+  GC_SafepointOpInterface
 ]> {
   let builders = [
     OpBuilder<(ins "Type":$result), [{
