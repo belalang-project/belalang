@@ -10,4 +10,8 @@ set(LLVM_TARGET_DEFINITIONS GCOps.td)
 mlir_tablegen(GCOps.h.inc -gen-op-decls)
 mlir_tablegen(GCOps.cpp.inc -gen-op-defs)
 
+set(LLVM_TARGET_DEFINITIONS GCInterfaces.td)
+mlir_tablegen(GCInterfaces.h.inc -gen-op-interface-decls)
+mlir_tablegen(GCInterfaces.cpp.inc -gen-op-interface-defs)
+
 add_mlir_dialect_tablegen_target(MLIRGCIncGen)

@@ -3,6 +3,7 @@
 #include "mlir/IR/DialectImplementation.h"
 
 #include "mlir/Dialect/GC/IR/GCDialect.cpp.inc"
+#include "mlir/Dialect/GC/IR/GCInterfaces.cpp.inc"
 
 #define GET_TYPEDEF_CLASSES
 #include "mlir/Dialect/GC/IR/GCTypes.cpp.inc"
