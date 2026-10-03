@@ -17,6 +17,14 @@ def GC_SafepointOpInterface : OpInterface<"SafepointOpInterface"> {
       /*retTy=*/"::mlir::Operation::result_range",
       /*methodName=*/"getRelocatedRoots"
     >,
+    InterfaceMethod<
+      /*desc=*/[{}],
+      /*retTy=*/"::mlir::FailureOr<::mlir::gc::SafepointOpInterface>",
+      /*methodName=*/"rebuildWithRoots",
+      /*args=*/(ins
+        "::mlir::RewriterBase &":$rewriter,
+        "::mlir::ValueRange":$roots)
+    >,
   ];
 }
 

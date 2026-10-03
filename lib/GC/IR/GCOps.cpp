@@ -7,6 +7,28 @@ namespace mlir {
 namespace gc {
 
 // -----------------------------------------------------------------------------
+// AllocOp: SafepointOpInterface
+// -----------------------------------------------------------------------------
+
+FailureOr<SafepointOpInterface>
+AllocOp::rebuildWithRoots(RewriterBase &rewriter, ValueRange roots) {
+  OpBuilder::InsertionGuard guard(rewriter);
+  rewriter.setInsertionPoint(getOperation());
+
+  SmallVector<Type> resultTypes;
+  resultTypes.reserve(roots.size() + 1);
+
+  resultTypes.push_back(getResult().getType());
+  for (Value root : roots)
+    resultTypes.push_back(root.getType());
+
+  AllocOp rebuilt = AllocOp::create(rewriter, getLoc(), resultTypes, roots,
+                                    getProperties());
+
+  return cast<SafepointOpInterface>(rebuilt.getOperation());
+}
+
+// -----------------------------------------------------------------------------
 // AllocaOp: PromotableMemOpInterface
 // -----------------------------------------------------------------------------
 

@@ -62,7 +62,7 @@ def GC_CallOp : GC_Op<"call", [CallOpInterface]> {
 
 def GC_AllocOp : GC_Op<"alloc", [
   TypesMatchWith<"", "roots", "relocated_roots", "$_self">,
-  GC_SafepointOpInterface
+  DeclareOpInterfaceMethods<GC_SafepointOpInterface>
 ]> {
   let builders = [
     OpBuilder<(ins "Type":$result), [{
