@@ -33,4 +33,9 @@ def GC_DerivedPtrType : GC_Type<"DerivedPtr", "derived_ptr", [
   let assemblyFormat = "`<` $pointee `>`";
 }
 
+def GC_AnyPtrType : AnyTypeOf<[
+  GC_PtrType,
+  GC_DerivedPtrType,
+]>;
+
 #endif // MLIR_DIALECT_GC_IR_GCTYPES_TD_

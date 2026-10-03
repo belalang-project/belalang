@@ -163,7 +163,7 @@ def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
   Pure,
 ]> {
   let arguments = (ins
-    GC_PtrType:$base,
+    GC_AnyPtrType:$base,
     Index:$offset);
 
   let results = (outs
