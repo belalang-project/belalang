@@ -13,11 +13,22 @@ class GC_Type<string name, string typeMnemonic,
 def GC_PtrType : GC_Type<"Ptr", "ptr", [
   DeclareTypeInterfaceMethods<DataLayoutTypeInterface>
 ]> {
-  let summary = "Movable garbage-collected pointer";
+  let summary = "ptr";
 
   let parameters = (ins
     "::mlir::Type":$pointee
   );
+
+  let assemblyFormat = "`<` $pointee `>`";
+}
+
+def GC_DerivedPtrType : GC_Type<"DerivedPtr", "derived_ptr", [
+  DeclareTypeInterfaceMethods<DataLayoutTypeInterface>
+]> {
+  let summary = "derived_ptr";
+
+  let parameters = (ins
+    "::mlir::Type":$pointee);
 
   let assemblyFormat = "`<` $pointee `>`";
 }
