@@ -26,19 +26,59 @@ static bool isLiveAcross(Value value, gc::AllocOp alloc,
   });
 }
 
+static Value findLiveDerivedPointer(FunctionOpInterface fn, gc::AllocOp alloc,
+                                    DominanceInfo &dominance) {
+  Value liveDerivedPointer;
+  fn->walk([&](Operation *op) {
+    if (liveDerivedPointer)
+      return;
+    for (Value result : op->getResults()) {
+      if (isa<gc::DerivedPtrType>(result.getType()) &&
+          isLiveAcross(result, alloc, dominance)) {
+        liveDerivedPointer = result;
+        return;
+      }
+    }
+  });
+
+  if (liveDerivedPointer)
+    return liveDerivedPointer;
+
+  for (Block &block : fn.getFunctionBody()) {
+    for (BlockArgument argument : block.getArguments()) {
+      if (isa<gc::DerivedPtrType>(argument.getType()) &&
+          isLiveAcross(argument, alloc, dominance))
+        return argument;
+    }
+  }
+
+  return {};
+}
+
 struct GCPrepareSafepoints final
     : public impl::GCPrepareSafepointsPassBase<GCPrepareSafepoints> {
   using impl::GCPrepareSafepointsPassBase<
       GCPrepareSafepoints>::GCPrepareSafepointsPassBase;
 
   void runOnOperation() override {
+    bool foundUnsupportedDerivedPointer = false;
     getOperation()->walk([&](FunctionOpInterface fn) {
+      if (foundUnsupportedDerivedPointer)
+        return;
+
       DominanceInfo dominance(fn);
 
       llvm::SmallVector<gc::AllocOp> allocs;
       fn->walk([&](gc::AllocOp alloc) { allocs.push_back(alloc); });
 
       for (gc::AllocOp alloc : allocs) {
+        if (findLiveDerivedPointer(fn, alloc, dominance)) {
+          alloc.emitOpError(
+              "does not support derived pointers live across safepoints");
+          foundUnsupportedDerivedPointer = true;
+          return;
+        }
+
         llvm::SmallSetVector<Value, 8> roots;
 
         for (Value root : alloc.getRoots())
@@ -87,6 +127,9 @@ struct GCPrepareSafepoints final
         alloc.erase();
       }
     });
+
+    if (foundUnsupportedDerivedPointer)
+      signalPassFailure();
   }
 };
 

@@ -20,3 +20,15 @@ func.func @dead_root(%root : !gc.ptr<i64>) {
   "test.use"(%object) : (!gc.ptr<i64>) -> ()
   return
 }
+
+// -----
+
+// CHECK-LABEL: func.func @dead_derived_pointer
+// CHECK:         "test.use"(%arg0) : (!gc.derived_ptr<i64>) -> ()
+// CHECK-NEXT:    %[[OBJ:.*]] = gc.alloc : !gc.ptr<i64>
+func.func @dead_derived_pointer(%derived : !gc.derived_ptr<i64>) {
+  "test.use"(%derived) : (!gc.derived_ptr<i64>) -> ()
+  %object = gc.alloc : !gc.ptr<i64>
+  "test.use"(%object) : (!gc.ptr<i64>) -> ()
+  return
+}
