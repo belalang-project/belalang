@@ -120,12 +120,12 @@ def GC_LoadOp : GC_Op<"load", [
     "",
     "address",
     "result",
-    "::llvm::cast<::mlir::gc::PtrType>($_self).getPointee()"
+    "::mlir::gc::getGCPointerPointee($_self)"
   >,
   DeclareOpInterfaceMethods<PromotableMemOpInterface>
 ]> {
   let arguments = (ins
-    Arg<GC_PtrType, "", [MemRead]>:$address
+    Arg<GC_AnyPtrType, "", [MemRead]>:$address
   );
 
   let results = (outs
@@ -142,13 +142,13 @@ def GC_StoreOp : GC_Op<"store", [
     "",
     "address",
     "value",
-    "::llvm::cast<::mlir::gc::PtrType>($_self).getPointee()"
+    "::mlir::gc::getGCPointerPointee($_self)"
   >,
   DeclareOpInterfaceMethods<PromotableMemOpInterface>
 ]> {
   let arguments = (ins
     AnyType:$value,
-    Arg<GC_PtrType, "", [MemWrite]>:$address
+    Arg<GC_AnyPtrType, "", [MemWrite]>:$address
   );
 
   let results = (outs);
@@ -161,14 +161,13 @@ def GC_StoreOp : GC_Op<"store", [
 
 def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
   Pure,
-  AllTypesMatch<["base", "result"]>,
 ]> {
   let arguments = (ins
-    GC_PtrType:$base,
+    GC_AnyPtrType:$base,
     Index:$offset);
 
   let results = (outs
-    GC_PtrType:$result);
+    GC_DerivedPtrType:$result);
 
   let assemblyFormat = [{
     $base `,` $offset attr-dict
@@ -179,16 +178,18 @@ def GC_PtrOffsetOp : GC_Op<"ptr_offset", [
 
 def GC_PtrCastOp : GC_Op<"ptr_cast"> {
   let arguments = (ins
-    GC_PtrType:$source);
+    GC_AnyPtrType:$source);
 
   let results = (outs
-    GC_PtrType:$result);
+    GC_AnyPtrType:$result);
 
   let assemblyFormat = [{
     $source attr-dict
     `:` qualified(type($source))
     `->` qualified(type($result))
   }];
+
+  let hasVerifier = true;
 }
 
 #endif // MLIR_DIALECT_GC_IR_GCOPS_TD_

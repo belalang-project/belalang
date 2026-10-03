@@ -110,5 +110,22 @@ mlir::DeletionKind StoreOp::removeBlockingUses(
   return mlir::DeletionKind::Delete;
 }
 
+// -----------------------------------------------------------------------------
+// PtrCastOp
+// -----------------------------------------------------------------------------
+
+mlir::LogicalResult PtrCastOp::verify() {
+  mlir::Type sourceTy = getSource().getType();
+  mlir::Type resultTy = getResult().getType();
+
+  bool sourceIsDerived = isa<gc::DerivedPtrType>(sourceTy);
+  bool resultIsDerived = isa<gc::DerivedPtrType>(resultTy);
+
+  if (sourceIsDerived != resultIsDerived)
+    return emitOpError("must preserve whether the pointer is derived");
+
+  return success();
+}
+
 } // namespace gc
 } // namespace mlir
