@@ -37,7 +37,7 @@
             ];
             profile = ''
               export BRT_DIR="$PWD/build/brt/src"
-              export PATH="$PWD/build/bin/belalang:$PWD/build/tools/bir-opt:$PWD/build/tools/bir-tblgen:$PWD/build/tools/bir-translate:''${PATH}"
+              export PATH="$PWD/build/bin/belalang:$PWD/build/tools/bir-lsp-server:$PWD/build/tools/bir-opt:$PWD/build/tools/bir-tblgen:$PWD/build/tools/bir-translate:''${PATH}"
               export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [
                 pkgs.zlib
                 pkgs.libxml2
