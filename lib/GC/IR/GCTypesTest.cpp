@@ -69,7 +69,7 @@ TEST_F(GCTest, AllocaHasUninitializedPromotableSlot) {
   SmallVector<MemorySlot> slots = alloca.getPromotableSlots();
   ASSERT_EQ(slots.size(), 1u);
   EXPECT_EQ(slots.front().ptr, alloca.getResult());
-  EXPECT_EQ(slots.front().elemType, builder.getI64Type());
+  EXPECT_EQ(slots.front().valueType, builder.getI64Type());
   EXPECT_FALSE(alloca.getDefaultValue(slots.front(), builder));
 }
 

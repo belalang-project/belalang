@@ -53,11 +53,9 @@ LLVMGen::LLVMGen(uintptr_t ptr) {
 }
 
 void LLVMGen::compileObjFile(llvm::StringRef outfile, SanitizerKind san) const {
-  llvm::InitializeAllTargetInfos();
-  llvm::InitializeAllTargets();
-  llvm::InitializeAllTargetMCs();
-  llvm::InitializeAllAsmParsers();
-  llvm::InitializeAllAsmPrinters();
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmParser();
+  llvm::InitializeNativeTargetAsmPrinter();
 
   const auto triple = llvm::Triple(llvm::sys::getDefaultTargetTriple());
   llvmModule->setTargetTriple(triple);

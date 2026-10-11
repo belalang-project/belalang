@@ -58,7 +58,7 @@ bir.func @heap_not_promoted() {
 // CHECK:       bir.store
 bir.func @blocked_get_member() {
   %0 = bir.alloc_stack : !bir.ref<!bir.struct<"T", {!bir.int}>>
-  %1 = bir.get_member %0[0] {name = "x"} : !bir.ref<!bir.struct<"T", {!bir.int}>> -> !bir.ref<!bir.int>
+  %1 = bir.get_member %0[0] <name = "x"> : !bir.ref<!bir.struct<"T", {!bir.int}>> -> !bir.ref<!bir.int>
   %2 = bir.constant #bir.int<1> : !bir.int
   bir.store %2 to %1 : !bir.int to !bir.ref<!bir.int>
   bir.return

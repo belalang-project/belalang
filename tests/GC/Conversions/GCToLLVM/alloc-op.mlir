@@ -14,10 +14,7 @@ module attributes {
   // CHECK:         %[[OBJECT:.*]] = llvm.call @allocate(%[[SIZE]], %[[COUNT]], %[[OFFSETS]])
   // CHECK:         llvm.return %[[OBJECT]] : !llvm.ptr
   func.func @main() -> !gc.ptr<i64> {
-    %object = gc.alloc : !gc.ptr<i64> {
-      size = 8 : i64,
-      pointer_offsets = array<i32>
-    }
+    %object = gc.alloc : !gc.ptr<i64> <size = 8, pointer_offsets = []>
     return %object : !gc.ptr<i64>
   }
 }
@@ -43,10 +40,7 @@ module attributes {
   func.func @rooted(%root : !gc.ptr<i64>)
       -> (!gc.ptr<i64>, !gc.ptr<i64>) {
     %object, %relocated = gc.alloc
-        roots(%root : !gc.ptr<i64>) : !gc.ptr<i64> {
-      size = 8 : i64,
-      pointer_offsets = array<i32>
-    }
+        roots(%root : !gc.ptr<i64>) : !gc.ptr<i64> <size = 8, pointer_offsets = []>
     return %object, %relocated : !gc.ptr<i64>, !gc.ptr<i64>
   }
 }

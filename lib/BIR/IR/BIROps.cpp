@@ -373,10 +373,10 @@ llvm::SmallVector<mlir::MemorySlot> AllocStackOp::getPromotableSlots() {
 
 mlir::Value AllocStackOp::getDefaultValue(const mlir::MemorySlot &slot,
                                           mlir::OpBuilder &builder) {
-  mlir::TypedAttr attr = getDefaultAttr(getContext(), slot.elemType);
+  mlir::TypedAttr attr = getDefaultAttr(getContext(), slot.valueType);
   if (!attr)
     return {};
-  return bir::ConstantOp::create(builder, getLoc(), slot.elemType, attr);
+  return bir::ConstantOp::create(builder, getLoc(), slot.valueType, attr);
 }
 
 void AllocStackOp::handleBlockArgument(const mlir::MemorySlot &slot,
@@ -419,7 +419,7 @@ bool LoadOp::canUsesBeRemoved(
 
   mlir::Value blockingUse = (*blockingUses.begin())->get();
   return blockingUse == slot.ptr && getRef() == slot.ptr &&
-         getResult().getType() == slot.elemType;
+         getResult().getType() == slot.valueType;
 }
 
 mlir::DeletionKind LoadOp::removeBlockingUses(
@@ -458,7 +458,7 @@ bool StoreOp::canUsesBeRemoved(
 
   mlir::Value blockingUse = (*blockingUses.begin())->get();
   return blockingUse == slot.ptr && getDest() == slot.ptr &&
-         getSrc() != slot.ptr && getSrc().getType() == slot.elemType;
+         getSrc() != slot.ptr && getSrc().getType() == slot.valueType;
 }
 
 mlir::DeletionKind StoreOp::removeBlockingUses(

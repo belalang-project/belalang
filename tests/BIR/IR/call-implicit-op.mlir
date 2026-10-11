@@ -24,3 +24,18 @@ bir.func @argument_types_differs() {
   %1 = bir.call_indirect %0(%1) : (!bir.float) -> !bir.int
   bir.return
 }
+
+// -----
+
+// CHECK-LABEL: bir.func @call_attributes
+bir.func @call_attributes(%arg : !bir.int) -> !bir.int {
+  %callee = bir.func_expr : (!bir.int) -> !bir.int {
+  ^bb0(%input: !bir.int):
+    bir.return %input : !bir.int
+  }
+  // CHECK: bir.call_indirect %{{.*}}(%{{.*}}) <arg_attrs = [{test.arg = "input"}], res_attrs = [{test.res = "output"}]> {test.marker = "preserved"} : (!bir.int) -> !bir.int
+  %result = bir.call_indirect %callee(%arg)
+      <arg_attrs = [{test.arg = "input"}], res_attrs = [{test.res = "output"}]>
+      {test.marker = "preserved"} : (!bir.int) -> !bir.int
+  bir.return %result : !bir.int
+}
