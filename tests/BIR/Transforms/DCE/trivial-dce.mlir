@@ -29,7 +29,7 @@ bir.func @unused_constant() {
 // CHECK-NEXT: bir.return
 bir.func @unused_get_member() {
   %0 = bir.alloc_stack : !bir.ref<!bir.struct<"Point", {!bir.int, !bir.int}>>
-  %1 = bir.get_member %0[0] {name = "x"} : !bir.ref<!bir.struct<"Point", {!bir.int, !bir.int}>> -> !bir.ref<!bir.int>
+  %1 = bir.get_member %0[0] <name = "x"> : !bir.ref<!bir.struct<"Point", {!bir.int, !bir.int}>> -> !bir.ref<!bir.int>
   bir.return
 }
 

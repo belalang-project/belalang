@@ -83,7 +83,7 @@ bool LoadOp::canUsesBeRemoved(
 
   mlir::Value blockingUse = (*blockingUses.begin())->get();
   return blockingUse == slot.ptr && getAddress() == slot.ptr &&
-         getResult().getType() == slot.elemType;
+         getResult().getType() == slot.valueType;
 }
 
 mlir::DeletionKind LoadOp::removeBlockingUses(
@@ -122,7 +122,7 @@ bool StoreOp::canUsesBeRemoved(
 
   mlir::Value blockingUse = (*blockingUses.begin())->get();
   return blockingUse == slot.ptr && getAddress() == slot.ptr &&
-         getValue() != slot.ptr && getValue().getType() == slot.elemType;
+         getValue() != slot.ptr && getValue().getType() == slot.valueType;
 }
 
 mlir::DeletionKind StoreOp::removeBlockingUses(

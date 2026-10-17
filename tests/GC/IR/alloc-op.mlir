@@ -38,3 +38,15 @@ func.func @multiple_roots() -> (!gc.ptr<i64>, !gc.ptr<f64>) {
       roots(%i64, %f64 : !gc.ptr<i64>, !gc.ptr<f64>) : !gc.ptr<i1>
   return %i64_next, %f64_next : !gc.ptr<i64>, !gc.ptr<f64>
 }
+
+// -----
+
+// CHECK-LABEL: func.func @layout
+// CHECK-NEXT:    %[[VALUE:.*]] = gc.alloc : !gc.ptr<i64> <size = 24, pointer_offsets = [0, 16]> {test.marker = "preserved"}
+// CHECK-NEXT:    return %[[VALUE]] : !gc.ptr<i64>
+func.func @layout() -> !gc.ptr<i64> {
+  %value = gc.alloc : !gc.ptr<i64>
+      <size = 24, pointer_offsets = [0, 16]>
+      {test.marker = "preserved"}
+  return %value : !gc.ptr<i64>
+}

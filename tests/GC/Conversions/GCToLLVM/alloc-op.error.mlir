@@ -15,9 +15,6 @@ module {
 // CHECK: error: 'gc.alloc' op requires GC runtime symbol configuration on the parent module
 
 func.func @test() -> !gc.ptr<i64> {
-  %p = gc.alloc : !gc.ptr<i64> {
-    size = 8 : i64,
-    pointer_offsets = array<i32>
-  }
+  %p = gc.alloc : !gc.ptr<i64> <size = 8, pointer_offsets = []>
   return %p : !gc.ptr<i64>
 }

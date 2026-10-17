@@ -1,4 +1,5 @@
 add_library(BelalangLLVMGen LLVMGen.cpp)
+llvm_map_components_to_libnames(BELALANG_NATIVE_TARGET_LIBS native)
 target_link_libraries(BelalangLLVMGen
   PUBLIC
     BelalangBIR
@@ -13,10 +14,7 @@ target_link_libraries(BelalangLLVMGen
     LLVMSupport
     LLVMTarget
     LLVMTargetParser
-    LLVMX86AsmParser
-    LLVMX86CodeGen
-    LLVMX86Desc
-    LLVMX86Info
+    ${BELALANG_NATIVE_TARGET_LIBS}
     MLIRBuiltinToLLVMIRTranslation
     MLIRIR
     MLIRLLVMDialect

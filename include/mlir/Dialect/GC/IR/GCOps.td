@@ -55,7 +55,7 @@ def GC_CallOp : GC_Op<"call", [CallOpInterface]> {
   }];
 
   let assemblyFormat = [{
-    $callee `(` $operands `)` attr-dict `:`
+    $callee `(` $operands `)` prop-dict attr-dict `:`
     functional-type($operands, results)
   }];
 }
@@ -91,7 +91,7 @@ def GC_AllocOp : GC_Op<"alloc", [
   let assemblyFormat = [{
     (`roots` `(` $roots^ `:` type($roots) `)`)?
     `:` qualified(type($result))
-    attr-dict
+    prop-dict attr-dict
   }];
 }
 

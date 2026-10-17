@@ -309,7 +309,7 @@ def BIR_CallIndirectOp : BIR_Op<"call_indirect", [
 
   let results = (outs Variadic<AnyType>:$results);
 
-  let assemblyFormat = "$callee `(` $callee_operands `)` attr-dict `:` type($callee)";
+  let assemblyFormat = "$callee `(` $callee_operands `)` prop-dict attr-dict `:` type($callee)";
 
   let extraClassDeclaration = [{
     operand_range getArgOperands() {
@@ -534,7 +534,7 @@ def BIR_GetMemberOp : BIR_Op<"get_member", [Pure]> {
   );
 
   let assemblyFormat = [{
-    $addr `[` $index_attr `]` attr-dict
+    $addr `[` $index_attr `]` prop-dict attr-dict
     `:` qualified(type($addr)) `->` qualified(type($result))
   }];
 }
